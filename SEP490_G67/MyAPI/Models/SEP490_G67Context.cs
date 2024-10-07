@@ -715,9 +715,13 @@ namespace MyAPI.Models
                     .HasColumnType("decimal(18, 2)")
                     .HasColumnName("price_promotion");
 
-                entity.Property(e => e.Reason)
-                    .HasMaxLength(50)
-                    .HasColumnName("reason");
+                entity.Property(e => e.Description)
+                    .HasMaxLength(255)
+                    .HasColumnName("description");
+
+                entity.Property(e => e.Note)
+                   .HasMaxLength(255)
+                   .HasColumnName("note");
 
                 entity.Property(e => e.SeatCode).HasMaxLength(50);
 

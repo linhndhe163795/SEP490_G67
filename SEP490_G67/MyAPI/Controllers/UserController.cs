@@ -15,7 +15,6 @@ namespace MyAPI.Controllers
         {
             _userRepository = userRepository;
         }
-
         [HttpGet]
         public IActionResult GetAll()
         {

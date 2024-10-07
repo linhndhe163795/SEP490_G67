@@ -21,7 +21,8 @@ namespace MyAPI.Models
         public string? PointEnd { get; set; }
         public DateTime? TimeFrom { get; set; }
         public DateTime? TimeTo { get; set; }
-        public string? Reason { get; set; }
+        public string? Description { get; set; }
+        public string? Note { get; set; }
         public int? UserId { get; set; }
         public int? VehicleId { get; set; }
         public int? TripId { get; set; }
