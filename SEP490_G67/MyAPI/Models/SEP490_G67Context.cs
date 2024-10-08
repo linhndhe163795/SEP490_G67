@@ -120,7 +120,7 @@ namespace MyAPI.Models
             modelBuilder.Entity<HistoryRentDriver>(entity =>
             {
                 entity.HasKey(e => e.HistoryId)
-                    .HasName("PK__HistoryR__096AA2E994822938");
+                    .HasName("PK__HistoryR__096AA2E968F1B19E");
 
                 entity.ToTable("HistoryRentDriver");
 
@@ -160,7 +160,7 @@ namespace MyAPI.Models
             modelBuilder.Entity<HistoryRentVehicle>(entity =>
             {
                 entity.HasKey(e => e.HistoryId)
-                    .HasName("PK__HistoryR__096AA2E9ADEA6D06");
+                    .HasName("PK__HistoryR__096AA2E959CC6ACC");
 
                 entity.ToTable("HistoryRentVehicle");
 
@@ -471,7 +471,7 @@ namespace MyAPI.Models
             modelBuilder.Entity<PromotionUser>(entity =>
             {
                 entity.HasKey(e => new { e.UserId, e.PromotionId })
-                    .HasName("PK__Promotio__1B75A259692AF584");
+                    .HasName("PK__Promotio__1B75A259E09821C0");
 
                 entity.ToTable("PromotionUser");
 
@@ -623,7 +623,7 @@ namespace MyAPI.Models
             modelBuilder.Entity<StopPoinTrip>(entity =>
             {
                 entity.HasKey(e => new { e.TripId, e.StopPointId })
-                    .HasName("PK__StopPoin__31BD6D9A0CBFD61E");
+                    .HasName("PK__StopPoin__31BD6D9A9642E275");
 
                 entity.ToTable("StopPoinTrip");
 
@@ -659,7 +659,7 @@ namespace MyAPI.Models
             modelBuilder.Entity<StopPoint>(entity =>
             {
                 entity.HasKey(e => e.TripId)
-                    .HasName("PK__StopPoin__302A5D9E267FA0E9");
+                    .HasName("PK__StopPoin__302A5D9ECCB40ACB");
 
                 entity.ToTable("StopPoint");
 
@@ -699,6 +699,14 @@ namespace MyAPI.Models
 
                 entity.Property(e => e.CreatedBy).HasColumnName("created_by");
 
+                entity.Property(e => e.Description)
+                    .HasMaxLength(255)
+                    .HasColumnName("description");
+
+                entity.Property(e => e.Note)
+                    .HasMaxLength(255)
+                    .HasColumnName("note");
+
                 entity.Property(e => e.PointEnd)
                     .HasMaxLength(255)
                     .HasColumnName("point_end");
@@ -714,14 +722,6 @@ namespace MyAPI.Models
                 entity.Property(e => e.PricePromotion)
                     .HasColumnType("decimal(18, 2)")
                     .HasColumnName("price_promotion");
-
-                entity.Property(e => e.Description)
-                    .HasMaxLength(255)
-                    .HasColumnName("description");
-
-                entity.Property(e => e.Note)
-                   .HasMaxLength(255)
-                   .HasColumnName("note");
 
                 entity.Property(e => e.SeatCode).HasMaxLength(50);
 
@@ -902,13 +902,17 @@ namespace MyAPI.Models
             {
                 entity.ToTable("User");
 
-                entity.HasIndex(e => e.Email, "UQ__User__AB6E616420E2D4BC")
+                entity.HasIndex(e => e.Email, "UQ__User__AB6E61648AA6B76E")
                     .IsUnique();
 
-                entity.HasIndex(e => e.Username, "UQ__User__F3DBC572EB072896")
+                entity.HasIndex(e => e.Username, "UQ__User__F3DBC5722847644C")
                     .IsUnique();
 
                 entity.Property(e => e.Id).HasColumnName("id");
+
+                entity.Property(e => e.ActiveCode)
+                    .HasMaxLength(255)
+                    .HasColumnName("activeCode");
 
                 entity.Property(e => e.Address)
                     .HasMaxLength(255)
@@ -1010,7 +1014,7 @@ namespace MyAPI.Models
             modelBuilder.Entity<UserRole>(entity =>
             {
                 entity.HasKey(e => new { e.UserId, e.RoleId })
-                    .HasName("PK__UserRole__6EDEA153E8BC5BC5");
+                    .HasName("PK__UserRole__6EDEA153392064D8");
 
                 entity.ToTable("UserRole");
 

@@ -4,12 +4,12 @@ namespace MyAPI.Infrastructure.Interfaces
 {
     public interface IRepository<T>
     {
-        T Add (T entity);
-        T Delete (T entity);
-        T Get (int id);
-        T Update (T entity);
-        IEnumerable<T> GetAll ();   
-        IEnumerable<T> Find(Expression<Func<T, bool>> predicate);
-        void SaveChange();
+        Task<T> Add (T entity);
+        Task<T> Delete (T entity);
+        Task<T> Get (int id);
+        Task<T> Update (T entity);
+        Task<IEnumerable<T>> GetAll();
+        Task<IEnumerable<T>> Find(Expression<Func<T, bool>> predicate);
+        Task SaveChange();
     }
 }

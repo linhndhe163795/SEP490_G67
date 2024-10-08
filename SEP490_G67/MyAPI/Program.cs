@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using MyAPI.Helper;
 using MyAPI.Infrastructure.Interfaces;
 using MyAPI.MappingProfile;
 using MyAPI.Models;
@@ -19,7 +20,12 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<SEP490_G67Context>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddScoped<IRepository<User>, UserRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IUserRoleRepository, UserRoleRepository>();
 builder.Services.AddAutoMapper(typeof(AutoMappings));
+builder.Services.AddScoped<HashPassword>();
+builder.Services.AddScoped<SendMail>();
+
 builder.Services.AddAuthentication(opt =>
 {
     opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
