@@ -1,13 +1,18 @@
 ﻿using MyAPI.DTOs;
+using MyAPI.DTOs.UserDTOs;
 using MyAPI.Models;
 
 namespace MyAPI.Infrastructure.Interfaces
 {
     public interface IUserRepository : IRepository<User>
     {
-        bool checkAccountExsit(UserRegisterDTO userRegisterDTO);
+        Task<bool> checkAccountExsit(User user);
         Task<User> Register(UserRegisterDTO userRegisterDTO);
         Task<int> lastIdUser();
+        Task<bool> confirmCode(ConfirmCode confirmCode);
+        Task<bool> checkLogin(UserLoginDTO userLoginDTO);
+        Task ForgotPassword(ForgotPasswordDTO forgotPassword);
+        Task ResetPassword(ResetPasswordDTO resetPasswordDTO);
 
     }
 }

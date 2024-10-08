@@ -1,4 +1,4 @@
-﻿namespace MyAPI.DTOs
+﻿namespace MyAPI.DTOs.UserDTOs
 {
     public class UserRegisterDTO
     {
@@ -9,6 +9,9 @@
         public string? Password { get; set; }
         public DateTime? Dob { get; set; }
         public bool? Status { get; set; }
+        public string? ActiveCode { get; set; }
+        public DateTime? UpdateAt { get; set; } 
+        public DateTime? CreatedAt { get; set; }
 
     }
 }

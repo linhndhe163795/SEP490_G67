@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using MyAPI.DTOs;
+using MyAPI.DTOs.UserDTOs;
 using MyAPI.Helper;
 using MyAPI.Infrastructure.Interfaces;
 using MyAPI.Models;
@@ -16,44 +17,113 @@ namespace MyAPI.Controllers
         private readonly IUserRoleRepository _userRoleRepository;
         private readonly SendMail _sendMail;
         private readonly IMapper _mapper;
-        public AuthController(IUserRepository userRepository, IUserRoleRepository userRoleRepository,SendMail sendMail ,IMapper mapper) 
+        public AuthController(IUserRepository userRepository, IUserRoleRepository userRoleRepository, SendMail sendMail, IMapper mapper)
         {
             _mapper = mapper;
             _sendMail = sendMail;
             _userRoleRepository = userRoleRepository;
-            _userRepository =  userRepository;  
+            _userRepository = userRepository;
         }
         [HttpPost]
         public async Task<IActionResult> Register(UserRegisterDTO user)
         {
-            bool checkAccount = _userRepository.checkAccountExsit(user);
-            var userMapper = _mapper.Map<User>(user);
-            if (!checkAccount)
+            try
             {
-                var verifyCode = _sendMail.GenerateVerificationCode(4);
-                SendMailDTO sendMailDTO = new()
-                {
-                    FromEmail = "duclinh5122002@gmail.com",
-                    Password = "jetj haze ijdw euci",
-                    ToEmail = user.Email,
-                    Subject = "Verify Code",
-                    Body = verifyCode,
-                };
-                if (await _sendMail.SendEmail(sendMailDTO)) 
+                var userMapper = _mapper.Map<User>(user);
+                bool checkAccount = await _userRepository.checkAccountExsit(userMapper);
+                if (!checkAccount)
                 {
                     await _userRepository.Register(user);
+                    var lastIdUser = _userRepository.lastIdUser();
+                    UserRole ur = new UserRole
+                    {
+                        RoleId = 3,
+                        Status = true,
+                        UserId = lastIdUser.Result
+                    };
+                    await _userRoleRepository.Add(ur);
+                    return Ok(user);
                 }
-                var lastIdUser = _userRepository.lastIdUser();
-                UserRole ur = new UserRole
-                {
-                    RoleId = 3,
-                    Status = true,
-                    UserId = lastIdUser.Result
-                };
-                await _userRoleRepository.Add(ur);
-                return Ok(user);
+                return BadRequest("ton tai account");
             }
-            return BadRequest("ton tai account");
+            catch (Exception ex)
+            {
+                throw new Exception("Register Failed " + ex.Message);
+            }
+
         }
+        [HttpPost("confirm")]
+        public async Task<IActionResult> Confirm(ConfirmCode code)
+        {
+            try
+            {
+                var user = await _userRepository.confirmCode(code);
+                if (user)
+                {
+                    return Ok();
+                }
+                return Ok("Incorrect code");
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Failed Confirm: " + ex.Message);
+            }
+        }
+        [HttpPost("login")]
+        public async Task<IActionResult> Login(UserLoginDTO userLogin)
+        {
+            try
+            {
+                if (await _userRepository.checkLogin(userLogin))
+                {
+                    return Ok("Login Successfull");
+                }
+                else
+                {
+                    return NotFound("Incorrect Email or Password");
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Login Failed" + ex.Message);
+            }
+        }
+        [HttpPost("ForgotPassword")]
+        public async Task<IActionResult> ForgotPassword(ForgotPasswordDTO forgotPassword)
+        {
+            try
+            {
+                var userMapper = _mapper.Map<User>(forgotPassword);
+                if (await _userRepository.checkAccountExsit(userMapper))
+                {
+                    await _userRepository.ForgotPassword(forgotPassword);
+                    return Ok();
+                }
+                else
+                {
+                    return NotFound("Not found account");
+                }
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Failed: " + ex.Message);
+            }
+        }
+        [HttpPost("ResetPassword")]
+        public async Task<IActionResult> ResetPassword(ResetPasswordDTO resetPasswordDTO)
+        {
+            try
+            {
+                await _userRepository.ResetPassword(resetPasswordDTO);
+                return Ok("Change Password successfully!");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+                throw new Exception("Failed " + ex.Message);
+            }
+        }
+
     }
 }

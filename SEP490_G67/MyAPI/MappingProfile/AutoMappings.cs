@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using MyAPI.DTOs;
+using MyAPI.DTOs.UserDTOs;
 using MyAPI.Models;
 
 namespace MyAPI.MappingProfile
@@ -9,6 +9,7 @@ namespace MyAPI.MappingProfile
         public AutoMappings() 
         {
             CreateMap<User, UserRegisterDTO>().ReverseMap();
+            CreateMap<User, ForgotPasswordDTO>().ReverseMap();
         }
     }
 }
