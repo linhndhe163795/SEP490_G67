@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using MyAPI.DTOs;
+using MyAPI.Models;
 
 namespace MyAPI.MappingProfile
 {
@@ -6,7 +8,7 @@ namespace MyAPI.MappingProfile
     {
         public AutoMappings() 
         {
-        
+            CreateMap<User, UserRegisterDTO>().ReverseMap();
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using MyAPI.Infrastructure.Interfaces;
+﻿using Microsoft.EntityFrameworkCore;
+using MyAPI.Infrastructure.Interfaces;
 using MyAPI.Models;
 using System.Linq.Expressions;
 
@@ -12,40 +13,45 @@ namespace MyAPI.Repositories.Impls
             _context = context;
         }
 
-        public T Add(T entity)
+        public async Task<T> Add(T entity)
         {
-            return _context.Add(entity).Entity;
+            _context.Add(entity);
+            await _context.SaveChangesAsync();  
+            return entity;
         }
 
-        public T Delete(T entity)
+        public async Task<T> Delete(T entity)
         {
-            return _context.Remove(entity).Entity;
+            _context.Remove(entity);
+            await _context.SaveChangesAsync();
+            return entity;
         }
 
-        public IEnumerable<T> Find(Expression<Func<T, bool>> predicate)
+        public async Task<IEnumerable<T>> Find(Expression<Func<T, bool>> predicate)
         {
-            return _context.Set<T>().AsQueryable().Where(predicate).ToList();
+            return await _context.Set<T>().AsQueryable().Where(predicate).ToListAsync();
         }
 
-        public T Get(int id)
+        public async Task<T> Get(int id)
         {
-            return _context.Find<T>(id);
+            return await _context.FindAsync<T>(id);
         }
 
-        public IEnumerable<T> GetAll()
+        public async Task<IEnumerable<T>> GetAll()
         {
-            return _context.Set<T>().ToList();
+            return await _context.Set<T>().ToListAsync();
         }
 
-        public void SaveChange()
+        public async Task SaveChange()
         {
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
 
-        public T Update(T entity)
+        public async Task<T> Update(T entity)
         {
-            return _context.Update(entity)
-               .Entity;
+             _context.Update(entity);
+            await _context.SaveChangesAsync();
+            return entity;
         }
     }
 }
