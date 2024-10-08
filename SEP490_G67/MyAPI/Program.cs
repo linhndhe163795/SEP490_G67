@@ -22,6 +22,7 @@ builder.Services.AddDbContext<SEP490_G67Context>(options =>
 builder.Services.AddScoped<IRepository<User>, UserRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserRoleRepository, UserRoleRepository>();
+builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 builder.Services.AddAutoMapper(typeof(AutoMappings));
 builder.Services.AddScoped<HashPassword>();
 builder.Services.AddScoped<SendMail>();

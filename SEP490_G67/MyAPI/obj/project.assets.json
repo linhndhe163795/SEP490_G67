@@ -2638,19 +2638,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\Nhat Anh\\.nuget\\packages\\": {}
+    "C:\\Users\\trinh\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\Ky10\\SEP490_G67\\SEP490_G67\\MyAPI\\MyAPI.csproj",
+      "projectUniqueName": "C:\\Users\\trinh\\OneDrive\\Tài liệu\\GitHub\\SEP490_G67\\SEP490_G67\\MyAPI\\MyAPI.csproj",
       "projectName": "MyAPI",
-      "projectPath": "D:\\Ky10\\SEP490_G67\\SEP490_G67\\MyAPI\\MyAPI.csproj",
-      "packagesPath": "C:\\Users\\Nhat Anh\\.nuget\\packages\\",
-      "outputPath": "D:\\Ky10\\SEP490_G67\\SEP490_G67\\MyAPI\\obj\\",
+      "projectPath": "C:\\Users\\trinh\\OneDrive\\Tài liệu\\GitHub\\SEP490_G67\\SEP490_G67\\MyAPI\\MyAPI.csproj",
+      "packagesPath": "C:\\Users\\trinh\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\trinh\\OneDrive\\Tài liệu\\GitHub\\SEP490_G67\\SEP490_G67\\MyAPI\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\Nhat Anh\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\trinh\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -2675,8 +2675,9 @@
       "restoreAuditProperties": {
         "enableAudit": "true",
         "auditLevel": "low",
-        "auditMode": "direct"
-      }
+        "auditMode": "all"
+      },
+      "SdkAnalysisLevel": "9.0.100"
     },
     "frameworks": {
       "net6.0": {
@@ -2724,6 +2725,24 @@
         ],
         "assetTargetFallback": true,
         "warn": true,
+        "downloadDependencies": [
+          {
+            "name": "Microsoft.AspNetCore.App.Ref",
+            "version": "[6.0.32, 6.0.32]"
+          },
+          {
+            "name": "Microsoft.NETCore.App.Host.win-x64",
+            "version": "[6.0.32, 6.0.32]"
+          },
+          {
+            "name": "Microsoft.NETCore.App.Ref",
+            "version": "[6.0.32, 6.0.32]"
+          },
+          {
+            "name": "Microsoft.WindowsDesktop.App.Ref",
+            "version": "[6.0.32, 6.0.32]"
+          }
+        ],
         "frameworkReferences": {
           "Microsoft.AspNetCore.App": {
             "privateAssets": "none"
@@ -2732,8 +2751,30 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.300\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.100-preview.7.24407.12\\RuntimeIdentifierGraph.json"
       }
     }
-  }
+  },
+  "logs": [
+    {
+      "code": "NU1903",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "Package 'Microsoft.Data.SqlClient' 2.1.4 has a known high severity vulnerability, https://github.com/advisories/GHSA-98g6-xh36-x2p7",
+      "libraryId": "Microsoft.Data.SqlClient",
+      "targetGraphs": [
+        "net6.0"
+      ]
+    },
+    {
+      "code": "NU1904",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "Package 'System.Drawing.Common' 4.7.0 has a known critical severity vulnerability, https://github.com/advisories/GHSA-rxg9-xrhp-64gj",
+      "libraryId": "System.Drawing.Common",
+      "targetGraphs": [
+        "net6.0"
+      ]
+    }
+  ]
 }
