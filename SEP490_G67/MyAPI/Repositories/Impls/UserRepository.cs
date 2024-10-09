@@ -140,5 +140,88 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception("Invalid email or reset code.");
             }
         }
+
+        public async Task ChangePassword(ChangePasswordDTO changeEmailDTO)
+        {
+            try
+            {
+                var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == changeEmailDTO.CurrentEmail);
+                var sendMailDTO = new SendMailDTO
+                {
+                    FromEmail = "duclinh5122002@gmail.com",
+                    Password = "jetj haze ijdw euci",
+                    ToEmail = changeEmailDTO.CurrentEmail,
+                    Subject = "Đổi mật khẩu thành công",
+                    Body = "Mật khẩu của bạn đã được đổi thành công."
+                };
+
+                bool isSent = await _sendMail.SendEmail(sendMailDTO);
+                if (!isSent)
+                {
+                    throw new Exception("Cannot send notification.");
+                }
+
+                if (user == null)
+                {
+                    throw new Exception("Not exist user!");
+                }
+
+
+                var hashPassword = new HashPassword();
+                string hashedCurrentPassword = hashPassword.HashMD5Password(changeEmailDTO.OldPassword);
+
+
+                if (user.Password != hashedCurrentPassword)
+                {
+                    throw new Exception("Password is not correct");
+                }
+
+
+                user.Password = hashPassword.HashMD5Password(changeEmailDTO.NewPassword);
+                user.UpdateAt = DateTime.UtcNow;
+                user.UpdateBy = user.Id; 
+
+                
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Something wrong when change email:" + ex.Message);
+            }
+        }
+
+        public async Task<User> EditProfile(int userId, EditProfileDTO editProfileDTO)
+        {
+            try
+            {
+                var user = await _context.Users.FindAsync(userId);
+                if (user == null)
+                {
+                    throw new Exception("Not exist user.");
+                }
+
+                // Cập nhật thông tin người dùng
+                user.Username = editProfileDTO.Username;
+                user.Email = editProfileDTO.Email;
+                user.NumberPhone = editProfileDTO.NumberPhone;
+                user.Avatar = editProfileDTO.Avatar;
+                user.FullName = editProfileDTO.FullName;
+                user.Address = editProfileDTO.Address;
+                user.Dob = editProfileDTO.Dob;
+                user.UpdateAt = DateTime.UtcNow;
+                user.UpdateBy = userId; 
+
+                await _context.SaveChangesAsync();
+
+                return user;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Something wrong when update user information" + ex.Message);
+            }
+        }
+
+
+
     }
 }
