@@ -221,15 +221,27 @@ namespace MyAPI.Repositories.Impls
             }
         }
 
-        public async Task<User> GetUserLogin(UserLoginDTO userLogin)
+        public async Task<UserLoginDTO> GetUserLogin(UserLoginDTO userLogin)
         {
             try
             {
                 var hashedPassword = _hassPassword.HashMD5Password(userLogin.Password);
                 var user = await _context.Users
-               .FirstOrDefaultAsync(x =>
-               (x.Username == userLogin.Username || x.Email == userLogin.Email) && x.Password == hashedPassword && x.Status == true);
-
+                    .Include(x => x.UserRoles)
+                    .ThenInclude(ur => ur.Role)
+                    .Where(x =>
+                    (x.Username == userLogin.Username || x.Email == userLogin.Email) &&
+                    x.Password == hashedPassword &&
+                    x.Status == true)
+                    .Select(x => new UserLoginDTO
+                    {
+                        Email = x.Email,
+                        Id = x.Id,
+                        NumberPhone = x.NumberPhone,
+                        Password = x.Password,
+                        RoleName = string.Join(", ", x.UserRoles.Select(ur => ur.Role.RoleName)),
+                    })
+                    .FirstOrDefaultAsync();
                 return user != null ? user : throw new Exception();
             }
             catch (Exception ex)
