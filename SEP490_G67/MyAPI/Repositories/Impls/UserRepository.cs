@@ -179,9 +179,9 @@ namespace MyAPI.Repositories.Impls
 
                 user.Password = hashPassword.HashMD5Password(changeEmailDTO.NewPassword);
                 user.UpdateAt = DateTime.UtcNow;
-                user.UpdateBy = user.Id; 
+                user.UpdateBy = user.Id;
 
-                
+
                 await _context.SaveChangesAsync();
             }
             catch (Exception ex)
@@ -209,7 +209,7 @@ namespace MyAPI.Repositories.Impls
                 user.Address = editProfileDTO.Address;
                 user.Dob = editProfileDTO.Dob;
                 user.UpdateAt = DateTime.UtcNow;
-                user.UpdateBy = userId; 
+                user.UpdateBy = userId;
 
                 await _context.SaveChangesAsync();
 
@@ -221,7 +221,22 @@ namespace MyAPI.Repositories.Impls
             }
         }
 
+        public async Task<User> GetUserLogin(UserLoginDTO userLogin)
+        {
+            try
+            {
+                var hashedPassword = _hassPassword.HashMD5Password(userLogin.Password);
+                var user = await _context.Users
+               .FirstOrDefaultAsync(x =>
+               (x.Username == userLogin.Username || x.Email == userLogin.Email) && x.Password == hashedPassword && x.Status == true);
 
+                return user != null ? user : throw new Exception();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("GetUserLogin: " + ex.Message);
+            }
+        }
 
     }
 }

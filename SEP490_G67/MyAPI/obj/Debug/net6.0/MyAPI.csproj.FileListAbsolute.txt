@@ -224,3 +224,5 @@ D:\Learning\FPT ki 9\project do an code\SEP490_G67\SEP490_G67\MyAPI\obj\Debug\ne
 D:\Learning\FPT ki 9\project do an code\SEP490_G67\SEP490_G67\MyAPI\obj\Debug\net6.0\MyAPI.pdb
 D:\Learning\FPT ki 9\project do an code\SEP490_G67\SEP490_G67\MyAPI\obj\Debug\net6.0\MyAPI.genruntimeconfig.cache
 D:\Learning\FPT ki 9\project do an code\SEP490_G67\SEP490_G67\MyAPI\obj\Debug\net6.0\ref\MyAPI.dll
+D:\Ky10\SEP490_G67\SEP490_G67\MyAPI\bin\Debug\net6.0\Microsoft.Bcl.AsyncInterfaces.dll
+D:\Ky10\SEP490_G67\SEP490_G67\MyAPI\bin\Debug\net6.0\Microsoft.Bcl.TimeProvider.dll
