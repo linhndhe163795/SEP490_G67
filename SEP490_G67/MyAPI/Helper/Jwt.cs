@@ -14,7 +14,7 @@ namespace MyAPI.Helper
         {
             _configuration = configuration;
         }
-        public string CreateToken(User userLogin)
+        public string CreateToken(UserLoginDTO userLogin)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(_configuration["JWT:SecretKey"]);
@@ -23,7 +23,8 @@ namespace MyAPI.Helper
                 Subject = new ClaimsIdentity(new Claim[]
                 {
             new Claim(ClaimTypes.Email, userLogin.Email),
-            new Claim("ID", userLogin.Id.ToString())
+            new Claim("ID", userLogin.Id.ToString()),
+            new Claim(ClaimTypes.Role, userLogin.RoleName.ToString())
                 }),
                 IssuedAt = DateTime.UtcNow,
                 Issuer = _configuration["JWT:Issuer"],
