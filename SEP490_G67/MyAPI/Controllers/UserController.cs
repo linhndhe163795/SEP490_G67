@@ -29,11 +29,11 @@ namespace MyAPI.Controllers
                 await _userRepository.ChangePassword(changePasswordDTO);
 
                 
-                return Ok("Mật khẩu đã được đổi thành công.");
+                return Ok("Change password successfully");
             }
             catch (Exception ex)
             {
-                return StatusCode(500, "Đã xảy ra lỗi: " + ex.Message);
+                return StatusCode(500, "Error: " + ex.Message);
             }
         }
 
@@ -47,7 +47,7 @@ namespace MyAPI.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, "Đã xảy ra lỗi: " + ex.Message);
+                return StatusCode(500, "Erro:  " + ex.Message);
             }
         }
 
