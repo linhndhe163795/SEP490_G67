@@ -47,7 +47,7 @@ namespace MyAPI.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, "Erro:  " + ex.Message);
+                return StatusCode(500, "Error:  " + ex.Message);
             }
         }
 
