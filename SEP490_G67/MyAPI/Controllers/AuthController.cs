@@ -17,12 +17,14 @@ namespace MyAPI.Controllers
         private readonly IUserRoleRepository _userRoleRepository;
         private readonly SendMail _sendMail;
         private readonly IMapper _mapper;
-        public AuthController(IUserRepository userRepository, IUserRoleRepository userRoleRepository, SendMail sendMail, IMapper mapper)
+        private readonly Jwt _Jwt;
+        public AuthController(IUserRepository userRepository, Jwt Jwt, IUserRoleRepository userRoleRepository, SendMail sendMail, IMapper mapper)
         {
             _mapper = mapper;
             _sendMail = sendMail;
             _userRoleRepository = userRoleRepository;
             _userRepository = userRepository;
+            _Jwt = Jwt;
         }
         [HttpPost]
         public async Task<IActionResult> Register(UserRegisterDTO user)
@@ -76,7 +78,9 @@ namespace MyAPI.Controllers
             {
                 if (await _userRepository.checkLogin(userLogin))
                 {
-                    return Ok("Login Successfull");
+                    var getUserLogin = await _userRepository.GetUserLogin(userLogin);
+                    var tokenString = _Jwt.CreateToken(getUserLogin);
+                    return Ok(tokenString);
                 }
                 else
                 {
