@@ -10,6 +10,8 @@ namespace MyAPI.MappingProfile
         public AutoMappings() 
         {
             CreateMap<User, UserRegisterDTO>().ReverseMap();
+            CreateMap<UserLoginDTO, User>().ReverseMap();
+            CreateMap<Role, UserLoginDTO>().ReverseMap();
             CreateMap<User, ForgotPasswordDTO>().ReverseMap();
             CreateMap<User, AccountListDTO>().ReverseMap();
             CreateMap<Role, AccountRoleDTO>().ReverseMap();
