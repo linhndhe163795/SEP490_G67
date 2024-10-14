@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Ky10\\SEP490_G67\\SEP490_G67\\MyAPI\\MyAPI.csproj": {}
+    "D:\\Learning\\FPT ki 9\\project do an code\\SEP490_G67\\SEP490_G67\\MyAPI\\MyAPI.csproj": {}
   },
   "projects": {
-    "D:\\Ky10\\SEP490_G67\\SEP490_G67\\MyAPI\\MyAPI.csproj": {
+    "D:\\Learning\\FPT ki 9\\project do an code\\SEP490_G67\\SEP490_G67\\MyAPI\\MyAPI.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Ky10\\SEP490_G67\\SEP490_G67\\MyAPI\\MyAPI.csproj",
+        "projectUniqueName": "D:\\Learning\\FPT ki 9\\project do an code\\SEP490_G67\\SEP490_G67\\MyAPI\\MyAPI.csproj",
         "projectName": "MyAPI",
-        "projectPath": "D:\\Ky10\\SEP490_G67\\SEP490_G67\\MyAPI\\MyAPI.csproj",
-        "packagesPath": "C:\\Users\\Nhat Anh\\.nuget\\packages\\",
-        "outputPath": "D:\\Ky10\\SEP490_G67\\SEP490_G67\\MyAPI\\obj\\",
+        "projectPath": "D:\\Learning\\FPT ki 9\\project do an code\\SEP490_G67\\SEP490_G67\\MyAPI\\MyAPI.csproj",
+        "packagesPath": "C:\\Users\\Admin\\.nuget\\packages\\",
+        "outputPath": "D:\\Learning\\FPT ki 9\\project do an code\\SEP490_G67\\SEP490_G67\\MyAPI\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\Nhat Anh\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\Admin\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -22,7 +22,6 @@
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -35,11 +34,6 @@
           "warnAsError": [
             "NU1605"
           ]
-        },
-        "restoreAuditProperties": {
-          "enableAudit": "true",
-          "auditLevel": "low",
-          "auditMode": "direct"
         }
       },
       "frameworks": {
@@ -100,7 +94,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.300\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.203\\RuntimeIdentifierGraph.json"
         }
       }
     }
