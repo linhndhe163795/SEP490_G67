@@ -199,10 +199,10 @@ namespace MyAPI.Repositories.Impls
         {
             try
             {
-                // Lấy token từ header Authorization
+                
                 var token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
 
-                // Lấy userId từ token
+                
                 int userId = _tokenHelper.GetIdInHeader(token);
 
                 if (userId == -1)

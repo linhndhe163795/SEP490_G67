@@ -23,6 +23,8 @@ builder.Services.AddScoped<IRepository<User>, UserRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserRoleRepository, UserRoleRepository>();
 builder.Services.AddScoped<IAccountRepository, AccountRepository>();
+builder.Services.AddScoped<IDriverRepository, DriverRepository>();
+builder.Services.AddScoped<ITypeOfDriverRepository, TypeOfDriverRepository>();
 builder.Services.AddAutoMapper(typeof(AutoMappings));
 builder.Services.AddScoped<HashPassword>();
 builder.Services.AddScoped<SendMail>();
@@ -64,6 +66,7 @@ builder.Services.AddAuthentication(opt =>
     };
 });
 builder.Services.AddHealthChecks();
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using MyAPI.DTOs.AccountDTOs;
+using MyAPI.DTOs.DriverDTOs;
 using MyAPI.DTOs.UserDTOs;
 using MyAPI.Models;
 
@@ -15,6 +16,9 @@ namespace MyAPI.MappingProfile
             CreateMap<User, ForgotPasswordDTO>().ReverseMap();
             CreateMap<User, AccountListDTO>().ReverseMap();
             CreateMap<Role, AccountRoleDTO>().ReverseMap();
+            CreateMap<Driver, DriverDTO>().ReverseMap();
+            CreateMap<Driver, UpdateDriverDTO>().ReverseMap();
+
         }
     }
 }
