@@ -18,6 +18,8 @@ namespace MyAPI.MappingProfile
             CreateMap<Role, AccountRoleDTO>().ReverseMap();
             CreateMap<Driver, DriverDTO>().ReverseMap();
             CreateMap<Driver, UpdateDriverDTO>().ReverseMap();
+            CreateMap<TypeOfDriver, TypeOfDriverDTO>().ReverseMap();
+            CreateMap<TypeOfDriver, UpdateTypeOfDriverDTO>().ReverseMap();
 
         }
     }

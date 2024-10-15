@@ -53,55 +53,37 @@ namespace MyAPI.Controllers
                 return BadRequest("Invalid driver data");
             }
 
-            var driver = _mapper.Map<Driver>(updateDriverDto);
-
-            
-            var typeOfDriver = await _typeOfDriverRepository.Get(updateDriverDto.TypeOfDriver);
-            if (typeOfDriver == null)
+            try
             {
-                return BadRequest("Invalid TypeOfDriver ID");
+                var driver = await _driverRepository.CreateDriverAsync(updateDriverDto);
+                var createdDriverDto = _mapper.Map<UpdateDriverDTO>(driver);
+                return CreatedAtAction(nameof(GetDriverById), new { id = driver.Id }, createdDriverDto);
             }
-
-            driver.TypeOfDriver = typeOfDriver.Id;
-
-            await _driverRepository.Add(driver);
-            var createdDriverDto = _mapper.Map<UpdateDriverDTO>(driver);
-            return CreatedAtAction(nameof(GetDriverById), new { id = driver.Id }, createdDriverDto);
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
-
-
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateDriver(int id, [FromBody] UpdateDriverDTO UpdateDriverDto)
+        public async Task<IActionResult> UpdateDriver(int id, [FromBody] UpdateDriverDTO updateDriverDto)
         {
-            if (UpdateDriverDto == null)
+            if (updateDriverDto == null)
             {
                 return BadRequest("Invalid driver data");
             }
 
-            var existingDriver = await _driverRepository.Get(id);
-            if (existingDriver == null)
+            try
             {
-                return NotFound("Driver not found");
+                var existingDriver = await _driverRepository.UpdateDriverAsync(id, updateDriverDto);
+                return Ok(existingDriver);
             }
-
-            
-            existingDriver.UserName = UpdateDriverDto.UserName;
-            existingDriver.Name = UpdateDriverDto.Name;
-            existingDriver.NumberPhone = UpdateDriverDto.NumberPhone;
-            existingDriver.Avatar = UpdateDriverDto.Avatar;
-            existingDriver.Dob = UpdateDriverDto.Dob;
-            existingDriver.StatusWork = UpdateDriverDto.StatusWork;
-            existingDriver.TypeOfDriver = UpdateDriverDto.TypeOfDriver;
-            existingDriver.Status = UpdateDriverDto.Status;
-            existingDriver.VehicleId = UpdateDriverDto.VehicleId; 
-
-            existingDriver.UpdateAt = DateTime.UtcNow;
-
-            await _driverRepository.Update(existingDriver);
-
-            return Ok("Driver updated successfully");
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
+
 
 
         [HttpDelete("{id}")]
@@ -116,5 +98,9 @@ namespace MyAPI.Controllers
             await _driverRepository.Delete(driver);
             return Ok("Driver deleted successfully");
         }
+
+
+        
+
     }
 }

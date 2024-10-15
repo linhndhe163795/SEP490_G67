@@ -1,11 +1,9 @@
-﻿using MyAPI.DTOs;
-using MyAPI.DTOs.UserDTOs;
+﻿using MyAPI.DTOs.DriverDTOs;
+using MyAPI.Infrastructure.Interfaces;
 using MyAPI.Models;
 
-namespace MyAPI.Infrastructure.Interfaces
+public interface ITypeOfDriverRepository : IRepository<TypeOfDriver>
 {
-    public interface ITypeOfDriverRepository : IRepository<TypeOfDriver>
-    {
-
-    }
+    Task<TypeOfDriver> CreateTypeOfDriverAsync(UpdateTypeOfDriverDTO updateTypeOfDriverDto);
+    Task<TypeOfDriver> UpdateTypeOfDriverAsync(int id, UpdateTypeOfDriverDTO updateTypeOfDriverDto);
 }
