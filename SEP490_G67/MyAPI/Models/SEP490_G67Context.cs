@@ -744,9 +744,9 @@ namespace MyAPI.Models
                     .HasColumnType("decimal(18, 0)")
                     .HasColumnName("price");
 
-                entity.Property(e => e.StartDate)
+                entity.Property(e => e.StartTime)
                     .HasColumnType("date")
-                    .HasColumnName("start_date");
+                    .HasColumnName("start_time");
 
                 entity.Property(e => e.UpdateAt)
                     .HasColumnType("datetime")
