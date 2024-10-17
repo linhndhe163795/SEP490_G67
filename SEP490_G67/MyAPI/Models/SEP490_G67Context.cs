@@ -16,6 +16,7 @@ namespace MyAPI.Models
         {
         }
 
+        public virtual DbSet<ChangeTimeTrip> ChangeTimeTrips { get; set; } = null!;
         public virtual DbSet<Driver> Drivers { get; set; } = null!;
         public virtual DbSet<HistoryRentDriver> HistoryRentDrivers { get; set; } = null!;
         public virtual DbSet<HistoryRentVehicle> HistoryRentVehicles { get; set; } = null!;
@@ -30,9 +31,6 @@ namespace MyAPI.Models
         public virtual DbSet<Review> Reviews { get; set; } = null!;
         public virtual DbSet<Role> Roles { get; set; } = null!;
         public virtual DbSet<StatusPayment> StatusPayments { get; set; } = null!;
-        public virtual DbSet<StatusTrip> StatusTrips { get; set; } = null!;
-        public virtual DbSet<StopPoinTrip> StopPoinTrips { get; set; } = null!;
-        public virtual DbSet<StopPoint> StopPoints { get; set; } = null!;
         public virtual DbSet<Ticket> Tickets { get; set; } = null!;
         public virtual DbSet<Trip> Trips { get; set; } = null!;
         public virtual DbSet<TypeOfDriver> TypeOfDrivers { get; set; } = null!;
@@ -42,6 +40,8 @@ namespace MyAPI.Models
         public virtual DbSet<UserCancleTicket> UserCancleTickets { get; set; } = null!;
         public virtual DbSet<UserRole> UserRoles { get; set; } = null!;
         public virtual DbSet<Vehicle> Vehicles { get; set; } = null!;
+        public virtual DbSet<VehicleSeatStatus> VehicleSeatStatuses { get; set; } = null!;
+        public virtual DbSet<VehicleTrip> VehicleTrips { get; set; } = null!;
         public virtual DbSet<VehicleType> VehicleTypes { get; set; } = null!;
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -55,6 +55,44 @@ namespace MyAPI.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<ChangeTimeTrip>(entity =>
+            {
+                entity.ToTable("ChangeTimeTrip");
+
+                entity.Property(e => e.Id).HasColumnName("id");
+
+                entity.Property(e => e.CreatedAt)
+                    .HasColumnType("datetime")
+                    .HasColumnName("created_at");
+
+                entity.Property(e => e.CreatedBy).HasColumnName("created_by");
+
+                entity.Property(e => e.NewStartupdate)
+                    .HasColumnType("date")
+                    .HasColumnName("new_startupdate");
+
+                entity.Property(e => e.Reason)
+                    .HasColumnType("text")
+                    .HasColumnName("reason");
+
+                entity.Property(e => e.Status)
+                    .HasMaxLength(50)
+                    .HasColumnName("status");
+
+                entity.Property(e => e.TickedId).HasColumnName("ticked_id");
+
+                entity.Property(e => e.UpdateAt)
+                    .HasColumnType("datetime")
+                    .HasColumnName("update_at");
+
+                entity.Property(e => e.UpdateBy).HasColumnName("update_by");
+
+                entity.HasOne(d => d.Ticked)
+                    .WithMany(p => p.ChangeTimeTrips)
+                    .HasForeignKey(d => d.TickedId)
+                    .HasConstraintName("FK__ChangeTim__ticke__6FE99F9F");
+            });
+
             modelBuilder.Entity<Driver>(entity =>
             {
                 entity.ToTable("Driver");
@@ -120,7 +158,7 @@ namespace MyAPI.Models
             modelBuilder.Entity<HistoryRentDriver>(entity =>
             {
                 entity.HasKey(e => e.HistoryId)
-                    .HasName("PK__HistoryR__096AA2E968F1B19E");
+                    .HasName("PK__HistoryR__096AA2E928BDF41C");
 
                 entity.ToTable("HistoryRentDriver");
 
@@ -160,7 +198,7 @@ namespace MyAPI.Models
             modelBuilder.Entity<HistoryRentVehicle>(entity =>
             {
                 entity.HasKey(e => e.HistoryId)
-                    .HasName("PK__HistoryR__096AA2E959CC6ACC");
+                    .HasName("PK__HistoryR__096AA2E98C728821");
 
                 entity.ToTable("HistoryRentVehicle");
 
@@ -304,22 +342,22 @@ namespace MyAPI.Models
                 entity.HasOne(d => d.StatusPaymentNavigation)
                     .WithMany(p => p.Payments)
                     .HasForeignKey(d => d.StatusPayment)
-                    .HasConstraintName("FK__Payment__status___75A278F5");
+                    .HasConstraintName("FK__Payment__status___74AE54BC");
 
                 entity.HasOne(d => d.Ticket)
                     .WithMany(p => p.Payments)
                     .HasForeignKey(d => d.TicketId)
-                    .HasConstraintName("FK__Payment__ticket___72C60C4A");
+                    .HasConstraintName("FK__Payment__ticket___71D1E811");
 
                 entity.HasOne(d => d.TypeOfPaymentNavigation)
                     .WithMany(p => p.Payments)
                     .HasForeignKey(d => d.TypeOfPayment)
-                    .HasConstraintName("FK__Payment__type_of__74AE54BC");
+                    .HasConstraintName("FK__Payment__type_of__73BA3083");
 
                 entity.HasOne(d => d.User)
                     .WithMany(p => p.Payments)
                     .HasForeignKey(d => d.UserId)
-                    .HasConstraintName("FK__Payment__user_id__73BA3083");
+                    .HasConstraintName("FK__Payment__user_id__72C60C4A");
             });
 
             modelBuilder.Entity<PaymentRentDriver>(entity =>
@@ -471,7 +509,7 @@ namespace MyAPI.Models
             modelBuilder.Entity<PromotionUser>(entity =>
             {
                 entity.HasKey(e => new { e.UserId, e.PromotionId })
-                    .HasName("PK__Promotio__1B75A259E09821C0");
+                    .HasName("PK__Promotio__1B75A259F07041AD");
 
                 entity.ToTable("PromotionUser");
 
@@ -581,107 +619,6 @@ namespace MyAPI.Models
                 entity.Property(e => e.UpdateBy).HasColumnName("update_by");
             });
 
-            modelBuilder.Entity<StatusTrip>(entity =>
-            {
-                entity.ToTable("StatusTrip");
-
-                entity.Property(e => e.Id).HasColumnName("id");
-
-                entity.Property(e => e.CreatedAt)
-                    .HasColumnType("datetime")
-                    .HasColumnName("created_at");
-
-                entity.Property(e => e.CreatedBy).HasColumnName("created_by");
-
-                entity.Property(e => e.NewStartupdate)
-                    .HasColumnType("date")
-                    .HasColumnName("new_startupdate");
-
-                entity.Property(e => e.Reason)
-                    .HasColumnType("text")
-                    .HasColumnName("reason");
-
-                entity.Property(e => e.Status)
-                    .HasMaxLength(50)
-                    .IsUnicode(false)
-                    .HasColumnName("status");
-
-                entity.Property(e => e.TickedId).HasColumnName("ticked_id");
-
-                entity.Property(e => e.UpdateAt)
-                    .HasColumnType("datetime")
-                    .HasColumnName("update_at");
-
-                entity.Property(e => e.UpdateBy).HasColumnName("update_by");
-
-                entity.HasOne(d => d.Ticked)
-                    .WithMany(p => p.StatusTrips)
-                    .HasForeignKey(d => d.TickedId)
-                    .HasConstraintName("FK__StatusTri__ticke__6FE99F9F");
-            });
-
-            modelBuilder.Entity<StopPoinTrip>(entity =>
-            {
-                entity.HasKey(e => new { e.TripId, e.StopPointId })
-                    .HasName("PK__StopPoin__31BD6D9A9642E275");
-
-                entity.ToTable("StopPoinTrip");
-
-                entity.Property(e => e.TripId).HasColumnName("trip_id");
-
-                entity.Property(e => e.StopPointId).HasColumnName("stop_point_id");
-
-                entity.Property(e => e.CreatedAt)
-                    .HasColumnType("datetime")
-                    .HasColumnName("created_at");
-
-                entity.Property(e => e.CreatedBy).HasColumnName("created_by");
-
-                entity.Property(e => e.UpdateAt)
-                    .HasColumnType("datetime")
-                    .HasColumnName("update_at");
-
-                entity.Property(e => e.UpdateBy).HasColumnName("update_by");
-
-                entity.HasOne(d => d.StopPoint)
-                    .WithMany(p => p.StopPoinTrips)
-                    .HasForeignKey(d => d.StopPointId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__StopPoinT__stop___71D1E811");
-
-                entity.HasOne(d => d.Trip)
-                    .WithMany(p => p.StopPoinTrips)
-                    .HasForeignKey(d => d.TripId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__StopPoinT__trip___70DDC3D8");
-            });
-
-            modelBuilder.Entity<StopPoint>(entity =>
-            {
-                entity.HasKey(e => e.TripId)
-                    .HasName("PK__StopPoin__302A5D9ECCB40ACB");
-
-                entity.ToTable("StopPoint");
-
-                entity.Property(e => e.TripId).HasColumnName("trip_id");
-
-                entity.Property(e => e.CreatedAt)
-                    .HasColumnType("datetime")
-                    .HasColumnName("created_at");
-
-                entity.Property(e => e.CreatedBy).HasColumnName("created_by");
-
-                entity.Property(e => e.Location)
-                    .HasMaxLength(255)
-                    .HasColumnName("location");
-
-                entity.Property(e => e.UpdateAt)
-                    .HasColumnType("datetime")
-                    .HasColumnName("update_at");
-
-                entity.Property(e => e.UpdateBy).HasColumnName("update_by");
-            });
-
             modelBuilder.Entity<Ticket>(entity =>
             {
                 entity.ToTable("Ticket");
@@ -767,17 +704,12 @@ namespace MyAPI.Models
                 entity.HasOne(d => d.TypeOfTicketNavigation)
                     .WithMany(p => p.Tickets)
                     .HasForeignKey(d => d.TypeOfTicket)
-                    .HasConstraintName("FK__Ticket__type_of___6B24EA82");
+                    .HasConstraintName("FK__Ticket__type_of___6A30C649");
 
                 entity.HasOne(d => d.User)
                     .WithMany(p => p.Tickets)
                     .HasForeignKey(d => d.UserId)
-                    .HasConstraintName("FK__Ticket__user_id__6C190EBB");
-
-                entity.HasOne(d => d.Vehicle)
-                    .WithMany(p => p.Tickets)
-                    .HasForeignKey(d => d.VehicleId)
-                    .HasConstraintName("FK__Ticket__vehicle___6D0D32F4");
+                    .HasConstraintName("FK__Ticket__user_id__6B24EA82");
             });
 
             modelBuilder.Entity<Trip>(entity =>
@@ -793,12 +725,11 @@ namespace MyAPI.Models
                 entity.Property(e => e.CreatedBy).HasColumnName("created_by");
 
                 entity.Property(e => e.Description)
-                    .HasColumnType("text")
+                    .HasMaxLength(255)
                     .HasColumnName("description");
 
                 entity.Property(e => e.Name)
                     .HasMaxLength(255)
-                    .IsUnicode(false)
                     .HasColumnName("name");
 
                 entity.Property(e => e.PointEnd)
@@ -809,6 +740,10 @@ namespace MyAPI.Models
                     .HasMaxLength(255)
                     .HasColumnName("point_start");
 
+                entity.Property(e => e.Price)
+                    .HasColumnType("decimal(18, 0)")
+                    .HasColumnName("price");
+
                 entity.Property(e => e.StartDate)
                     .HasColumnType("date")
                     .HasColumnName("start_date");
@@ -818,13 +753,6 @@ namespace MyAPI.Models
                     .HasColumnName("update_at");
 
                 entity.Property(e => e.UpdateBy).HasColumnName("update_by");
-
-                entity.Property(e => e.VehicleId).HasColumnName("vehicle_id");
-
-                entity.HasOne(d => d.Vehicle)
-                    .WithMany(p => p.Trips)
-                    .HasForeignKey(d => d.VehicleId)
-                    .HasConstraintName("FK__Trip__vehicle_id__6A30C649");
             });
 
             modelBuilder.Entity<TypeOfDriver>(entity =>
@@ -840,7 +768,7 @@ namespace MyAPI.Models
                 entity.Property(e => e.CreatedBy).HasColumnName("created_by");
 
                 entity.Property(e => e.Description)
-                    .HasColumnType("text")
+                    .HasMaxLength(255)
                     .HasColumnName("description");
 
                 entity.Property(e => e.Status).HasColumnName("status");
@@ -902,10 +830,10 @@ namespace MyAPI.Models
             {
                 entity.ToTable("User");
 
-                entity.HasIndex(e => e.Email, "UQ__User__AB6E61648AA6B76E")
+                entity.HasIndex(e => e.Email, "UQ__User__AB6E6164CF1CCE38")
                     .IsUnique();
 
-                entity.HasIndex(e => e.Username, "UQ__User__F3DBC5722847644C")
+                entity.HasIndex(e => e.Username, "UQ__User__F3DBC5724A704CF3")
                     .IsUnique();
 
                 entity.Property(e => e.Id).HasColumnName("id");
@@ -998,23 +926,23 @@ namespace MyAPI.Models
                 entity.HasOne(d => d.Payment)
                     .WithMany(p => p.UserCancleTickets)
                     .HasForeignKey(d => d.PaymentId)
-                    .HasConstraintName("FK__UserCancl__payme__76969D2E");
+                    .HasConstraintName("FK__UserCancl__payme__75A278F5");
 
                 entity.HasOne(d => d.Ticket)
                     .WithMany(p => p.UserCancleTickets)
                     .HasForeignKey(d => d.TicketId)
-                    .HasConstraintName("FK__UserCancl__ticke__787EE5A0");
+                    .HasConstraintName("FK__UserCancl__ticke__778AC167");
 
                 entity.HasOne(d => d.User)
                     .WithMany(p => p.UserCancleTickets)
                     .HasForeignKey(d => d.UserId)
-                    .HasConstraintName("FK__UserCancl__user___778AC167");
+                    .HasConstraintName("FK__UserCancl__user___76969D2E");
             });
 
             modelBuilder.Entity<UserRole>(entity =>
             {
                 entity.HasKey(e => new { e.UserId, e.RoleId })
-                    .HasName("PK__UserRole__6EDEA153392064D8");
+                    .HasName("PK__UserRole__6EDEA1537812F5E4");
 
                 entity.ToTable("UserRole");
 
@@ -1043,8 +971,6 @@ namespace MyAPI.Models
 
                 entity.Property(e => e.Id).HasColumnName("id");
 
-                entity.Property(e => e.CarTypeId).HasColumnName("car_type_id");
-
                 entity.Property(e => e.CreatedAt)
                     .HasColumnType("datetime")
                     .HasColumnName("created_at");
@@ -1062,7 +988,7 @@ namespace MyAPI.Models
                     .IsUnicode(false)
                     .HasColumnName("license_plate");
 
-                entity.Property(e => e.Seat).HasColumnName("seat");
+                entity.Property(e => e.NumberSeat).HasColumnName("number_seat");
 
                 entity.Property(e => e.Status).HasColumnName("status");
 
@@ -1072,15 +998,89 @@ namespace MyAPI.Models
 
                 entity.Property(e => e.UpdateBy).HasColumnName("update_by");
 
-                entity.HasOne(d => d.CarType)
-                    .WithMany(p => p.Vehicles)
-                    .HasForeignKey(d => d.CarTypeId)
-                    .HasConstraintName("FK__Vehicle__car_typ__60A75C0F");
+                entity.Property(e => e.VehicleTypeId).HasColumnName("vehicle_type_id");
 
                 entity.HasOne(d => d.Driver)
                     .WithMany(p => p.Vehicles)
                     .HasForeignKey(d => d.DriverId)
                     .HasConstraintName("FK__Vehicle__driver___5FB337D6");
+
+                entity.HasOne(d => d.VehicleType)
+                    .WithMany(p => p.Vehicles)
+                    .HasForeignKey(d => d.VehicleTypeId)
+                    .HasConstraintName("FK__Vehicle__vehicle__60A75C0F");
+            });
+
+            modelBuilder.Entity<VehicleSeatStatus>(entity =>
+            {
+                entity.ToTable("VehicleSeatStatus");
+
+                entity.Property(e => e.Id).HasColumnName("id");
+
+                entity.Property(e => e.CreatedAt)
+                    .HasColumnType("datetime")
+                    .HasColumnName("created_at");
+
+                entity.Property(e => e.CreatedBy).HasColumnName("created_by");
+
+                entity.Property(e => e.DepartureDate)
+                    .HasColumnType("datetime")
+                    .HasColumnName("departure_date");
+
+                entity.Property(e => e.SeatNumber).HasColumnName("seat_number");
+
+                entity.Property(e => e.Status)
+                    .HasMaxLength(50)
+                    .HasColumnName("status");
+
+                entity.Property(e => e.UpdateAt)
+                    .HasColumnType("datetime")
+                    .HasColumnName("update_at");
+
+                entity.Property(e => e.UpdateBy).HasColumnName("update_by");
+
+                entity.Property(e => e.VehicleId).HasColumnName("vehicle_id");
+
+                entity.HasOne(d => d.Vehicle)
+                    .WithMany(p => p.VehicleSeatStatuses)
+                    .HasForeignKey(d => d.VehicleId)
+                    .HasConstraintName("FK__VehicleSe__vehic__70DDC3D8");
+            });
+
+            modelBuilder.Entity<VehicleTrip>(entity =>
+            {
+                entity.HasKey(e => new { e.TripId, e.VehicleId })
+                    .HasName("PK__VehicleT__3F031A22AD503028");
+
+                entity.ToTable("VehicleTrip");
+
+                entity.Property(e => e.TripId).HasColumnName("trip_id");
+
+                entity.Property(e => e.VehicleId).HasColumnName("vehicle_id");
+
+                entity.Property(e => e.CreatedAt)
+                    .HasColumnType("datetime")
+                    .HasColumnName("created_at");
+
+                entity.Property(e => e.CreatedBy).HasColumnName("created_by");
+
+                entity.Property(e => e.UpdateAt)
+                    .HasColumnType("datetime")
+                    .HasColumnName("update_at");
+
+                entity.Property(e => e.UpdateBy).HasColumnName("update_by");
+
+                entity.HasOne(d => d.Trip)
+                    .WithMany(p => p.VehicleTrips)
+                    .HasForeignKey(d => d.TripId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK__VehicleTr__trip___6C190EBB");
+
+                entity.HasOne(d => d.Vehicle)
+                    .WithMany(p => p.VehicleTrips)
+                    .HasForeignKey(d => d.VehicleId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK__VehicleTr__vehic__6D0D32F4");
             });
 
             modelBuilder.Entity<VehicleType>(entity =>

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace MyAPI.Models
 {
-    public partial class StatusTrip
+    public partial class ChangeTimeTrip
     {
         public int Id { get; set; }
         public string? Status { get; set; }
