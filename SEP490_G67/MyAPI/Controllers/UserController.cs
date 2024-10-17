@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using MyAPI.DTOs;
 using MyAPI.DTOs.UserDTOs;
@@ -21,6 +22,7 @@ namespace MyAPI.Controllers
             
         }
 
+        [Authorize]
         [HttpPost("ChangePassword")]
         public async Task<IActionResult> ChangePassword(ChangePasswordDTO changePasswordDTO)
         {
@@ -29,25 +31,26 @@ namespace MyAPI.Controllers
                 await _userRepository.ChangePassword(changePasswordDTO);
 
                 
-                return Ok("Mật khẩu đã được đổi thành công.");
+                return Ok("Change password successfully");
             }
             catch (Exception ex)
             {
-                return StatusCode(500, "Đã xảy ra lỗi: " + ex.Message);
+                return StatusCode(500, "Error: " + ex.Message);
             }
         }
 
+        [Authorize]
         [HttpPut("EditProfile/{userId}")]
         public async Task<IActionResult> EditProfile(int userId, EditProfileDTO editProfileDTO)
         {
             try
             {
-                var updatedUser = await _userRepository.EditProfile(userId, editProfileDTO);
+                var updatedUser = await _userRepository.EditProfile( editProfileDTO);
                 return Ok();
             }
             catch (Exception ex)
             {
-                return StatusCode(500, "Đã xảy ra lỗi: " + ex.Message);
+                return StatusCode(500, "Error:  " + ex.Message);
             }
         }
 
