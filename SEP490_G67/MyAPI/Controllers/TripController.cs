@@ -14,7 +14,7 @@ namespace MyAPI.Controllers
             _tripRepository = tripRepository;
         }
         [HttpGet]
-        public async Task<IActionResult> GetListTrip() 
+        public async Task<IActionResult> GetListTrip()
         {
             try
             {
@@ -32,7 +32,24 @@ namespace MyAPI.Controllers
             {
                 throw new Exception("GetListTrip: " + ex.Message);
             }
-           
+
+        }
+        [HttpGet("searchTrip/startPoint/endPoint")]
+        public async Task<IActionResult> searchTrip(string startPoint, string endPoint, DateTime time)
+        {
+            
+            try
+            {
+                var timeonly = time.ToString("HH:ss:mm");
+
+                var searchTrip = await _tripRepository.SreachTrip(startPoint, endPoint, timeonly);
+                if (searchTrip == null) return NotFound("Not found trip");
+                return Ok(searchTrip);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest("searchTripAPI: " + ex.Message);
+            }
         }
     }
 }
