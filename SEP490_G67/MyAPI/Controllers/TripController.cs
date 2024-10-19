@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using MyAPI.DTOs.TripDTOs;
 using MyAPI.Infrastructure.Interfaces;
 
 namespace MyAPI.Controllers
@@ -34,10 +35,10 @@ namespace MyAPI.Controllers
             }
 
         }
-        [HttpGet("searchTrip/startPoint/endPoint")]
+        [HttpGet("searchTrip/startPoint/endPoint/time")]
         public async Task<IActionResult> searchTrip(string startPoint, string endPoint, DateTime time)
         {
-            
+
             try
             {
                 var timeonly = time.ToString("HH:ss:mm");
@@ -49,6 +50,19 @@ namespace MyAPI.Controllers
             catch (Exception ex)
             {
                 return BadRequest("searchTripAPI: " + ex.Message);
+            }
+        }
+        [HttpPost("addTrip")]
+        public async Task<IActionResult> addTrip(TripDTO trip)
+        {
+            try
+            {
+                _tripRepository.AddTrip(trip);
+                return Ok(trip);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
             }
         }
     }
