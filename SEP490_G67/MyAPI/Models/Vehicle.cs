@@ -19,6 +19,7 @@ namespace MyAPI.Models
         public int? VehicleTypeId { get; set; }
         public bool? Status { get; set; }
         public int? DriverId { get; set; }
+        public int? VehicleOwner { get; set; }
         public string? LicensePlate { get; set; }
         public string? Description { get; set; }
         public DateTime? CreatedAt { get; set; }
@@ -27,6 +28,7 @@ namespace MyAPI.Models
         public int? UpdateBy { get; set; }
 
         public virtual Driver? Driver { get; set; }
+        public virtual VehicleOwner? VehicleOwnerNavigation { get; set; }
         public virtual VehicleType? VehicleType { get; set; }
         public virtual ICollection<HistoryRentDriver> HistoryRentDrivers { get; set; }
         public virtual ICollection<HistoryRentVehicle> HistoryRentVehicles { get; set; }

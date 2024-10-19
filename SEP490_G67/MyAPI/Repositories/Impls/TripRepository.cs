@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using MyAPI.DTOs.DriverDTOs;
 using MyAPI.DTOs.TripDTOs;
 using MyAPI.DTOs.VehicleDTOs;
 using MyAPI.Infrastructure.Interfaces;
@@ -16,15 +17,15 @@ namespace MyAPI.Repositories.Impls
             _mapper = mapper;
         }
 
-        public async Task<List<TripDTO>> GetListTrip()
+        public async Task<List<DriverTripDTO>> GetListTrip()
         {
             try
             {
                 var tripList = await _context.Trips.ToListAsync();
-                var mapperTrip = _mapper.Map<List<TripDTO>>(tripList);
+                var mapperTrip = _mapper.Map<List<DriverTripDTO>>(tripList);
                 return mapperTrip;
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 throw new Exception("GetListTrip: " + ex.Message);
             }
@@ -40,7 +41,7 @@ namespace MyAPI.Repositories.Impls
                                  on t.Id equals tv.TripId
                                  join v in _context.Vehicles
                                  on tv.VehicleId equals v.Id
-                                 where t.PointStart.Contains(startPoint) && t.PointEnd.Contains(endPoint) && t.StartTime.Value.TimeOfDay > timeSpan
+                                 where t.PointStart.Contains(startPoint) && t.PointEnd.Contains(endPoint) && t.StartTime > timeSpan
                                  group v by new
                                  {
                                      t.Description,
@@ -69,6 +70,43 @@ namespace MyAPI.Repositories.Impls
             catch (Exception ex)
             {
                 throw new Exception("SreachTrip: " + ex.Message);
+            }
+        }
+        public async Task AddTrip(TripDTO trip)
+        {
+            try
+            {
+                Trip addTrip = new Trip
+                {
+                    Name = trip.Name,
+                    Description = trip.Description,
+                    PointStart = trip.PointStart,
+                    PointEnd = trip.PointEnd,
+                    StartTime = trip.StartTime,
+                    CreatedAt = DateTime.Now,
+                    CreatedBy = 1,
+                    Price = trip.Price,
+                    UpdateAt = DateTime.Now,
+                    UpdateBy = 1
+                };
+                _context.Add(addTrip);
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("addTrips: " + ex.Message, ex);
+            }
+        }
+
+        public Task AssgineTripToVehicle(int tripId, List<int> vehicleId)
+        {
+            try
+            {
+                return null;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("AssgineTripToVehicle:" + ex.Message);
             }
         }
     }
