@@ -25,6 +25,8 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserRoleRepository, UserRoleRepository>();
 builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 builder.Services.AddScoped<ITripRepository, TripRepository>();
+builder.Services.AddScoped<IDriverRepository, DriverRepository>();
+builder.Services.AddScoped<ITypeOfDriverRepository, TypeOfDriverRepository>();
 builder.Services.AddAutoMapper(typeof(AutoMappings));
 builder.Services.AddScoped<HashPassword>();
 builder.Services.AddScoped<SendMail>();
