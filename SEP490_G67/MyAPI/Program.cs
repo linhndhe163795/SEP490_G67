@@ -28,6 +28,7 @@ builder.Services.AddScoped<HashPassword>();
 builder.Services.AddScoped<SendMail>();
 builder.Services.AddScoped<Jwt>();
 builder.Services.AddScoped<GetInforFromToken>();
+builder.Services.AddScoped<IVehicleRepository, VehicleRepository>();
 
 builder.Services.AddAuthentication(opt =>
 {

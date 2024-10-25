@@ -15,6 +15,16 @@ namespace MyAPI.MappingProfile
             CreateMap<User, ForgotPasswordDTO>().ReverseMap();
             CreateMap<User, AccountListDTO>().ReverseMap();
             CreateMap<Role, AccountRoleDTO>().ReverseMap();
+<<<<<<< Updated upstream
+=======
+            CreateMap<Trip,TripDTO>().ReverseMap();
+            CreateMap<TripDTO,Trip>().ReverseMap();
+            CreateMap<Trip,TripVehicleDTO>().ReverseMap();
+            CreateMap<Vehicle,VehicleDTO>().ReverseMap();
+            CreateMap<Driver,DriverTripDTO>().ReverseMap();
+            CreateMap<VehicleType, VehicleTypeDTO>().ReverseMap();
+            CreateMap<Vehicle, VehicleListDTO>().ReverseMap();
+>>>>>>> Stashed changes
         }
     }
 }
