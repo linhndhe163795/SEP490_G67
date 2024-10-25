@@ -1,4 +1,4 @@
-﻿using MyAPI.Models;
+﻿
 
 namespace MyAPI.DTOs.UserDTOs
 {

@@ -1,6 +1,9 @@
 ﻿using AutoMapper;
 using MyAPI.DTOs.AccountDTOs;
+using MyAPI.DTOs.DriverDTOs;
+using MyAPI.DTOs.TripDTOs;
 using MyAPI.DTOs.UserDTOs;
+using MyAPI.DTOs.VehicleDTOs;
 using MyAPI.Models;
 
 namespace MyAPI.MappingProfile
@@ -15,8 +18,6 @@ namespace MyAPI.MappingProfile
             CreateMap<User, ForgotPasswordDTO>().ReverseMap();
             CreateMap<User, AccountListDTO>().ReverseMap();
             CreateMap<Role, AccountRoleDTO>().ReverseMap();
-<<<<<<< Updated upstream
-=======
             CreateMap<Trip,TripDTO>().ReverseMap();
             CreateMap<TripDTO,Trip>().ReverseMap();
             CreateMap<Trip,TripVehicleDTO>().ReverseMap();
@@ -24,7 +25,11 @@ namespace MyAPI.MappingProfile
             CreateMap<Driver,DriverTripDTO>().ReverseMap();
             CreateMap<VehicleType, VehicleTypeDTO>().ReverseMap();
             CreateMap<Vehicle, VehicleListDTO>().ReverseMap();
->>>>>>> Stashed changes
+            CreateMap<Driver, UpdateDriverDTO>().ReverseMap();
+            CreateMap<Driver, DriverDTO>().ReverseMap();
+            CreateMap<TypeOfDriver, TypeOfDriverDTO>().ReverseMap();
+            CreateMap<TypeOfDriver, UpdateTypeOfDriverDTO>().ReverseMap();
+            CreateMap<VehicleOwner, VehicleDTO>().ReverseMap();
         }
     }
 }

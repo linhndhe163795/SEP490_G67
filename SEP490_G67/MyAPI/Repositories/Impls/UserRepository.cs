@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using MyAPI.DTOs;
@@ -13,9 +14,13 @@ namespace MyAPI.Repositories.Impls
     {
         private readonly SendMail _sendMail;
         private readonly IMapper _mapper;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly GetInforFromToken _tokenHelper;
         private readonly HashPassword _hassPassword;
-        public UserRepository(SEP490_G67Context _context, SendMail sendMail, IMapper mapper, HashPassword hashPassword) : base(_context)
+        public UserRepository(SEP490_G67Context _context, SendMail sendMail, IMapper mapper, HashPassword hashPassword, IHttpContextAccessor httpContextAccessor, GetInforFromToken tokenHelper) : base(_context)
         {
+            _httpContextAccessor = httpContextAccessor;
+            _tokenHelper = tokenHelper;
             _mapper = mapper;
             _hassPassword = hashPassword;
             _sendMail = sendMail;
@@ -190,14 +195,25 @@ namespace MyAPI.Repositories.Impls
             }
         }
 
-        public async Task<User> EditProfile(int userId, EditProfileDTO editProfileDTO)
+        public async Task<User> EditProfile(EditProfileDTO editProfileDTO)
         {
             try
             {
+                // Lấy token từ header Authorization
+                var token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+
+                // Lấy userId từ token
+                int userId = _tokenHelper.GetIdInHeader(token);
+
+                if (userId == -1)
+                {
+                    throw new Exception("Invalid user ID from token.");
+                }
+
                 var user = await _context.Users.FindAsync(userId);
                 if (user == null)
                 {
-                    throw new Exception("Not exist user.");
+                    throw new Exception("User does not exist.");
                 }
 
                 // Cập nhật thông tin người dùng
@@ -217,7 +233,7 @@ namespace MyAPI.Repositories.Impls
             }
             catch (Exception ex)
             {
-                throw new Exception("Something wrong when update user information" + ex.Message);
+                throw new Exception("Something went wrong when updating user information: " + ex.Message);
             }
         }
 
