@@ -11,6 +11,5 @@
         public string? StatusWork { get; set; }
         public int TypeOfDriver { get; set; }
         public bool? Status { get; set; }
-        public int? VehicleId { get; set; }
     }
 }
