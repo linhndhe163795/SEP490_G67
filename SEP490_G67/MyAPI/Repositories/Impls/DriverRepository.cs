@@ -38,6 +38,7 @@ namespace MyAPI.Repositories.Impls
                 Dob = updateDriverDto.Dob,
                 StatusWork = updateDriverDto.StatusWork,
                 Status = updateDriverDto.Status,
+                VehicleId = updateDriverDto.VehicleId
             };
 
             var typeOfDriver = await _typeOfDriverRepository.Get(updateDriverDto.TypeOfDriver);
@@ -68,6 +69,7 @@ namespace MyAPI.Repositories.Impls
             existingDriver.StatusWork = updateDriverDto.StatusWork;
             existingDriver.TypeOfDriver = updateDriverDto.TypeOfDriver;
             existingDriver.Status = updateDriverDto.Status;
+            existingDriver.VehicleId = updateDriverDto.VehicleId;
             existingDriver.UpdateAt = DateTime.UtcNow;
 
             await Update(existingDriver);

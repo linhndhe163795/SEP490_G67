@@ -1,4 +1,4 @@
-﻿//using MyAPI.Models;
+﻿using MyAPI.Models;
 
 namespace MyAPI.DTOs.TripDTOs
 {

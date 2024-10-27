@@ -27,7 +27,7 @@ namespace MyAPI.MappingProfile
             CreateMap<Driver, DriverDTO>().ReverseMap();
             CreateMap<TypeOfDriver, TypeOfDriverDTO>().ReverseMap();
             CreateMap<TypeOfDriver, UpdateTypeOfDriverDTO>().ReverseMap();
-            //CreateMap<VehicleOwner, VehicleDTO>().ReverseMap();
+            CreateMap<VehicleOwner, VehicleDTO>().ReverseMap();
         }
     }
 }
