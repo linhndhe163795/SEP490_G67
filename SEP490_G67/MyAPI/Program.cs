@@ -27,6 +27,10 @@ builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 builder.Services.AddScoped<ITripRepository, TripRepository>();
 builder.Services.AddScoped<IDriverRepository, DriverRepository>();
 builder.Services.AddScoped<ITypeOfDriverRepository, TypeOfDriverRepository>();
+builder.Services.AddScoped<IRequestRepository, RequestRepository>();
+builder.Services.AddScoped<IRequestDetailRepository, RequestDetailRepository>();
+
+//builder.Services.AddScoped<ITicketRepository, TicketRepository>();
 builder.Services.AddScoped<ITripDetailsRepository, TripDetailsRepository>();
 builder.Services.AddScoped<ITicketRepository, TicketRepository>();
 

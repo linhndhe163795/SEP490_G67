@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using MyAPI.DTOs.AccountDTOs;
 using MyAPI.DTOs.DriverDTOs;
+using MyAPI.DTOs.RequestDTOs;
 using MyAPI.DTOs.TicketDTOs;
 using MyAPI.DTOs.TripDetailsDTOs;
 using MyAPI.DTOs.TripDTOs;
@@ -29,6 +30,8 @@ namespace MyAPI.MappingProfile
             CreateMap<Driver, DriverDTO>().ReverseMap();
             CreateMap<TypeOfDriver, TypeOfDriverDTO>().ReverseMap();
             CreateMap<TypeOfDriver, UpdateTypeOfDriverDTO>().ReverseMap();
+            CreateMap<Request, RequestDTO>().ReverseMap();
+            CreateMap<RequestDetail, RequestDetailDTO>().ReverseMap();
             CreateMap<TripDetail, TripDetailsDTO>().ReverseMap();
             CreateMap<TicketDTOs,Ticket>().ReverseMap();
             CreateMap<Ticket, TicketDTOs>().ReverseMap();
