@@ -27,7 +27,7 @@ builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 builder.Services.AddScoped<ITripRepository, TripRepository>();
 builder.Services.AddScoped<IDriverRepository, DriverRepository>();
 builder.Services.AddScoped<ITypeOfDriverRepository, TypeOfDriverRepository>();
-//builder.Services.AddScoped<IVehicleOwnerRepository, VehicleOwnerRepository>();
+//builder.Services.AddScoped<ITicketRepository, TicketRepository>();
 builder.Services.AddAutoMapper(typeof(AutoMappings));
 builder.Services.AddScoped<HashPassword>();
 builder.Services.AddScoped<SendMail>();
