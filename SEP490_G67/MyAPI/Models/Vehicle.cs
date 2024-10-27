@@ -10,6 +10,7 @@ namespace MyAPI.Models
             HistoryRentDrivers = new HashSet<HistoryRentDriver>();
             HistoryRentVehicles = new HashSet<HistoryRentVehicle>();
             LossCosts = new HashSet<LossCost>();
+            RequestDetails = new HashSet<RequestDetail>();
             VehicleSeatStatuses = new HashSet<VehicleSeatStatus>();
             VehicleTrips = new HashSet<VehicleTrip>();
         }
@@ -18,6 +19,7 @@ namespace MyAPI.Models
         public int? NumberSeat { get; set; }
         public int? VehicleTypeId { get; set; }
         public bool? Status { get; set; }
+        public string? Image { get; set; }
         public int? DriverId { get; set; }
         public int? VehicleOwner { get; set; }
         public string? LicensePlate { get; set; }
@@ -28,11 +30,12 @@ namespace MyAPI.Models
         public int? UpdateBy { get; set; }
 
         public virtual Driver? Driver { get; set; }
-        public virtual VehicleOwner? VehicleOwnerNavigation { get; set; }
+        public virtual User? VehicleOwnerNavigation { get; set; }
         public virtual VehicleType? VehicleType { get; set; }
         public virtual ICollection<HistoryRentDriver> HistoryRentDrivers { get; set; }
         public virtual ICollection<HistoryRentVehicle> HistoryRentVehicles { get; set; }
         public virtual ICollection<LossCost> LossCosts { get; set; }
+        public virtual ICollection<RequestDetail> RequestDetails { get; set; }
         public virtual ICollection<VehicleSeatStatus> VehicleSeatStatuses { get; set; }
         public virtual ICollection<VehicleTrip> VehicleTrips { get; set; }
     }

@@ -41,27 +41,32 @@ namespace MyAPI.Repositories.Impls
                                  on t.Id equals tv.TripId
                                  join v in _context.Vehicles
                                  on tv.VehicleId equals v.Id
-                                 where t.PointStart.Contains(startPoint) && t.PointEnd.Contains(endPoint) && t.StartTime > timeSpan
-                                 group v by new
+                                 join u in _context.Users on v.VehicleOwner equals u.Id 
+                                 where t.PointStart.Contains(startPoint) && t.PointEnd.Contains(endPoint) && t.StartTime >= timeSpan
+                                 group new {t,v,u} by new
                                  {
+                                     t.Id,
+                                     u.FullName,
                                      t.Description,
                                      t.PointStart,
                                      t.PointEnd,
-                                     t.Price,
                                      t.StartTime
                                  } into tripGroup
                                  select new TripVehicleDTO
                                  {
+                                     Id = tripGroup.Key.Id,
+                                     FullName = tripGroup.Key.FullName,
                                      Description = tripGroup.Key.Description,
                                      PointStart = tripGroup.Key.PointStart,
                                      PointEnd = tripGroup.Key.PointEnd,
-                                     Price = tripGroup.Key.Price,
                                      StartTime = tripGroup.Key.StartTime,
-                                     listVehicle = tripGroup.Select(v => new VehicleDTO
+                                     listVehicle = tripGroup.Select(g => new VehicleDTO
                                      {
-                                         LicensePlate = v.LicensePlate,
-                                         NumberSeat = v.NumberSeat,
-                                         VehicleTypeId = v.VehicleTypeId
+                                         LicensePlate = g.v.LicensePlate,
+                                         NumberSeat = g.v.NumberSeat,
+                                         VehicleTypeId = g.v.VehicleTypeId,
+                                         Price = g.t.Price,
+                                         
                                      }).OrderByDescending(v => v.LicensePlate).ToList()
                                  };
                 var searchTripMapper = _mapper.Map<List<TripVehicleDTO>>(searchTrip);

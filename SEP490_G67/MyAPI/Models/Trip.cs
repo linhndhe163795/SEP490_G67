@@ -9,6 +9,7 @@ namespace MyAPI.Models
         {
             Reviews = new HashSet<Review>();
             Tickets = new HashSet<Ticket>();
+            TripDetails = new HashSet<TripDetail>();
             VehicleTrips = new HashSet<VehicleTrip>();
         }
 
@@ -26,6 +27,7 @@ namespace MyAPI.Models
 
         public virtual ICollection<Review> Reviews { get; set; }
         public virtual ICollection<Ticket> Tickets { get; set; }
+        public virtual ICollection<TripDetail> TripDetails { get; set; }
         public virtual ICollection<VehicleTrip> VehicleTrips { get; set; }
     }
 }
