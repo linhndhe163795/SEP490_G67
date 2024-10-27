@@ -10,9 +10,11 @@ namespace MyAPI.Controllers
     public class TripController : ControllerBase
     {
         private readonly ITripRepository _tripRepository;
-        public TripController(ITripRepository tripRepository)
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        public TripController(ITripRepository tripRepository, IHttpContextAccessor httpContextAccessor)
         {
             _tripRepository = tripRepository;
+            _httpContextAccessor = httpContextAccessor;
         }
         [HttpGet]
         public async Task<IActionResult> GetListTrip()
@@ -42,8 +44,9 @@ namespace MyAPI.Controllers
             try
             {
                 var timeonly = time.ToString("HH:ss:mm");
-
+                var date = time.ToString();
                 var searchTrip = await _tripRepository.SreachTrip(startPoint, endPoint, timeonly);
+                _httpContextAccessor.HttpContext.Session.SetString("date", date);
                 if (searchTrip == null) return NotFound("Not found trip");
                 return Ok(searchTrip);
             }
