@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -31,12 +31,24 @@ builder.Services.AddScoped<IRequestRepository, RequestRepository>();
 builder.Services.AddScoped<IRequestDetailRepository, RequestDetailRepository>();
 
 //builder.Services.AddScoped<ITicketRepository, TicketRepository>();
+builder.Services.AddScoped<ITripDetailsRepository, TripDetailsRepository>();
+builder.Services.AddScoped<ITicketRepository, TicketRepository>();
+
 builder.Services.AddAutoMapper(typeof(AutoMappings));
 builder.Services.AddScoped<HashPassword>();
 builder.Services.AddScoped<SendMail>();
 builder.Services.AddScoped<Jwt>();
 builder.Services.AddScoped<GetInforFromToken>();
+builder.Services.AddScoped<ParseStringToDateTime>();
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddHttpContextAccessor();
 
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(10);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true; 
+});
 builder.Services.AddAuthentication(opt =>
 {
     opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -122,6 +134,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+app.UseSession();
 app.UseCors("corsapp");
 app.UseAuthentication();
 app.UseAuthorization();
