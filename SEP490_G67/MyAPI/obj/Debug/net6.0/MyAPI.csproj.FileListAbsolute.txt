@@ -1,77 +1,3 @@
-D:\Ky10\SEP490_G67\SEP490_G67\MyAPI\bin\Debug\net6.0\appsettings.Development.json
-D:\Ky10\SEP490_G67\SEP490_G67\MyAPI\bin\Debug\net6.0\appsettings.json
-D:\Ky10\SEP490_G67\SEP490_G67\MyAPI\bin\Debug\net6.0\MyAPI.exe
-D:\Ky10\SEP490_G67\SEP490_G67\MyAPI\bin\Debug\net6.0\MyAPI.deps.json
-D:\Ky10\SEP490_G67\SEP490_G67\MyAPI\bin\Debug\net6.0\MyAPI.runtimeconfig.json
-D:\Ky10\SEP490_G67\SEP490_G67\MyAPI\bin\Debug\net6.0\MyAPI.dll
-D:\Ky10\SEP490_G67\SEP490_G67\MyAPI\bin\Debug\net6.0\MyAPI.pdb
-D:\Ky10\SEP490_G67\SEP490_G67\MyAPI\bin\Debug\net6.0\AutoMapper.dll
-D:\Ky10\SEP490_G67\SEP490_G67\MyAPI\bin\Debug\net6.0\AutoMapper.Extensions.Microsoft.DependencyInjection.dll
-D:\Ky10\SEP490_G67\SEP490_G67\MyAPI\bin\Debug\net6.0\Humanizer.dll
-D:\Ky10\SEP490_G67\SEP490_G67\MyAPI\bin\Debug\net6.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
-D:\Ky10\SEP490_G67\SEP490_G67\MyAPI\bin\Debug\net6.0\Microsoft.AspNetCore.JsonPatch.dll
-D:\Ky10\SEP490_G67\SEP490_G67\MyAPI\bin\Debug\net6.0\Microsoft.AspNetCore.Mvc.NewtonsoftJson.dll
-D:\Ky10\SEP490_G67\SEP490_G67\MyAPI\bin\Debug\net6.0\Microsoft.Data.SqlClient.dll
-D:\Ky10\SEP490_G67\SEP490_G67\MyAPI\bin\Debug\net6.0\Microsoft.EntityFrameworkCore.dll
-D:\Ky10\SEP490_G67\SEP490_G67\MyAPI\bin\Debug\net6.0\Microsoft.EntityFrameworkCore.Abstractions.dll
-D:\Ky10\SEP490_G67\SEP490_G67\MyAPI\bin\Debug\net6.0\Microsoft.EntityFrameworkCore.Design.dll
-D:\Ky10\SEP490_G67\SEP490_G67\MyAPI\bin\Debug\net6.0\Microsoft.EntityFrameworkCore.Relational.dll
-D:\Ky10\SEP490_G67\SEP490_G67\MyAPI\bin\Debug\net6.0\Microsoft.EntityFrameworkCore.SqlServer.dll
-D:\Ky10\SEP490_G67\SEP490_G67\MyAPI\bin\Debug\net6.0\Microsoft.Identity.Client.dll
-D:\Ky10\SEP490_G67\SEP490_G67\MyAPI\bin\Debug\net6.0\Microsoft.IdentityModel.Abstractions.dll
-D:\Ky10\SEP490_G67\SEP490_G67\MyAPI\bin\Debug\net6.0\Microsoft.IdentityModel.JsonWebTokens.dll
-D:\Ky10\SEP490_G67\SEP490_G67\MyAPI\bin\Debug\net6.0\Microsoft.IdentityModel.Logging.dll
-D:\Ky10\SEP490_G67\SEP490_G67\MyAPI\bin\Debug\net6.0\Microsoft.IdentityModel.Protocols.dll
-D:\Ky10\SEP490_G67\SEP490_G67\MyAPI\bin\Debug\net6.0\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
-D:\Ky10\SEP490_G67\SEP490_G67\MyAPI\bin\Debug\net6.0\Microsoft.IdentityModel.Tokens.dll
-D:\Ky10\SEP490_G67\SEP490_G67\MyAPI\bin\Debug\net6.0\Microsoft.OpenApi.dll
-D:\Ky10\SEP490_G67\SEP490_G67\MyAPI\bin\Debug\net6.0\Microsoft.Win32.SystemEvents.dll
-D:\Ky10\SEP490_G67\SEP490_G67\MyAPI\bin\Debug\net6.0\Newtonsoft.Json.dll
-D:\Ky10\SEP490_G67\SEP490_G67\MyAPI\bin\Debug\net6.0\Newtonsoft.Json.Bson.dll
-D:\Ky10\SEP490_G67\SEP490_G67\MyAPI\bin\Debug\net6.0\Swashbuckle.AspNetCore.Swagger.dll
-D:\Ky10\SEP490_G67\SEP490_G67\MyAPI\bin\Debug\net6.0\Swashbuckle.AspNetCore.SwaggerGen.dll
-D:\Ky10\SEP490_G67\SEP490_G67\MyAPI\bin\Debug\net6.0\Swashbuckle.AspNetCore.SwaggerUI.dll
-D:\Ky10\SEP490_G67\SEP490_G67\MyAPI\bin\Debug\net6.0\System.Configuration.ConfigurationManager.dll
-D:\Ky10\SEP490_G67\SEP490_G67\MyAPI\bin\Debug\net6.0\System.Drawing.Common.dll
-D:\Ky10\SEP490_G67\SEP490_G67\MyAPI\bin\Debug\net6.0\System.IdentityModel.Tokens.Jwt.dll
-D:\Ky10\SEP490_G67\SEP490_G67\MyAPI\bin\Debug\net6.0\System.Runtime.Caching.dll
-D:\Ky10\SEP490_G67\SEP490_G67\MyAPI\bin\Debug\net6.0\System.Security.Cryptography.ProtectedData.dll
-D:\Ky10\SEP490_G67\SEP490_G67\MyAPI\bin\Debug\net6.0\System.Security.Permissions.dll
-D:\Ky10\SEP490_G67\SEP490_G67\MyAPI\bin\Debug\net6.0\System.Windows.Extensions.dll
-D:\Ky10\SEP490_G67\SEP490_G67\MyAPI\bin\Debug\net6.0\runtimes\unix\lib\netcoreapp3.1\Microsoft.Data.SqlClient.dll
-D:\Ky10\SEP490_G67\SEP490_G67\MyAPI\bin\Debug\net6.0\runtimes\win\lib\netcoreapp3.1\Microsoft.Data.SqlClient.dll
-D:\Ky10\SEP490_G67\SEP490_G67\MyAPI\bin\Debug\net6.0\runtimes\win-arm\native\Microsoft.Data.SqlClient.SNI.dll
-D:\Ky10\SEP490_G67\SEP490_G67\MyAPI\bin\Debug\net6.0\runtimes\win-arm64\native\Microsoft.Data.SqlClient.SNI.dll
-D:\Ky10\SEP490_G67\SEP490_G67\MyAPI\bin\Debug\net6.0\runtimes\win-x64\native\Microsoft.Data.SqlClient.SNI.dll
-D:\Ky10\SEP490_G67\SEP490_G67\MyAPI\bin\Debug\net6.0\runtimes\win-x86\native\Microsoft.Data.SqlClient.SNI.dll
-D:\Ky10\SEP490_G67\SEP490_G67\MyAPI\bin\Debug\net6.0\runtimes\win\lib\netcoreapp3.0\Microsoft.Win32.SystemEvents.dll
-D:\Ky10\SEP490_G67\SEP490_G67\MyAPI\bin\Debug\net6.0\runtimes\unix\lib\netcoreapp3.0\System.Drawing.Common.dll
-D:\Ky10\SEP490_G67\SEP490_G67\MyAPI\bin\Debug\net6.0\runtimes\win\lib\netcoreapp3.0\System.Drawing.Common.dll
-D:\Ky10\SEP490_G67\SEP490_G67\MyAPI\bin\Debug\net6.0\runtimes\win\lib\netstandard2.0\System.Runtime.Caching.dll
-D:\Ky10\SEP490_G67\SEP490_G67\MyAPI\bin\Debug\net6.0\runtimes\win\lib\netstandard2.0\System.Security.Cryptography.ProtectedData.dll
-D:\Ky10\SEP490_G67\SEP490_G67\MyAPI\bin\Debug\net6.0\runtimes\win\lib\netcoreapp3.0\System.Windows.Extensions.dll
-D:\Ky10\SEP490_G67\SEP490_G67\MyAPI\obj\Debug\net6.0\MyAPI.csproj.AssemblyReference.cache
-D:\Ky10\SEP490_G67\SEP490_G67\MyAPI\obj\Debug\net6.0\MyAPI.GeneratedMSBuildEditorConfig.editorconfig
-D:\Ky10\SEP490_G67\SEP490_G67\MyAPI\obj\Debug\net6.0\MyAPI.AssemblyInfoInputs.cache
-D:\Ky10\SEP490_G67\SEP490_G67\MyAPI\obj\Debug\net6.0\MyAPI.AssemblyInfo.cs
-D:\Ky10\SEP490_G67\SEP490_G67\MyAPI\obj\Debug\net6.0\MyAPI.csproj.CoreCompileInputs.cache
-D:\Ky10\SEP490_G67\SEP490_G67\MyAPI\obj\Debug\net6.0\MyAPI.MvcApplicationPartsAssemblyInfo.cs
-D:\Ky10\SEP490_G67\SEP490_G67\MyAPI\obj\Debug\net6.0\MyAPI.MvcApplicationPartsAssemblyInfo.cache
-D:\Ky10\SEP490_G67\SEP490_G67\MyAPI\obj\Debug\net6.0\MyAPI.sourcelink.json
-D:\Ky10\SEP490_G67\SEP490_G67\MyAPI\obj\Debug\net6.0\staticwebassets.build.json
-D:\Ky10\SEP490_G67\SEP490_G67\MyAPI\obj\Debug\net6.0\staticwebassets.development.json
-D:\Ky10\SEP490_G67\SEP490_G67\MyAPI\obj\Debug\net6.0\staticwebassets\msbuild.MyAPI.Microsoft.AspNetCore.StaticWebAssets.props
-D:\Ky10\SEP490_G67\SEP490_G67\MyAPI\obj\Debug\net6.0\staticwebassets\msbuild.build.MyAPI.props
-D:\Ky10\SEP490_G67\SEP490_G67\MyAPI\obj\Debug\net6.0\staticwebassets\msbuild.buildMultiTargeting.MyAPI.props
-D:\Ky10\SEP490_G67\SEP490_G67\MyAPI\obj\Debug\net6.0\staticwebassets\msbuild.buildTransitive.MyAPI.props
-D:\Ky10\SEP490_G67\SEP490_G67\MyAPI\obj\Debug\net6.0\staticwebassets.pack.json
-D:\Ky10\SEP490_G67\SEP490_G67\MyAPI\obj\Debug\net6.0\scopedcss\bundle\MyAPI.styles.css
-D:\Ky10\SEP490_G67\SEP490_G67\MyAPI\obj\Debug\net6.0\MyAPI.csproj.Up2Date
-D:\Ky10\SEP490_G67\SEP490_G67\MyAPI\obj\Debug\net6.0\MyAPI.dll
-D:\Ky10\SEP490_G67\SEP490_G67\MyAPI\obj\Debug\net6.0\refint\MyAPI.dll
-D:\Ky10\SEP490_G67\SEP490_G67\MyAPI\obj\Debug\net6.0\MyAPI.pdb
-D:\Ky10\SEP490_G67\SEP490_G67\MyAPI\obj\Debug\net6.0\MyAPI.genruntimeconfig.cache
-D:\Ky10\SEP490_G67\SEP490_G67\MyAPI\obj\Debug\net6.0\ref\MyAPI.dll
 C:\Users\trinh\OneDrive\Tài liệu\GitHub\SEP490_G67\SEP490_G67\MyAPI\bin\Debug\net6.0\appsettings.Development.json
 C:\Users\trinh\OneDrive\Tài liệu\GitHub\SEP490_G67\SEP490_G67\MyAPI\bin\Debug\net6.0\appsettings.json
 C:\Users\trinh\OneDrive\Tài liệu\GitHub\SEP490_G67\SEP490_G67\MyAPI\bin\Debug\net6.0\MyAPI.staticwebassets.endpoints.json
@@ -224,7 +150,10 @@ D:\Learning\FPT ki 9\project do an code\SEP490_G67\SEP490_G67\MyAPI\obj\Debug\ne
 D:\Learning\FPT ki 9\project do an code\SEP490_G67\SEP490_G67\MyAPI\obj\Debug\net6.0\MyAPI.pdb
 D:\Learning\FPT ki 9\project do an code\SEP490_G67\SEP490_G67\MyAPI\obj\Debug\net6.0\MyAPI.genruntimeconfig.cache
 D:\Learning\FPT ki 9\project do an code\SEP490_G67\SEP490_G67\MyAPI\obj\Debug\net6.0\ref\MyAPI.dll
+<<<<<<< HEAD
+=======
 D:\Ky10\SEP490_G67\SEP490_G67\MyAPI\bin\Debug\net6.0\Microsoft.Bcl.AsyncInterfaces.dll
 D:\Ky10\SEP490_G67\SEP490_G67\MyAPI\bin\Debug\net6.0\Microsoft.Bcl.TimeProvider.dll
 C:\Users\trinh\OneDrive\Tài liệu\GitHub\SEP490_G67\SEP490_G67\MyAPI\bin\Debug\net6.0\Microsoft.Bcl.AsyncInterfaces.dll
 C:\Users\trinh\OneDrive\Tài liệu\GitHub\SEP490_G67\SEP490_G67\MyAPI\bin\Debug\net6.0\Microsoft.Bcl.TimeProvider.dll
+>>>>>>> bba6613c4aa74afbf87bf576b38836fa5196cc28

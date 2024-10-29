@@ -14,7 +14,7 @@ namespace MyAPI.Infrastructure.Interfaces
         Task ForgotPassword(ForgotPasswordDTO forgotPassword);
         Task ResetPassword(ResetPasswordDTO resetPasswordDTO);
         Task ChangePassword(ChangePasswordDTO changePasswordDTO);
-        Task<User> EditProfile(int userId, EditProfileDTO editProfileDTO);
+        Task<User> EditProfile( EditProfileDTO editProfileDTO);
         Task<UserLoginDTO> GetUserLogin(UserLoginDTO userLogin);
 
 
