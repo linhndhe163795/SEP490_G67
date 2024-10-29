@@ -44,6 +44,16 @@ namespace MyAPI.MappingProfile
             CreateMap<TripDetail, StartPointTripDetails>().ReverseMap();
             CreateMap<TripDetail, EndPointTripDetails>().ReverseMap();
 
+<<<<<<< Updated upstream
+=======
+            CreateMap<Trip,TripDTO>().ReverseMap();
+            CreateMap<TripDTO,Trip>().ReverseMap();
+            CreateMap<Trip,TripVehicleDTO>().ReverseMap();
+            CreateMap<Vehicle,VehicleDTO>().ReverseMap();
+            CreateMap<Driver,DriverTripDTO>().ReverseMap();
+            CreateMap<VehicleType, VehicleTypeDTO>().ReverseMap();
+            CreateMap<Vehicle, VehicleListDTO>().ReverseMap();
+>>>>>>> Stashed changes
         }
     }
 }

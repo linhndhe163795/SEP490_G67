@@ -44,6 +44,7 @@ builder.Services.AddScoped<GetInforFromToken>();
 builder.Services.AddScoped<ParseStringToDateTime>();
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<IVehicleRepository, VehicleRepository>();
 
 builder.Services.AddSession(options =>
 {
