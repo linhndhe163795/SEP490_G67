@@ -14,6 +14,37 @@ namespace MyAPI.Repositories.Impls
             _mapper = mapper;
         }
 
+        public async Task<List<EndPointTripDetails>> EndPointTripDetailsById(int TripId)
+        {
+            try
+            {
+                var listEndPointTripDetails = await _context.TripDetails.Where(x => x.TripId == TripId).ToListAsync();
+                var listEndPointTripDetailsMapper = _mapper.Map<List<EndPointTripDetails>>(listEndPointTripDetails)
+                                                    .GroupBy(x => new { x.PointEndDetails, x.TimeEndDetails })  
+                                                    .Select(g => g.First())  
+                                                    .ToList();
+                return listEndPointTripDetailsMapper;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("EndPointTripDetailsById: " + ex.Message);
+            }
+        }
+
+        public async Task<List<StartPointTripDetails>> StartPointTripDetailsById(int TripId)
+        {
+            try
+            {
+                var listStartPointTripDetails = await _context.TripDetails.Where(x => x.TripId == TripId).ToListAsync();
+                var listStartPointTripDetailsMapper = _mapper.Map<List<StartPointTripDetails>>(listStartPointTripDetails);
+                return listStartPointTripDetailsMapper;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("EndPointTripDetailsById: " + ex.Message);
+            }
+        }
+
         public async Task<List<TripDetailsDTO>> TripDetailsByTripId(int TripId)
         {
             try

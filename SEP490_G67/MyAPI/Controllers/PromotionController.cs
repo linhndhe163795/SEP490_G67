@@ -36,8 +36,23 @@ namespace MyAPI.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        // Lấy id từ header
+        [HttpGet("getPromotionById")]
+        public async Task<IActionResult> GetPromotionByUser(int userId)
+        {
+            try
+            {
+                var listPromtion = await _promotionRepository.getPromotionUserById(userId);
+                if (listPromtion == null) return NotFound();
+                return Ok(listPromtion);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest("GetPromotionByUser: " + ex.Message);
+            }
+        }
         [HttpPut("updatePromotion/id")]
-        public async Task<IActionResult> UpdatePromotion(int id, PromotionDTO promotionDTO)
+        public async Task<IActionResult> UpdatePromotion(int id, [FromForm] PromotionDTO promotionDTO, IFormFile? imageFile)
         {
             try
             {
@@ -45,10 +60,27 @@ namespace MyAPI.Controllers
                 if (getPromotionById == null) return NotFound("Not found promotion had id = " + id);
                 getPromotionById.Description = promotionDTO.Description;
                 getPromotionById.Discount = promotionDTO.Discount;
+                getPromotionById.CodePromotion = promotionDTO.CodePromotion;
+                getPromotionById.ImagePromotion = promotionDTO.ImagePromotion;
                 getPromotionById.UpdateAt = DateTime.Now;
                 getPromotionById.UpdateBy = 1;
                 getPromotionById.StartDate = promotionDTO.StartDate;
                 getPromotionById.EndDate = promotionDTO.EndDate;
+                if (imageFile != null && imageFile.Length > 0)
+                {
+                    var fileName = Path.GetFileNameWithoutExtension(imageFile.FileName);
+                    var fileExtension = Path.GetExtension(imageFile.FileName);
+                    var newFileName = $"{fileName}_{DateTime.Now.Ticks}{fileExtension}";
+                    var filePath = Path.Combine("wwwroot/uploads", newFileName);
+
+                    Directory.CreateDirectory(Path.GetDirectoryName(filePath));
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await imageFile.CopyToAsync(stream);
+                    }
+
+                    getPromotionById.ImagePromotion = $"/uploads/{newFileName}";
+                }
                 await _promotionRepository.Update(getPromotionById);
                 return Ok(promotionDTO);
             }

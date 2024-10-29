@@ -508,6 +508,11 @@ namespace MyAPI.Models
 
                 entity.Property(e => e.Id).HasColumnName("id");
 
+                entity.Property(e => e.CodePromotion)
+                    .HasMaxLength(50)
+                    .IsUnicode(false)
+                    .HasColumnName("code_promotion");
+
                 entity.Property(e => e.CreatedAt)
                     .HasColumnType("datetime")
                     .HasColumnName("created_at")
@@ -524,6 +529,10 @@ namespace MyAPI.Models
                 entity.Property(e => e.EndDate)
                     .HasColumnType("date")
                     .HasColumnName("end_date");
+
+                entity.Property(e => e.ImagePromotion)
+                   .HasMaxLength(255)
+                   .HasColumnName("image_promotion");
 
                 entity.Property(e => e.StartDate)
                     .HasColumnType("date")
@@ -859,6 +868,8 @@ namespace MyAPI.Models
                     .HasColumnName("price");
 
                 entity.Property(e => e.StartTime).HasColumnName("start_time");
+
+                entity.Property(e => e.Status).HasColumnName("status");
 
                 entity.Property(e => e.UpdateAt)
                     .HasColumnType("datetime")

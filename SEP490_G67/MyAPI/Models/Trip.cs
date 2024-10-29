@@ -20,6 +20,7 @@ namespace MyAPI.Models
         public decimal? Price { get; set; }
         public string? PointStart { get; set; }
         public string? PointEnd { get; set; }
+        public bool? Status { get; set; }
         public DateTime? CreatedAt { get; set; }
         public int? CreatedBy { get; set; }
         public DateTime? UpdateAt { get; set; }

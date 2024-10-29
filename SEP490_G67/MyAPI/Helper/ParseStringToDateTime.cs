@@ -13,7 +13,7 @@ namespace MyAPI.Helper
             }
             else
             {
-                throw new Exception("Không thể chuyển đổi chuỗi thành DateTime");
+                throw new Exception();
             }
 
 
