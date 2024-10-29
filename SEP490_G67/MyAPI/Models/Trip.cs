@@ -9,6 +9,7 @@ namespace MyAPI.Models
         {
             Reviews = new HashSet<Review>();
             Tickets = new HashSet<Ticket>();
+            TripDetails = new HashSet<TripDetail>();
             VehicleTrips = new HashSet<VehicleTrip>();
         }
 
@@ -19,6 +20,7 @@ namespace MyAPI.Models
         public decimal? Price { get; set; }
         public string? PointStart { get; set; }
         public string? PointEnd { get; set; }
+        public bool? Status { get; set; }
         public DateTime? CreatedAt { get; set; }
         public int? CreatedBy { get; set; }
         public DateTime? UpdateAt { get; set; }
@@ -26,6 +28,7 @@ namespace MyAPI.Models
 
         public virtual ICollection<Review> Reviews { get; set; }
         public virtual ICollection<Ticket> Tickets { get; set; }
+        public virtual ICollection<TripDetail> TripDetails { get; set; }
         public virtual ICollection<VehicleTrip> VehicleTrips { get; set; }
     }
 }
