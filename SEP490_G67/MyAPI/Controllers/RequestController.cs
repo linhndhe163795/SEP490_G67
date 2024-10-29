@@ -37,17 +37,8 @@ namespace MyAPI.Controllers
         public async Task<IActionResult> CreateRequest(RequestDTO requestDto)
         {
             // Chuyển đổi RequestDTO sang thực thể Request
-            var request = new Request
-            {
-                UserId = requestDto.UserId,
-                TypeId = requestDto.TypeId,
-                Status = requestDto.Status,
-                Description = requestDto.Description,
-                Note = requestDto.Note,
-                CreatedAt = DateTime.UtcNow 
-            };
-
-            var createdRequest = await _requestRepository.CreateRequestAsync(request);
+            
+            var createdRequest = await _requestRepository.CreateRequestAsync(requestDto);
             return CreatedAtAction(nameof(GetRequestById), new { id = createdRequest.UserId }, createdRequest);
         }
 

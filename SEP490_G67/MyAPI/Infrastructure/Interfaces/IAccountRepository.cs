@@ -12,7 +12,7 @@ namespace MyAPI.Infrastructure.Interfaces
 
         Task<bool> DeteleAccount(int id);
 
-        Task<bool> UpdateRoleOfAccount(int id, int roleId, int userIdUpdate);
+        Task<bool> UpdateRoleOfAccount(int id, int newRoleId);
 
         Task<List<AccountRoleDTO>> GetListRole();
 
