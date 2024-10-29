@@ -5,6 +5,11 @@ namespace MyAPI.Infrastructure.Interfaces
 {
     public interface ITicketRepository : IRepository<Ticket>
     {
-        Task CreateTicketByUser(int? promotionId, int tripDetailsId, TicketDTOs ticketDTOs, int userId);
+        Task CreateTicketByUser(string? promotionCode, int tripDetailsId, TicketDTOs ticketDTOs, int userId);
+
+        Task<List<ListTicketDTOs>> getAllTicket();
+
+        Task<List<TicketDTOs>> getTicketAfterInputPromotion(string promotionCode);
+        
     }
 }

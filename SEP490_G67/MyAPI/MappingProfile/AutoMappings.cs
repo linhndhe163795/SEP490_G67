@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using MyAPI.DTOs.AccountDTOs;
 using MyAPI.DTOs.DriverDTOs;
+using MyAPI.DTOs.PromotionDTOs;
+using MyAPI.DTOs.PromotionUserDTOs;
 using MyAPI.DTOs.RequestDTOs;
 using MyAPI.DTOs.TicketDTOs;
 using MyAPI.DTOs.TripDetailsDTOs;
@@ -24,6 +26,7 @@ namespace MyAPI.MappingProfile
             CreateMap<Trip,TripDTO>().ReverseMap();
             CreateMap<TripDTO,Trip>().ReverseMap();
             CreateMap<Trip,TripVehicleDTO>().ReverseMap();
+            CreateMap<Trip, DriverTripDTO>();
             CreateMap<Vehicle,VehicleDTO>().ReverseMap();
             CreateMap<Driver,DriverTripDTO>().ReverseMap();
             CreateMap<Driver, UpdateDriverDTO>().ReverseMap();
@@ -35,7 +38,22 @@ namespace MyAPI.MappingProfile
             CreateMap<TripDetail, TripDetailsDTO>().ReverseMap();
             CreateMap<TicketDTOs,Ticket>().ReverseMap();
             CreateMap<Ticket, TicketDTOs>().ReverseMap();
-
+            CreateMap<Ticket, ListTicketDTOs>().ReverseMap();
+            CreateMap<Promotion, PromotionDTO>().ReverseMap();
+            CreateMap<PromotionUser, PromotionUserDTO>().ReverseMap();
+            CreateMap<TripDetail, StartPointTripDetails>().ReverseMap();
+            CreateMap<TripDetail, EndPointTripDetails>().ReverseMap();
+            CreateMap<Trip,TripDTO>().ReverseMap();
+            CreateMap<TripDTO,Trip>().ReverseMap();
+            CreateMap<Trip,TripVehicleDTO>().ReverseMap();
+            CreateMap<Vehicle,VehicleDTO>().ReverseMap();
+            CreateMap<Driver,DriverTripDTO>().ReverseMap();
+            CreateMap<VehicleType, VehicleTypeDTO>().ReverseMap();
+            CreateMap<Vehicle, VehicleListDTO>().ReverseMap();
+            CreateMap<Driver, UpdateDriverDTO>().ReverseMap();
+            CreateMap<Driver, DriverDTO>().ReverseMap();
+            CreateMap<TypeOfDriver, TypeOfDriverDTO>().ReverseMap();
+            CreateMap<TypeOfDriver, UpdateTypeOfDriverDTO>().ReverseMap();
             //CreateMap<VehicleOwner, VehicleDTO>().ReverseMap();
         }
     }

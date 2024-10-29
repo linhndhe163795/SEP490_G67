@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using MyAPI.DTOs.TripDTOs;
 using MyAPI.Infrastructure.Interfaces;
+using MyAPI.Models;
 
 namespace MyAPI.Controllers
 {
@@ -38,7 +39,7 @@ namespace MyAPI.Controllers
 
         }
         [HttpGet("searchTrip/startPoint/endPoint/time")]
-        public async Task<IActionResult> searchTrip(string startPoint, string endPoint, DateTime time)
+        public async Task<IActionResult> searchTrip(string startPoint,  string endPoint, DateTime time)
         {
 
             try
@@ -62,6 +63,36 @@ namespace MyAPI.Controllers
             {
                 _tripRepository.AddTrip(trip);
                 return Ok(trip);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        // lấy id từ token
+        [HttpPut("updateTrip/{id}")]
+        public async Task<IActionResult> updateTrip(int id, TripDTO tripDTO, int userId)
+        {
+            try
+            {
+                await _tripRepository.UpdateTripById(id, tripDTO, userId);
+                return Ok(tripDTO);
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        // lấy id từ token
+        [HttpPut("updateStatusTrip/{id}")]
+        public async Task<IActionResult> updateStatusTrip(int id, int userId)
+        {
+            try
+            {
+                await _tripRepository.updateStatusTrip(id, userId);
+                return Ok();
+
             }
             catch (Exception ex)
             {

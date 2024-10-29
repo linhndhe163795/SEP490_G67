@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using MyAPI.DTOs.TicketDTOs;
 using MyAPI.Helper;
@@ -12,13 +13,15 @@ namespace MyAPI.Controllers
     {
         private readonly ITicketRepository _ticketRepository;
         private readonly GetInforFromToken _getInforFromToken;
-        public TicketController(ITicketRepository ticketRepository, GetInforFromToken getInforFromToken)
+        private readonly IMapper _mapper;
+        public TicketController(ITicketRepository ticketRepository, GetInforFromToken getInforFromToken, IMapper mapper)
         {
             _ticketRepository = ticketRepository;
+            _mapper = mapper;
             _getInforFromToken = getInforFromToken;
         }
         [HttpPost]
-        public async Task<IActionResult> createTicket(TicketDTOs ticketDTOs, int tripDetailsId, int? Promotion ,int uid)
+        public async Task<IActionResult> createTicket( TicketDTOs ticketDTOs,  int tripDetailsId, [FromQuery] string? promotionCode ,  int uid)
         {
             try
             {
@@ -33,7 +36,7 @@ namespace MyAPI.Controllers
                 //}
                 //var userId = _getInforFromToken.GetIdInHeader(token);
 
-                await _ticketRepository.CreateTicketByUser(Promotion, tripDetailsId, ticketDTOs, uid);
+                await _ticketRepository.CreateTicketByUser(promotionCode, tripDetailsId, ticketDTOs, uid);
                 return Ok(ticketDTOs);
             }
             catch (Exception ex)
@@ -41,6 +44,20 @@ namespace MyAPI.Controllers
                 return BadRequest("createTicket: " + ex.Message);
             }
         }
-
+        [HttpGet]
+        public async Task<IActionResult> getListTicket()
+        {
+            try
+            {
+                var listTicket = await _ticketRepository.getAllTicket();
+                if (listTicket == null) return NotFound();
+                var listTickerMapper = _mapper.Map<List<ListTicketDTOs>>(listTicket);
+                return Ok(listTickerMapper);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest("getListTicket: " + ex.Message);
+            }
+        }
     }
 }

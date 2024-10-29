@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using MyAPI.DTOs.RequestDTOs;
 using MyAPI.Infrastructure.Interfaces;
 using MyAPI.Models;
 
@@ -6,18 +7,28 @@ namespace MyAPI.Repositories.Impls
 {
     public class RequestRepository : GenericRepository<Request>, IRequestRepository
     {
-        private readonly SEP490_G67Context _context;
 
         public RequestRepository(SEP490_G67Context context) : base(context)
         {
-            _context = context;
         }
 
-        public async Task<Request> CreateRequestAsync(Request request)
+        public async Task<Request> CreateRequestAsync(RequestDTO request)
         {
-            request.CreatedAt = DateTime.UtcNow;  
-            await Add(request);
-            return request;
+
+            var requestAdd = new Request
+            {
+                UserId = request.UserId,
+                CreatedAt = DateTime.UtcNow,
+                TypeId = request.TypeId,
+                Status = false,
+                Description = request.Description,
+                Note = request.Note,
+            };
+
+            _context.Requests.Add(requestAdd);
+            await _context.SaveChangesAsync();
+            
+            return requestAdd;
         }
 
         public async Task<Request> UpdateRequestAsync(int id, Request request)
@@ -29,8 +40,6 @@ namespace MyAPI.Repositories.Impls
             }
 
             // Cập nhật các trường cần thiết
-            existingRequest.UserId = request.UserId;
-            existingRequest.TypeId = request.TypeId;
             existingRequest.Status = request.Status;
             existingRequest.Description = request.Description;
             existingRequest.Note = request.Note;
