@@ -4,6 +4,7 @@ using MyAPI.DTOs.DriverDTOs;
 using MyAPI.DTOs.PromotionDTOs;
 using MyAPI.DTOs.PromotionUserDTOs;
 using MyAPI.DTOs.RequestDTOs;
+using MyAPI.DTOs.ReviewDTOs;
 using MyAPI.DTOs.TicketDTOs;
 using MyAPI.DTOs.TripDetailsDTOs;
 using MyAPI.DTOs.TripDTOs;
@@ -54,6 +55,7 @@ namespace MyAPI.MappingProfile
             CreateMap<Driver, DriverDTO>().ReverseMap();
             CreateMap<TypeOfDriver, TypeOfDriverDTO>().ReverseMap();
             CreateMap<TypeOfDriver, UpdateTypeOfDriverDTO>().ReverseMap();
+            CreateMap<Review, ReviewDTO>().ReverseMap();
             //CreateMap<VehicleOwner, VehicleDTO>().ReverseMap();
         }
     }
