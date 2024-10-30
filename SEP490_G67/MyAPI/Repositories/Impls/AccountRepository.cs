@@ -12,8 +12,15 @@ namespace MyAPI.Repositories.Impls
     public class AccountRepository : GenericRepository<User>, IAccountRepository 
     {
         private readonly IMapper _mapper;
-        public AccountRepository(SEP490_G67Context _context,  IMapper mapper) : base(_context)
+        private readonly IHttpContextAccessor _contextAccessor;
+        private readonly GetInforFromToken _inforFromToken;
+
+
+        public AccountRepository(SEP490_G67Context _context,  IMapper mapper, 
+            IHttpContextAccessor httpContextAccessor, GetInforFromToken inforFromToken) : base(_context)
         {
+            _contextAccessor = httpContextAccessor;
+            _inforFromToken = inforFromToken;
             _mapper = mapper;
         }
 
@@ -65,8 +72,16 @@ namespace MyAPI.Repositories.Impls
 
         }
 
-        public async Task<bool> UpdateRoleOfAccount(int id, int roleId, int userIdUpdate)
+        public async Task<bool> UpdateRoleOfAccount(int id, int newRoleId)
         {
+            var token = _contextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+            int userId = _inforFromToken.GetIdInHeader(token);
+
+            if (userId == -1)
+            {
+                throw new Exception("Invalid user ID from token.");
+            }
+
             var user = await _context.Users
                 .Include(u => u.UserRoles)
                     .ThenInclude(ur => ur.Role)
@@ -74,33 +89,30 @@ namespace MyAPI.Repositories.Impls
 
             if (user == null)
             {
-                return false; 
-            }
-
-            var roleExists = await _context.Roles.SingleOrDefaultAsync(r => r.Id == roleId);
-
-            if (roleExists == null)
-            {
-                return false; 
+                throw new Exception("User to be updated does not exist.");
             }
 
             var userRole = user.UserRoles.SingleOrDefault(ur => ur.UserId == id);
-
-            if (userRole != null)
+            if (userRole == null)
             {
-                userRole.RoleId = roleId;
+                throw new Exception("UserRole entry does not exist.");
+            }
 
-                user.UpdateBy = userIdUpdate;
-                user.UpdateAt = DateTime.Now;
-            }
-            else
+            var roleExists = await _context.Roles.AnyAsync(r => r.Id == newRoleId);
+            if (!roleExists)
             {
-                return false; 
+                throw new Exception("New role does not exist.");
             }
+
+            userRole.RoleId = newRoleId;
+
+            user.UpdateBy = userId; 
+            user.UpdateAt = DateTime.Now;
 
             await _context.SaveChangesAsync();
-            return true; 
+            return true;
         }
+
 
     }
 }

@@ -18,7 +18,7 @@ namespace MyAPI.Controllers
             _accountRepository = accountRepository;
         }
 
-        [HttpPost("listAccount")]
+        [HttpGet("listAccount")]
         public async Task<IActionResult> GetListAccount()
         {
             try
@@ -34,12 +34,12 @@ namespace MyAPI.Controllers
             }
             catch (Exception ex)
             {
-                throw new Exception("GetListAccount Failed " + ex.Message);
+                return BadRequest(new { Message = "Account get list failed", Details = ex.Message });
             }
 
         }
 
-        [HttpPost("detailsAccount/{id}")]
+        [HttpGet("detailsAccount/{id}")]
         public async Task<IActionResult> GetDetailsAccountById(int id)
         {
             try
@@ -56,13 +56,13 @@ namespace MyAPI.Controllers
             }
             catch (Exception ex)
             {
-                throw new Exception("GetDetailsAccount Failed " + ex.Message);
+                return BadRequest(new { Message = "Account details failed", Details = ex.Message });
             }
 
         }
 
 
-        [HttpPost("deleteAccount/{id}")]
+        [HttpDelete("deleteAccount/{id}")]
         public async Task<IActionResult> DelteAccountById(int id)
         {
             try
@@ -79,36 +79,31 @@ namespace MyAPI.Controllers
             }
             catch (Exception ex)
             {
-                throw new Exception("DeleteAccount Failed " + ex.Message);
+                return BadRequest(new { Message = "Account delete failed", Details = ex.Message });
             }
 
         }
 
         
 
-        [HttpPost("updateAccount/{id}/{roleId}/{userIdUpdate}")]
-        public async Task<IActionResult> UpdateAccountById(int id, int roleId, int userIdUpdate)
+        [HttpPut("updateAccount/{id}/{newIdUpdate}")]
+        public async Task<IActionResult> UpdateAccountById(int id, int newIdUpdate)
         {
             try
             {
-                var accountUpdated = await _accountRepository.UpdateRoleOfAccount(id, roleId, userIdUpdate);
+                var accountUpdated = await _accountRepository.UpdateRoleOfAccount(id, newIdUpdate);
 
-                if (accountUpdated)
-                {
-                    return Ok("Update Success!!");
-                }
-                else
-                {
-                    return NotFound("Account does not exist");
-                }
+                return Ok(new { Message = "Account Update successfully." });
+
             }
             catch (Exception ex)
             {
-                throw new Exception("DeleteAccount Failed " + ex.Message);
+                return BadRequest(new { Message = "Account update failed", Details = ex.Message });
             }
+        
         }
 
-        [HttpPost("listRole")]
+        [HttpGet("listRole")]
         public async Task<IActionResult> GetListRole()
         {
             try
@@ -125,7 +120,7 @@ namespace MyAPI.Controllers
             }
             catch (Exception ex)
             {
-                throw new Exception("GetListRole Failed " + ex.Message);
+                return BadRequest(new { Message = "Account list failed", Details = ex.Message });
             }
 
         }

@@ -24,8 +24,9 @@ namespace MyAPI.Repositories.Impls
                 Seats = requestDetailDto.Seats,
                 
             };
+            _context.RequestDetails.Add(requestDetail);
+            await _context.SaveChangesAsync();
 
-            await Add(requestDetail);
             return requestDetail;
         }
 

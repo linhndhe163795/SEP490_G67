@@ -4,6 +4,7 @@ using MyAPI.DTOs.DriverDTOs;
 using MyAPI.DTOs.PromotionDTOs;
 using MyAPI.DTOs.PromotionUserDTOs;
 using MyAPI.DTOs.RequestDTOs;
+using MyAPI.DTOs.ReviewDTOs;
 using MyAPI.DTOs.TicketDTOs;
 using MyAPI.DTOs.TripDetailsDTOs;
 using MyAPI.DTOs.TripDTOs;
@@ -43,9 +44,6 @@ namespace MyAPI.MappingProfile
             CreateMap<PromotionUser, PromotionUserDTO>().ReverseMap();
             CreateMap<TripDetail, StartPointTripDetails>().ReverseMap();
             CreateMap<TripDetail, EndPointTripDetails>().ReverseMap();
-
-<<<<<<< Updated upstream
-=======
             CreateMap<Trip,TripDTO>().ReverseMap();
             CreateMap<TripDTO,Trip>().ReverseMap();
             CreateMap<Trip,TripVehicleDTO>().ReverseMap();
@@ -53,7 +51,12 @@ namespace MyAPI.MappingProfile
             CreateMap<Driver,DriverTripDTO>().ReverseMap();
             CreateMap<VehicleType, VehicleTypeDTO>().ReverseMap();
             CreateMap<Vehicle, VehicleListDTO>().ReverseMap();
->>>>>>> Stashed changes
+            CreateMap<Driver, UpdateDriverDTO>().ReverseMap();
+            CreateMap<Driver, DriverDTO>().ReverseMap();
+            CreateMap<TypeOfDriver, TypeOfDriverDTO>().ReverseMap();
+            CreateMap<TypeOfDriver, UpdateTypeOfDriverDTO>().ReverseMap();
+            CreateMap<Review, ReviewDTO>().ReverseMap();
+            //CreateMap<VehicleOwner, VehicleDTO>().ReverseMap();
         }
     }
 }

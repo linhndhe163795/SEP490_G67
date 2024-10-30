@@ -8,13 +8,15 @@ namespace MyAPI.Infrastructure.Interfaces
 
         Task<List<VehicleTypeDTO>> GetVehicleTypeDTOsAsync();
 
-        Task<bool> AddVehicleAsync(VehicleAddDTO vehicleAddDTO, string driverName, int roleID);
+        Task<bool> AddVehicleAsync(VehicleAddDTO vehicleAddDTO, string driverName);
 
-        Task<bool> UpdateVehicleAsync(int id, string driverName, int userIdUpdate);
+        Task<bool> UpdateVehicleAsync(int id, string driverName);
 
         Task<bool> DeleteVehicleAsync(int id);
 
         Task<List<VehicleListDTO>> GetVehicleDTOsAsync();
+
+        Task<bool> AddVehicleByStaffcheckAsync(int requestId, bool isApprove);
 
 
     }
