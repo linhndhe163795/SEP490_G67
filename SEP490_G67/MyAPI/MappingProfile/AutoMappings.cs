@@ -10,6 +10,7 @@ using MyAPI.DTOs.TripDetailsDTOs;
 using MyAPI.DTOs.TripDTOs;
 using MyAPI.DTOs.UserDTOs;
 using MyAPI.DTOs.VehicleDTOs;
+using MyAPI.DTOs.VehicleTripDTOs;
 using MyAPI.Models;
 
 namespace MyAPI.MappingProfile
@@ -44,19 +45,12 @@ namespace MyAPI.MappingProfile
             CreateMap<PromotionUser, PromotionUserDTO>().ReverseMap();
             CreateMap<TripDetail, StartPointTripDetails>().ReverseMap();
             CreateMap<TripDetail, EndPointTripDetails>().ReverseMap();
-            CreateMap<Trip,TripDTO>().ReverseMap();
-            CreateMap<TripDTO,Trip>().ReverseMap();
-            CreateMap<Trip,TripVehicleDTO>().ReverseMap();
-            CreateMap<Vehicle,VehicleDTO>().ReverseMap();
-            CreateMap<Driver,DriverTripDTO>().ReverseMap();
             CreateMap<VehicleType, VehicleTypeDTO>().ReverseMap();
             CreateMap<Vehicle, VehicleListDTO>().ReverseMap();
-            CreateMap<Driver, UpdateDriverDTO>().ReverseMap();
-            CreateMap<Driver, DriverDTO>().ReverseMap();
-            CreateMap<TypeOfDriver, TypeOfDriverDTO>().ReverseMap();
-            CreateMap<TypeOfDriver, UpdateTypeOfDriverDTO>().ReverseMap();
             CreateMap<Review, ReviewDTO>().ReverseMap();
-            //CreateMap<VehicleOwner, VehicleDTO>().ReverseMap();
+            CreateMap<VehicleTrip, VehicleTripDTO>().ReverseMap();
+            CreateMap<Trip,EndPointDTO>().ReverseMap();
+            CreateMap<Trip,StartPointDTO>().ReverseMap();
         }
     }
 }

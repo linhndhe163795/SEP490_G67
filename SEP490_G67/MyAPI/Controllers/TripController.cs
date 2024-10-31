@@ -12,7 +12,7 @@ namespace MyAPI.Controllers
     {
         private readonly ITripRepository _tripRepository;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        public TripController(ITripRepository tripRepository, IHttpContextAccessor httpContextAccessor)
+        public TripController(ITripRepository tripRepository ,IHttpContextAccessor httpContextAccessor)
         {
             _tripRepository = tripRepository;
             _httpContextAccessor = httpContextAccessor;
@@ -56,12 +56,14 @@ namespace MyAPI.Controllers
                 return BadRequest("searchTripAPI: " + ex.Message);
             }
         }
+        //Lay id tu token
         [HttpPost("addTrip")]
-        public async Task<IActionResult> addTrip(TripDTO trip)
+        public async Task<IActionResult> addTrip(TripDTO trip, int vehicleId, int userId)
         {
             try
             {
-                _tripRepository.AddTrip(trip);
+                await _tripRepository.AddTrip(trip, vehicleId, userId);
+
                 return Ok(trip);
             }
             catch (Exception ex)

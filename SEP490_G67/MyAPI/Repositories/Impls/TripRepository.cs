@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using MyAPI.DTOs.DriverDTOs;
 using MyAPI.DTOs.TripDTOs;
 using MyAPI.DTOs.VehicleDTOs;
+using MyAPI.DTOs.VehicleTripDTOs;
 using MyAPI.Infrastructure.Interfaces;
 using MyAPI.Models;
 
@@ -77,7 +78,7 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception("SreachTrip: " + ex.Message);
             }
         }
-        public async Task AddTrip(TripDTO trip)
+        public async Task AddTrip(TripDTO trip, int? vehicleId, int userId)
         {
             try
             {
@@ -89,13 +90,29 @@ namespace MyAPI.Repositories.Impls
                     PointEnd = trip.PointEnd,
                     StartTime = trip.StartTime,
                     CreatedAt = DateTime.Now,
-                    CreatedBy = 1,
+                    CreatedBy = userId,
                     Price = trip.Price,
-                    UpdateAt = DateTime.Now,
-                    UpdateBy = 1,
+                    UpdateAt = null,
+                    UpdateBy = null,
                     Status = trip.Status,
                 };
                 _context.Add(addTrip);
+                await _context.SaveChangesAsync();
+                var vechicleById = await _context.Vehicles.FirstOrDefaultAsync(x => x.Id == vehicleId);
+                if (vechicleById != null) 
+                {
+                    VehicleTripDTO vehicleTripDTO = new VehicleTripDTO
+                    {
+                        TripId = addTrip.Id,
+                        VehicleId = vechicleById.Id,
+                        CreatedAt = DateTime.Now,
+                        CreatedBy = userId,
+                        UpdateAt = null,
+                        UpdateBy = null
+                    };
+                    var vehicleTripMapper = _mapper.Map<VehicleTrip>(vehicleTripDTO);
+                     _context.VehicleTrips.Add(vehicleTripMapper);
+                }
                 await _context.SaveChangesAsync();
             }
             catch (Exception ex)

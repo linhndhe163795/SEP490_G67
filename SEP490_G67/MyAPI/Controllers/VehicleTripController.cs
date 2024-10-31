@@ -7,5 +7,6 @@ namespace MyAPI.Controllers
     [ApiController]
     public class VehicleTripController : ControllerBase
     {
+
     }
 }
