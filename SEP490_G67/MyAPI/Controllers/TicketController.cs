@@ -20,28 +20,56 @@ namespace MyAPI.Controllers
             _mapper = mapper;
             _getInforFromToken = getInforFromToken;
         }
-        [HttpPost]
-        public async Task<IActionResult> createTicket( TicketDTOs ticketDTOs,  int tripDetailsId, [FromQuery] string? promotionCode ,  int uid)
+        [HttpPost("bookTicket")]
+        public async Task<IActionResult> createTicket( TicketDTOs ticketDTOs,  int tripDetailsId,  string? promotionCode )
         {
             try
             {
-                //string token = Request.Headers["Authorization"];
-                //if (token.StartsWith("Bearer"))
-                //{
-                //    token = token.Substring("Bearer ".Length).Trim();
-                //}
-                //if (string.IsNullOrEmpty(token))
-                //{
-                //    return BadRequest("Token is required.");
-                //}
-                //var userId = _getInforFromToken.GetIdInHeader(token);
+             
+                string token = Request.Headers["Authorization"];
+                if (token.StartsWith("Bearer"))
+                {
+                    token = token.Substring("Bearer ".Length).Trim();
+                }
+                if (string.IsNullOrEmpty(token))
+                {
+                    return BadRequest("Token is required.");
+                }
+                var userId = _getInforFromToken.GetIdInHeader(token);
 
-                await _ticketRepository.CreateTicketByUser(promotionCode, tripDetailsId, ticketDTOs, uid);
+                await _ticketRepository.CreateTicketByUser(promotionCode, tripDetailsId, ticketDTOs, userId);
                 return Ok(ticketDTOs);
             }
             catch (Exception ex)
             {
                 return BadRequest("createTicket: " + ex.Message);
+            }
+        }
+       
+        [HttpPost("createTicketFromDriver/{vehicleId}")]
+        public async Task<IActionResult> creatTicketFromDriver([FromBody]TicketFromDriverDTOs ticketFromDriver, [FromForm]int vehicleId)
+        {
+            try
+            {
+                string token = Request.Headers["Authorization"];
+                if (token.StartsWith("Bearer"))
+                {
+                    token = token.Substring("Bearer ".Length).Trim();
+                }
+                if (string.IsNullOrEmpty(token))
+                {
+                    return BadRequest("Token is required.");
+                }
+                var driverId = _getInforFromToken.GetIdInHeader(token);
+
+                var priceTrip = await _ticketRepository.GetPriceFromPoint(ticketFromDriver, vehicleId);
+                await _ticketRepository.CreatTicketFromDriver(priceTrip, vehicleId, ticketFromDriver, driverId);
+                return Ok();
+                
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
             }
         }
         [HttpGet]
@@ -53,6 +81,20 @@ namespace MyAPI.Controllers
                 if (listTicket == null) return NotFound();
                 var listTickerMapper = _mapper.Map<List<ListTicketDTOs>>(listTicket);
                 return Ok(listTickerMapper);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest("getListTicket: " + ex.Message);
+            }
+        }
+        [HttpGet("tickeNotPaid")]
+        public async Task<IActionResult> getListTicketNotPaid(int vehicleId)
+        {
+            try
+            {
+                var listTicket = await _ticketRepository.GetListTicketNotPaid(vehicleId);
+                if (listTicket == null) return NotFound();
+                return Ok(listTicket);
             }
             catch (Exception ex)
             {

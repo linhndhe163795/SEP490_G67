@@ -4,6 +4,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using MyAPI.Helper;
 using MyAPI.Infrastructure.Interfaces;
+using MyAPI.Infrastructure.Repositories;
 using MyAPI.MappingProfile;
 using MyAPI.Models;
 using MyAPI.Repositories.Impls;
@@ -31,6 +32,7 @@ builder.Services.AddScoped<IRequestRepository, RequestRepository>();
 builder.Services.AddScoped<IRequestDetailRepository, RequestDetailRepository>();
 builder.Services.AddScoped<IPromotionRepository, PromotionRepository>();
 builder.Services.AddScoped<IPromotionUserRepository, PromotionUserRepository>();
+builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
 
 //builder.Services.AddScoped<ITicketRepository, TicketRepository>();
 builder.Services.AddScoped<ITripDetailsRepository, TripDetailsRepository>();
