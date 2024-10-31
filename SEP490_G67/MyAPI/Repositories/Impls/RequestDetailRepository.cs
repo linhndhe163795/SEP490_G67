@@ -22,7 +22,6 @@ namespace MyAPI.Repositories.Impls
                 StartTime = requestDetailDto.StartTime,
                 EndTime = requestDetailDto.EndTime,
                 Seats = requestDetailDto.Seats,
-                
             };
             _context.RequestDetails.Add(requestDetail);
             await _context.SaveChangesAsync();

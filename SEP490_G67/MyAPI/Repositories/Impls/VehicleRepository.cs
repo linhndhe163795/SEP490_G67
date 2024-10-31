@@ -2,12 +2,12 @@
 using Microsoft.EntityFrameworkCore;
 using MyAPI.DTOs.AccountDTOs;
 using MyAPI.DTOs.RequestDTOs;
+using MyAPI.DTOs.TripDTOs;
 using MyAPI.DTOs.VehicleDTOs;
 using MyAPI.Helper;
 using MyAPI.Infrastructure.Interfaces;
 using MyAPI.Models;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
-using static System.Net.Mime.MediaTypeNames;
+
 
 namespace MyAPI.Repositories.Impls
 {
@@ -20,11 +20,13 @@ namespace MyAPI.Repositories.Impls
         private readonly IRequestDetailRepository _requestDetailRepository;
 
 
+
         public VehicleRepository(SEP490_G67Context context, IMapper mapper,
             IHttpContextAccessor httpContextAccessor,
-            GetInforFromToken tokenHelper, 
+            GetInforFromToken tokenHelper,
             IRequestRepository requestRepository,
             IRequestDetailRepository requestDetailRepository) : base(context)
+
         {
             _mapper = mapper;
             _httpContextAccessor = httpContextAccessor;
@@ -81,7 +83,7 @@ namespace MyAPI.Repositories.Impls
             };
 
             _context.Vehicles.Add(vehicle);
-            
+
 
             if (!isStaff)
             {
@@ -112,7 +114,6 @@ namespace MyAPI.Repositories.Impls
             await _context.SaveChangesAsync();
             return true;
         }
-
         public async Task<bool> AddVehicleByStaffcheckAsync(int requestId, bool isApprove)
         {
             var checkRequestExits = await _context.Requests.FirstOrDefaultAsync(s => s.Id == requestId);
@@ -176,18 +177,18 @@ namespace MyAPI.Repositories.Impls
             }
         }
 
-        public async Task<List<VehicleListDTO>> GetVehicleDTOsAsync()
+        public async Task<List<EndPointDTO>> GetListEndPointByVehicleId(int vehicleId)
         {
-            var listVehicle = _context.Vehicles.ToList();
+            var listVehicle = await _context.Vehicles.ToListAsync();
 
-            var vehicleListDTOs = _mapper.Map<List<VehicleListDTO>>(listVehicle);
+            var vehicleListDTOs = _mapper.Map<List<EndPointDTO>>(listVehicle);
 
             return vehicleListDTOs;
         }
 
         public async Task<List<VehicleTypeDTO>> GetVehicleTypeDTOsAsync()
         {
-            var listVehicleType = _context.VehicleTypes.ToList();
+            var listVehicleType = await _context.VehicleTypes.ToListAsync();
 
             var vehicleTypeListDTOs = _mapper.Map<List<VehicleTypeDTO>>(listVehicleType);
 
@@ -207,7 +208,7 @@ namespace MyAPI.Repositories.Impls
 
             var vehicleUpdate = await _context.Vehicles.SingleOrDefaultAsync(vehicle => vehicle.Id == id);
 
-            var checkUserNameDrive =  _context.Drivers.SingleOrDefault(s => s.Name.Equals(driverName));
+            var checkUserNameDrive = _context.Drivers.SingleOrDefault(s => s.Name.Equals(driverName));
 
             if (vehicleUpdate != null && checkUserNameDrive != null)
             {
@@ -221,40 +222,106 @@ namespace MyAPI.Repositories.Impls
 
                 return true;
 
-            }else
+            }
+            else
             {
                 throw new Exception("Not found user name in system");
             }
         }
 
-
-        private bool UpdateVehicleByStaff(int id, int userIdUpdate, bool updateStatus)
+        public async Task<List<StartPointDTO>> GetListStartPointByVehicleId(int vehicleId)
         {
-            var vehicleUpdate =  _context.Vehicles.SingleOrDefault(vehicle => vehicle.Id == id);
-
-
-            if (vehicleUpdate != null )
+            try
             {
-                vehicleUpdate.Status = updateStatus;
+                var i = 1;
+                var listStartPoint = await (from v in _context.Vehicles
+                                            join vt in _context.VehicleTrips
+                                            on v.Id equals vt.VehicleId
+                                            join t in _context.Trips
+                                            on vt.TripId equals t.Id
+                                            where v.Id == vehicleId
+                                            select t.PointStart).Distinct()
+                                         .ToListAsync();
+                List<StartPointDTO> listStartPointDTOs = new List<StartPointDTO>();
+                foreach (var v in listStartPoint)
+                {
+                    listStartPointDTOs.Add(new StartPointDTO { id = i++, name = v });
+                }
 
-                vehicleUpdate.UpdateBy = userIdUpdate;
+                if (listStartPointDTOs == null)
+                {
+                    throw new ArgumentNullException(nameof(listStartPointDTOs));
+                }
+                else
+                {
+                    return listStartPointDTOs;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("GetListStartPointByVehicleId: " + ex.Message);
+            }
+        }
+
+        public async Task<List<VehicleListDTO>> GetVehicleDTOsAsync()
+        {
+            var listVehicle = await _context.Vehicles.ToListAsync();
+
+            var vehicleListDTOs = _mapper.Map<List<VehicleListDTO>>(listVehicle);
+
+            return vehicleListDTOs;
+        }
+
+        public async Task<bool> UpdateVehicleAsync(int id, string driverName, int userIdUpdate)
+        {
+            var vehicleUpdate = await _context.Vehicles.SingleOrDefaultAsync(vehicle => vehicle.Id == id);
+
+            var checkUserNameDrive = _context.Drivers.SingleOrDefault(s => s.Name.Equals(driverName));
+
+            if (vehicleUpdate != null && checkUserNameDrive != null)
+            {
+                vehicleUpdate.DriverId = userIdUpdate;
+
+                vehicleUpdate.UpdateBy = checkUserNameDrive.Id;
 
                 vehicleUpdate.UpdateAt = DateTime.Now;
 
-                _context.Vehicles.Update(vehicleUpdate);
-
-                _context.SaveChanges();
+                //await _context.SaveChangesAsync();
 
                 return true;
 
             }
             else
             {
-                throw new Exception("Not found vehicle in system");
+                throw new Exception("Not found user name in system");
+            }
+            }
+
+            private bool UpdateVehicleByStaff(int id, int userIdUpdate, bool updateStatus)
+            {
+                var vehicleUpdate = _context.Vehicles.SingleOrDefault(vehicle => vehicle.Id == id);
+
+
+                if (vehicleUpdate != null)
+                {
+                    vehicleUpdate.Status = updateStatus;
+
+                    vehicleUpdate.UpdateBy = userIdUpdate;
+
+                    vehicleUpdate.UpdateAt = DateTime.Now;
+
+                    _context.Vehicles.Update(vehicleUpdate);
+
+                    _context.SaveChanges();
+
+                    return true;
+
+                }
+                else
+                {
+                    throw new Exception("Not found vehicle in system");
+                }
             }
         }
-
-
-
     }
-}
+

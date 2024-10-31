@@ -66,12 +66,14 @@ namespace MyAPI.Controllers
 
 
         [HttpPost("addVehicle")]
-        public async Task<IActionResult> AddVehicle(VehicleAddDTO vehicleAddDTO, string driverName)
+        public async Task<IActionResult> AddVehicle(VehicleAddDTO vehicleAddDTO, string driverName, int roleId)
         {
             try
             {
+
                 var isAdded = await _vehicleRepository.AddVehicleAsync(vehicleAddDTO, driverName);
                 return Ok(new { Message = "Vehicle added successfully.", Vehicle = vehicleAddDTO });
+
             }
             catch (Exception ex)
             {
@@ -119,7 +121,6 @@ namespace MyAPI.Controllers
 
         }
 
-
         [HttpDelete("deleteVehicleByStatus/{id}")]
         public async Task<IActionResult> UpdateVehicle(int id)
         {
@@ -141,7 +142,41 @@ namespace MyAPI.Controllers
             {
                 return BadRequest(new { Message = "DeleteVehicle failed", Details = ex.Message });
             }
+        }
 
+        [HttpGet("getStartPointTripFromVehicle/{vehicleId}")]
+        public async Task<IActionResult> getStartPointTripFromVehicle(int vehicleId)
+        {
+            try
+            {
+                var listStartPoint = await _vehicleRepository.GetListStartPointByVehicleId(vehicleId);   
+                if(listStartPoint == null)
+                {
+                    return NotFound();
+                }
+                return Ok(listStartPoint);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { ex.Message });
+            }
+        }
+        [HttpGet("getEndPointTripFromVehicle/{vehicleId}")]
+        public async Task<IActionResult> getEndPointTripFromVehicle(int vehicleId)
+        {
+            try
+            {
+                var listEndPoint =  await _vehicleRepository.GetListEndPointByVehicleId(vehicleId);
+                if (listEndPoint == null)
+                {
+                    return NotFound();
+                }
+                return Ok(listEndPoint);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { ex.Message });
+            }
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿using MyAPI.DTOs.VehicleDTOs;
+﻿using MyAPI.DTOs.TripDetailsDTOs;
+using MyAPI.DTOs.TripDTOs;
+using MyAPI.DTOs.VehicleDTOs;
 using MyAPI.Models;
 
 namespace MyAPI.Infrastructure.Interfaces
@@ -18,6 +20,8 @@ namespace MyAPI.Infrastructure.Interfaces
 
         Task<bool> AddVehicleByStaffcheckAsync(int requestId, bool isApprove);
 
+        Task<List<EndPointDTO>> GetListEndPointByVehicleId(int vehicleId);
+        Task<List<StartPointDTO>> GetListStartPointByVehicleId(int vehicleId);
 
     }
 }
