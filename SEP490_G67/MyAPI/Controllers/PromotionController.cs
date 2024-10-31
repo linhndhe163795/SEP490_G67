@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using MyAPI.DTOs.PromotionDTOs;
+using MyAPI.Helper;
 using MyAPI.Infrastructure.Interfaces;
 using MyAPI.Models;
 
@@ -13,12 +14,14 @@ namespace MyAPI.Controllers
     {
         private readonly IPromotionRepository _promotionRepository;
         private readonly IPromotionUserRepository _promotionUserRepository;
+        private readonly GetInforFromToken _getInforFromToken;
         private readonly IUserRepository _userRepository;
         private readonly IMapper _mapper;
-        public PromotionController(IPromotionRepository promotionRepository, IMapper mapper, IPromotionUserRepository promotionUserRepository, IUserRepository userRepository)
+        public PromotionController(IPromotionRepository promotionRepository, GetInforFromToken getInforFromToken,IMapper mapper, IPromotionUserRepository promotionUserRepository, IUserRepository userRepository)
         {
             _promotionRepository = promotionRepository;
             _mapper = mapper;
+            _getInforFromToken = getInforFromToken;
             _promotionUserRepository = promotionUserRepository;
             _userRepository = userRepository;
         }
@@ -38,10 +41,20 @@ namespace MyAPI.Controllers
         }
         // Lấy id từ header
         [HttpGet("getPromotionById")]
-        public async Task<IActionResult> GetPromotionByUser(int userId)
+        public async Task<IActionResult> GetPromotionByUser()
         {
             try
             {
+                string token = Request.Headers["Authorization"];
+                if (token.StartsWith("Bearer"))
+                {
+                    token = token.Substring("Bearer ".Length).Trim();
+                }
+                if (string.IsNullOrEmpty(token))
+                {
+                    return BadRequest("Token is required.");
+                }
+                var userId = _getInforFromToken.GetIdInHeader(token);
                 var listPromtion = await _promotionRepository.getPromotionUserById(userId);
                 if (listPromtion == null) return NotFound();
                 return Ok(listPromtion);
