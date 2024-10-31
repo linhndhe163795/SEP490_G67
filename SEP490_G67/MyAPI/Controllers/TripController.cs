@@ -36,7 +36,6 @@ namespace MyAPI.Controllers
             {
                 throw new Exception("GetListTrip: " + ex.Message);
             }
-
         }
         [HttpGet("searchTrip/startPoint/endPoint/time")]
         public async Task<IActionResult> searchTrip(string startPoint,  string endPoint, DateTime time)

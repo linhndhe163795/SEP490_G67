@@ -80,6 +80,15 @@ namespace MyAPI.Controllers
                 {
                     var getUserLogin = await _userRepository.GetUserLogin(userLogin);
                     var tokenString = _Jwt.CreateToken(getUserLogin);
+                    var cookieOptions = new CookieOptions
+                    {
+                        HttpOnly = false,   
+                        //Secure = true,     
+                        SameSite = SameSiteMode.Strict,
+                        Expires = DateTime.UtcNow.AddHours(1) 
+                    };
+                    Response.Cookies.Append("AuthToken", tokenString, cookieOptions);
+                   
                     return Ok(tokenString);
                 }
                 else

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.CookiePolicy;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -47,6 +48,12 @@ builder.Services.AddScoped<ParseStringToDateTime>();
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IVehicleRepository, VehicleRepository>();
+builder.Services.Configure<CookiePolicyOptions>(options =>
+{
+    options.MinimumSameSitePolicy = SameSiteMode.Strict; // SameSite policy
+    options.HttpOnly = HttpOnlyPolicy.Always;            // Make all cookies HttpOnly
+    options.Secure = CookieSecurePolicy.Always;          // Use Secure cookies in production
+});
 
 builder.Services.AddSession(options =>
 {
@@ -139,6 +146,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+app.UseCookiePolicy();
+
 app.UseSession();
 app.UseCors("corsapp");
 app.UseAuthentication();
