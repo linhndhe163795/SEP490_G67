@@ -83,12 +83,11 @@ namespace MyAPI.Controllers
                     var cookieOptions = new CookieOptions
                     {
                         HttpOnly = false,   
-                        //Secure = true,     
+                        Secure = true,     
                         SameSite = SameSiteMode.Strict,
                         Expires = DateTime.UtcNow.AddHours(1) 
                     };
                     Response.Cookies.Append("AuthToken", tokenString, cookieOptions);
-                   
                     return Ok(tokenString);
                 }
                 else

@@ -61,6 +61,13 @@ builder.Services.AddSession(options =>
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true; 
 });
+builder.Services.Configure<CookiePolicyOptions>(options =>
+{
+    options.MinimumSameSitePolicy = SameSiteMode.Strict; // SameSite policy
+    options.HttpOnly = HttpOnlyPolicy.Always;            // Make all cookies HttpOnly
+    options.Secure = CookieSecurePolicy.Always;          // Use Secure cookies in production
+});
+
 builder.Services.AddAuthentication(opt =>
 {
     opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -95,6 +102,13 @@ builder.Services.AddAuthentication(opt =>
         }
     };
 });
+builder.Services.Configure<CookiePolicyOptions>(options =>
+{
+    options.MinimumSameSitePolicy = SameSiteMode.Strict; 
+    options.HttpOnly = HttpOnlyPolicy.Always;           
+    options.Secure = CookieSecurePolicy.Always;          
+});
+
 builder.Services.AddHealthChecks();
 builder.Services.AddSwaggerGen(c =>
 {
@@ -147,7 +161,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 app.UseCookiePolicy();
-
 app.UseSession();
 app.UseCors("corsapp");
 app.UseAuthentication();

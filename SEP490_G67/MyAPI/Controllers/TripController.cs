@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using MyAPI.DTOs.TripDTOs;
+using MyAPI.Helper;
 using MyAPI.Infrastructure.Interfaces;
 using MyAPI.Models;
 
@@ -11,11 +13,14 @@ namespace MyAPI.Controllers
     public class TripController : ControllerBase
     {
         private readonly ITripRepository _tripRepository;
+        private readonly GetInforFromToken _getInforFromToken;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        public TripController(ITripRepository tripRepository ,IHttpContextAccessor httpContextAccessor)
+
+        public TripController(ITripRepository tripRepository,  IHttpContextAccessor httpContextAccessor, GetInforFromToken getInforFromToken)
         {
             _tripRepository = tripRepository;
             _httpContextAccessor = httpContextAccessor;
+            _getInforFromToken = getInforFromToken;
         }
         [HttpGet]
         public async Task<IActionResult> GetListTrip()
@@ -55,12 +60,21 @@ namespace MyAPI.Controllers
                 return BadRequest("searchTripAPI: " + ex.Message);
             }
         }
-        //Lay id tu token
         [HttpPost("addTrip")]
-        public async Task<IActionResult> addTrip(TripDTO trip, int vehicleId, int userId)
+        public async Task<IActionResult> addTrip(TripDTO trip, int vehicleId)
         {
             try
             {
+                string token = Request.Headers["Authorization"];
+                if (token.StartsWith("Bearer"))
+                {
+                    token = token.Substring("Bearer ".Length).Trim();
+                }
+                if (string.IsNullOrEmpty(token))
+                {
+                    return BadRequest("Token is required.");
+                }
+                var userId = _getInforFromToken.GetIdInHeader(token);
                 await _tripRepository.AddTrip(trip, vehicleId, userId);
 
                 return Ok(trip);
@@ -70,12 +84,22 @@ namespace MyAPI.Controllers
                 return BadRequest(ex.Message);
             }
         }
-        // lấy id từ token
         [HttpPut("updateTrip/{id}")]
-        public async Task<IActionResult> updateTrip(int id, TripDTO tripDTO, int userId)
+        public async Task<IActionResult> updateTrip(int id, TripDTO tripDTO)
         {
             try
             {
+                string token = Request.Headers["Authorization"];
+                if (token.StartsWith("Bearer"))
+                {
+                    token = token.Substring("Bearer ".Length).Trim();
+                }
+                if (string.IsNullOrEmpty(token))
+                {
+                    return BadRequest("Token is required.");
+                }
+                var userId = _getInforFromToken.GetIdInHeader(token);
+
                 await _tripRepository.UpdateTripById(id, tripDTO, userId);
                 return Ok(tripDTO);
 
@@ -85,12 +109,21 @@ namespace MyAPI.Controllers
                 return BadRequest(ex.Message);
             }
         }
-        // lấy id từ token
         [HttpPut("updateStatusTrip/{id}")]
-        public async Task<IActionResult> updateStatusTrip(int id, int userId)
+        public async Task<IActionResult> updateStatusTrip(int id)
         {
             try
             {
+                string token = Request.Headers["Authorization"];
+                if (token.StartsWith("Bearer"))
+                {
+                    token = token.Substring("Bearer ".Length).Trim();
+                }
+                if (string.IsNullOrEmpty(token))
+                {
+                    return BadRequest("Token is required.");
+                }
+                var userId = _getInforFromToken.GetIdInHeader(token);
                 await _tripRepository.updateStatusTrip(id, userId);
                 return Ok();
 
