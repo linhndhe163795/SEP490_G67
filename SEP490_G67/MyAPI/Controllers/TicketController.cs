@@ -24,8 +24,7 @@ namespace MyAPI.Controllers
         public async Task<IActionResult> createTicket( TicketDTOs ticketDTOs,  int tripDetailsId,  string? promotionCode )
         {
             try
-            {
-             
+            {   
                 string token = Request.Headers["Authorization"];
                 if (token.StartsWith("Bearer"))
                 {
