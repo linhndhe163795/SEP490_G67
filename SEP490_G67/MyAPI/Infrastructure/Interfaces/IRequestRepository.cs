@@ -1,5 +1,4 @@
-﻿using MyAPI.DTOs.RequestDTOs;
-using MyAPI.Models;
+﻿using MyAPI.Models;
 
 namespace MyAPI.Infrastructure.Interfaces
 {
@@ -14,7 +13,6 @@ namespace MyAPI.Infrastructure.Interfaces
         Task<Request> CreateRequestAsync(Request request, List<RequestDetail> requestDetails);
 
         Task DeleteRequestDetailAsync(int requestId, int detailId);
-
 
     }
 }
