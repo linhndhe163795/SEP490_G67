@@ -6,7 +6,6 @@ namespace MyAPI.Infrastructure.Interfaces
     public interface IRequestRepository : IRepository<Request>
     {
 
-
         Task<IEnumerable<Request>> GetAllRequestsWithDetailsAsync();
 
         // Thêm phương thức lấy một request bao gồm chi tiết

@@ -1,4 +1,5 @@
 ﻿
+
 using Microsoft.EntityFrameworkCore;
 using MyAPI.DTOs.RequestDTOs;
 using MyAPI.Infrastructure.Interfaces;
@@ -37,7 +38,9 @@ namespace MyAPI.Repositories.Impls
                 throw new KeyNotFoundException("Request not found");
             }
 
-            // Cập nhật các trường cần thiết
+            // Cập nhật các trường cần thiết của yêu cầu
+            existingRequest.UserId = request.UserId;
+            existingRequest.TypeId = request.TypeId;
             existingRequest.Status = request.Status;
             existingRequest.Description = request.Description;
             existingRequest.Note = request.Note;
