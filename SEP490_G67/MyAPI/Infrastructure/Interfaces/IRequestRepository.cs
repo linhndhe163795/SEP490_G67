@@ -1,10 +1,16 @@
-﻿using MyAPI.Models;
+﻿using MyAPI.DTOs.RequestDTOs;
+using MyAPI.Models;
 
 namespace MyAPI.Infrastructure.Interfaces
 {
     public interface IRequestRepository : IRepository<Request>
     {
-        
+
+
+        Task<Request> CreateRequestVehicleAsync(RequestDTO requestDTO);
+
+        Task<bool> UpdateRequestVehicleAsync(int requestId, Request request);
+
         Task<IEnumerable<Request>> GetAllRequestsWithDetailsAsync();
 
         Task<Request> GetRequestWithDetailsByIdAsync(int id);

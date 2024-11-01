@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using MyAPI.DTOs.AccountDTOs;
 using MyAPI.DTOs.DriverDTOs;
+using MyAPI.DTOs.LossCostDTOs.LossCostTypeDTOs;
 using MyAPI.DTOs.PromotionDTOs;
 using MyAPI.DTOs.PromotionUserDTOs;
 using MyAPI.DTOs.RequestDTOs;
@@ -51,6 +52,7 @@ namespace MyAPI.MappingProfile
             CreateMap<VehicleTrip, VehicleTripDTO>().ReverseMap();
             CreateMap<Trip,EndPointDTO>().ReverseMap();
             CreateMap<Trip,StartPointDTO>().ReverseMap();
+            CreateMap<LossCostType, LossCostTypeListDTO>().ReverseMap();
         }
     }
 }

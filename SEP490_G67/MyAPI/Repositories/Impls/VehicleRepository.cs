@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using MyAPI.DTOs;
 using MyAPI.DTOs.AccountDTOs;
 using MyAPI.DTOs.RequestDTOs;
 using MyAPI.DTOs.TripDTOs;
@@ -18,6 +19,8 @@ namespace MyAPI.Repositories.Impls
         private readonly GetInforFromToken _tokenHelper;
         private readonly IRequestRepository _requestRepository;
         private readonly IRequestDetailRepository _requestDetailRepository;
+        private readonly SendMail _sendMail;
+
 
 
 
@@ -25,7 +28,8 @@ namespace MyAPI.Repositories.Impls
             IHttpContextAccessor httpContextAccessor,
             GetInforFromToken tokenHelper,
             IRequestRepository requestRepository,
-            IRequestDetailRepository requestDetailRepository) : base(context)
+            IRequestDetailRepository requestDetailRepository,
+            SendMail sendMail) : base(context)
 
         {
             _mapper = mapper;
@@ -33,6 +37,7 @@ namespace MyAPI.Repositories.Impls
             _tokenHelper = tokenHelper;
             _requestRepository = requestRepository;
             _requestDetailRepository = requestDetailRepository;
+            _sendMail = sendMail;
         }
 
         public async Task<bool> AddVehicleAsync(VehicleAddDTO vehicleAddDTO, string driverName)
@@ -76,7 +81,7 @@ namespace MyAPI.Repositories.Impls
                 VehicleOwner = userId,
                 LicensePlate = vehicleAddDTO.LicensePlate,
                 Description = vehicleAddDTO.Description,
-                CreatedBy = vehicleAddDTO.CreatedBy,
+                CreatedBy = userId,
                 CreatedAt = vehicleAddDTO.CreatedAt,
                 UpdateAt = vehicleAddDTO.UpdateAt,
                 UpdateBy = vehicleAddDTO.UpdateBy,
@@ -95,7 +100,7 @@ namespace MyAPI.Repositories.Impls
                     Note = "Đang chờ xác nhận",
                 };
 
-                var createdRequest = await _requestRepository.CreateRequestAsync(requestDTO);
+                var createdRequest = await _requestRepository.CreateRequestVehicleAsync(requestDTO);
                 if (createdRequest == null)
                 {
                     throw new Exception("Failed to create request.");
@@ -109,6 +114,21 @@ namespace MyAPI.Repositories.Impls
                 };
 
                 await _requestDetailRepository.CreateRequestDetailAsync(requestDetailDTO);
+
+                SendMailDTO mail = new SendMailDTO
+                {
+                    FromEmail = "nhaxenhanam@gmail.com",
+                    Password = "vzgq unyk xtpt xyjp",
+                    ToEmail = user.Email,
+                    Subject = "Thông báo về việc đăng ký xe vào hệ thống",
+                    Body = "Thông tin của bạn đã được chúng tôi tiếp nhận xin vui lòng chờ đợi kiểm duyệt"
+                };
+
+                var checkMail = await _sendMail.SendEmail(mail);
+                if (!checkMail)
+                {
+                    throw new Exception("Send mail fail!!");
+                }
             }
 
             await _context.SaveChangesAsync();
@@ -138,11 +158,39 @@ namespace MyAPI.Repositories.Impls
             }
 
             checkRequestExits.Note = isApprove ? "Đã xác nhận" : "Từ chối xác nhận";
-            var updateRequest = await _requestRepository.UpdateRequestAsync(requestId, checkRequestExits);
+            checkRequestExits.Status = isApprove;
+            var updateRequest = await _requestRepository.UpdateRequestVehicleAsync(requestId, checkRequestExits);
 
-            if (updateRequest == null)
+            if (!updateRequest)
             {
                 throw new Exception("Failed to update request.");
+            }
+
+
+            var emailOfUser = await _context.Users
+                                          .Where(rq => rq.Id == checkRequestExits.UserId)
+                                          .Select(rq => rq.Email)
+                                          .FirstOrDefaultAsync();
+
+            if (string.IsNullOrEmpty(emailOfUser))
+            {
+                throw new Exception("User email not found.");
+            }
+
+            SendMailDTO mail = new SendMailDTO
+            {
+                FromEmail = "nhaxenhanam@gmail.com",
+                Password = "vzgq unyk xtpt xyjp",
+                ToEmail = emailOfUser,
+                Subject = "Thông báo về việc đăng ký xe vào hệ thống",
+                Body = isApprove ? "Hệ thống đã xác nhận yêu cầu xe của bạn. Xe của bạn đã tham gia hệ thống."
+                                 : "Rất tiếc, yêu cầu xe của bạn đã bị từ chối xác nhận."
+            };
+
+            var checkMail = await _sendMail.SendEmail(mail);
+            if (!checkMail)
+            {
+                throw new Exception("Send mail fail!!");
             }
 
             var vehicleID = await _context.Requests

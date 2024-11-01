@@ -34,6 +34,7 @@ builder.Services.AddScoped<IRequestDetailRepository, RequestDetailRepository>();
 builder.Services.AddScoped<IPromotionRepository, PromotionRepository>();
 builder.Services.AddScoped<IPromotionUserRepository, PromotionUserRepository>();
 builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
+builder.Services.AddScoped<ILossCostTypeRepository, LossCostTypeRepository>();
 
 //builder.Services.AddScoped<ITicketRepository, TicketRepository>();
 builder.Services.AddScoped<ITripDetailsRepository, TripDetailsRepository>();

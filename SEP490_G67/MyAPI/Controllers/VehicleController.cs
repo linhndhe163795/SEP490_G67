@@ -14,7 +14,7 @@ namespace MyAPI.Controllers
     {
 
         private readonly IVehicleRepository _vehicleRepository;
-        public VehicleController(IVehicleRepository vehicleRepository, IMapper mapper)
+        public VehicleController(IVehicleRepository vehicleRepository)
         {
             _vehicleRepository = vehicleRepository;
         }
@@ -66,7 +66,7 @@ namespace MyAPI.Controllers
 
 
         [HttpPost("addVehicle")]
-        public async Task<IActionResult> AddVehicle(VehicleAddDTO vehicleAddDTO, string driverName, int roleId)
+        public async Task<IActionResult> AddVehicle(VehicleAddDTO vehicleAddDTO, string driverName)
         {
             try
             {
@@ -77,7 +77,7 @@ namespace MyAPI.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new { Message = "AddVehicle failed", Details = ex.Message });
+                return BadRequest(new { Message = "AddVehicle Add failed", Details = ex.Message });
             }
         }
 
@@ -116,7 +116,7 @@ namespace MyAPI.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new { Message = "UpdateVehicle failed", Details = ex.Message });
+                return BadRequest(new { Message = "UpdateVehicle Update failed", Details = ex.Message });
             }
 
         }
@@ -140,7 +140,7 @@ namespace MyAPI.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new { Message = "DeleteVehicle failed", Details = ex.Message });
+                return BadRequest(new { Message = "DeleteVehicle Delete failed", Details = ex.Message });
             }
         }
 

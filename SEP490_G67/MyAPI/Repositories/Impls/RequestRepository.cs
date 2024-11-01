@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using MyAPI.DTOs.RequestDTOs;
 using MyAPI.Infrastructure.Interfaces;
 using MyAPI.Models;
 
@@ -99,6 +100,38 @@ namespace MyAPI.Repositories.Impls
                 _context.RequestDetails.Remove(detail);
                 await _context.SaveChangesAsync();
             }
+        }
+
+        public async Task<Request> CreateRequestVehicleAsync(RequestDTO requestDTO)
+        {
+            var newRequest = new Request
+            {
+                CreatedAt = DateTime.Now,
+                Description = requestDTO.Description,
+                Note = requestDTO.Note,
+                Status = requestDTO.Status,
+                TypeId = requestDTO.TypeId,
+                UserId = requestDTO.UserId,
+            };
+
+            await _context.Requests.AddAsync(newRequest);
+            await _context.SaveChangesAsync();
+
+            return newRequest;
+        }
+
+        public async Task<bool> UpdateRequestVehicleAsync(int requestId, Request request)
+        {
+            var update = await _context.Requests.SingleOrDefaultAsync(s => s.Id == requestId);
+            if (update != null)
+            {
+                update.Status = request.Status;
+                update.Note = request.Note;
+
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            return false;
         }
     }
 }
