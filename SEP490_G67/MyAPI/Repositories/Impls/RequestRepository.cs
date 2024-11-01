@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿    using Microsoft.EntityFrameworkCore;
 using MyAPI.Infrastructure.Interfaces;
 using MyAPI.Models;
 
@@ -13,12 +13,23 @@ namespace MyAPI.Repositories.Impls
             _context = context;
         }
 
-        public async Task<Request> CreateRequestAsync(Request request)
+        public async Task<Request> CreateRequestAsync(Request request, List<RequestDetail> requestDetails)
         {
-            request.CreatedAt = DateTime.UtcNow;  
-            await Add(request);
+            // Thêm Request mới vào CSDL
+            _context.Requests.Add(request);
+            await _context.SaveChangesAsync();
+
+            // Thêm danh sách RequestDetail và thiết lập RequestId
+            foreach (var detail in requestDetails)
+            {
+                detail.RequestId = request.Id;
+                _context.RequestDetails.Add(detail);
+            }
+
+            await _context.SaveChangesAsync();
             return request;
         }
+
 
         public async Task<Request> UpdateRequestAsync(int id, Request request)
         {

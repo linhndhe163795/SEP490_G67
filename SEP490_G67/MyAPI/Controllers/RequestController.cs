@@ -34,22 +34,34 @@ namespace MyAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateRequest(RequestDTO requestDto)
+        public async Task<IActionResult> CreateRequestWithDetails(RequestDTO requestWithDetailsDto)
         {
-            // Chuyển đổi RequestDTO sang thực thể Request
+            // Chuyển đổi DTO sang các entity tương ứng
             var request = new Request
             {
-                UserId = requestDto.UserId,
-                TypeId = requestDto.TypeId,
-                Status = requestDto.Status,
-                Description = requestDto.Description,
-                Note = requestDto.Note,
-                CreatedAt = DateTime.UtcNow 
+                UserId = requestWithDetailsDto.UserId,
+                TypeId = requestWithDetailsDto.TypeId,
+                Status = requestWithDetailsDto.Status,
+                Description = requestWithDetailsDto.Description,
+                Note = requestWithDetailsDto.Note,
+                CreatedAt = requestWithDetailsDto.CreatedAt ?? DateTime.UtcNow
             };
 
-            var createdRequest = await _requestRepository.CreateRequestAsync(request);
-            return CreatedAtAction(nameof(GetRequestById), new { id = createdRequest.UserId }, createdRequest);
+            var requestDetails = requestWithDetailsDto.RequestDetails.Select(detailDto => new RequestDetail
+            {
+                VehicleId = detailDto.VehicleId,
+                StartLocation = detailDto.StartLocation,
+                EndLocation = detailDto.EndLocation,
+                StartTime = detailDto.StartTime,
+                EndTime = detailDto.EndTime,
+                Seats = detailDto.Seats
+            }).ToList();
+
+            var createdRequest = await _requestRepository.CreateRequestAsync(request, requestDetails);
+            return CreatedAtAction(nameof(GetRequestById), new { id = createdRequest.Id }, createdRequest);
         }
+
+
 
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateRequest(int id, RequestDTO requestDto)
