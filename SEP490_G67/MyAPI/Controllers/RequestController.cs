@@ -36,10 +36,29 @@ namespace MyAPI.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateRequest(RequestDTO requestDto)
         {
-            // Chuyển đổi RequestDTO sang thực thể Request
-            
-            var createdRequest = await _requestRepository.CreateRequestAsync(requestDto);
-            return CreatedAtAction(nameof(GetRequestById), new { id = createdRequest.UserId }, createdRequest);
+            // Chuyển đổi DTO sang các entity tương ứng
+            var request = new Request
+            {
+                UserId = requestWithDetailsDto.UserId,
+                TypeId = requestWithDetailsDto.TypeId,
+                Status = requestWithDetailsDto.Status,
+                Description = requestWithDetailsDto.Description,
+                Note = requestWithDetailsDto.Note,
+                CreatedAt = requestWithDetailsDto.CreatedAt ?? DateTime.UtcNow
+            };
+
+            var requestDetails = requestWithDetailsDto.RequestDetails.Select(detailDto => new RequestDetail
+            {
+                VehicleId = detailDto.VehicleId,
+                StartLocation = detailDto.StartLocation,
+                EndLocation = detailDto.EndLocation,
+                StartTime = detailDto.StartTime,
+                EndTime = detailDto.EndTime,
+                Seats = detailDto.Seats
+            }).ToList();
+
+            var createdRequest = await _requestRepository.CreateRequestAsync(request, requestDetails);
+            return CreatedAtAction(nameof(GetRequestById), new { id = createdRequest.Id }, createdRequest);
         }
 
         [HttpPut("{id}")]

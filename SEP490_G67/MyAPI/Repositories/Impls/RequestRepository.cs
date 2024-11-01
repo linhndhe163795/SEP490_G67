@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿
+using Microsoft.EntityFrameworkCore;
 using MyAPI.DTOs.RequestDTOs;
 using MyAPI.Infrastructure.Interfaces;
 using MyAPI.Models;
@@ -12,24 +13,21 @@ namespace MyAPI.Repositories.Impls
         {
         }
 
-        public async Task<Request> CreateRequestAsync(RequestDTO request)
+        public async Task<Request> CreateRequestAsync(Request request, List<RequestDetail> requestDetails)
         {
-
-            var requestAdd = new Request
-            {
-                UserId = request.UserId,
-                CreatedAt = DateTime.UtcNow,
-                TypeId = request.TypeId,
-                Status = false,
-                Description = request.Description,
-                Note = request.Note,
-            };
-
-            _context.Requests.Add(requestAdd);
+            // Thêm Request mới vào CSDL
+            _context.Requests.Add(request);
             await _context.SaveChangesAsync();
-            
-            return requestAdd;
-        }
+
+            // Thêm danh sách RequestDetail và thiết lập RequestId
+            foreach (var detail in requestDetails)
+            {
+                detail.RequestId = request.Id;
+                _context.RequestDetails.Add(detail);
+            }
+
+            await _context.SaveChangesAsync();
+            return request;
 
         public async Task<Request> UpdateRequestAsync(int id, Request request)
         {
