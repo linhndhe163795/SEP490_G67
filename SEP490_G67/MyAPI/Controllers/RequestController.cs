@@ -36,7 +36,6 @@ namespace MyAPI.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateRequestWithDetails(RequestDTO requestWithDetailsDto)
         {
-            // Chuyển đổi DTO sang các entity tương ứng
             var request = new Request
             {
                 UserId = requestWithDetailsDto.UserId,
@@ -68,12 +67,12 @@ namespace MyAPI.Controllers
         {
             
 
-            // Lấy yêu cầu hiện tại
+            
             var existingRequest = await _requestRepository.GetRequestWithDetailsByIdAsync(id);
             if (existingRequest == null)
                 return NotFound();
 
-            // Cập nhật thông tin yêu cầu
+            
             existingRequest.UserId = requestDto.UserId;
             existingRequest.TypeId = requestDto.TypeId;
             existingRequest.Status = requestDto.Status;
@@ -81,7 +80,7 @@ namespace MyAPI.Controllers
             existingRequest.Note = requestDto.Note;
             existingRequest.CreatedAt = requestDto.CreatedAt ?? DateTime.UtcNow;
 
-            // Cập nhật chi tiết yêu cầu
+            
             var updatedDetails = requestDto.RequestDetails.Select(detailDto => new RequestDetail
             {
                 VehicleId = detailDto.VehicleId,
@@ -92,7 +91,7 @@ namespace MyAPI.Controllers
                 Seats = detailDto.Seats
             }).ToList();
 
-            // Gọi phương thức cập nhật với danh sách chi tiết mới
+            
             await _requestRepository.UpdateRequestAsync(id, existingRequest, updatedDetails);
 
             return Ok(existingRequest);
@@ -104,21 +103,21 @@ namespace MyAPI.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteRequest(int id)
         {
-            // Lấy yêu cầu với chi tiết
+            
             var request = await _requestRepository.GetRequestWithDetailsByIdAsync(id);
             if (request == null)
                 return NotFound();
 
-            // Xóa tất cả các chi tiết yêu cầu trước
+           
             foreach (var detail in request.RequestDetails)
             {
-                await _requestRepository.DeleteRequestDetailAsync(request.Id, detail.DetailId); // Gọi phương thức xóa từng detail
+                await _requestRepository.DeleteRequestDetailAsync(request.Id, detail.DetailId);
             }
 
-            // Xóa yêu cầu chính
+           
             await _requestRepository.Delete(request);
 
-            return NoContent(); // Trả về trạng thái 204 No Content
+            return NoContent(); 
         }
 
 
