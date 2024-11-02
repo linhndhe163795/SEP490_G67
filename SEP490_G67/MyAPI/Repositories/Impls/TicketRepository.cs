@@ -113,6 +113,63 @@ namespace MyAPI.Repositories.Impls
             }
         }
 
+        public async Task CreateTicketForRentCar(int vehicleId, decimal price, TicketForRentCarDTO ticketRentalDTO, int userId)
+        {
+            try
+            {
+                var promotionUser = await (from u in _context.Users
+                                           join pu in _context.PromotionUsers on u.Id equals pu.UserId
+                                           join p in _context.Promotions on pu.PromotionId equals p.Id
+                                           where u.Id == userId && p.CodePromotion.Equals(ticketRentalDTO.CodePromotion)
+                                           select p).FirstOrDefaultAsync();
+
+                var promotionUserUsed = await _context.PromotionUsers.Include(x => x.Promotion)
+                                                    .FirstOrDefaultAsync(x => x.Promotion.CodePromotion == ticketRentalDTO.CodePromotion && x.UserId == userId);
+
+                var ticket = new Ticket
+                {
+                    VehicleId = vehicleId,
+                    Price = price,
+                    CodePromotion = promotionUser?.Description,
+                    SeatCode = ticketRentalDTO.seatCode,
+                    PointStart = ticketRentalDTO.PointStart,
+                    PointEnd = ticketRentalDTO.PointEnd,
+                    TimeFrom = ticketRentalDTO.TimeFrom,
+                    TimeTo = ticketRentalDTO.TimeTo,
+                    Description = ticketRentalDTO.Description,
+                    Note = ticketRentalDTO.Note,
+                    UserId = userId,
+                    TypeOfTicket = 3,
+                    TypeOfPayment = ticketRentalDTO.TypeOfPayment,
+                    CreatedAt = DateTime.UtcNow,
+                    Status = "Đã thanh toán"
+                };
+
+                if (promotionUser != null)
+                {
+                    ticket.PricePromotion = price - (price * (promotionUser.Discount / 100.0m));
+                }
+
+                await _context.Tickets.AddAsync(ticket);
+
+                if (promotionUserUsed != null)
+                {
+                    var promotionUserMapper = _mapper.Map<PromotionUser>(promotionUserUsed);
+                    _context.PromotionUsers.Remove(promotionUserMapper);
+                }
+
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("CreateTicketForRentCar: " + ex.Message);
+            }
+        }
+
+
+
+
+
         public async Task<List<ListTicketDTOs>> getAllTicket()
         {
             try

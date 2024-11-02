@@ -14,22 +14,7 @@ namespace MyAPI.Repositories.Impls
             _context = context;
         }
 
-        public async Task<Request> CreateRequestAsync(Request request, List<RequestDetail> requestDetails)
-        {
-            _context.Requests.Add(request);
-            await _context.SaveChangesAsync();
-
-            foreach (var detail in requestDetails)
-            {
-                detail.RequestId = request.Id;
-                _context.RequestDetails.Add(detail);
-            }
-
-            await _context.SaveChangesAsync();
-            return request;
-        }
-
-        public async Task<Request> UpdateRequestAsync(int id, Request request, List<RequestDetail> requestDetails)
+        public async Task<Request> UpdateRequestRentCarAsync(int id, RequestDTO requestDTO)
         {
             var existingRequest = await GetRequestWithDetailsByIdAsync(id);
             if (existingRequest == null)
@@ -37,18 +22,18 @@ namespace MyAPI.Repositories.Impls
                 throw new KeyNotFoundException("Request not found");
             }
 
-            existingRequest.UserId = request.UserId;
-            existingRequest.TypeId = request.TypeId;
-            existingRequest.Status = request.Status;
-            existingRequest.Description = request.Description;
-            existingRequest.Note = request.Note;
-            existingRequest.CreatedAt = request.CreatedAt ?? existingRequest.CreatedAt;
+            existingRequest.UserId = requestDTO.UserId;
+            existingRequest.TypeId = requestDTO.TypeId;
+            existingRequest.Status = requestDTO.Status;
+            existingRequest.Description = requestDTO.Description;
+            existingRequest.Note = requestDTO.Note;
+            existingRequest.CreatedAt = requestDTO.CreatedAt ?? existingRequest.CreatedAt;
 
+           
             var existingDetails = existingRequest.RequestDetails.ToList();
-
             foreach (var detail in existingDetails)
             {
-                var updatedDetail = requestDetails.FirstOrDefault(d => d.VehicleId == detail.VehicleId);
+                var updatedDetail = requestDTO.RequestDetails.FirstOrDefault(d => d.VehicleId == detail.VehicleId);
                 if (updatedDetail == null)
                 {
                     _context.RequestDetails.Remove(detail);
@@ -63,18 +48,65 @@ namespace MyAPI.Repositories.Impls
                 }
             }
 
-            foreach (var detail in requestDetails)
+            foreach (var detail in requestDTO.RequestDetails)
             {
                 if (!existingDetails.Any(d => d.VehicleId == detail.VehicleId))
                 {
-                    detail.RequestId = existingRequest.Id;
-                    _context.RequestDetails.Add(detail);
+                    var newDetail = new RequestDetail
+                    {
+                        VehicleId = detail.VehicleId,
+                        StartLocation = detail.StartLocation,
+                        EndLocation = detail.EndLocation,
+                        StartTime = detail.StartTime,
+                        EndTime = detail.EndTime,
+                        Seats = detail.Seats,
+                        RequestId = existingRequest.Id 
+                    };
+                    _context.RequestDetails.Add(newDetail);
                 }
             }
 
             await _context.SaveChangesAsync();
             return existingRequest;
         }
+
+        public async Task<Request> CreateRequestRentCarAsync(RequestDTO requestDTO)
+        {
+            var newRequest = new Request
+            {
+                UserId = requestDTO.UserId,
+                TypeId = requestDTO.TypeId,
+                Status = requestDTO.Status,
+                Description = requestDTO.Description,
+                Note = requestDTO.Note,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            await _context.Requests.AddAsync(newRequest);
+            await _context.SaveChangesAsync();
+
+            var maxId = await _context.Requests.MaxAsync(r => (int?)r.Id) ?? 0;
+            var newRequestId = maxId + 1;
+
+            foreach (var detailDto in requestDTO.RequestDetails)
+            {
+                var requestDetail = new RequestDetail
+                {
+                    VehicleId = detailDto.VehicleId,
+                    StartLocation = detailDto.StartLocation,
+                    EndLocation = detailDto.EndLocation,
+                    StartTime = detailDto.StartTime,
+                    EndTime = detailDto.EndTime,
+                    Seats = detailDto.Seats,
+                    RequestId = detailDto.RequestId,
+                };
+                await _context.RequestDetails.AddAsync(requestDetail);
+            }
+
+            await _context.SaveChangesAsync();
+            return newRequest;
+        }
+
 
         public async Task<IEnumerable<Request>> GetAllRequestsWithDetailsAsync()
         {
@@ -133,5 +165,30 @@ namespace MyAPI.Repositories.Impls
             }
             return false;
         }
+
+        public async Task<bool> AcceptRequestAsync(int requestId)
+        {
+            var request = await GetRequestWithDetailsByIdAsync(requestId);
+            if (request == null)
+            {
+                throw new KeyNotFoundException("Request not found");
+            }
+            request.Status = true; 
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> DenyRequestAsync(int requestId)
+        {
+            var request = await GetRequestWithDetailsByIdAsync(requestId);
+            if (request == null)
+            {
+                throw new KeyNotFoundException("Request not found");
+            }
+            request.Status = false; 
+            await _context.SaveChangesAsync();
+            return true; 
+        }
+
     }
 }

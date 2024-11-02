@@ -33,69 +33,24 @@ namespace MyAPI.Controllers
             return Ok(request);
         }
 
-        [HttpPost]
+        [HttpPost("/api/requestForRentCar")]
         public async Task<IActionResult> CreateRequestWithDetails(RequestDTO requestWithDetailsDto)
         {
-            var request = new Request
-            {
-                UserId = requestWithDetailsDto.UserId,
-                TypeId = requestWithDetailsDto.TypeId,
-                Status = requestWithDetailsDto.Status,
-                Description = requestWithDetailsDto.Description,
-                Note = requestWithDetailsDto.Note,
-                CreatedAt = requestWithDetailsDto.CreatedAt ?? DateTime.UtcNow
-            };
-
-            var requestDetails = requestWithDetailsDto.RequestDetails.Select(detailDto => new RequestDetail
-            {
-                VehicleId = detailDto.VehicleId,
-                StartLocation = detailDto.StartLocation,
-                EndLocation = detailDto.EndLocation,
-                StartTime = detailDto.StartTime,
-                EndTime = detailDto.EndTime,
-                Seats = detailDto.Seats
-            }).ToList();
-
-            var createdRequest = await _requestRepository.CreateRequestAsync(request, requestDetails);
+            var createdRequest = await _requestRepository.CreateRequestRentCarAsync(requestWithDetailsDto);
             return CreatedAtAction(nameof(GetRequestById), new { id = createdRequest.Id }, createdRequest);
         }
 
-
-
-        [HttpPut("{id}")]
+        [HttpPut("/api/requestForRentCar{id}")]
         public async Task<IActionResult> UpdateRequest(int id, RequestDTO requestDto)
         {
-            
-
-            
-            var existingRequest = await _requestRepository.GetRequestWithDetailsByIdAsync(id);
-            if (existingRequest == null)
-                return NotFound();
-
-            
-            existingRequest.UserId = requestDto.UserId;
-            existingRequest.TypeId = requestDto.TypeId;
-            existingRequest.Status = requestDto.Status;
-            existingRequest.Description = requestDto.Description;
-            existingRequest.Note = requestDto.Note;
-            existingRequest.CreatedAt = requestDto.CreatedAt ?? DateTime.UtcNow;
-
-            
-            var updatedDetails = requestDto.RequestDetails.Select(detailDto => new RequestDetail
+            var updated = await _requestRepository.UpdateRequestRentCarAsync(id, requestDto);
+            if (updated == null)
             {
-                VehicleId = detailDto.VehicleId,
-                StartLocation = detailDto.StartLocation,
-                EndLocation = detailDto.EndLocation,
-                StartTime = detailDto.StartTime,
-                EndTime = detailDto.EndTime,
-                Seats = detailDto.Seats
-            }).ToList();
-
-            
-            await _requestRepository.UpdateRequestAsync(id, existingRequest, updatedDetails);
-
-            return Ok(existingRequest);
+                return NotFound();
+            }
+            return NoContent();
         }
+
 
 
 
@@ -119,6 +74,35 @@ namespace MyAPI.Controllers
 
             return NoContent(); 
         }
+
+        [HttpPost("accept/{id}")]
+        public async Task<IActionResult> AcceptRequest(int id)
+        {
+            try
+            {
+                await _requestRepository.AcceptRequestAsync(id);
+                return Ok("Request accepted.");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPost("deny/{id}")]
+        public async Task<IActionResult> DenyRequest(int id)
+        {
+            try
+            {
+                await _requestRepository.DenyRequestAsync(id);
+                return Ok("Request denied.");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
 
 
     }
