@@ -14,6 +14,7 @@ using MyAPI.DTOs.UserDTOs;
 using MyAPI.DTOs.VehicleDTOs;
 using MyAPI.DTOs.VehicleTripDTOs;
 using MyAPI.Models;
+using MyAPI.DTOs.LossCostDTOs.LossCostVehicleDTOs;
 
 namespace MyAPI.MappingProfile
 {
@@ -58,6 +59,7 @@ namespace MyAPI.MappingProfile
             CreateMap<LossCostType, LossCostTypeListDTO>().ReverseMap();
             CreateMap<LossCost, AddLostCostVehicleDTOs>().ReverseMap();
             CreateMap<LossCost, AddLostCostVehicleDTOs>().ReverseMap();
+            CreateMap<LossCostAddDTOs, LossCost>().ReverseMap();
 
         }
     }

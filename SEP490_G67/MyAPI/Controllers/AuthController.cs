@@ -154,8 +154,6 @@ namespace MyAPI.Controllers
             {
                 return BadRequest("Token is required.");
             }
-
-            var handler = new JwtSecurityTokenHandler();
             try
             {   var userId = _getInforFromToken.GetIdInHeader(token);
                 var user = await _userRepository.getUserById(userId);
