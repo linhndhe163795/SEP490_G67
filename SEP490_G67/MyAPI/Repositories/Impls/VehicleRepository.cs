@@ -343,33 +343,33 @@ namespace MyAPI.Repositories.Impls
             {
                 throw new Exception("Not found user name in system");
             }
-            }
+        }
 
-            private bool UpdateVehicleByStaff(int id, int userIdUpdate, bool updateStatus)
+        private bool UpdateVehicleByStaff(int id, int userIdUpdate, bool updateStatus)
+        {
+            var vehicleUpdate = _context.Vehicles.SingleOrDefault(vehicle => vehicle.Id == id);
+
+
+            if (vehicleUpdate != null)
             {
-                var vehicleUpdate = _context.Vehicles.SingleOrDefault(vehicle => vehicle.Id == id);
+                vehicleUpdate.Status = updateStatus;
 
+                vehicleUpdate.UpdateBy = userIdUpdate;
 
-                if (vehicleUpdate != null)
-                {
-                    vehicleUpdate.Status = updateStatus;
+                vehicleUpdate.UpdateAt = DateTime.Now;
 
-                    vehicleUpdate.UpdateBy = userIdUpdate;
+                _context.Vehicles.Update(vehicleUpdate);
 
-                    vehicleUpdate.UpdateAt = DateTime.Now;
+                _context.SaveChanges();
 
-                    _context.Vehicles.Update(vehicleUpdate);
+                return true;
 
-                    _context.SaveChanges();
-
-                    return true;
-
-                }
-                else
-                {
-                    throw new Exception("Not found vehicle in system");
-                }
+            }
+            else
+            {
+                throw new Exception("Not found vehicle in system");
             }
         }
     }
+}
 

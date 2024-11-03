@@ -22,6 +22,7 @@ namespace MyAPI.Controllers
             _httpContextAccessor = httpContextAccessor;
             _getInforFromToken = getInforFromToken;
         }
+        [Authorize(Roles = "Staff")]
         [HttpGet]
         public async Task<IActionResult> GetListTrip()
         {
@@ -51,7 +52,7 @@ namespace MyAPI.Controllers
                 var timeonly = time.ToString("HH:ss:mm");
                 var date = time.ToString();
                 var searchTrip = await _tripRepository.SreachTrip(startPoint, endPoint, timeonly);
-                _httpContextAccessor.HttpContext.Session.SetString("date", date);
+                _httpContextAccessor?.HttpContext?.Session.SetString("date", date);
                 if (searchTrip == null) return NotFound("Not found trip");
                 return Ok(searchTrip);
             }
@@ -60,6 +61,7 @@ namespace MyAPI.Controllers
                 return BadRequest("searchTripAPI: " + ex.Message);
             }
         }
+        [Authorize(Roles = "Staff")]
         [HttpPost("addTrip")]
         public async Task<IActionResult> addTrip(TripDTO trip, int vehicleId)
         {
@@ -84,6 +86,7 @@ namespace MyAPI.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        [Authorize(Roles = "Staff")]
         [HttpPut("updateTrip/{id}")]
         public async Task<IActionResult> updateTrip(int id, TripDTO tripDTO)
         {
@@ -109,6 +112,7 @@ namespace MyAPI.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        [Authorize(Roles = "Staff")]
         [HttpPut("updateStatusTrip/{id}")]
         public async Task<IActionResult> updateStatusTrip(int id)
         {

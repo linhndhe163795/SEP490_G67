@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using MyAPI.DTOs.RequestDTOs;
 using MyAPI.Infrastructure.Interfaces;
 using MyAPI.Models;
@@ -16,14 +17,14 @@ namespace MyAPI.Controllers
         {
             _requestRepository = requestRepository;
         }
-
+        [Authorize(Roles = "Staff")]
         [HttpGet]
         public async Task<IActionResult> GetAllRequests()
         {
             var requests = await _requestRepository.GetAllRequestsWithDetailsAsync();
             return Ok(requests);
         }
-
+        [Authorize(Roles = "Staff")]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetRequestById(int id)
         {
@@ -32,7 +33,7 @@ namespace MyAPI.Controllers
                 return NotFound();
             return Ok(request);
         }
-
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> CreateRequestWithDetails(RequestDTO requestWithDetailsDto)
         {
@@ -59,9 +60,7 @@ namespace MyAPI.Controllers
             var createdRequest = await _requestRepository.CreateRequestAsync(request, requestDetails);
             return CreatedAtAction(nameof(GetRequestById), new { id = createdRequest.Id }, createdRequest);
         }
-
-
-
+        [Authorize(Roles = "Staff")]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateRequest(int id, RequestDTO requestDto)
         {
@@ -96,10 +95,7 @@ namespace MyAPI.Controllers
 
             return Ok(existingRequest);
         }
-
-
-
-
+        [Authorize(Roles = "Staff")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteRequest(int id)
         {

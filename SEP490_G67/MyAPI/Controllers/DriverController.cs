@@ -5,7 +5,7 @@ using MyAPI.DTOs.DriverDTOs;
 using AutoMapper;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using MyAPI.DTOs.DriverDTOs;
+using Microsoft.AspNetCore.Authorization;
 
 namespace MyAPI.Controllers
 {
@@ -23,7 +23,7 @@ namespace MyAPI.Controllers
             _typeOfDriverRepository = typeOfDriverRepository;
             _mapper = mapper;
         }
-
+        [Authorize(Roles = "Staff,Admin")]
         [HttpGet]
         public async Task<IActionResult> GetAllDrivers()
         {
@@ -31,7 +31,7 @@ namespace MyAPI.Controllers
             var UpdateDriverDtos = _mapper.Map<IEnumerable<DriverDTO>>(drivers);
             return Ok(UpdateDriverDtos);
         }
-
+        [Authorize(Roles = "Staff,Admin")]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetDriverById(int id)
         {
@@ -44,7 +44,7 @@ namespace MyAPI.Controllers
             var UpdateDriverDto = _mapper.Map<DriverDTO>(driver);
             return Ok(UpdateDriverDto);
         }
-
+        [Authorize(Roles = "Staff")]
         [HttpPost]
         public async Task<IActionResult> CreateDriver([FromBody] UpdateDriverDTO updateDriverDto)
         {
@@ -64,7 +64,7 @@ namespace MyAPI.Controllers
                 return BadRequest(ex.Message);
             }
         }
-
+        [Authorize(Roles = "Staff")]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateDriver(int id, [FromBody] UpdateDriverDTO updateDriverDto)
         {
@@ -83,9 +83,7 @@ namespace MyAPI.Controllers
                 return NotFound(ex.Message);
             }
         }
-
-
-
+        [Authorize(Roles = "Staff")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteDriver(int id)
         {

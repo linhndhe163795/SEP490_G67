@@ -12,6 +12,7 @@ namespace MyAPI.Repositories.Impls
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ParseStringToDateTime _parseToDateTime;
         private readonly IMapper _mapper;
+       
         public TicketRepository(SEP490_G67Context _context, IHttpContextAccessor httpContextAccessor, ParseStringToDateTime parseToDateTime, IMapper mapper) : base(_context)
         {
             _httpContextAccessor = httpContextAccessor;
@@ -45,7 +46,7 @@ namespace MyAPI.Repositories.Impls
                                              VehicleTrip = vt,
                                              Vehicle = v
                                          }).FirstOrDefaultAsync();
-
+             
                 var createTicket = new TicketDTOs
                 {
                     TripId = tripDetails.Trip.Id,
@@ -59,9 +60,9 @@ namespace MyAPI.Repositories.Impls
                     PricePromotion = tripDetails.Trip.Price - (tripDetails.Trip.Price * (promotionUser?.Discount ?? 0) / 100),
                     SeatCode = null,
                     TypeOfPayment = ticketDTOs.TypeOfPayment,
-                    Status = (ticketDTOs.TypeOfPayment == 1) ? "Đã thanh toán" : "Chưa thanh toán",
+                    Status = (ticketDTOs.TypeOfPayment == Constant.CHUYEN_KHOAN) ? "Đã thanh toán" : "Chưa thanh toán",
                     VehicleId = tripDetails.Vehicle.Id,
-                    TypeOfTicket = (tripDetails.Vehicle.NumberSeat > 7) ? 1 : 0,
+                    TypeOfTicket = (tripDetails.Vehicle.NumberSeat >= Constant.SO_GHE_XE_TIEN_CHUYEN) ? 1 : 2,
                     Note = ticketDTOs.Note,
                     UserId = ticketDTOs.UserId,
                     CreatedAt = DateTime.Now,
@@ -132,23 +133,23 @@ namespace MyAPI.Repositories.Impls
             try
             {
                 var listTicket = await (from v in _context.Vehicles
-                                       join vt in _context.VehicleTrips
-                                       on v.Id equals vt.VehicleId
-                                       join t in _context.Trips
-                                       on vt.TripId equals t.Id
-                                       join tk in _context.Tickets
-                                       on t.Id equals tk.TripId
-                                       join u in _context.Users on tk.UserId equals u.Id
-                                       join typeP in _context.TypeOfPayments on tk.TypeOfPayment equals typeP.Id
-                                       where typeP.Id == 2 && v.Id == vehicleId
-                                       select new { u.FullName, tk.PricePromotion , typeP.TypeOfPayment1 }
+                                        join vt in _context.VehicleTrips
+                                        on v.Id equals vt.VehicleId
+                                        join t in _context.Trips
+                                        on vt.TripId equals t.Id
+                                        join tk in _context.Tickets
+                                        on t.Id equals tk.TripId
+                                        join u in _context.Users on tk.UserId equals u.Id
+                                        join typeP in _context.TypeOfPayments on tk.TypeOfPayment equals typeP.Id
+                                        where typeP.Id == Constant.TIEN_MAT && v.Id == vehicleId
+                                        select new { u.FullName, tk.PricePromotion, typeP.TypeOfPayment1 }
                                        ).ToListAsync();
                 var totalPricePromotion = listTicket
                     .GroupBy(t => t.FullName)
-                    .Select(g => new TicketNotPaid {FullName = g.Key,Price = g.Sum(x => x.PricePromotion.Value), TypeOfPayment = g.FirstOrDefault()?.TypeOfPayment1 })
+                    .Select(g => new TicketNotPaid { FullName = g.Key, Price = g.Sum(x => x.PricePromotion.Value), TypeOfPayment = g.FirstOrDefault()?.TypeOfPayment1 })
                     .ToList();
 
-                
+
                 return totalPricePromotion;
             }
             catch (Exception ex)
@@ -181,6 +182,25 @@ namespace MyAPI.Repositories.Impls
             }
         }
 
-
+        public async Task UpdateStatusTicketNotPaid(int id)
+        {
+            try
+            {
+                var ticketNotPaid = await _context.Tickets.FirstOrDefaultAsync(x => x.Id == id && x.TypeOfPayment == Constant.TIEN_MAT);
+                if (ticketNotPaid != null)
+                {
+                    ticketNotPaid.Status = "Đã thanh toán";
+                    await _context.SaveChangesAsync();
+                }
+                else
+                {
+                    throw new NullReferenceException();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("UpdateStatusTicketNotPaid: " + ex.Message);
+            }
+        }
     }
 }

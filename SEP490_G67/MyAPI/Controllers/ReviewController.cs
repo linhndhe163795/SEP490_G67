@@ -20,14 +20,14 @@ namespace MyAPI.Controllers
             _reviewRepository = reviewRepository;
             _getInforFromToken = getInforFromToken;
         }
-
+        [Authorize(Roles = "Staff")]
         [HttpGet]
         public async Task<IActionResult> GetAllReviews()
         {
             var reviews = await _reviewRepository.GetAll();
             return Ok(reviews);
         }
-
+        [Authorize(Roles = "Staff")]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetReviewById(int id)
         {
@@ -38,7 +38,7 @@ namespace MyAPI.Controllers
             }
             return Ok(review);
         }
-
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> CreateReview([FromBody] ReviewDTO reviewDto)
         {
@@ -57,7 +57,7 @@ namespace MyAPI.Controllers
             var review = await _reviewRepository.CreateReviewAsync(reviewDto);
             return CreatedAtAction(nameof(GetReviewById), new { id = review.Id }, review);
         }
-
+        [Authorize]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateReview(int id, [FromBody] ReviewDTO reviewDto)
         {
@@ -82,7 +82,7 @@ namespace MyAPI.Controllers
             return Ok(review);
         }
 
-
+        [Authorize]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteReview(int id)
         {

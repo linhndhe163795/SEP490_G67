@@ -1,11 +1,14 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using MyAPI.DTOs;
 using MyAPI.DTOs.UserDTOs;
 using MyAPI.Helper;
 using MyAPI.Infrastructure.Interfaces;
 using MyAPI.Models;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace MyAPI.Controllers
 {
@@ -14,19 +17,21 @@ namespace MyAPI.Controllers
     public class AuthController : ControllerBase
     {
         private readonly IUserRepository _userRepository;
+        private readonly GetInforFromToken _getInforFromToken;
         private readonly IUserRoleRepository _userRoleRepository;
         private readonly SendMail _sendMail;
         private readonly IMapper _mapper;
         private readonly Jwt _Jwt;
-        public AuthController(IUserRepository userRepository, Jwt Jwt, IUserRoleRepository userRoleRepository, SendMail sendMail, IMapper mapper)
+        public AuthController(IUserRepository userRepository, Jwt Jwt, GetInforFromToken getInforFromToken, IUserRoleRepository userRoleRepository, SendMail sendMail, IMapper mapper)
         {
             _mapper = mapper;
             _sendMail = sendMail;
             _userRoleRepository = userRoleRepository;
             _userRepository = userRepository;
             _Jwt = Jwt;
+            _getInforFromToken = getInforFromToken;
         }
-        [HttpPost]
+        [HttpPost("register")]
         public async Task<IActionResult> Register(UserRegisterDTO user)
         {
             try
@@ -83,7 +88,7 @@ namespace MyAPI.Controllers
                     var cookieOptions = new CookieOptions
                     {
                         HttpOnly = false,   
-                        Secure = true,     
+                        Secure = false,     
                         SameSite = SameSiteMode.Strict,
                         Expires = DateTime.UtcNow.AddHours(1) 
                     };
@@ -134,6 +139,36 @@ namespace MyAPI.Controllers
             {
                 return BadRequest(ex.Message);
                 throw new Exception("Failed " + ex.Message);
+            }
+        }
+        [Authorize]
+        [HttpGet("userProfile")]
+        public async Task<IActionResult> GetUserProfile()
+        {
+            string token = Request.Headers["Authorization"];
+            if (token.StartsWith("Bearer"))
+            {
+                token = token.Substring("Bearer ".Length).Trim();
+            }
+            if (string.IsNullOrEmpty(token))
+            {
+                return BadRequest("Token is required.");
+            }
+
+            var handler = new JwtSecurityTokenHandler();
+            try
+            {   var userId = _getInforFromToken.GetIdInHeader(token);
+                var user = await _userRepository.getUserById(userId);
+                if (user == null)
+                {
+                    return NotFound();
+                }
+
+                return Ok(user);
+            }
+            catch (SecurityTokenException)
+            {
+                return Unauthorized("Invalid token.");
             }
         }
 

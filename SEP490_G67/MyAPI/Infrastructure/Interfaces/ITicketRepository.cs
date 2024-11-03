@@ -9,8 +9,7 @@ namespace MyAPI.Infrastructure.Interfaces
         Task CreatTicketFromDriver(int vehicleId,int priceTrip, TicketFromDriverDTOs ticket, int driverId);
         Task<List<ListTicketDTOs>> getAllTicket();
         Task<int> GetPriceFromPoint(TicketFromDriverDTOs ticket, int vehicleId);
-        Task<List<TicketNotPaid>> GetListTicketNotPaid (int vehicleId);  
-            
-        
+        Task<List<TicketNotPaid>> GetListTicketNotPaid (int vehicleId);
+        Task UpdateStatusTicketNotPaid(int id);
     }
 }
