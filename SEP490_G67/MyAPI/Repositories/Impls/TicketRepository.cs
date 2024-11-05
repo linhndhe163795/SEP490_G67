@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using MyAPI.DTOs;
 using MyAPI.DTOs.TicketDTOs;
 using MyAPI.Helper;
 using MyAPI.Infrastructure.Interfaces;
@@ -12,18 +13,25 @@ namespace MyAPI.Repositories.Impls
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ParseStringToDateTime _parseToDateTime;
         private readonly IMapper _mapper;
+        private readonly SendMail _sendMail;
        
-        public TicketRepository(SEP490_G67Context _context, IHttpContextAccessor httpContextAccessor, ParseStringToDateTime parseToDateTime, IMapper mapper) : base(_context)
+        public TicketRepository(SEP490_G67Context _context, IHttpContextAccessor httpContextAccessor, ParseStringToDateTime parseToDateTime, IMapper mapper, SendMail sendMail) : base(_context)
         {
             _httpContextAccessor = httpContextAccessor;
             _parseToDateTime = parseToDateTime;
             _mapper = mapper;
+            _sendMail = sendMail;
         }
 
-        public async Task CreateTicketByUser(string? promotionCode, int tripDetailsId, TicketDTOs ticketDTOs, int userId)
+        public async Task CreateTicketByUser(string? promotionCode, int tripDetailsId, BookTicketDTOs ticketDTOs, int userId)
         {
             try
             {
+                var user = await _context.Users.FirstOrDefaultAsync(x => x.Id == userId);
+                if (user == null) 
+                {
+                    throw new NullReferenceException();
+                }
                 var promotionUser = await (from u in _context.Users
                                            join pu in _context.PromotionUsers on u.Id equals pu.UserId
                                            join p in _context.Promotions on pu.PromotionId equals p.Id
@@ -62,11 +70,11 @@ namespace MyAPI.Repositories.Impls
                     TypeOfPayment = ticketDTOs.TypeOfPayment,
                     Status = (ticketDTOs.TypeOfPayment == Constant.CHUYEN_KHOAN) ? "Đã thanh toán" : "Chưa thanh toán",
                     VehicleId = tripDetails.Vehicle.Id,
-                    TypeOfTicket = (tripDetails.Vehicle.NumberSeat >= Constant.SO_GHE_XE_TIEN_CHUYEN) ? 1 : 2,
+                    TypeOfTicket = (tripDetails.Vehicle.NumberSeat >= Constant.SO_GHE_XE_TIEN_CHUYEN) ? Constant.VE_XE_LIEN_TINH : Constant.VE_XE_TIEN_CHUYEN,
                     Note = ticketDTOs.Note,
-                    UserId = ticketDTOs.UserId,
+                    UserId = userId,
                     CreatedAt = DateTime.Now,
-                    CreatedBy = ticketDTOs.UserId,
+                    CreatedBy = userId,
                     UpdateAt = null,
                     UpdateBy = null
                 };
@@ -74,6 +82,28 @@ namespace MyAPI.Repositories.Impls
                 _context.Tickets.Add(createTicketMapper);
                 var promotionUserMapper = _mapper.Map<PromotionUser>(promotionUserUsed);
                 if (promotionUser != null) _context.PromotionUsers.Remove(promotionUserMapper);
+                SendMailDTO mail = new SendMailDTO
+                {
+                    FromEmail = "datvexe@gmail.com",
+                    Password = "vzgq unyk xtpt xyjp",
+                    ToEmail = user.Email,
+                    Subject = "Thông báo về việc mua vé thành công tại hệ thống ĐẶT VÉ XE!",
+                    Body = "Cảm ơn bạn đã đặt vé xe trên hệ thống của chúng tôi" +
+                            "Bạn đã đặt vé xe thành công. Chúng tôi xin gửi thông tin chi tiết về vé của bạn: " +
+                            "Loại vé: " + createTicket.TypeOfTicket +
+                            "Điểm đón: " + createTicket.PointStart +
+                            "Điểm đến: " + createTicket.PointEnd +
+                            "Giá: " + createTicket.Price +
+                            "Trạng thái thanh toán: " + createTicket.Status +
+                            "Chúc bạn một ngày tốt lành." +
+                            "Trân trọng!"
+                };
+
+                var checkMail = await _sendMail.SendEmail(mail);
+                if (!checkMail)
+                {
+                    throw new Exception("Send mail fail!!");
+                }
                 await _context.SaveChangesAsync();
             }
             catch (Exception ex)

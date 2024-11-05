@@ -21,7 +21,7 @@ namespace MyAPI.Controllers
             _getInforFromToken = getInforFromToken;
         }
         [HttpPost("bookTicket")]
-        public async Task<IActionResult> createTicket(TicketDTOs ticketDTOs, int tripDetailsId, string? promotionCode)
+        public async Task<IActionResult> createTicket(BookTicketDTOs ticketDTOs, int tripDetailsId, string? promotionCode)
         {
             try
             {

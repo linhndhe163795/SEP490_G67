@@ -227,11 +227,36 @@ namespace MyAPI.Repositories.Impls
 
         public async Task<List<EndPointDTO>> GetListEndPointByVehicleId(int vehicleId)
         {
-            var listVehicle = await _context.Vehicles.ToListAsync();
+            try
+            {
+                var i = 1;
+                var listStartPoint = await (from v in _context.Vehicles
+                                            join vt in _context.VehicleTrips
+                                            on v.Id equals vt.VehicleId
+                                            join t in _context.Trips
+                                            on vt.TripId equals t.Id
+                                            where v.Id == vehicleId
+                                            select t.PointEnd).Distinct()
+                                         .ToListAsync();
+                List<EndPointDTO> listEndPointDTOs = new List<EndPointDTO>();
+                foreach (var v in listStartPoint)
+                {
+                    listEndPointDTOs.Add(new EndPointDTO{ id = i++, name = v });
+                }
 
-            var vehicleListDTOs = _mapper.Map<List<EndPointDTO>>(listVehicle);
-
-            return vehicleListDTOs;
+                if (listEndPointDTOs == null)
+                {
+                    throw new ArgumentNullException(nameof(listEndPointDTOs));
+                }
+                else
+                {
+                    return listEndPointDTOs;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("GetListEndPointByVehicleId: " + ex.Message);
+            }
         }
 
         public async Task<List<VehicleTypeDTO>> GetVehicleTypeDTOsAsync()

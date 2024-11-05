@@ -70,7 +70,7 @@ namespace MyAPI.Controllers
             }
         }
         [Authorize(Roles = "Staff")]
-        [HttpPost]
+        [HttpPost("addLossCostVehicle")]
         public async Task<IActionResult> addLossCost(LossCostAddDTOs lossCostAddDTOs)
         {
             string token = Request.Headers["Authorization"];

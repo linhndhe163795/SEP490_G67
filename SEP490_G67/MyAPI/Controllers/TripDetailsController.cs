@@ -14,8 +14,8 @@ namespace MyAPI.Controllers
         {
             _tripDetailsRepository = tripDetailsRepository;
         }
-        [Authorize]
-        [HttpGet("/tripId")]
+        
+        [HttpGet("tripId")]
         public async Task<IActionResult> getListTripDetailsbyTripId(int TripId)
         {
             try
@@ -29,7 +29,7 @@ namespace MyAPI.Controllers
                 return BadRequest("getListTripDetailsbyTripId API: " + ex.Message);
             }
         }
-        [Authorize]
+        
         [HttpGet("startPoint/tripId")]
         public async Task<IActionResult> getListstartPointTripDetailsbyTripId(int TripId)
         {
@@ -44,7 +44,7 @@ namespace MyAPI.Controllers
                 return BadRequest("getListTripDetailsbyTripId API: " + ex.Message);
             }
         }
-        [Authorize]
+       
         [HttpGet("endPoint/tripId")]
         public async Task<IActionResult> getListendPointTripDetailsbyTripId(int TripId)
         {
