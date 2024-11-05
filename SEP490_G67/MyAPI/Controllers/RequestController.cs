@@ -9,7 +9,7 @@ namespace MyAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-   
+
     public class RequestController : ControllerBase
     {
         private readonly IRequestRepository _requestRepository;
@@ -18,14 +18,14 @@ namespace MyAPI.Controllers
         {
             _requestRepository = requestRepository;
         }
-
+        [Authorize(Roles = "Staff")]
         [HttpGet]
         public async Task<IActionResult> GetAllRequests()
         {
             var requests = await _requestRepository.GetAllRequestsWithDetailsAsync();
             return Ok(requests);
         }
-
+        [Authorize(Roles = "Staff")]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetRequestById(int id)
         {
@@ -34,6 +34,7 @@ namespace MyAPI.Controllers
                 return NotFound();
             return Ok(request);
         }
+
         [Authorize(Roles = "Staff")]
         [HttpPost("/api/requestForRentCar")]
         public async Task<IActionResult> CreateRequestWithDetails(RequestDTO requestWithDetailsDto)
@@ -60,21 +61,21 @@ namespace MyAPI.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteRequest(int id)
         {
-            
+
             var request = await _requestRepository.GetRequestWithDetailsByIdAsync(id);
             if (request == null)
                 return NotFound();
 
-           
+
             foreach (var detail in request.RequestDetails)
             {
                 await _requestRepository.DeleteRequestDetailAsync(request.Id, detail.DetailId);
             }
 
-           
+
             await _requestRepository.Delete(request);
 
-            return NoContent(); 
+            return NoContent();
         }
 
         [HttpPost("accept/{id}")]
