@@ -35,7 +35,7 @@ namespace MyAPI.Controllers
             return Ok(request);
         }
 
-        [Authorize(Roles = "Staff")]
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> CreateRequestWithDetails(RequestDTO requestWithDetailsDto)
         {
@@ -53,7 +53,6 @@ namespace MyAPI.Controllers
             }
             return NoContent();
         }
-
         [Authorize(Roles = "Staff")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteRequest(int id)
