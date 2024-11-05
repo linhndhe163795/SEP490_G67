@@ -12,13 +12,11 @@ namespace MyAPI.Repositories.Impls
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ParseStringToDateTime _parseToDateTime;
-        private readonly SendMail _sendMail;
         private readonly IMapper _mapper;
-        public TicketRepository(SEP490_G67Context _context,SendMail sendMail, IHttpContextAccessor httpContextAccessor, ParseStringToDateTime parseToDateTime, IMapper mapper) : base(_context)
+        public TicketRepository(SEP490_G67Context _context, IHttpContextAccessor httpContextAccessor, ParseStringToDateTime parseToDateTime, IMapper mapper) : base(_context)
         {
             _httpContextAccessor = httpContextAccessor;
             _parseToDateTime = parseToDateTime;
-            _sendMail = sendMail;
             _mapper = mapper;
         }
 

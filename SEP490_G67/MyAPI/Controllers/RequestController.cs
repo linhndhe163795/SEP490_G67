@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using MyAPI.DTOs.RequestDTOs;
 using MyAPI.Infrastructure.Interfaces;
 using MyAPI.Models;
+using System.Data;
 
 namespace MyAPI.Controllers
 {
@@ -32,14 +34,14 @@ namespace MyAPI.Controllers
                 return NotFound();
             return Ok(request);
         }
-
+        [Authorize(Roles = "Staff")]
         [HttpPost("/api/requestForRentCar")]
         public async Task<IActionResult> CreateRequestWithDetails(RequestDTO requestWithDetailsDto)
         {
             var createdRequest = await _requestRepository.CreateRequestRentCarAsync(requestWithDetailsDto);
             return CreatedAtAction(nameof(GetRequestById), new { id = createdRequest.Id }, createdRequest);
         }
-
+        [Authorize(Roles = "Staff")]
         [HttpPut("/api/requestForRentCar{id}")]
         public async Task<IActionResult> UpdateRequest(int id, RequestDTO requestDto)
         {
@@ -54,7 +56,7 @@ namespace MyAPI.Controllers
 
 
 
-
+        [Authorize(Roles = "Staff")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteRequest(int id)
         {
