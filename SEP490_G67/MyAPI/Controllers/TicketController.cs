@@ -44,8 +44,8 @@ namespace MyAPI.Controllers
                 return BadRequest("createTicket: " + ex.Message);
             }
         }
-        [HttpPost("bookTicketBefortUsePromotion")]
-        public async Task<IActionResult> createTicketBefortUsePromotion(TicketDTOs ticketDTOs, int tripDetailsId, string? promotionCode)
+        [HttpPost("bookTicketBeforetUsePromotion")]
+        public async Task<IActionResult> createTicketBefortUsePromotion(BookTicketDTOs ticketDTOs, int tripDetailsId, string? promotionCode)
         {
             try
             {
