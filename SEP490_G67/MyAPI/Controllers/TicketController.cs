@@ -45,7 +45,7 @@ namespace MyAPI.Controllers
             }
         }
         [HttpPost("bookTicketBefortUsePromotion")]
-        public async Task<IActionResult> createTicketBefortUsePromotion(TicketDTOs ticketDTOs, int tripDetailsId, string? promotionCode)
+        public async Task<IActionResult> createTicketBefortUsePromotion(BookTicketDTOs ticketDTOs, int tripDetailsId, string? promotionCode)
         {
             try
             {
