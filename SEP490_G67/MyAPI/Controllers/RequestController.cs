@@ -34,7 +34,6 @@ namespace MyAPI.Controllers
                 return NotFound();
             return Ok(request);
         }
-
         [Authorize]
         [HttpPost]
         public async Task<IActionResult> CreateRequestWithDetails(RequestDTO requestWithDetailsDto)
