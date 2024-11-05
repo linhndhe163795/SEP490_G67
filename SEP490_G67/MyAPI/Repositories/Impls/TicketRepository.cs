@@ -14,6 +14,7 @@ namespace MyAPI.Repositories.Impls
         private readonly ParseStringToDateTime _parseToDateTime;
         private readonly IMapper _mapper;
         private readonly SendMail _sendMail;
+        
        
         public TicketRepository(SEP490_G67Context _context, IHttpContextAccessor httpContextAccessor, ParseStringToDateTime parseToDateTime, IMapper mapper, SendMail sendMail) : base(_context)
         {
@@ -143,6 +144,86 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception(ex.Message);
             }
         }
+
+        public async Task CreateTicketForRentCar(int vehicleId, decimal price, TicketForRentCarDTO ticketRentalDTO, int userId)
+        {
+            try
+            {
+                var promotionUser = await (from u in _context.Users
+                                           join pu in _context.PromotionUsers on u.Id equals pu.UserId
+                                           join p in _context.Promotions on pu.PromotionId equals p.Id
+                                           where u.Id == userId && p.CodePromotion.Equals(ticketRentalDTO.CodePromotion)
+                                           select p).FirstOrDefaultAsync();
+
+                var promotionUserUsed = await _context.PromotionUsers.Include(x => x.Promotion)
+                                                      .FirstOrDefaultAsync(x => x.Promotion.CodePromotion == ticketRentalDTO.CodePromotion && x.UserId == userId);
+
+                var ticket = new Ticket
+                {
+                    VehicleId = vehicleId,
+                    Price = price,
+                    CodePromotion = promotionUser?.Description,
+                    SeatCode = ticketRentalDTO.seatCode,
+                    PointStart = ticketRentalDTO.PointStart,
+                    PointEnd = ticketRentalDTO.PointEnd,
+                    TimeFrom = ticketRentalDTO.TimeFrom,
+                    TimeTo = ticketRentalDTO.TimeTo,
+                    Description = ticketRentalDTO.Description,
+                    Note = ticketRentalDTO.Note,
+                    UserId = userId,
+                    TypeOfTicket = Constant.VE_XE_DU_LICH,
+                    TypeOfPayment = ticketRentalDTO.TypeOfPayment,
+                    CreatedAt = DateTime.UtcNow,
+                    Status = "Đã thanh toán"
+                };
+
+                if (promotionUser != null)
+                {
+                    ticket.PricePromotion = price - (price * (promotionUser.Discount / 100.0m));
+                }
+
+                
+                await _context.Tickets.AddAsync(ticket);
+
+                
+                if (promotionUserUsed != null)
+                {
+                    _context.PromotionUsers.Remove(promotionUserUsed);
+                }
+
+               
+                await _context.SaveChangesAsync();
+
+                
+                var user = await _context.Users.FindAsync(userId);
+                if (user != null)
+                {
+                    
+                    SendMailDTO sendMailDTO = new()
+                    {
+                        FromEmail = "duclinh5122002@gmail.com",
+                        Password = "jetj haze ijdw euci",
+                        ToEmail = user.Email,
+                        Subject = "Ticket Confirmation",
+                        Body = $"Your ticket from {ticket.PointStart} to {ticket.PointEnd} has been successfully created. Thank you for your purchase!"
+                    };
+
+                    if (!await _sendMail.SendEmail(sendMailDTO))
+                    {
+                        throw new Exception("Failed to send confirmation email.");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("CreateTicketForRentCar: " + ex.Message);
+            }
+        }
+
+
+
+
+
 
         public async Task<List<ListTicketDTOs>> getAllTicket()
         {

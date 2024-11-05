@@ -44,7 +44,7 @@ namespace MyAPI.Controllers
                 return BadRequest("createTicket: " + ex.Message);
             }
         }
-        [HttpPost("bookTicketBeforetUsePromotion")]
+        [HttpPost("bookTicketBefortUsePromotion")]
         public async Task<IActionResult> createTicketBefortUsePromotion(BookTicketDTOs ticketDTOs, int tripDetailsId, string? promotionCode)
         {
             try
@@ -94,6 +94,27 @@ namespace MyAPI.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        [HttpPost("createTicketForRentCar/{vehicleId}")]
+        public async Task<IActionResult> CreateTicketForRentCar([FromBody] TicketForRentCarDTO ticketRentalDTO, int vehicleId, decimal price, int userId)
+        {
+            if (ticketRentalDTO == null)
+            {
+                return BadRequest("Invalid ticket rental data.");
+            }
+
+            try
+            {
+                await _ticketRepository.CreateTicketForRentCar(vehicleId, price, ticketRentalDTO, userId);
+
+                return Ok("Ticket created successfully.");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
         [HttpGet]
         public async Task<IActionResult> getListTicket()
         {
