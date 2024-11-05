@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using MyAPI.DTOs;
 using MyAPI.DTOs.TicketDTOs;
 using MyAPI.Helper;
 using MyAPI.Infrastructure.Interfaces;
@@ -11,11 +12,13 @@ namespace MyAPI.Repositories.Impls
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ParseStringToDateTime _parseToDateTime;
+        private readonly SendMail _sendMail;
         private readonly IMapper _mapper;
-        public TicketRepository(SEP490_G67Context _context, IHttpContextAccessor httpContextAccessor, ParseStringToDateTime parseToDateTime, IMapper mapper) : base(_context)
+        public TicketRepository(SEP490_G67Context _context,SendMail sendMail, IHttpContextAccessor httpContextAccessor, ParseStringToDateTime parseToDateTime, IMapper mapper) : base(_context)
         {
             _httpContextAccessor = httpContextAccessor;
             _parseToDateTime = parseToDateTime;
+            _sendMail = sendMail;
             _mapper = mapper;
         }
 
@@ -124,7 +127,7 @@ namespace MyAPI.Repositories.Impls
                                            select p).FirstOrDefaultAsync();
 
                 var promotionUserUsed = await _context.PromotionUsers.Include(x => x.Promotion)
-                                                    .FirstOrDefaultAsync(x => x.Promotion.CodePromotion == ticketRentalDTO.CodePromotion && x.UserId == userId);
+                                                      .FirstOrDefaultAsync(x => x.Promotion.CodePromotion == ticketRentalDTO.CodePromotion && x.UserId == userId);
 
                 var ticket = new Ticket
                 {
@@ -150,21 +153,44 @@ namespace MyAPI.Repositories.Impls
                     ticket.PricePromotion = price - (price * (promotionUser.Discount / 100.0m));
                 }
 
+                
                 await _context.Tickets.AddAsync(ticket);
 
+                
                 if (promotionUserUsed != null)
                 {
-                    var promotionUserMapper = _mapper.Map<PromotionUser>(promotionUserUsed);
-                    _context.PromotionUsers.Remove(promotionUserMapper);
+                    _context.PromotionUsers.Remove(promotionUserUsed);
                 }
 
+               
                 await _context.SaveChangesAsync();
+
+                
+                var user = await _context.Users.FindAsync(userId);
+                if (user != null)
+                {
+                    
+                    SendMailDTO sendMailDTO = new()
+                    {
+                        FromEmail = "duclinh5122002@gmail.com",
+                        Password = "jetj haze ijdw euci",
+                        ToEmail = user.Email,
+                        Subject = "Ticket Confirmation",
+                        Body = $"Your ticket from {ticket.PointStart} to {ticket.PointEnd} has been successfully created. Thank you for your purchase!"
+                    };
+
+                    if (!await _sendMail.SendEmail(sendMailDTO))
+                    {
+                        throw new Exception("Failed to send confirmation email.");
+                    }
+                }
             }
             catch (Exception ex)
             {
                 throw new Exception("CreateTicketForRentCar: " + ex.Message);
             }
         }
+
 
 
 
