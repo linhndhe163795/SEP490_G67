@@ -14,6 +14,7 @@ namespace MyAPI.Repositories.Impls
         private readonly ParseStringToDateTime _parseToDateTime;
         private readonly IMapper _mapper;
         private readonly SendMail _sendMail;
+        
        
         public TicketRepository(SEP490_G67Context _context, IHttpContextAccessor httpContextAccessor, ParseStringToDateTime parseToDateTime, IMapper mapper, SendMail sendMail) : base(_context)
         {
@@ -170,7 +171,7 @@ namespace MyAPI.Repositories.Impls
                     Description = ticketRentalDTO.Description,
                     Note = ticketRentalDTO.Note,
                     UserId = userId,
-                    TypeOfTicket = 3,
+                    TypeOfTicket = Constant.VE_XE_DU_LICH,
                     TypeOfPayment = ticketRentalDTO.TypeOfPayment,
                     CreatedAt = DateTime.UtcNow,
                     Status = "Đã thanh toán"
