@@ -11,6 +11,5 @@ namespace MyAPI.Infrastructure.Interfaces
         Task<int> GetPriceFromPoint(TicketFromDriverDTOs ticket, int vehicleId);
         Task<List<TicketNotPaid>> GetListTicketNotPaid (int vehicleId);
         Task UpdateStatusTicketNotPaid(int id);
-
     }
 }
