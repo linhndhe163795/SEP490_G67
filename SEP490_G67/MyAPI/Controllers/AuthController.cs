@@ -69,7 +69,10 @@ namespace MyAPI.Controllers
                 {
                     return Ok();
                 }
-                return Ok("Incorrect code");
+                else
+                {
+                    return BadRequest("Incorrect Code");
+                }
             }
             catch (Exception ex)
             {
