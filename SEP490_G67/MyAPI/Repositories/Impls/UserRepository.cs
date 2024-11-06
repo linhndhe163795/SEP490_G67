@@ -279,18 +279,27 @@ namespace MyAPI.Repositories.Impls
         {
             try
             {
-                var user = await _context.Users.FirstOrDefaultAsync(x => x.Id == id);
-                if (user == null) 
+                var user = await _context.Users
+                    .Include(u => u.UserRoles)
+                        .ThenInclude(ur => ur.Role)
+                    .FirstOrDefaultAsync(x => x.Id == id);
+
+                if (user == null)
                 {
-                    throw new NullReferenceException();
+                    throw new NullReferenceException("User not found.");
                 }
+
                 var userMapper = _mapper.Map<UserPostLoginDTO>(user);
+                userMapper.Role = user.UserRoles.FirstOrDefault()?.Role?.RoleName;
+
                 return userMapper;
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
-                throw new Exception("getUserById: "+ ex.Message);
+                throw new Exception("getUserById: " + ex.Message);
             }
         }
+
+
     }
 }
