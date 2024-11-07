@@ -76,16 +76,25 @@ namespace MyAPI.Repositories.Impls
         }
         public async Task<bool> confirmCode(ConfirmCode code)
         {
-            var acc = await _context.Users.FirstOrDefaultAsync(x => x.Email == code.Email && x.ActiveCode == code.Code);
-            if (acc != null)
+            try
             {
-                acc.Status = true;
-                acc.ActiveCode = null;
-                await _context.SaveChangesAsync();
-                return true;
+                var acc = await _context.Users.FirstOrDefaultAsync(x => x.Email == code.Email && x.ActiveCode == code.Code);
+                if (acc != null)
+                {
+                    acc.Status = true;
+                    acc.ActiveCode = null;
+                    await _context.SaveChangesAsync();
+                    return true;
+                }
+                return false;
             }
-            return false;
+            catch (Exception ex)
+            {
+                throw ex;
+
+            }
         }
+       
 
         public async Task<bool> checkLogin(UserLoginDTO userLoginDTO)
         {
@@ -133,7 +142,7 @@ namespace MyAPI.Repositories.Impls
                     acc.Password = _hassPassword.HashMD5Password(resetPasswordDTO.Password);
                     acc.ActiveCode = null;
                     acc.UpdateBy = acc.Id;
-                    base.Update(acc);
+                    await base.Update(acc);
                 }
                 else
                 {
@@ -265,6 +274,32 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception("GetUserLogin: " + ex.Message);
             }
         }
+
+        public async Task<UserPostLoginDTO> getUserById(int id)
+        {
+            try
+            {
+                var user = await _context.Users
+                    .Include(u => u.UserRoles)
+                        .ThenInclude(ur => ur.Role)
+                    .FirstOrDefaultAsync(x => x.Id == id);
+
+                if (user == null)
+                {
+                    throw new NullReferenceException("User not found.");
+                }
+
+                var userMapper = _mapper.Map<UserPostLoginDTO>(user);
+                userMapper.Role = user.UserRoles.FirstOrDefault()?.Role?.RoleName;
+
+                return userMapper;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("getUserById: " + ex.Message);
+            }
+        }
+
 
     }
 }

@@ -14,10 +14,14 @@ namespace MyAPI.Infrastructure.Interfaces
         Task<IEnumerable<Request>> GetAllRequestsWithDetailsAsync();
 
         Task<Request> GetRequestWithDetailsByIdAsync(int id);
-        Task<Request> UpdateRequestAsync(int id, Request request, List<RequestDetail> requestDetails);
-        Task<Request> CreateRequestAsync(Request request, List<RequestDetail> requestDetails);
+        Task<Request> UpdateRequestRentCarAsync(int id, RequestDTO requestDTO);
+
+        Task<Request> CreateRequestRentCarAsync(RequestDTO requestDTO);
 
         Task DeleteRequestDetailAsync(int requestId, int detailId);
+
+        Task<bool> AcceptRequestAsync(int requestId);
+        Task<bool> DenyRequestAsync(int requestId);
 
     }
 }

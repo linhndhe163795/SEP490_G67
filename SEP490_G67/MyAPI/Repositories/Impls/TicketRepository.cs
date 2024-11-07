@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using MyAPI.DTOs;
 using MyAPI.DTOs.TicketDTOs;
 using MyAPI.Helper;
 using MyAPI.Infrastructure.Interfaces;
@@ -12,17 +13,26 @@ namespace MyAPI.Repositories.Impls
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ParseStringToDateTime _parseToDateTime;
         private readonly IMapper _mapper;
-        public TicketRepository(SEP490_G67Context _context, IHttpContextAccessor httpContextAccessor, ParseStringToDateTime parseToDateTime, IMapper mapper) : base(_context)
+        private readonly SendMail _sendMail;
+        
+       
+        public TicketRepository(SEP490_G67Context _context, IHttpContextAccessor httpContextAccessor, ParseStringToDateTime parseToDateTime, IMapper mapper, SendMail sendMail) : base(_context)
         {
             _httpContextAccessor = httpContextAccessor;
             _parseToDateTime = parseToDateTime;
             _mapper = mapper;
+            _sendMail = sendMail;
         }
 
-        public async Task CreateTicketByUser(string? promotionCode, int tripDetailsId, TicketDTOs ticketDTOs, int userId)
+        public async Task CreateTicketByUser(string? promotionCode, int tripDetailsId, BookTicketDTOs ticketDTOs, int userId)
         {
             try
             {
+                var user = await _context.Users.FirstOrDefaultAsync(x => x.Id == userId);
+                if (user == null) 
+                {
+                    throw new NullReferenceException();
+                }
                 var promotionUser = await (from u in _context.Users
                                            join pu in _context.PromotionUsers on u.Id equals pu.UserId
                                            join p in _context.Promotions on pu.PromotionId equals p.Id
@@ -45,7 +55,7 @@ namespace MyAPI.Repositories.Impls
                                              VehicleTrip = vt,
                                              Vehicle = v
                                          }).FirstOrDefaultAsync();
-
+             
                 var createTicket = new TicketDTOs
                 {
                     TripId = tripDetails.Trip.Id,
@@ -59,13 +69,13 @@ namespace MyAPI.Repositories.Impls
                     PricePromotion = tripDetails.Trip.Price - (tripDetails.Trip.Price * (promotionUser?.Discount ?? 0) / 100),
                     SeatCode = null,
                     TypeOfPayment = ticketDTOs.TypeOfPayment,
-                    Status = (ticketDTOs.TypeOfPayment == 1) ? "Đã thanh toán" : "Chưa thanh toán",
+                    Status = (ticketDTOs.TypeOfPayment == Constant.CHUYEN_KHOAN) ? "Đã thanh toán" : "Chưa thanh toán",
                     VehicleId = tripDetails.Vehicle.Id,
-                    TypeOfTicket = (tripDetails.Vehicle.NumberSeat > 7) ? 1 : 0,
+                    TypeOfTicket = (tripDetails.Vehicle.NumberSeat >= Constant.SO_GHE_XE_TIEN_CHUYEN) ? Constant.VE_XE_LIEN_TINH : Constant.VE_XE_TIEN_CHUYEN,
                     Note = ticketDTOs.Note,
-                    UserId = ticketDTOs.UserId,
+                    UserId = userId,
                     CreatedAt = DateTime.Now,
-                    CreatedBy = ticketDTOs.UserId,
+                    CreatedBy = userId,
                     UpdateAt = null,
                     UpdateBy = null
                 };
@@ -73,6 +83,28 @@ namespace MyAPI.Repositories.Impls
                 _context.Tickets.Add(createTicketMapper);
                 var promotionUserMapper = _mapper.Map<PromotionUser>(promotionUserUsed);
                 if (promotionUser != null) _context.PromotionUsers.Remove(promotionUserMapper);
+                SendMailDTO mail = new SendMailDTO
+                {
+                    FromEmail = "datvexe@gmail.com",
+                    Password = "vzgq unyk xtpt xyjp",
+                    ToEmail = user.Email,
+                    Subject = "Thông báo về việc mua vé thành công tại hệ thống ĐẶT VÉ XE!",
+                    Body = "Cảm ơn bạn đã đặt vé xe trên hệ thống của chúng tôi" +
+                            "Bạn đã đặt vé xe thành công. Chúng tôi xin gửi thông tin chi tiết về vé của bạn: " +
+                            "Loại vé: " + createTicket.TypeOfTicket +
+                            "Điểm đón: " + createTicket.PointStart +
+                            "Điểm đến: " + createTicket.PointEnd +
+                            "Giá: " + createTicket.Price +
+                            "Trạng thái thanh toán: " + createTicket.Status +
+                            "Chúc bạn một ngày tốt lành." +
+                            "Trân trọng!"
+                };
+
+                var checkMail = await _sendMail.SendEmail(mail);
+                if (!checkMail)
+                {
+                    throw new Exception("Send mail fail!!");
+                }
                 await _context.SaveChangesAsync();
             }
             catch (Exception ex)
@@ -113,6 +145,86 @@ namespace MyAPI.Repositories.Impls
             }
         }
 
+        public async Task CreateTicketForRentCar(int vehicleId, decimal price, TicketForRentCarDTO ticketRentalDTO, int userId)
+        {
+            try
+            {
+                var promotionUser = await (from u in _context.Users
+                                           join pu in _context.PromotionUsers on u.Id equals pu.UserId
+                                           join p in _context.Promotions on pu.PromotionId equals p.Id
+                                           where u.Id == userId && p.CodePromotion.Equals(ticketRentalDTO.CodePromotion)
+                                           select p).FirstOrDefaultAsync();
+
+                var promotionUserUsed = await _context.PromotionUsers.Include(x => x.Promotion)
+                                                      .FirstOrDefaultAsync(x => x.Promotion.CodePromotion == ticketRentalDTO.CodePromotion && x.UserId == userId);
+
+                var ticket = new Ticket
+                {
+                    VehicleId = vehicleId,
+                    Price = price,
+                    CodePromotion = promotionUser?.Description,
+                    SeatCode = ticketRentalDTO.seatCode,
+                    PointStart = ticketRentalDTO.PointStart,
+                    PointEnd = ticketRentalDTO.PointEnd,
+                    TimeFrom = ticketRentalDTO.TimeFrom,
+                    TimeTo = ticketRentalDTO.TimeTo,
+                    Description = ticketRentalDTO.Description,
+                    Note = ticketRentalDTO.Note,
+                    UserId = userId,
+                    TypeOfTicket = Constant.VE_XE_DU_LICH,
+                    TypeOfPayment = ticketRentalDTO.TypeOfPayment,
+                    CreatedAt = DateTime.UtcNow,
+                    Status = "Đã thanh toán"
+                };
+
+                if (promotionUser != null)
+                {
+                    ticket.PricePromotion = price - (price * (promotionUser.Discount / 100.0m));
+                }
+
+                
+                await _context.Tickets.AddAsync(ticket);
+
+                
+                if (promotionUserUsed != null)
+                {
+                    _context.PromotionUsers.Remove(promotionUserUsed);
+                }
+
+               
+                await _context.SaveChangesAsync();
+
+                
+                var user = await _context.Users.FindAsync(userId);
+                if (user != null)
+                {
+                    
+                    SendMailDTO sendMailDTO = new()
+                    {
+                        FromEmail = "duclinh5122002@gmail.com",
+                        Password = "jetj haze ijdw euci",
+                        ToEmail = user.Email,
+                        Subject = "Ticket Confirmation",
+                        Body = $"Your ticket from {ticket.PointStart} to {ticket.PointEnd} has been successfully created. Thank you for your purchase!"
+                    };
+
+                    if (!await _sendMail.SendEmail(sendMailDTO))
+                    {
+                        throw new Exception("Failed to send confirmation email.");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("CreateTicketForRentCar: " + ex.Message);
+            }
+        }
+
+
+
+
+
+
         public async Task<List<ListTicketDTOs>> getAllTicket()
         {
             try
@@ -132,23 +244,23 @@ namespace MyAPI.Repositories.Impls
             try
             {
                 var listTicket = await (from v in _context.Vehicles
-                                       join vt in _context.VehicleTrips
-                                       on v.Id equals vt.VehicleId
-                                       join t in _context.Trips
-                                       on vt.TripId equals t.Id
-                                       join tk in _context.Tickets
-                                       on t.Id equals tk.TripId
-                                       join u in _context.Users on tk.UserId equals u.Id
-                                       join typeP in _context.TypeOfPayments on tk.TypeOfPayment equals typeP.Id
-                                       where typeP.Id == 2 && v.Id == vehicleId
-                                       select new { u.FullName, tk.PricePromotion , typeP.TypeOfPayment1 }
+                                        join vt in _context.VehicleTrips
+                                        on v.Id equals vt.VehicleId
+                                        join t in _context.Trips
+                                        on vt.TripId equals t.Id
+                                        join tk in _context.Tickets
+                                        on t.Id equals tk.TripId
+                                        join u in _context.Users on tk.UserId equals u.Id
+                                        join typeP in _context.TypeOfPayments on tk.TypeOfPayment equals typeP.Id
+                                        where typeP.Id == Constant.TIEN_MAT && v.Id == vehicleId
+                                        select new { u.FullName, tk.PricePromotion, typeP.TypeOfPayment1 }
                                        ).ToListAsync();
                 var totalPricePromotion = listTicket
                     .GroupBy(t => t.FullName)
-                    .Select(g => new TicketNotPaid {FullName = g.Key,Price = g.Sum(x => x.PricePromotion.Value), TypeOfPayment = g.FirstOrDefault()?.TypeOfPayment1 })
+                    .Select(g => new TicketNotPaid { FullName = g.Key, Price = g.Sum(x => x.PricePromotion.Value), TypeOfPayment = g.FirstOrDefault()?.TypeOfPayment1 })
                     .ToList();
 
-                
+
                 return totalPricePromotion;
             }
             catch (Exception ex)
@@ -181,6 +293,25 @@ namespace MyAPI.Repositories.Impls
             }
         }
 
-
+        public async Task UpdateStatusTicketNotPaid(int id)
+        {
+            try
+            {
+                var ticketNotPaid = await _context.Tickets.FirstOrDefaultAsync(x => x.Id == id && x.TypeOfPayment == Constant.TIEN_MAT);
+                if (ticketNotPaid != null)
+                {
+                    ticketNotPaid.Status = "Đã thanh toán";
+                    await _context.SaveChangesAsync();
+                }
+                else
+                {
+                    throw new NullReferenceException();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("UpdateStatusTicketNotPaid: " + ex.Message);
+            }
+        }
     }
 }

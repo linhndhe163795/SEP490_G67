@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using MyAPI.DTOs.PromotionDTOs;
@@ -25,6 +26,7 @@ namespace MyAPI.Controllers
             _promotionUserRepository = promotionUserRepository;
             _userRepository = userRepository;
         }
+        [Authorize(Roles = "Staff")]
         [HttpGet]
         public async Task<IActionResult> GetAllPromotion() 
         {
@@ -39,7 +41,7 @@ namespace MyAPI.Controllers
                 return BadRequest(ex.Message);
             }
         }
-        // Lấy id từ header
+        [Authorize]
         [HttpGet("getPromotionById")]
         public async Task<IActionResult> GetPromotionByUser()
         {
@@ -64,6 +66,7 @@ namespace MyAPI.Controllers
                 return BadRequest("GetPromotionByUser: " + ex.Message);
             }
         }
+        [Authorize(Roles = "Staff")]
         [HttpPut("updatePromotion/id")]
         public async Task<IActionResult> UpdatePromotion(int id, [FromForm] PromotionDTO promotionDTO, IFormFile? imageFile)
         {
@@ -102,6 +105,7 @@ namespace MyAPI.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        [Authorize(Roles = "Staff")]
         [HttpDelete("deletePromotion/id")]
         public async Task<IActionResult> DeletePromotion(int id)
         {
@@ -118,6 +122,7 @@ namespace MyAPI.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        [Authorize(Roles = "Staff")]
         [HttpPost("givePromotionToUser/PromotionId/userId")]
         public async Task<IActionResult> GivePromotionToUser(int PromotionId, int userId)
         {
@@ -141,6 +146,7 @@ namespace MyAPI.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        [Authorize(Roles = "Staff")]
         [HttpPost("givePromotionAllUser")]
         public async Task<IActionResult> GivePromotionAllUser(PromotionDTO promotionDTO)
         {

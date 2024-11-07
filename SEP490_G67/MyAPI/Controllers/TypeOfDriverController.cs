@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using MyAPI.DTOs.DriverDTOs;
 using MyAPI.Infrastructure.Interfaces;
 using MyAPI.Models;
@@ -16,7 +17,7 @@ namespace MyAPI.Controllers
         {
             _typeOfDriverRepository = typeOfDriverRepository;
         }
-
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> CreateTypeOfDriver([FromBody] UpdateTypeOfDriverDTO updateTypeOfDriverDto)
         {
@@ -28,7 +29,7 @@ namespace MyAPI.Controllers
             var typeOfDriver = await _typeOfDriverRepository.CreateTypeOfDriverAsync(updateTypeOfDriverDto);
             return CreatedAtAction(nameof(GetTypeOfDriverById), new { id = typeOfDriver.Id }, typeOfDriver);
         }
-
+        [Authorize(Roles = "Admin")]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateTypeOfDriver(int id, [FromBody] UpdateTypeOfDriverDTO updateTypeOfDriverDto)
         {
@@ -47,7 +48,7 @@ namespace MyAPI.Controllers
                 return NotFound(ex.Message);
             }
         }
-
+        [Authorize(Roles = "Staff,Admin")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteTypeOfDriver(int id)
         {
@@ -60,7 +61,7 @@ namespace MyAPI.Controllers
             await _typeOfDriverRepository.Delete(typeOfDriver);
             return Ok("Deleted successfully");
         }
-
+        [Authorize(Roles = "Admin")]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetTypeOfDriverById(int id)
         {
@@ -72,7 +73,7 @@ namespace MyAPI.Controllers
 
             return Ok(typeOfDriver);
         }
-
+        [Authorize(Roles = "Admin")]
         [HttpGet]
         public async Task<IActionResult> GetAllTypeOfDrivers()
         {

@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using MyAPI.DTOs.AccountDTOs;
 using MyAPI.DTOs.DriverDTOs;
+using MyAPI.DTOs.LossCostDTOs.LossCostVehicelDTOs;
 using MyAPI.DTOs.LossCostDTOs.LossCostTypeDTOs;
 using MyAPI.DTOs.PromotionDTOs;
 using MyAPI.DTOs.PromotionUserDTOs;
@@ -13,6 +14,7 @@ using MyAPI.DTOs.UserDTOs;
 using MyAPI.DTOs.VehicleDTOs;
 using MyAPI.DTOs.VehicleTripDTOs;
 using MyAPI.Models;
+using MyAPI.DTOs.LossCostDTOs.LossCostVehicleDTOs;
 
 namespace MyAPI.MappingProfile
 {
@@ -24,6 +26,8 @@ namespace MyAPI.MappingProfile
             CreateMap<UserLoginDTO, User>().ReverseMap();
             CreateMap<Role, UserLoginDTO>().ReverseMap();
             CreateMap<User, ForgotPasswordDTO>().ReverseMap();
+            CreateMap<User, UserPostLoginDTO>().ReverseMap();
+            CreateMap<UserPostLoginDTO, User>().ReverseMap();
             CreateMap<User, AccountListDTO>().ReverseMap();
             CreateMap<Role, AccountRoleDTO>().ReverseMap();
             CreateMap<Trip,TripDTO>().ReverseMap();
@@ -53,6 +57,10 @@ namespace MyAPI.MappingProfile
             CreateMap<Trip,EndPointDTO>().ReverseMap();
             CreateMap<Trip,StartPointDTO>().ReverseMap();
             CreateMap<LossCostType, LossCostTypeListDTO>().ReverseMap();
+            CreateMap<LossCost, AddLostCostVehicleDTOs>().ReverseMap();
+            CreateMap<LossCost, AddLostCostVehicleDTOs>().ReverseMap();
+            CreateMap<LossCostAddDTOs, LossCost>().ReverseMap();
+
         }
     }
 }

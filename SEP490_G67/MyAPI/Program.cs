@@ -39,6 +39,8 @@ builder.Services.AddScoped<ILossCostTypeRepository, LossCostTypeRepository>();
 //builder.Services.AddScoped<ITicketRepository, TicketRepository>();
 builder.Services.AddScoped<ITripDetailsRepository, TripDetailsRepository>();
 builder.Services.AddScoped<ITicketRepository, TicketRepository>();
+builder.Services.AddScoped<ILossCostVehicleRepository, LossCostVehicleRepository>();
+
 
 builder.Services.AddAutoMapper(typeof(AutoMappings));
 builder.Services.AddScoped<HashPassword>();
@@ -62,19 +64,6 @@ builder.Services.AddSession(options =>
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true; 
 });
-builder.Services.Configure<CookiePolicyOptions>(options =>
-{
-    options.MinimumSameSitePolicy = SameSiteMode.Strict; // SameSite policy
-    options.HttpOnly = HttpOnlyPolicy.Always;            // Make all cookies HttpOnly
-    options.Secure = CookieSecurePolicy.Always;          // Use Secure cookies in production
-});
-
-builder.Services.AddControllers().AddJsonOptions(options =>
-{
-    options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
-});
-
-
 builder.Services.AddAuthentication(opt =>
 {
     opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;

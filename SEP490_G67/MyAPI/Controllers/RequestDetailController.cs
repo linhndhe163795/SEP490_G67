@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using MyAPI.DTOs.RequestDTOs;
 using MyAPI.Infrastructure.Interfaces;
 using MyAPI.Models;
@@ -16,14 +17,14 @@ namespace MyAPI.Controllers
         {
             _requestDetailRepository = requestDetailRepository;
         }
-
+        [Authorize(Roles = "Staff")]
         [HttpGet]
         public async Task<IActionResult> GetAllRequestDetails()
         {
             var requestDetails = await _requestDetailRepository.GetAll();
             return Ok(requestDetails);
         }
-
+        [Authorize(Roles = "Staff")]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetRequestDetailById(int id)
         {

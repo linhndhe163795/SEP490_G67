@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MyAPI.DTOs.UserDTOs;
 using MyAPI.Helper;
@@ -17,7 +18,7 @@ namespace MyAPI.Controllers
         {
             _accountRepository = accountRepository;
         }
-
+        [Authorize(Roles = "Admin")]
         [HttpGet("listAccount")]
         public async Task<IActionResult> GetListAccount()
         {
@@ -38,7 +39,7 @@ namespace MyAPI.Controllers
             }
 
         }
-
+        [Authorize(Roles = "Admin")]
         [HttpGet("detailsAccount/{id}")]
         public async Task<IActionResult> GetDetailsAccountById(int id)
         {
@@ -61,7 +62,7 @@ namespace MyAPI.Controllers
 
         }
 
-
+        [Authorize(Roles = "Admin")]
         [HttpDelete("deleteAccount/{id}")]
         public async Task<IActionResult> DelteAccountById(int id)
         {
@@ -84,8 +85,8 @@ namespace MyAPI.Controllers
 
         }
 
-        
 
+        [Authorize(Roles = "Admin")]
         [HttpPut("updateAccount/{id}/{newIdUpdate}")]
         public async Task<IActionResult> UpdateAccountById(int id, int newIdUpdate)
         {
@@ -102,7 +103,7 @@ namespace MyAPI.Controllers
             }
         
         }
-
+        [Authorize(Roles = "Admin")]
         [HttpGet("listRole")]
         public async Task<IActionResult> GetListRole()
         {
@@ -124,12 +125,5 @@ namespace MyAPI.Controllers
             }
 
         }
-
-
-
-
-
-
-
     }
 }

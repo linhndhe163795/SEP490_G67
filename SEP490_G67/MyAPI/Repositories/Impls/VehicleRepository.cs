@@ -227,11 +227,36 @@ namespace MyAPI.Repositories.Impls
 
         public async Task<List<EndPointDTO>> GetListEndPointByVehicleId(int vehicleId)
         {
-            var listVehicle = await _context.Vehicles.ToListAsync();
+            try
+            {
+                var i = 1;
+                var listStartPoint = await (from v in _context.Vehicles
+                                            join vt in _context.VehicleTrips
+                                            on v.Id equals vt.VehicleId
+                                            join t in _context.Trips
+                                            on vt.TripId equals t.Id
+                                            where v.Id == vehicleId
+                                            select t.PointEnd).Distinct()
+                                         .ToListAsync();
+                List<EndPointDTO> listEndPointDTOs = new List<EndPointDTO>();
+                foreach (var v in listStartPoint)
+                {
+                    listEndPointDTOs.Add(new EndPointDTO{ id = i++, name = v });
+                }
 
-            var vehicleListDTOs = _mapper.Map<List<EndPointDTO>>(listVehicle);
-
-            return vehicleListDTOs;
+                if (listEndPointDTOs == null)
+                {
+                    throw new ArgumentNullException(nameof(listEndPointDTOs));
+                }
+                else
+                {
+                    return listEndPointDTOs;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("GetListEndPointByVehicleId: " + ex.Message);
+            }
         }
 
         public async Task<List<VehicleTypeDTO>> GetVehicleTypeDTOsAsync()
@@ -343,33 +368,33 @@ namespace MyAPI.Repositories.Impls
             {
                 throw new Exception("Not found user name in system");
             }
-            }
+        }
 
-            private bool UpdateVehicleByStaff(int id, int userIdUpdate, bool updateStatus)
+        private bool UpdateVehicleByStaff(int id, int userIdUpdate, bool updateStatus)
+        {
+            var vehicleUpdate = _context.Vehicles.SingleOrDefault(vehicle => vehicle.Id == id);
+
+
+            if (vehicleUpdate != null)
             {
-                var vehicleUpdate = _context.Vehicles.SingleOrDefault(vehicle => vehicle.Id == id);
+                vehicleUpdate.Status = updateStatus;
 
+                vehicleUpdate.UpdateBy = userIdUpdate;
 
-                if (vehicleUpdate != null)
-                {
-                    vehicleUpdate.Status = updateStatus;
+                vehicleUpdate.UpdateAt = DateTime.Now;
 
-                    vehicleUpdate.UpdateBy = userIdUpdate;
+                _context.Vehicles.Update(vehicleUpdate);
 
-                    vehicleUpdate.UpdateAt = DateTime.Now;
+                _context.SaveChanges();
 
-                    _context.Vehicles.Update(vehicleUpdate);
+                return true;
 
-                    _context.SaveChanges();
-
-                    return true;
-
-                }
-                else
-                {
-                    throw new Exception("Not found vehicle in system");
-                }
+            }
+            else
+            {
+                throw new Exception("Not found vehicle in system");
             }
         }
     }
+}
 

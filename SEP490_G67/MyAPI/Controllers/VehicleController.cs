@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using AutoMapper.Internal;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MyAPI.DTOs.VehicleDTOs;
 using MyAPI.Infrastructure.Interfaces;
@@ -18,7 +19,7 @@ namespace MyAPI.Controllers
         {
             _vehicleRepository = vehicleRepository;
         }
-
+        [Authorize(Roles = "Staff")]
         [HttpGet("listVehicleType")]
         public async Task<IActionResult> GetVehicleType()
         {
@@ -41,7 +42,7 @@ namespace MyAPI.Controllers
             }
             
         }
-
+        [Authorize(Roles = "Staff")]
         [HttpGet("listVehicle")]
         public async Task<IActionResult> GetVehicleList()
         {
@@ -64,7 +65,7 @@ namespace MyAPI.Controllers
             }
         }
 
-
+        [Authorize(Roles = "Staff, VehicleOwner")]
         [HttpPost("addVehicle")]
         public async Task<IActionResult> AddVehicle(VehicleAddDTO vehicleAddDTO, string driverName)
         {
@@ -80,7 +81,7 @@ namespace MyAPI.Controllers
                 return BadRequest(new { Message = "AddVehicle Add failed", Details = ex.Message });
             }
         }
-
+        [Authorize(Roles = "Staff")]
         [HttpPost("addVehicleByStaff")]
         public async Task<IActionResult> AddVehicleByStaff(int requestID, bool isApprove)
         {
@@ -103,7 +104,7 @@ namespace MyAPI.Controllers
             }
 
         }
-
+        [Authorize(Roles = "Staff, VehicleOwner")]
         [HttpPut("updateVehicle/{id}/{driverName}")]
         public async Task<IActionResult> UpdateVehicle(int id, string driverName)
         {
@@ -120,7 +121,7 @@ namespace MyAPI.Controllers
             }
 
         }
-
+        [Authorize(Roles = "Staff")]
         [HttpDelete("deleteVehicleByStatus/{id}")]
         public async Task<IActionResult> UpdateVehicle(int id)
         {
@@ -143,7 +144,7 @@ namespace MyAPI.Controllers
                 return BadRequest(new { Message = "DeleteVehicle Delete failed", Details = ex.Message });
             }
         }
-
+        [Authorize]
         [HttpGet("getStartPointTripFromVehicle/{vehicleId}")]
         public async Task<IActionResult> getStartPointTripFromVehicle(int vehicleId)
         {
@@ -161,6 +162,7 @@ namespace MyAPI.Controllers
                 return BadRequest(new { ex.Message });
             }
         }
+        [Authorize]
         [HttpGet("getEndPointTripFromVehicle/{vehicleId}")]
         public async Task<IActionResult> getEndPointTripFromVehicle(int vehicleId)
         {
