@@ -130,8 +130,7 @@
               "RelativeToolTip": "MyAPI\\MappingProfile\\AutoMappings.cs",
               "ViewState": "AgIAABAAAAAAAAAAAAAAADYAAABIAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-11-01T18:43:43.918Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-11-01T18:43:43.918Z"
             },
             {
               "$type": "Document",
@@ -143,8 +142,7 @@
               "RelativeToolTip": "MyAPI\\Program.cs",
               "ViewState": "AgIAABUAAAAAAAAAAAAAACQAAABOAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-11-01T18:43:03.022Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-11-01T18:43:03.022Z"
             },
             {
               "$type": "Document",
@@ -156,8 +154,7 @@
               "RelativeToolTip": "MyAPI\\DTOs\\LossCostDTOs\\LossCostTypeDTOs\\LossCostTypeAddDTO.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAQAAAAwAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-11-01T18:37:53.071Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-11-01T18:37:53.071Z"
             },
             {
               "$type": "Document",
@@ -169,8 +166,7 @@
               "RelativeToolTip": "MyAPI\\Controllers\\LossCostTypeController.cs",
               "ViewState": "AgIAADgAAAAAAAAAAAAqwEYAAAAgAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-11-01T18:33:27.923Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-11-01T18:33:27.923Z"
             },
             {
               "$type": "Document",
@@ -182,8 +178,7 @@
               "RelativeToolTip": "MyAPI\\Infrastructure\\Interfaces\\IVehicleOwner.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-11-01T18:30:34.654Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-11-01T18:30:34.654Z"
             },
             {
               "$type": "Document",
@@ -195,8 +190,7 @@
               "RelativeToolTip": "MyAPI\\Infrastructure\\Interfaces\\IRequestDetailRepository.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAABKAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-11-01T18:29:23.683Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-11-01T18:29:23.683Z"
             },
             {
               "$type": "Document",
@@ -208,8 +202,7 @@
               "RelativeToolTip": "MyAPI\\Infrastructure\\Interfaces\\IPromotionRepository.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-11-01T18:27:27.749Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-11-01T18:27:27.749Z"
             },
             {
               "$type": "Document",
@@ -221,8 +214,7 @@
               "RelativeToolTip": "MyAPI\\Infrastructure\\Interfaces\\IDriverRepository.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-11-01T18:15:09.695Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-11-01T18:15:09.695Z"
             },
             {
               "$type": "Document",
@@ -234,8 +226,7 @@
               "RelativeToolTip": "MyAPI\\Infrastructure\\Interfaces\\IVehicleRepository.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAAFAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-11-01T18:15:03.089Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-11-01T18:15:03.089Z"
             },
             {
               "$type": "Document",
@@ -247,8 +238,7 @@
               "RelativeToolTip": "MyAPI\\Infrastructure\\Interfaces\\IPromotionUserRepository.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAABKAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-11-01T18:14:29.86Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-11-01T18:14:29.86Z"
             },
             {
               "$type": "Document",
@@ -260,8 +250,7 @@
               "RelativeToolTip": "MyAPI\\Infrastructure\\Interfaces\\IRepository.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-11-01T18:14:28.954Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-11-01T18:14:28.954Z"
             },
             {
               "$type": "Document",
@@ -271,7 +260,7 @@
               "RelativeDocumentMoniker": "MyAPI\\Infrastructure\\Interfaces\\IRequestRepository.cs",
               "ToolTip": "C:\\Users\\trinh\\OneDrive\\Ta\u0300i li\u00EA\u0323u\\GitHub\\SEP490_G67\\SEP490_G67\\MyAPI\\Infrastructure\\Interfaces\\IRequestRepository.cs",
               "RelativeToolTip": "MyAPI\\Infrastructure\\Interfaces\\IRequestRepository.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABMAAABDAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAABEAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-11-01T18:14:23.506Z",
               "EditorCaption": ""
@@ -286,8 +275,7 @@
               "RelativeToolTip": "MyAPI\\Infrastructure\\Interfaces\\IReviewRepository.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-11-01T18:14:22.333Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-11-01T18:14:22.333Z"
             },
             {
               "$type": "Document",
@@ -323,8 +311,7 @@
               "RelativeToolTip": "MyAPI\\Repositories\\Impls\\RequestRepository.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAAJAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-11-01T18:12:00.776Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-11-01T18:12:00.776Z"
             },
             {
               "$type": "Document",
@@ -360,8 +347,7 @@
               "RelativeToolTip": "MyAPI\\Repositories\\Impls\\LossCostTypeRepository.cs",
               "ViewState": "AgIAADAAAAAAAAAAAAAowFEAAAANAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-11-01T18:10:31.887Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-11-01T18:10:31.887Z"
             },
             {
               "$type": "Document",
@@ -373,8 +359,7 @@
               "RelativeToolTip": "MyAPI\\DTOs\\LossCostDTOs\\LossCostTypeDTOs\\LossCostTypeListDTO.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAAqAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-11-01T18:07:49.946Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-11-01T18:07:49.946Z"
             },
             {
               "$type": "Document",
@@ -398,8 +383,7 @@
               "RelativeToolTip": "MyAPI\\Infrastructure\\Interfaces\\ILossCostTypeRepository.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAABAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-11-01T18:06:12.125Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-11-01T18:06:12.125Z"
             },
             {
               "$type": "Document",
@@ -411,8 +395,7 @@
               "RelativeToolTip": "MyAPI\\Controllers\\VehicleController.cs",
               "ViewState": "AgIAAJUAAAAAAAAAAAAAwKYAAAAPAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-11-01T17:38:06.811Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-11-01T17:38:06.811Z"
             },
             {
               "$type": "Document",
@@ -424,8 +407,7 @@
               "RelativeToolTip": "MyAPI\\Repositories\\Impls\\VehicleRepository.cs",
               "ViewState": "AgIAANcAAAAAAAAAAAAIwPIAAAAnAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-11-01T17:12:20.196Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-11-01T17:12:20.196Z"
             }
           ]
         },
