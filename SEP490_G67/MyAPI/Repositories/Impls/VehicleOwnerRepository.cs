@@ -54,55 +54,55 @@
 //        await _context.SaveChangesAsync();
 //    }
 
-    
-//        public async Task<VehicleOwner> CreateOwnerAsync(VehicleOwnerDTO vehicleOwnerDto)
+
+//    public async Task<VehicleOwner> CreateOwnerAsync(VehicleOwnerDTO vehicleOwnerDto)
+//    {
+//        var vehicleOwner = new VehicleOwner
 //        {
-//            var vehicleOwner = new VehicleOwner
-//            {
-//                Username = vehicleOwnerDto.Username,
-//                Password = vehicleOwnerDto.Password,
-//                Email = vehicleOwnerDto.Email,
-//                NumberPhone = vehicleOwnerDto.NumberPhone,
-//                FullName = vehicleOwnerDto.FullName,
-//                Address = vehicleOwnerDto.Address,
-//                Avatar = vehicleOwnerDto.Avatar,
-//                Status = vehicleOwnerDto.Status,
-//                Dob = vehicleOwnerDto.Dob,
-//                CreatedAt = DateTime.Now,
-//                UpdateAt = DateTime.Now
-//            };
+//            Username = vehicleOwnerDto.Username,
+//            Password = vehicleOwnerDto.Password,
+//            Email = vehicleOwnerDto.Email,
+//            NumberPhone = vehicleOwnerDto.NumberPhone,
+//            FullName = vehicleOwnerDto.FullName,
+//            Address = vehicleOwnerDto.Address,
+//            Avatar = vehicleOwnerDto.Avatar,
+//            Status = vehicleOwnerDto.Status,
+//            Dob = vehicleOwnerDto.Dob,
+//            CreatedAt = DateTime.Now,
+//            UpdateAt = DateTime.Now
+//        };
 
-//            await _context.VehicleOwners.AddAsync(vehicleOwner);
-//            await _context.SaveChangesAsync();
+//        await _context.VehicleOwners.AddAsync(vehicleOwner);
+//        await _context.SaveChangesAsync();
 
-//            return vehicleOwner;
+//        return vehicleOwner;
+//    }
+
+//    public async Task<VehicleOwner> UpdateOwnerAsync(int id, VehicleOwnerDTO vehicleOwnerDto)
+//    {
+//        var vehicleOwner = await _context.VehicleOwners.FindAsync(id);
+//        if (vehicleOwner == null)
+//        {
+//            return null;
 //        }
 
-//        public async Task<VehicleOwner> UpdateOwnerAsync(int id, VehicleOwnerDTO vehicleOwnerDto)
-//        {
-//            var vehicleOwner = await _context.VehicleOwners.FindAsync(id);
-//            if (vehicleOwner == null)
-//            {
-//                return null;
-//            }
+//        vehicleOwner.Username = vehicleOwnerDto.Username;
+//        vehicleOwner.Password = vehicleOwnerDto.Password;
+//        vehicleOwner.Email = vehicleOwnerDto.Email;
+//        vehicleOwner.NumberPhone = vehicleOwnerDto.NumberPhone;
+//        vehicleOwner.FullName = vehicleOwnerDto.FullName;
+//        vehicleOwner.Address = vehicleOwnerDto.Address;
+//        vehicleOwner.Avatar = vehicleOwnerDto.Avatar;
+//        vehicleOwner.Status = vehicleOwnerDto.Status;
+//        vehicleOwner.Dob = vehicleOwnerDto.Dob;
+//        vehicleOwner.UpdateAt = DateTime.Now;
 
-//            vehicleOwner.Username = vehicleOwnerDto.Username;
-//            vehicleOwner.Password = vehicleOwnerDto.Password;
-//            vehicleOwner.Email = vehicleOwnerDto.Email;
-//            vehicleOwner.NumberPhone = vehicleOwnerDto.NumberPhone;
-//            vehicleOwner.FullName = vehicleOwnerDto.FullName;
-//            vehicleOwner.Address = vehicleOwnerDto.Address;
-//            vehicleOwner.Avatar = vehicleOwnerDto.Avatar;
-//            vehicleOwner.Status = vehicleOwnerDto.Status;
-//            vehicleOwner.Dob = vehicleOwnerDto.Dob;
-//            vehicleOwner.UpdateAt = DateTime.Now;
+//        _context.VehicleOwners.Update(vehicleOwner);
+//        await _context.SaveChangesAsync();
 
-//            _context.VehicleOwners.Update(vehicleOwner);
-//            await _context.SaveChangesAsync();
+//        return vehicleOwner;
+//    }
 
-//            return vehicleOwner;
-//        }
-    
 
 
 

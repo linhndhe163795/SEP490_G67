@@ -52,7 +52,7 @@ namespace MyAPI.Models
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-                optionsBuilder.UseSqlServer("Server=LAPTOP-HK5HU0DA;Database=SEP490_G67;User=sa;Password=123; TrustServerCertificate= true;");
+                optionsBuilder.UseSqlServer("server =(local); database = SEP490_G67;uid=sa;pwd=123;");
             }
         }
 
@@ -166,7 +166,7 @@ namespace MyAPI.Models
             modelBuilder.Entity<HistoryRentDriver>(entity =>
             {
                 entity.HasKey(e => e.HistoryId)
-                    .HasName("PK__HistoryR__096AA2E994C411FD");
+                    .HasName("PK__HistoryR__096AA2E9CA450BD7");
 
                 entity.ToTable("HistoryRentDriver");
 
@@ -207,7 +207,7 @@ namespace MyAPI.Models
             modelBuilder.Entity<HistoryRentVehicle>(entity =>
             {
                 entity.HasKey(e => e.HistoryId)
-                    .HasName("PK__HistoryR__096AA2E93BF86EC2");
+                    .HasName("PK__HistoryR__096AA2E95F4E29A0");
 
                 entity.ToTable("HistoryRentVehicle");
 
@@ -473,6 +473,8 @@ namespace MyAPI.Models
 
                 entity.Property(e => e.Points).HasColumnName("points");
 
+                entity.Property(e => e.PointsMinus).HasColumnName("points_minus");
+
                 entity.Property(e => e.UpdateAt)
                     .HasColumnType("datetime")
                     .HasColumnName("update_at");
@@ -520,6 +522,8 @@ namespace MyAPI.Models
                     .HasColumnType("date")
                     .HasColumnName("end_date");
 
+                entity.Property(e => e.ExchangePoint).HasColumnName("exchange_point");
+
                 entity.Property(e => e.ImagePromotion)
                     .HasMaxLength(255)
                     .HasColumnName("image_promotion");
@@ -538,7 +542,7 @@ namespace MyAPI.Models
             modelBuilder.Entity<PromotionUser>(entity =>
             {
                 entity.HasKey(e => new { e.UserId, e.PromotionId })
-                    .HasName("PK__Promotio__1B75A259C6F30568");
+                    .HasName("PK__Promotio__1B75A259D0F5A547");
 
                 entity.ToTable("PromotionUser");
 
@@ -603,7 +607,7 @@ namespace MyAPI.Models
             modelBuilder.Entity<RequestDetail>(entity =>
             {
                 entity.HasKey(e => e.DetailId)
-                    .HasName("PK__Request___38E9A224AC1BA9C9");
+                    .HasName("PK__Request___38E9A224AE24B801");
 
                 entity.ToTable("Request_Details");
 
@@ -628,6 +632,8 @@ namespace MyAPI.Models
                 entity.Property(e => e.StartTime)
                     .HasColumnType("datetime")
                     .HasColumnName("start_time");
+
+                entity.Property(e => e.TicketId).HasColumnName("ticket_id");
 
                 entity.Property(e => e.VehicleId).HasColumnName("vehicle_id");
 
@@ -976,10 +982,10 @@ namespace MyAPI.Models
             {
                 entity.ToTable("User");
 
-                entity.HasIndex(e => e.Email, "UQ__User__AB6E61641C5489AD")
+                entity.HasIndex(e => e.Email, "UQ__User__AB6E6164863D6A80")
                     .IsUnique();
 
-                entity.HasIndex(e => e.Username, "UQ__User__F3DBC572E8B64F93")
+                entity.HasIndex(e => e.Username, "UQ__User__F3DBC572022D2F0B")
                     .IsUnique();
 
                 entity.Property(e => e.Id).HasColumnName("id");
@@ -1090,7 +1096,7 @@ namespace MyAPI.Models
             modelBuilder.Entity<UserRole>(entity =>
             {
                 entity.HasKey(e => new { e.UserId, e.RoleId })
-                    .HasName("PK__UserRole__6EDEA153F4178E37");
+                    .HasName("PK__UserRole__6EDEA153A3CD3D2E");
 
                 entity.ToTable("UserRole");
 
@@ -1211,7 +1217,7 @@ namespace MyAPI.Models
             modelBuilder.Entity<VehicleTrip>(entity =>
             {
                 entity.HasKey(e => new { e.TripId, e.VehicleId })
-                    .HasName("PK__VehicleT__3F031A2218AEFCD0");
+                    .HasName("PK__VehicleT__3F031A2227B289DB");
 
                 entity.ToTable("VehicleTrip");
 

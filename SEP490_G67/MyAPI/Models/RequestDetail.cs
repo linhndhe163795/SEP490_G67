@@ -8,6 +8,7 @@ namespace MyAPI.Models
         public int DetailId { get; set; }
         public int? RequestId { get; set; }
         public int? VehicleId { get; set; }
+        public int? TicketId { get; set; }
         public string? StartLocation { get; set; }
         public string? EndLocation { get; set; }
         public DateTime? StartTime { get; set; }

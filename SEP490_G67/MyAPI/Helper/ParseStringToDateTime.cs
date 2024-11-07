@@ -1,6 +1,4 @@
-﻿using MyAPI.Models;
-
-namespace MyAPI.Helper
+﻿namespace MyAPI.Helper
 {
     public class ParseStringToDateTime
     {
