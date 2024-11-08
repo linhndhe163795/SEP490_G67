@@ -27,7 +27,7 @@
         public const int XE_DU_LICH = 3;
 
         public const int CHI_PHI_CO_DINH = 1;
-        public const double TICH_DIEM = 0.001;
+        public const double TICH_DIEM = 0.0001;
 
 
     }

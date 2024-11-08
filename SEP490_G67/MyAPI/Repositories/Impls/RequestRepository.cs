@@ -200,40 +200,81 @@ namespace MyAPI.Repositories.Impls
             {
                 DateTime dateTimeCancle = DateTime.Now.AddHours(-2);
                 var listTicketId = await _context.Tickets.Where(x => x.UserId == userId && x.TimeFrom <= dateTimeCancle).ToListAsync();
-                if (!listTicketId.Any()) 
+                if (!listTicketId.Any())
                 {
                     throw new NullReferenceException("Không có vé của nào của user");
                 }
-                else
+                var ticketToCancel = listTicketId.FirstOrDefault(ticket => ticket.Id == requestCancleTicketDTOs.TicketId);
+                if (ticketToCancel == null)
                 {
-                    foreach (var ticket in listTicketId)
-                    {
-                        if (!ticket.Id.Equals(requestCancleTicketDTOs.TicketId))
-                        {
-                            throw new NullReferenceException("Không có vé hợp lệ để hủy");
-                        }
-                    }
-                    var RequestCancleTicket = new Request
-                    {
-                        UserId = userId,
-                        TypeId = Helper.Constant.HUY_VE,
-                        Description = "Yêu cầu hủy vé xe",
-                    };
-                    _context.Requests.Add(RequestCancleTicket);
-                    await _context.SaveChangesAsync();
-                    var RequestCancleTicketDetails = new RequestDetail
-                    {
-                        RequestId = RequestCancleTicket.Id,
-                        TicketId = requestCancleTicketDTOs.TicketId,
-                    };
-                    _context.RequestDetails.Add(RequestCancleTicketDetails);
-                    await _context.SaveChangesAsync();
+                    throw new NullReferenceException("Không có vé hợp lệ để hủy");
                 }
+                var RequestCancleTicket = new Request
+                {
+                    UserId = userId,
+                    TypeId = Helper.Constant.HUY_VE,
+                    Description = "Yêu cầu hủy vé xe",
+                };
+                _context.Requests.Add(RequestCancleTicket);
+                await _context.SaveChangesAsync();
+                var RequestCancleTicketDetails = new RequestDetail
+                {
+                    RequestId = RequestCancleTicket.Id,
+                    TicketId = requestCancleTicketDTOs.TicketId,
+                };
+                _context.RequestDetails.Add(RequestCancleTicketDetails);
+                await _context.SaveChangesAsync();
+
 
             }
             catch (Exception ex)
             {
                 throw new Exception(ex.Message, ex);
+            }
+        }
+
+        public async Task<List<ResponeCancleTicketDTOs>> getListRequestCancle()
+        {
+            try
+            {
+                var listRequestCancleTicket = await (from r in _context.Requests
+                                                     join rd in _context.RequestDetails
+                                                     on r.Id equals rd.RequestId
+                                                     where r.TypeId == Helper.Constant.HUY_VE
+                                                     select new ResponeCancleTicketDTOs
+                                                     {
+                                                         Description = r.Description,
+                                                         TicketId = rd.TicketId,
+                                                     }).ToListAsync();
+                if (listRequestCancleTicket == null)
+                {
+                    throw new NullReferenceException();
+                }
+                return listRequestCancleTicket;
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
+
+        public async Task updateStatusRequestCancleTicket(int requestId)
+        {
+            try
+            {
+                var requestCancleTicket = await _context.Requests.FirstOrDefaultAsync(x => x.Id == requestId);
+                if (requestCancleTicket == null)
+                {
+                    throw new NullReferenceException();
+                }
+                requestCancleTicket.Status = true;
+                requestCancleTicket.Note = "Đã xác nhận";
+
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
             }
         }
     }

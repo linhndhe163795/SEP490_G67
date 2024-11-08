@@ -13,5 +13,6 @@ namespace MyAPI.Infrastructure.Interfaces
         Task UpdateStatusTicketNotPaid(int id);
 
         Task CreateTicketForRentCar(int vehicleId, decimal price, TicketForRentCarDTO ticketRentalDTO, int userId);
+        Task<TicketByIdDTOs> getTicketById(int ticketId);
     }
 }
