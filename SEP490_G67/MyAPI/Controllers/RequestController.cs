@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MyAPI.DTOs.RequestDTOs;
+using MyAPI.Helper;
 using MyAPI.Infrastructure.Interfaces;
 using MyAPI.Models;
 using System.Data;
@@ -13,9 +14,11 @@ namespace MyAPI.Controllers
     public class RequestController : ControllerBase
     {
         private readonly IRequestRepository _requestRepository;
+        private readonly GetInforFromToken _token;  
 
-        public RequestController(IRequestRepository requestRepository)
+        public RequestController(IRequestRepository requestRepository, GetInforFromToken token)
         {
+            _token = token;
             _requestRepository = requestRepository;
         }
         [Authorize(Roles = "Staff")]
@@ -100,8 +103,28 @@ namespace MyAPI.Controllers
                 return BadRequest(ex.Message);
             }
         }
-
-
-
+        [HttpPost("createRequestCancleTicket")]
+        public async Task<IActionResult> createRequestCanleTicket(RequestCancleTicketDTOs requestCancleTicketDTOs)
+        {
+            try
+            {
+                string token = Request.Headers["Authorization"];
+                if (token.StartsWith("Bearer"))
+                {
+                    token = token.Substring("Bearer ".Length).Trim();
+                }
+                if (string.IsNullOrEmpty(token))
+                {
+                    return BadRequest("Token is required.");
+                }
+                var userId = _token.GetIdInHeader(token);
+                await _requestRepository.createRequestCancleTicket(requestCancleTicketDTOs, userId);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }

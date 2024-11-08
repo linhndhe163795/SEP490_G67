@@ -20,7 +20,7 @@ namespace MyAPI.Controllers
             _mapper = mapper;
             _getInforFromToken = getInforFromToken;
         }
-        [HttpPost("bookTicket")]
+        [HttpPost("bookTicket/{tripDetailsId}")]
         public async Task<IActionResult> createTicket(BookTicketDTOs ticketDTOs, int tripDetailsId, string? promotionCode)
         {
             try

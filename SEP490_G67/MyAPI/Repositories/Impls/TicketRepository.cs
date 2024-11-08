@@ -83,28 +83,6 @@ namespace MyAPI.Repositories.Impls
                 _context.Tickets.Add(createTicketMapper);
                 var promotionUserMapper = _mapper.Map<PromotionUser>(promotionUserUsed);
                 if (promotionUser != null) _context.PromotionUsers.Remove(promotionUserMapper);
-                SendMailDTO mail = new SendMailDTO
-                {
-                    FromEmail = "datvexe@gmail.com",
-                    Password = "vzgq unyk xtpt xyjp",
-                    ToEmail = user.Email,
-                    Subject = "Thông báo về việc mua vé thành công tại hệ thống ĐẶT VÉ XE!",
-                    Body = "Cảm ơn bạn đã đặt vé xe trên hệ thống của chúng tôi" +
-                            "Bạn đã đặt vé xe thành công. Chúng tôi xin gửi thông tin chi tiết về vé của bạn: " +
-                            "Loại vé: " + createTicket.TypeOfTicket +
-                            "Điểm đón: " + createTicket.PointStart +
-                            "Điểm đến: " + createTicket.PointEnd +
-                            "Giá: " + createTicket.Price +
-                            "Trạng thái thanh toán: " + createTicket.Status +
-                            "Chúc bạn một ngày tốt lành." +
-                            "Trân trọng!"
-                };
-
-                var checkMail = await _sendMail.SendEmail(mail);
-                if (!checkMail)
-                {
-                    throw new Exception("Send mail fail!!");
-                }
                 await _context.SaveChangesAsync();
             }
             catch (Exception ex)

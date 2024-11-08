@@ -1,12 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 
 namespace MyAPI.Controllers
 {
-    public class UserCancleTicketController : Controller
+    [Route("api/[controller]")]
+    [ApiController]
+    public class UserCancleTicketController : ControllerBase
     {
-        public IActionResult Index()
-        {
-            return View();
-        }
+
     }
 }

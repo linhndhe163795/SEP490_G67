@@ -13,6 +13,7 @@
 
         public const int THUE_XE = 1;
         public const int THEM_XE = 2;
+        public const int HUY_VE = 3;
 
         public const int VE_XE_LIEN_TINH = 1;
         public const int VE_XE_TIEN_CHUYEN = 2;

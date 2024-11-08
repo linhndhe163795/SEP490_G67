@@ -1,7 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualBasic;
 using MyAPI.DTOs.RequestDTOs;
+using MyAPI.Helper;
 using MyAPI.Infrastructure.Interfaces;
 using MyAPI.Models;
+using System.Reflection.Metadata;
+
 
 namespace MyAPI.Repositories.Impls
 {
@@ -29,7 +33,7 @@ namespace MyAPI.Repositories.Impls
             existingRequest.Note = requestDTO.Note;
             existingRequest.CreatedAt = requestDTO.CreatedAt ?? existingRequest.CreatedAt;
 
-           
+
             var existingDetails = existingRequest.RequestDetails.ToList();
             foreach (var detail in existingDetails)
             {
@@ -60,7 +64,7 @@ namespace MyAPI.Repositories.Impls
                         StartTime = detail.StartTime,
                         EndTime = detail.EndTime,
                         Seats = detail.Seats,
-                        RequestId = existingRequest.Id 
+                        RequestId = existingRequest.Id
                     };
                     _context.RequestDetails.Add(newDetail);
                 }
@@ -173,7 +177,7 @@ namespace MyAPI.Repositories.Impls
             {
                 throw new KeyNotFoundException("Request not found");
             }
-            request.Status = true; 
+            request.Status = true;
             await _context.SaveChangesAsync();
             return true;
         }
@@ -185,10 +189,52 @@ namespace MyAPI.Repositories.Impls
             {
                 throw new KeyNotFoundException("Request not found");
             }
-            request.Status = false; 
+            request.Status = false;
             await _context.SaveChangesAsync();
-            return true; 
+            return true;
         }
 
+        public async Task createRequestCancleTicket(RequestCancleTicketDTOs requestCancleTicketDTOs, int userId)
+        {
+            try
+            {
+                DateTime dateTimeCancle = DateTime.Now.AddHours(-2);
+                var listTicketId = await _context.Tickets.Where(x => x.UserId == userId && x.TimeFrom <= dateTimeCancle).ToListAsync();
+                if (!listTicketId.Any()) 
+                {
+                    throw new NullReferenceException("Không có vé của nào của user");
+                }
+                else
+                {
+                    foreach (var ticket in listTicketId)
+                    {
+                        if (!ticket.Id.Equals(requestCancleTicketDTOs.TicketId))
+                        {
+                            throw new NullReferenceException("Không có vé hợp lệ để hủy");
+                        }
+                    }
+                    var RequestCancleTicket = new Request
+                    {
+                        UserId = userId,
+                        TypeId = Helper.Constant.HUY_VE,
+                        Description = "Yêu cầu hủy vé xe",
+                    };
+                    _context.Requests.Add(RequestCancleTicket);
+                    await _context.SaveChangesAsync();
+                    var RequestCancleTicketDetails = new RequestDetail
+                    {
+                        RequestId = RequestCancleTicket.Id,
+                        TicketId = requestCancleTicketDTOs.TicketId,
+                    };
+                    _context.RequestDetails.Add(RequestCancleTicketDetails);
+                    await _context.SaveChangesAsync();
+                }
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message, ex);
+            }
+        }
     }
 }

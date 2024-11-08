@@ -22,6 +22,6 @@ namespace MyAPI.Infrastructure.Interfaces
 
         Task<bool> AcceptRequestAsync(int requestId);
         Task<bool> DenyRequestAsync(int requestId);
-
+        Task createRequestCancleTicket(RequestCancleTicketDTOs requestCancleTicketDTOs, int userId);
     }
 }
