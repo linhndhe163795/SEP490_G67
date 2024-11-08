@@ -39,14 +39,14 @@ namespace MyAPI.Controllers
         }
         [Authorize]
         [HttpPost]
-        public async Task<IActionResult> CreateRequestWithDetails(RequestDTO requestWithDetailsDto)
+        public async Task<IActionResult> CreateRequestForRentCar(RequestDTO requestWithDetailsDto)
         {
             var createdRequest = await _requestRepository.CreateRequestRentCarAsync(requestWithDetailsDto);
             return CreatedAtAction(nameof(GetRequestById), new { id = createdRequest.Id }, createdRequest);
         }
         [Authorize(Roles = "Staff")]
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateRequest(int id, RequestDTO requestDto)
+        public async Task<IActionResult> UpdateRequestForRentCar(int id, RequestDTO requestDto)
         {
             var updated = await _requestRepository.UpdateRequestRentCarAsync(id, requestDto);
             if (updated == null)
