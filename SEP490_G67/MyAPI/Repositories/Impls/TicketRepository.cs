@@ -69,7 +69,7 @@ namespace MyAPI.Repositories.Impls
                     PricePromotion = tripDetails.Trip.Price - (tripDetails.Trip.Price * (promotionUser?.Discount ?? 0) / 100),
                     SeatCode = null,
                     TypeOfPayment = ticketDTOs.TypeOfPayment,
-                    Status = (ticketDTOs.TypeOfPayment == Constant.CHUYEN_KHOAN) ? "Đã thanh toán" : "Chưa thanh toán",
+                    Status = (ticketDTOs.TypeOfPayment == Constant.CHUYEN_KHOAN) ? "Chờ thanh toán" : "Chưa thanh toán",
                     VehicleId = tripDetails.Vehicle.Id,
                     TypeOfTicket = (tripDetails.Vehicle.NumberSeat >= Constant.SO_GHE_XE_TIEN_CHUYEN) ? Constant.VE_XE_LIEN_TINH : Constant.VE_XE_TIEN_CHUYEN,
                     Note = ticketDTOs.Note,
@@ -122,7 +122,7 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception(ex.Message);
             }
         }
-
+        
         public async Task CreateTicketForRentCar(int vehicleId, decimal price, TicketForRentCarDTO ticketRentalDTO, int userId)
         {
             try
@@ -197,12 +197,6 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception("CreateTicketForRentCar: " + ex.Message);
             }
         }
-
-
-
-
-
-
         public async Task<List<ListTicketDTOs>> getAllTicket()
         {
             try
@@ -289,6 +283,20 @@ namespace MyAPI.Repositories.Impls
             catch (Exception ex)
             {
                 throw new Exception("UpdateStatusTicketNotPaid: " + ex.Message);
+            }
+        }
+
+        public async Task<TicketByIdDTOs> getTicketById(int ticketId)
+        {
+            try
+            {
+                var ticketById = await _context.Tickets.FirstOrDefaultAsync(x => x.Id == ticketId);
+                var mapperTicketById = _mapper.Map<TicketByIdDTOs>(ticketById);
+                return mapperTicketById;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
             }
         }
     }

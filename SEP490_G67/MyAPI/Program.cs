@@ -38,6 +38,7 @@ builder.Services.AddScoped<ILossCostTypeRepository, LossCostTypeRepository>();
 builder.Services.AddScoped<IPointUserRepository, PointUserRepository>();
 builder.Services.AddScoped<IVehicleSeatStatustRepository, VehicleSeatStatusRepository>();
 builder.Services.AddScoped<IVehicleRepository, VehicleRepository>();
+builder.Services.AddScoped<IUserCancleTicketRepository, UserCancleTicketRepository>();
 
 //builder.Services.AddScoped<ITicketRepository, TicketRepository>();
 builder.Services.AddScoped<ITripDetailsRepository, TripDetailsRepository>();
