@@ -14,6 +14,7 @@ namespace MyAPI.Models
         public string CodePromotion { get; set; } = null!;
         public string? ImagePromotion { get; set; }
         public int Discount { get; set; }
+        public int? ExchangePoint { get; set; }
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
         public string? Description { get; set; }

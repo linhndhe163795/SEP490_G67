@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MyAPI.DTOs.RequestDTOs;
+using MyAPI.Helper;
 using MyAPI.Infrastructure.Interfaces;
 using MyAPI.Models;
 using System.Data;
@@ -13,9 +14,12 @@ namespace MyAPI.Controllers
     public class RequestController : ControllerBase
     {
         private readonly IRequestRepository _requestRepository;
+        private readonly IUserCancleTicketRepository _userCancleTicketRepository;
+        private readonly GetInforFromToken _token;
 
-        public RequestController(IRequestRepository requestRepository)
+        public RequestController(IRequestRepository requestRepository, GetInforFromToken token)
         {
+            _token = token;
             _requestRepository = requestRepository;
         }
         [Authorize(Roles = "Staff")]
@@ -36,14 +40,14 @@ namespace MyAPI.Controllers
         }
         [Authorize]
         [HttpPost]
-        public async Task<IActionResult> CreateRequestWithDetails(RequestDTO requestWithDetailsDto)
+        public async Task<IActionResult> CreateRequestForRentCar(RequestDTO requestWithDetailsDto)
         {
             var createdRequest = await _requestRepository.CreateRequestRentCarAsync(requestWithDetailsDto);
             return CreatedAtAction(nameof(GetRequestById), new { id = createdRequest.Id }, createdRequest);
         }
         [Authorize(Roles = "Staff")]
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateRequest(int id, RequestDTO requestDto)
+        public async Task<IActionResult> UpdateRequestForRentCar(int id, RequestDTO requestDto)
         {
             var updated = await _requestRepository.UpdateRequestRentCarAsync(id, requestDto);
             if (updated == null)
@@ -100,8 +104,70 @@ namespace MyAPI.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        [Authorize(Roles = "Staff")]
+        [HttpPut("acceptCancleTicket/{id}")]
+        public async Task<IActionResult> AcceptCancleTicketRequest(int id)
+        {
+            try
+            {
+                string token = Request.Headers["Authorization"];
+                if (token.StartsWith("Bearer"))
+                {
+                    token = token.Substring("Bearer ".Length).Trim();
+                }
+                if (string.IsNullOrEmpty(token))
+                {
+                    return BadRequest("Token is required.");
+                }
+                var staffId = _token.GetIdInHeader(token);
+                await _requestRepository.updateStatusRequestCancleTicket(id, staffId);
+                return Ok("update success");
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+        [Authorize(Roles = "Staff")]
+        [HttpGet("listRequestCancleTicket")]
+        public async Task<IActionResult> listRequestCancleTicket()
+        {
+            try
+            {
+                var listRequestCancle = await _requestRepository.getListRequestCancle();
+                return Ok(listRequestCancle);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
 
 
-
+        // create request from user
+        [Authorize]
+        [HttpPost("createRequestCancleTicket")]
+        public async Task<IActionResult> createRequestCanleTicket(RequestCancleTicketDTOs requestCancleTicketDTOs)
+        {
+            try
+            {
+                string token = Request.Headers["Authorization"];
+                if (token.StartsWith("Bearer"))
+                {
+                    token = token.Substring("Bearer ".Length).Trim();
+                }
+                if (string.IsNullOrEmpty(token))
+                {
+                    return BadRequest("Token is required.");
+                }
+                var userId = _token.GetIdInHeader(token);
+                await _requestRepository.createRequestCancleTicket(requestCancleTicketDTOs, userId);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }

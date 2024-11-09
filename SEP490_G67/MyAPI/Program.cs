@@ -35,14 +35,19 @@ builder.Services.AddScoped<IPromotionRepository, PromotionRepository>();
 builder.Services.AddScoped<IPromotionUserRepository, PromotionUserRepository>();
 builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
 builder.Services.AddScoped<ILossCostTypeRepository, LossCostTypeRepository>();
+builder.Services.AddScoped<IPointUserRepository, PointUserRepository>();
+builder.Services.AddScoped<IVehicleSeatStatustRepository, VehicleSeatStatusRepository>();
+builder.Services.AddScoped<IVehicleRepository, VehicleRepository>();
+builder.Services.AddScoped<IUserCancleTicketRepository, UserCancleTicketRepository>();
 
 //builder.Services.AddScoped<ITicketRepository, TicketRepository>();
 builder.Services.AddScoped<ITripDetailsRepository, TripDetailsRepository>();
 builder.Services.AddScoped<ITicketRepository, TicketRepository>();
 builder.Services.AddScoped<ILossCostVehicleRepository, LossCostVehicleRepository>();
 
-
 builder.Services.AddAutoMapper(typeof(AutoMappings));
+
+
 builder.Services.AddScoped<HashPassword>();
 builder.Services.AddScoped<SendMail>();
 builder.Services.AddScoped<Jwt>();
@@ -50,7 +55,6 @@ builder.Services.AddScoped<GetInforFromToken>();
 builder.Services.AddScoped<ParseStringToDateTime>();
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddScoped<IVehicleRepository, VehicleRepository>();
 builder.Services.Configure<CookiePolicyOptions>(options =>
 {
     options.MinimumSameSitePolicy = SameSiteMode.Strict; // SameSite policy

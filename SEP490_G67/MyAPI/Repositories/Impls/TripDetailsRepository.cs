@@ -18,7 +18,7 @@ namespace MyAPI.Repositories.Impls
         {
             try
             {
-                var listEndPointTripDetails = await _context.TripDetails.Where(x => x.TripId == TripId).ToListAsync();
+                var listEndPointTripDetails = await _context.TripDetails.Where(x => x.TripId == TripId && x.Status == true).ToListAsync();
                 var listEndPointTripDetailsMapper = _mapper.Map<List<EndPointTripDetails>>(listEndPointTripDetails)
                                                     .GroupBy(x => new { x.PointEndDetails, x.TimeEndDetails })  
                                                     .Select(g => g.First())  
@@ -35,7 +35,7 @@ namespace MyAPI.Repositories.Impls
         {
             try
             {
-                var listStartPointTripDetails = await _context.TripDetails.Where(x => x.TripId == TripId).ToListAsync();
+                var listStartPointTripDetails = await _context.TripDetails.Where(x => x.TripId == TripId && x.Status == true).ToListAsync();
                 var listStartPointTripDetailsMapper = _mapper.Map<List<StartPointTripDetails>>(listStartPointTripDetails);
                 return listStartPointTripDetailsMapper;
             }
@@ -49,7 +49,7 @@ namespace MyAPI.Repositories.Impls
         {
             try
             {
-                var listTripDetails = await _context.TripDetails.Where(x => x.TripId == TripId).ToListAsync();
+                var listTripDetails = await _context.TripDetails.Where(x => x.TripId == TripId && x.Status == true).ToListAsync();
                 var listTripDetailsMapper = _mapper.Map<List<TripDetailsDTO>>(listTripDetails);
                 return listTripDetailsMapper;
             }

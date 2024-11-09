@@ -52,6 +52,7 @@ namespace MyAPI.Repositories.Impls
                     UpdateAt = DateTime.Now,
                     Status = false,
                 };
+
                 var userMapper = _mapper.Map<User>(userRegisterDTO);
                 await _context.AddAsync(userMapper);
                 await base.SaveChange();

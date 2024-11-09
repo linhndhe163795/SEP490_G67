@@ -20,7 +20,7 @@ namespace MyAPI.Repositories.Impls
             {
                 var listPromotion = await (from pu in _context.PromotionUsers
                                            join p in _context.Promotions on pu.UserId equals p.Id
-                                           where p.Id == id
+                                           where p.Id == id 
                                            select p).ToListAsync();
                 var listPromotionMapper = _mapper.Map<List<PromotionDTO>>(listPromotion);
                 return listPromotionMapper;

@@ -69,7 +69,7 @@ namespace MyAPI.Repositories.Impls
                     PricePromotion = tripDetails.Trip.Price - (tripDetails.Trip.Price * (promotionUser?.Discount ?? 0) / 100),
                     SeatCode = null,
                     TypeOfPayment = ticketDTOs.TypeOfPayment,
-                    Status = (ticketDTOs.TypeOfPayment == Constant.CHUYEN_KHOAN) ? "Đã thanh toán" : "Chưa thanh toán",
+                    Status = (ticketDTOs.TypeOfPayment == Constant.CHUYEN_KHOAN) ? "Chờ thanh toán" : "Thanh toán bằng tiền mặt",
                     VehicleId = tripDetails.Vehicle.Id,
                     TypeOfTicket = (tripDetails.Vehicle.NumberSeat >= Constant.SO_GHE_XE_TIEN_CHUYEN) ? Constant.VE_XE_LIEN_TINH : Constant.VE_XE_TIEN_CHUYEN,
                     Note = ticketDTOs.Note,
@@ -83,28 +83,6 @@ namespace MyAPI.Repositories.Impls
                 _context.Tickets.Add(createTicketMapper);
                 var promotionUserMapper = _mapper.Map<PromotionUser>(promotionUserUsed);
                 if (promotionUser != null) _context.PromotionUsers.Remove(promotionUserMapper);
-                SendMailDTO mail = new SendMailDTO
-                {
-                    FromEmail = "datvexe@gmail.com",
-                    Password = "vzgq unyk xtpt xyjp",
-                    ToEmail = user.Email,
-                    Subject = "Thông báo về việc mua vé thành công tại hệ thống ĐẶT VÉ XE!",
-                    Body = "Cảm ơn bạn đã đặt vé xe trên hệ thống của chúng tôi" +
-                            "Bạn đã đặt vé xe thành công. Chúng tôi xin gửi thông tin chi tiết về vé của bạn: " +
-                            "Loại vé: " + createTicket.TypeOfTicket +
-                            "Điểm đón: " + createTicket.PointStart +
-                            "Điểm đến: " + createTicket.PointEnd +
-                            "Giá: " + createTicket.Price +
-                            "Trạng thái thanh toán: " + createTicket.Status +
-                            "Chúc bạn một ngày tốt lành." +
-                            "Trân trọng!"
-                };
-
-                var checkMail = await _sendMail.SendEmail(mail);
-                if (!checkMail)
-                {
-                    throw new Exception("Send mail fail!!");
-                }
                 await _context.SaveChangesAsync();
             }
             catch (Exception ex)
@@ -144,7 +122,7 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception(ex.Message);
             }
         }
-
+        
         public async Task CreateTicketForRentCar(int vehicleId, decimal price, TicketForRentCarDTO ticketRentalDTO, int userId)
         {
             try
@@ -219,12 +197,6 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception("CreateTicketForRentCar: " + ex.Message);
             }
         }
-
-
-
-
-
-
         public async Task<List<ListTicketDTOs>> getAllTicket()
         {
             try
@@ -311,6 +283,20 @@ namespace MyAPI.Repositories.Impls
             catch (Exception ex)
             {
                 throw new Exception("UpdateStatusTicketNotPaid: " + ex.Message);
+            }
+        }
+
+        public async Task<TicketByIdDTOs> getTicketById(int ticketId)
+        {
+            try
+            {
+                var ticketById = await _context.Tickets.FirstOrDefaultAsync(x => x.Id == ticketId);
+                var mapperTicketById = _mapper.Map<TicketByIdDTOs>(ticketById);
+                return mapperTicketById;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
             }
         }
     }
