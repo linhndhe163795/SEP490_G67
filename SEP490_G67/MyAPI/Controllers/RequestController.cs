@@ -104,13 +104,23 @@ namespace MyAPI.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        [Authorize(Roles = "Staff")]
         [HttpPut("acceptCancleTicket/{id}")]
         public async Task<IActionResult> AcceptCancleTicketRequest(int id)
         {
             try
             {
-                await _requestRepository.updateStatusRequestCancleTicket(id);
-                //await _userCancleTicketRepository.
+                string token = Request.Headers["Authorization"];
+                if (token.StartsWith("Bearer"))
+                {
+                    token = token.Substring("Bearer ".Length).Trim();
+                }
+                if (string.IsNullOrEmpty(token))
+                {
+                    return BadRequest("Token is required.");
+                }
+                var staffId = _token.GetIdInHeader(token);
+                await _requestRepository.updateStatusRequestCancleTicket(id, staffId);
                 return Ok("update success");
             }
             catch (Exception e)

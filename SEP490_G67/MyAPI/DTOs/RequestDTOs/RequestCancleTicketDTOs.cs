@@ -6,8 +6,11 @@ namespace MyAPI.DTOs.RequestDTOs
     {
         [JsonIgnore]
         public int? TypeId { get; set; }
-        [JsonIgnore]
         public string? Description { get; set; }
         public int? TicketId { get; set; }
+        [JsonIgnore]
+        public DateTime? CreatedAt { get; set; }
+        [JsonIgnore]
+        public int? CreatedBy { get; set; }
     }
 }
