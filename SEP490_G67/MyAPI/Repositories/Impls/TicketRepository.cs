@@ -299,5 +299,26 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception(ex.Message);
             }
         }
+
+        public async Task<bool> UpdateStatusTicketForPayment(int id)
+        {
+            try
+            {
+                var checkTicket = await _context.Tickets.FirstOrDefaultAsync(s => s.Id == id);
+                if (checkTicket != null)
+                {
+                    checkTicket.Status = "Đã thanh toán bằng tài khoản";
+                    checkTicket.UpdateAt = DateTime.Now;
+                    await _context.SaveChangesAsync();
+                    return true;
+                }else
+                {
+                    throw new Exception("Update for payment");
+                }
+            }catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
     }
 }

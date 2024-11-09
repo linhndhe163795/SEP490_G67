@@ -12,6 +12,8 @@ namespace MyAPI.Infrastructure.Interfaces
         Task<List<TicketNotPaid>> GetListTicketNotPaid (int vehicleId);
         Task UpdateStatusTicketNotPaid(int id);
 
+        Task<bool> UpdateStatusTicketForPayment(int id);
+
         Task CreateTicketForRentCar(int vehicleId, decimal price, TicketForRentCarDTO ticketRentalDTO, int userId);
         Task<TicketByIdDTOs> getTicketById(int ticketId);
     }

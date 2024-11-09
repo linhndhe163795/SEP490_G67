@@ -9,6 +9,8 @@ using System.Net.Http.Headers;
 using MyAPI.DTOs.PaymentDTOs;
 using MyAPI.Helper;
 using MyAPI.DTOs;
+using MyAPI.DTOs.PointUserDTOs;
+using Microsoft.EntityFrameworkCore;
 
 namespace MyAPI.Repositories.Impls
 {
@@ -17,11 +19,17 @@ namespace MyAPI.Repositories.Impls
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly GetInforFromToken _tokenHelper;
         private readonly SendMail _sendMail;
-        public PaymentRepository(SEP490_G67Context _context, GetInforFromToken tokenHelper, IHttpContextAccessor httpContextAccessor, SendMail sendMail) : base(_context)
+        private readonly IPointUserRepository _pointUserRepository;
+        private readonly ITicketRepository _ticketRepository;
+        public PaymentRepository(SEP490_G67Context _context, GetInforFromToken tokenHelper
+            , IHttpContextAccessor httpContextAccessor
+            , SendMail sendMail, IPointUserRepository pointUserRepository, ITicketRepository ticketRepository) : base(_context)
         {
             _httpContextAccessor = httpContextAccessor;
             _tokenHelper = tokenHelper;
             _sendMail = sendMail;
+            _pointUserRepository = pointUserRepository;
+            _ticketRepository = ticketRepository;   
         }
 
         private const string API_KEY = "AK_CS.ab1265c09b8511ef8a02890bf6befcfe.ootjjrZYN3szbLfojxUvMfPWNFSzbxFeJd7ScLfGFTnvGNu4goxy9iKc1YZU9d2n01TKhP1D";
@@ -30,6 +38,13 @@ namespace MyAPI.Repositories.Impls
 
         public async Task<bool> checkHistoryPayment(int amout, string description, string codePayment, int ticketID, int typePayment, string email)
         {
+            var token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+            int userId = _tokenHelper.GetIdInHeader(token);
+
+            if (userId == -1)
+            {
+                throw new Exception("Invalid user ID from token.");
+            }
             using (var client = new HttpClient())
             {
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("apikey", API_KEY);
@@ -60,6 +75,9 @@ namespace MyAPI.Repositories.Impls
                             var recordAmount = record["amount"]?.ToObject<int>();
                             Console.WriteLine("Record Amount: " + recordAmount);
 
+                            var datePayment = record["when"]?.ToString();
+                            Console.WriteLine("Record date: " + datePayment);
+
                             if (!string.IsNullOrEmpty(recordDescription) &&
                             recordDescription.Contains(description.Trim().ToLower()) &&
                             recordAmount == amout)
@@ -67,11 +85,14 @@ namespace MyAPI.Repositories.Impls
                                 Console.WriteLine("Thanh toán thành công!");
                                 var paymentDTO = new PaymentAddDTO
                                 {
+                                    UserId = userId,
                                     Code = codePayment,
                                     Description = recordDescription,
-                                    Price = recordAmount,
+                                    Price = (decimal)recordAmount,
                                     TicketId = ticketID,
-                                    TypeOfPayment = typePayment
+                                    TypeOfPayment = typePayment,
+                                    Time = DateTime.Parse(datePayment)
+
                                 };
                                 var paymentResult = await addPayment(paymentDTO);
                                 if (paymentResult == null)
@@ -94,6 +115,42 @@ namespace MyAPI.Repositories.Impls
                                     throw new Exception("Send mail fail!!");
                                 }
 
+
+                                int amountPoint = 0;
+                                if (paymentResult.Price.HasValue)
+                                {
+                                    amountPoint = (int)Math.Round(paymentResult.Price.Value * 0.1m);  
+                                }
+                                else
+                                {
+                                    throw new Exception("Price is null");
+                                }
+
+                                var checkPointUserExits = await _context.PointUsers.FirstOrDefaultAsync(s => s.UserId == userId);
+
+                                if (checkPointUserExits == null)
+                                {
+                                    var pointUser = new PointUserAddDTO
+                                    {
+                                        CreatedBy = userId,
+                                        UserId = userId,
+                                        PaymentId = paymentResult.PaymentId,
+                                        Points = amountPoint,
+                                        PointsMinus = 0,
+                                        UpdateBy = userId,
+                                    };
+                                   await _pointUserRepository.addPointUser(pointUser);
+                                }else
+                                {
+                                    var updatePointDTO = new PointUserUpdateDTO
+                                    {
+                                        Points = amountPoint,
+                                        UpdateBy = userId,
+                                    };
+                                    await _pointUserRepository.updatePointUser(userId, updatePointDTO);
+                                }
+
+                                await _ticketRepository.UpdateStatusTicketForPayment(ticketID);
                                 return true;
                             }
                         }
@@ -112,31 +169,31 @@ namespace MyAPI.Repositories.Impls
 
         public async Task<Payment> addPayment(PaymentAddDTO paymentAddDTO)
         {
-            var token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
-            int userId = _tokenHelper.GetIdInHeader(token);
-
-            if (userId == -1)
+            try
             {
-                throw new Exception("Invalid user ID from token.");
+                var payment = new Payment
+                {
+                    Code = paymentAddDTO.Code,
+                    CreatedAt = DateTime.Now,
+                    CreatedBy = paymentAddDTO.UserId,
+                    Description = paymentAddDTO.Description,
+                    Price = paymentAddDTO.Price,
+                    TicketId = paymentAddDTO.TicketId,
+                    TypeOfPayment = paymentAddDTO.TypeOfPayment,
+                    UpdateAt = DateTime.Now,
+                    UpdateBy = paymentAddDTO.UserId,
+                    Time = paymentAddDTO.Time,
+                };
+
+                await _context.AddAsync(payment);
+                await _context.SaveChangesAsync();
+                return payment;
             }
-
-            var payment = new Payment
+            catch (Exception ex)
             {
-                Code = paymentAddDTO.Code,
-                CreatedAt = DateTime.Now,
-                CreatedBy = userId,
-                Description = paymentAddDTO.Description,
-                Price = paymentAddDTO.Price,
-                TicketId = paymentAddDTO.TicketId,
-                TypeOfPayment = paymentAddDTO.TypeOfPayment,
-                UpdateAt = DateTime.Now,
-                UpdateBy = userId,
-                Time = DateTime.Now,
-            };
-
-            await _context.AddAsync(payment);
-            await _context.SaveChangesAsync();
-            return payment;
+                throw new Exception("UpdateVehicleByStaff: " + ex.Message);
+            }
+            
         }
     }
 }

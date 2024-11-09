@@ -14,6 +14,33 @@ namespace MyAPI.Repositories.Impls
            _mapper = mapper;
         }
 
+        public async Task<bool> addPointUser(PointUserAddDTO pointUserAddDTO)
+        {
+            try
+            {
+                var addPoint = new PointUser
+                {
+                    CreatedAt = DateTime.Now,
+                    CreatedBy = pointUserAddDTO.CreatedBy,
+                    PaymentId = pointUserAddDTO.PaymentId,
+                    UpdateBy = pointUserAddDTO.UpdateBy,
+                    Points = pointUserAddDTO.Points,
+                    PointsMinus = pointUserAddDTO.PointsMinus,
+                    Date = DateTime.Now,
+                    UpdateAt = DateTime.Now,
+                    UserId = pointUserAddDTO.UserId
+                };
+                await _context.PointUsers.AddAsync(addPoint);
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+            
+        }
+
         public async Task<PointUserDTOs> getPointUserById(int userId)
         {
             try
@@ -31,6 +58,22 @@ namespace MyAPI.Repositories.Impls
             catch (Exception ex)
             {
                 throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<bool> updatePointUser(int userId, PointUserUpdateDTO pointUserUpdateDTO)
+        {
+            var checkPoint = await _context.PointUsers.FirstOrDefaultAsync(s => s.UserId == userId);
+            if (checkPoint != null)
+            {
+                checkPoint.Points = checkPoint.Points + pointUserUpdateDTO.Points;
+                checkPoint.UpdateAt = DateTime.Now;
+                checkPoint.UpdateBy = pointUserUpdateDTO.UpdateBy;
+                await _context.SaveChangesAsync();
+                return true;
+            }else
+            {
+                throw new Exception("Update point user!!!");
             }
         }
     }

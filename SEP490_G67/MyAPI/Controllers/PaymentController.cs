@@ -16,12 +16,12 @@ namespace MyAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CheckHistoryPayment(int amount, string description)
+        public async Task<IActionResult> CheckHistoryPayment(int amout, string description, string codePayment, int ticketID, int typePayment, string email)
         {
             try
             {
 
-                var isChecked = await _paymentRepository.checkHistoryPayment(amount, description,null,0,0,null);
+                var isChecked = await _paymentRepository.checkHistoryPayment(amout, description, codePayment, ticketID, typePayment, email);
                 if (isChecked)
                 {
                     return Ok(new { Message = "Payment successfully." });
