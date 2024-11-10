@@ -82,7 +82,10 @@ namespace MyAPI.Repositories.Impls
                 Status = requestDTO.Status,
                 Description = requestDTO.Description,
                 Note = requestDTO.Note,
-                CreatedAt = DateTime.UtcNow
+                CreatedAt = DateTime.UtcNow,
+                CreatedBy = requestDTO.CreatedBy,
+                UpdatedAt = DateTime.UtcNow,
+                UpdatedBy = Constant.ADMIN,
             };
 
             await _context.Requests.AddAsync(newRequest);
@@ -96,12 +99,17 @@ namespace MyAPI.Repositories.Impls
                 var requestDetail = new RequestDetail
                 {
                     VehicleId = detailDto.VehicleId,
+                    TicketId = detailDto.TicketId,
                     StartLocation = detailDto.StartLocation,
                     EndLocation = detailDto.EndLocation,
                     StartTime = detailDto.StartTime,
                     EndTime = detailDto.EndTime,
                     Seats = detailDto.Seats,
-                    RequestId = detailDto.RequestId,
+                    RequestId = maxId,
+                    CreatedAt = DateTime.UtcNow,
+                    CreatedBy = requestDTO.CreatedBy,
+                    UpdatedAt = DateTime.UtcNow,
+                    UpdatedBy = Constant.ADMIN,
                 };
                 await _context.RequestDetails.AddAsync(requestDetail);
             }
