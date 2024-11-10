@@ -1,6 +1,7 @@
 ﻿using ClosedXML.Excel;
 using DocumentFormat.OpenXml.Spreadsheet;
 using MyAPI.Models;
+using System.Globalization;
 
 namespace MyAPI.Helper
 {
@@ -19,7 +20,7 @@ namespace MyAPI.Helper
         {
             if (string.IsNullOrEmpty(trip.Name) ||
                 trip.StartTime == default ||
-                trip.Price <= 0 ||
+                trip.Price <= 0 || trip.Price == null || 
                 string.IsNullOrEmpty(trip.PointStart) ||
                 string.IsNullOrEmpty(trip.PointEnd))
             {
@@ -46,29 +47,47 @@ namespace MyAPI.Helper
                         var trip = new Trip 
                         { 
                             Name = row.Cell(1).GetValue<string>(), 
-                            StartTime = row.Cell(2).GetValue<TimeSpan>(), 
                             Description = row.Cell(3).GetValue<string>(), 
-                            Price = row.Cell(4).GetValue<Int32>(), 
                             PointStart = row.Cell(5).GetValue<string>(), 
                             PointEnd = row.Cell(6).GetValue<string>(), 
                             Status = true, CreatedAt = DateTime.Now, 
                             CreatedBy = staffId, 
                             UpdateAt = null, 
                             UpdateBy = null, 
-                        }; 
-                        if (IsValidTrip(trip)) 
-                        { 
-                            validEntries.Add(trip); 
-                        } 
-                        else 
-                        { 
-                            invalidEntries.Add(trip); 
-                        } 
+                        };
+                        var startTimeCellValue = row.Cell(2).GetString();
+                        if (TimeSpan.TryParse(startTimeCellValue, out TimeSpan parsedStartTime))
+                        {
+                            trip.StartTime = parsedStartTime;
+                        }
+                        else
+                        {
+                            invalidEntries.Add(trip);
+                            continue;
+                        }
+                        var priceCellValue = row.Cell(4).GetString();
+                        if (int.TryParse(priceCellValue, out int parsedPrice) && parsedPrice > 0)
+                        {
+                            trip.Price = parsedPrice;
+                        }
+                        else
+                        {
+                            invalidEntries.Add(trip);
+                            continue;
+                        }
+                        if (IsValidTrip(trip))
+                        {
+                            validEntries.Add(trip);
+                        }
+                        else
+                        {
+                            invalidEntries.Add(trip);
+                        }
                     } 
                 } 
             }
-            await _context.Trips.AddRangeAsync(validEntries); 
-            await _context.SaveChangesAsync(); 
+            //await _context.Trips.AddRangeAsync(validEntries); 
+            //await _context.SaveChangesAsync(); 
             return (validEntries, invalidEntries);
         }
         public async Task ImportTripDetailsByTripId(IFormFile excelFileTripDetails, int staffId, int tripId)

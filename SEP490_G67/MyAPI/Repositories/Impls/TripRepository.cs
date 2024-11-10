@@ -185,5 +185,18 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception("updateStatusTrip: " + ex.Message);
             }
         }
+
+        public async Task confirmAddValidEntryImport(List<Trip> validEntry)
+        {
+            try
+            {
+                _context.Trips.AddRange(validEntry);
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex) 
+            {
+                throw new Exception(ex.Message);
+            }
+        }
     }
 }
