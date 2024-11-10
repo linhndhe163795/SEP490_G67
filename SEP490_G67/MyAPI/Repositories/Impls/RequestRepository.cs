@@ -109,7 +109,6 @@ namespace MyAPI.Repositories.Impls
                     CreatedAt = DateTime.UtcNow,
                     CreatedBy = requestDTO.CreatedBy,
                     UpdatedAt = DateTime.UtcNow,
-                    UpdatedBy = Constant.ADMIN,
                 };
                 await _context.RequestDetails.AddAsync(requestDetail);
             }
