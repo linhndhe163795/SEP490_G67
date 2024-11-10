@@ -84,8 +84,8 @@ namespace MyAPI.Repositories.Impls
                 Note = requestDTO.Note,
                 CreatedAt = DateTime.UtcNow,
                 CreatedBy = requestDTO.CreatedBy,
-                UpdatedAt = DateTime.UtcNow,
-                UpdatedBy = Constant.ADMIN,
+                UpdateAt = DateTime.UtcNow,
+                UpdateBy = Constant.ADMIN,
             };
 
             await _context.Requests.AddAsync(newRequest);

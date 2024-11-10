@@ -87,38 +87,38 @@ namespace MyAPI.Repositories.Impls
 
         public async Task SendEmailToDriversWithoutVehicle()
         {
-            try
-            {
-                var driversWithoutVehicle = await GetDriversWithoutVehicleAsync();
+            //try
+            //{
+            //    var driversWithoutVehicle = await GetDriversWithoutVehicleAsync();
 
-                if (!driversWithoutVehicle.Any())
-                {
-                    Console.WriteLine("No drivers without vehicles found.");
-                    return;
-                }
+            //    if (!driversWithoutVehicle.Any())
+            //    {
+            //        Console.WriteLine("No drivers without vehicles found.");
+            //        return;
+            //    }
 
-                foreach (var driver in driversWithoutVehicle)
-                {
-                    SendMailDTO sendMailDTO = new()
-                    {
-                        FromEmail = "duclinh5122002@gmail.com",
-                        Password = "jetj haze ijdw euci",
-                        ToEmail = driver.Email,
-                        Subject = "Vehicle Rental Opportunity",
-                        Body = $"Hello {driver.Name},\n\nWe currently have vehicles available for rent. Please contact us if you are interested in renting a vehicle.\n\nBest regards,\nYour Company Name"
-                    };
+            //    foreach (var driver in driversWithoutVehicle)
+            //    {
+            //        SendMailDTO sendMailDTO = new()
+            //        {
+            //            FromEmail = "duclinh5122002@gmail.com",
+            //            Password = "jetj haze ijdw euci",
+            //            ToEmail = driver.Email,
+            //            Subject = "Vehicle Rental Opportunity",
+            //            Body = $"Hello {driver.Name},\n\nWe currently have vehicles available for rent. Please contact us if you are interested in renting a vehicle.\n\nBest regards,\nYour Company Name"
+            //        };
 
-                    if (!await _sendMail.SendEmail(sendMailDTO))
-                    {
-                        Console.WriteLine($"Failed to send email to driver {driver.Email}.");
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("SendEmailToDriversWithoutVehicle error: " + ex.Message);
-                throw new Exception("Failed to send email to drivers without vehicles.", ex);
-            }
+            //        if (!await _sendMail.SendEmail(sendMailDTO))
+            //        {
+            //            Console.WriteLine($"Failed to send email to driver {driver.Email}.");
+            //        }
+            //    }
+            //}
+            //catch (Exception ex)
+            //{
+            //    Console.WriteLine("SendEmailToDriversWithoutVehicle error: " + ex.Message);
+            //    throw new Exception("Failed to send email to drivers without vehicles.", ex);
+            //}
         }
 
     }
