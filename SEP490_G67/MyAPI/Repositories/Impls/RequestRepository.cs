@@ -12,11 +12,9 @@ namespace MyAPI.Repositories.Impls
 {
     public class RequestRepository : GenericRepository<Request>, IRequestRepository
     {
-        private readonly SEP490_G67Context _context;
 
-        public RequestRepository(SEP490_G67Context context) : base(context)
+        public RequestRepository(SEP490_G67Context _context) : base(_context)
         {
-            _context = context;
         }
 
         public async Task<Request> UpdateRequestRentCarAsync(int id, RequestDTO requestDTO)
@@ -207,40 +205,174 @@ namespace MyAPI.Repositories.Impls
             {
                 DateTime dateTimeCancle = DateTime.Now.AddHours(-2);
                 var listTicketId = await _context.Tickets.Where(x => x.UserId == userId && x.TimeFrom <= dateTimeCancle).ToListAsync();
-                if (!listTicketId.Any()) 
+                if (!listTicketId.Any())
                 {
                     throw new NullReferenceException("Không có vé của nào của user");
                 }
-                else
+                var ticketToCancel = listTicketId.FirstOrDefault(ticket => ticket.Id == requestCancleTicketDTOs.TicketId);
+                if (ticketToCancel == null)
                 {
-                    foreach (var ticket in listTicketId)
-                    {
-                        if (!ticket.Id.Equals(requestCancleTicketDTOs.TicketId))
-                        {
-                            throw new NullReferenceException("Không có vé hợp lệ để hủy");
-                        }
-                    }
-                    var RequestCancleTicket = new Request
-                    {
-                        UserId = userId,
-                        TypeId = Helper.Constant.HUY_VE,
-                        Description = "Yêu cầu hủy vé xe",
-                    };
-                    _context.Requests.Add(RequestCancleTicket);
-                    await _context.SaveChangesAsync();
-                    var RequestCancleTicketDetails = new RequestDetail
-                    {
-                        RequestId = RequestCancleTicket.Id,
-                        TicketId = requestCancleTicketDTOs.TicketId,
-                    };
-                    _context.RequestDetails.Add(RequestCancleTicketDetails);
-                    await _context.SaveChangesAsync();
+                    throw new NullReferenceException("Không có vé hợp lệ để hủy");
                 }
-
+                var RequestCancleTicket = new Request
+                {
+                    UserId = userId,
+                    TypeId = Helper.Constant.HUY_VE,
+                    Description = requestCancleTicketDTOs.Description,
+                    Note = "Chờ xác nhận",
+                    CreatedAt = DateTime.Now,
+                    CreatedBy = userId,
+                };
+                _context.Requests.Add(RequestCancleTicket);
+                await _context.SaveChangesAsync();
+                var RequestCancleTicketDetails = new RequestDetail
+                {
+                    RequestId = RequestCancleTicket.Id,
+                    TicketId = requestCancleTicketDTOs.TicketId,
+                    CreatedAt = DateTime.Now,
+                    CreatedBy = userId
+                };
+                _context.RequestDetails.Add(RequestCancleTicketDetails);
+                await _context.SaveChangesAsync();
             }
             catch (Exception ex)
             {
                 throw new Exception(ex.Message, ex);
+            }
+        }
+
+        public async Task<List<ResponeCancleTicketDTOs>> getListRequestCancle()
+        {
+            try
+            {
+                var listRequestCancleTicket = await (from r in _context.Requests
+                                                     join rd in _context.RequestDetails
+                                                     on r.Id equals rd.RequestId
+                                                     where r.TypeId == Helper.Constant.HUY_VE
+                                                     select new ResponeCancleTicketDTOs
+                                                     {
+                                                         Description = r.Description,
+                                                         TicketId = rd.TicketId,
+                                                     }).ToListAsync();
+                if (listRequestCancleTicket == null)
+                {
+                    throw new NullReferenceException();
+                }
+                return listRequestCancleTicket;
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
+
+        public async Task updateStatusRequestCancleTicket(int requestId, int staffId)
+        {
+            try
+            {
+                var requestCancleTicket = await _context.Requests.FirstOrDefaultAsync(x => x.Id == requestId);
+                if (requestCancleTicket == null)
+                {
+                    throw new NullReferenceException();
+                }
+                requestCancleTicket.Status = true;
+                requestCancleTicket.Note = "Đã xác nhận";
+                var getTicketCancle = await (from r in _context.Requests
+                                               join rd in _context.RequestDetails
+                                               on r.Id equals rd.RequestId
+                                               where r.Id == requestId
+                                               select rd
+                                               ).FirstOrDefaultAsync();
+                if (getTicketCancle == null)
+                {
+                    throw new NullReferenceException();
+                }
+                var inforTicketCancle = await (from t in _context.Tickets join p in _context.Payments
+                                               on t.Id equals p.TicketId
+                                               join rd in _context.RequestDetails on t.Id equals rd.TicketId
+                                               join r in _context.Requests on rd.RequestId equals r.Id
+                                               join u in _context.Users on t.UserId equals u.Id
+                                               where r.Id == requestId && t.Id == getTicketCancle.TicketId
+                                               select new { t, p, u, r }
+                                               ).FirstOrDefaultAsync();
+                if (inforTicketCancle == null)
+                {
+                    throw new Exception("Không có vé để hủy");
+                }
+                var pointOfPayment = (int) inforTicketCancle.t.Price * Helper.Constant.TICH_DIEM;
+
+                var updatePointUserCancle = await (from pu in _context.PointUsers
+                                                   where pu.Id == (from innerPu in _context.PointUsers
+                                                                   where innerPu.UserId == inforTicketCancle.t.UserId
+                                                                   select innerPu.Id).Max()
+                                                   && pu.UserId == inforTicketCancle.t.UserId
+                                                   select pu
+                                  ).FirstOrDefaultAsync();
+                if(updatePointUserCancle == null)
+                {
+                    throw new Exception();
+                }
+                if(updatePointUserCancle.Points <= pointOfPayment)
+                {
+                    var PointUserMinus = new PointUser
+                    {
+                        PaymentId = inforTicketCancle.p.PaymentId,
+                        UserId = inforTicketCancle.t.UserId,
+                        Points = 0,
+                        PointsMinus = (int) pointOfPayment,
+                        Date = DateTime.Now,
+                        CreatedAt = DateTime.Now,
+                        CreatedBy = inforTicketCancle.t.UserId,
+                        UpdateAt = null,
+                        UpdateBy = null
+                    };
+                    _context.PointUsers.Add(PointUserMinus);
+                }
+                else
+                {
+                    var PointUserMinus = new PointUser
+                    {
+                        PaymentId = inforTicketCancle.p.PaymentId,
+                        UserId = inforTicketCancle.t.UserId,
+                        Points = (int) (updatePointUserCancle.Points - pointOfPayment),
+                        PointsMinus = (int)pointOfPayment,
+                        Date = DateTime.Now,
+                        CreatedAt = DateTime.Now,
+                        CreatedBy = inforTicketCancle.t.UserId,
+                        UpdateAt = null,
+                        UpdateBy = null
+                    };
+                    _context.PointUsers.Add(PointUserMinus);
+                }
+                inforTicketCancle.t.Price = 0;
+                inforTicketCancle.t.Status = "Hủy vé";
+                inforTicketCancle.p.Price = 0;
+                var UserCancleTicket = new UserCancleTicket
+                {
+                    PaymentId = inforTicketCancle.p.PaymentId,
+                    ReasonCancle = inforTicketCancle.r.Description,
+                    UserId = inforTicketCancle.r.UserId,
+                    TicketId = inforTicketCancle.t.Id,
+                    CreatedAt = DateTime.Now,
+                    CreatedBy = staffId,
+                    UpdateAt = null,
+                    UpdateBy = null
+                };
+                _context.UserCancleTickets.Add(UserCancleTicket);
+                SendMailDTO sendMailDTO = new()
+                {
+                    FromEmail = "duclinh5122002@gmail.com",
+                    Password = "jetj haze ijdw euci",
+                    ToEmail = inforTicketCancle.u.Email,
+                    Subject = "Xác nhận hủy vé",
+                    Body = "Hệ thống đã xác nhận hủy vé xe chuyến đi: " + inforTicketCancle.t.PointStart + " - " + inforTicketCancle.t.PointEnd,
+                };
+
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
             }
         }
 

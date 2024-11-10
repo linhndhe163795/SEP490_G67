@@ -8,5 +8,9 @@ namespace MyAPI.Infrastructure.Interfaces
 
         //Task AddPointUser(int paymentId);
         Task<PointUserDTOs> getPointUserById(int userId);
+
+        Task<bool> addPointUser(PointUserAddDTO pointUserAddDTO);
+
+        Task<bool> updatePointUser(int userId, PointUserUpdateDTO pointUserUpdateDTO);
     }
 }

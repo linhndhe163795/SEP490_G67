@@ -2,6 +2,7 @@
 {
     public class AddUserCancleTicketDTOs
     {
+       
         public string? ReasonCancle { get; set; }
         public int? TicketId { get; set; }
         public DateTime? CreatedAt { get; set; }

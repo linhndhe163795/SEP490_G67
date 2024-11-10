@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using MyAPI.DTOs.TicketDTOs;
@@ -20,6 +21,7 @@ namespace MyAPI.Controllers
             _mapper = mapper;
             _getInforFromToken = getInforFromToken;
         }
+        [Authorize]
         [HttpPost("bookTicket/{tripDetailsId}")]
         public async Task<IActionResult> createTicket(BookTicketDTOs ticketDTOs, int tripDetailsId, string? promotionCode)
         {
@@ -44,30 +46,31 @@ namespace MyAPI.Controllers
                 return BadRequest("createTicket: " + ex.Message);
             }
         }
-        [HttpPost("bookTicketBefortUsePromotion")]
-        public async Task<IActionResult> createTicketBefortUsePromotion(BookTicketDTOs ticketDTOs, int tripDetailsId, string? promotionCode)
-        {
-            try
-            {
-                string token = Request.Headers["Authorization"];
-                if (token.StartsWith("Bearer"))
-                {
-                    token = token.Substring("Bearer ".Length).Trim();
-                }
-                if (string.IsNullOrEmpty(token))
-                {
-                    return BadRequest("Token is required.");
-                }
-                var userId = _getInforFromToken.GetIdInHeader(token);
+        //[HttpPost("bookTicketBefortUsePromotion")]
+        //public async Task<IActionResult> createTicketBefortUsePromotion(BookTicketDTOs ticketDTOs, int tripDetailsId, string? promotionCode)
+        //{
+        //    try
+        //    {
+        //        string token = Request.Headers["Authorization"];
+        //        if (token.StartsWith("Bearer"))
+        //        {
+        //            token = token.Substring("Bearer ".Length).Trim();
+        //        }
+        //        if (string.IsNullOrEmpty(token))
+        //        {
+        //            return BadRequest("Token is required.");
+        //        }
+        //        var userId = _getInforFromToken.GetIdInHeader(token);
 
-                await _ticketRepository.CreateTicketByUser(promotionCode, tripDetailsId, ticketDTOs, userId);
-                return Ok(ticketDTOs);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest("createTicket: " + ex.Message);
-            }
-        }
+        //        await _ticketRepository.CreateTicketByUser(promotionCode, tripDetailsId, ticketDTOs, userId);
+        //        return Ok(ticketDTOs);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return BadRequest("createTicket: " + ex.Message);
+        //    }
+        //}
+        [Authorize(Roles = "Staff")]
         [HttpPost("createTicketFromDriver/{vehicleId}")]
         public async Task<IActionResult> creatTicketFromDriver([FromBody] TicketFromDriverDTOs ticketFromDriver, [FromForm] int vehicleId)
         {
@@ -130,6 +133,7 @@ namespace MyAPI.Controllers
                 return BadRequest("getListTicket: " + ex.Message);
             }
         }
+        [Authorize(Roles = "Staff")]
         [HttpGet("tickeNotPaid")]
         public async Task<IActionResult> getListTicketNotPaid(int vehicleId)
         {
@@ -144,6 +148,21 @@ namespace MyAPI.Controllers
                 return BadRequest("getListTicket: " + ex.Message);
             }
         }
+        [Authorize]
+        [HttpGet("ticketById/{ticketId}")]
+        public async Task<IActionResult> getTicketByTicketId(int ticketId)
+        {
+            try
+            {
+                var ticketById = await _ticketRepository.getTicketById(ticketId);
+                return Ok(ticketById);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [Authorize(Roles = "Staff")]
         [HttpPut("updateStatusticketNotPaid/id")]
         public async Task<IActionResult> updateStatusTicketNotPaid(int id)
         {

@@ -14,7 +14,8 @@ namespace MyAPI.Controllers
     public class RequestController : ControllerBase
     {
         private readonly IRequestRepository _requestRepository;
-        private readonly GetInforFromToken _token;  
+        private readonly IUserCancleTicketRepository _userCancleTicketRepository;
+        private readonly GetInforFromToken _token;
 
         public RequestController(IRequestRepository requestRepository, GetInforFromToken token)
         {
@@ -121,6 +122,48 @@ namespace MyAPI.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        [Authorize(Roles = "Staff")]
+        [HttpPut("acceptCancleTicket/{id}")]
+        public async Task<IActionResult> AcceptCancleTicketRequest(int id)
+        {
+            try
+            {
+                string token = Request.Headers["Authorization"];
+                if (token.StartsWith("Bearer"))
+                {
+                    token = token.Substring("Bearer ".Length).Trim();
+                }
+                if (string.IsNullOrEmpty(token))
+                {
+                    return BadRequest("Token is required.");
+                }
+                var staffId = _token.GetIdInHeader(token);
+                await _requestRepository.updateStatusRequestCancleTicket(id, staffId);
+                return Ok("update success");
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+        [Authorize(Roles = "Staff")]
+        [HttpGet("listRequestCancleTicket")]
+        public async Task<IActionResult> listRequestCancleTicket()
+        {
+            try
+            {
+                var listRequestCancle = await _requestRepository.getListRequestCancle();
+                return Ok(listRequestCancle);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+
+        // create request from user
+        [Authorize]
         [HttpPost("createRequestCancleTicket")]
         public async Task<IActionResult> createRequestCanleTicket(RequestCancleTicketDTOs requestCancleTicketDTOs)
         {

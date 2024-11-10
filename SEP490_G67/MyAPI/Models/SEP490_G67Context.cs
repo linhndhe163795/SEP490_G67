@@ -577,6 +577,8 @@ namespace MyAPI.Models
                     .HasColumnType("datetime")
                     .HasColumnName("created_at")
                     .HasDefaultValueSql("(getdate())");
+                
+                entity.Property(e => e.CreatedBy).HasColumnName("created_by");
 
                 entity.Property(e => e.Description)
                     .HasColumnType("text")
@@ -591,6 +593,12 @@ namespace MyAPI.Models
                 entity.Property(e => e.TypeId).HasColumnName("type_id");
 
                 entity.Property(e => e.UserId).HasColumnName("user_id");
+
+                entity.Property(e => e.UpdateAt)
+                   .HasColumnType("datetime")
+                   .HasColumnName("update_at");
+
+                entity.Property(e => e.UpdateBy).HasColumnName("update_by");
 
                 entity.HasOne(d => d.Type)
                     .WithMany(p => p.Requests)
@@ -612,6 +620,14 @@ namespace MyAPI.Models
                 entity.ToTable("Request_Details");
 
                 entity.Property(e => e.DetailId).HasColumnName("detail_id");
+
+
+                entity.Property(e => e.CreatedAt)
+                    .HasColumnType("datetime")
+                    .HasColumnName("created_at")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.CreatedBy).HasColumnName("created_by");
 
                 entity.Property(e => e.EndLocation)
                     .HasMaxLength(255)
@@ -636,6 +652,12 @@ namespace MyAPI.Models
                 entity.Property(e => e.TicketId).HasColumnName("ticket_id");
 
                 entity.Property(e => e.VehicleId).HasColumnName("vehicle_id");
+
+                entity.Property(e => e.UpdateAt)
+                   .HasColumnType("datetime")
+                   .HasColumnName("update_at");
+
+                entity.Property(e => e.UpdateBy).HasColumnName("update_by");
 
                 entity.HasOne(d => d.Request)
                     .WithMany(p => p.RequestDetails)

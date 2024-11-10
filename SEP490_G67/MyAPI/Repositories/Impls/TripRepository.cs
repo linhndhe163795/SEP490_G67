@@ -1,5 +1,11 @@
 ﻿using AutoMapper;
+using DocumentFormat.OpenXml.Drawing.Charts;
+using DocumentFormat.OpenXml.InkML;
+using DocumentFormat.OpenXml.VariantTypes;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Internal;
 using MyAPI.DTOs.DriverDTOs;
 using MyAPI.DTOs.TripDTOs;
 using MyAPI.DTOs.VehicleDTOs;
@@ -99,7 +105,7 @@ namespace MyAPI.Repositories.Impls
                 _context.Add(addTrip);
                 await _context.SaveChangesAsync();
                 var vechicleById = await _context.Vehicles.FirstOrDefaultAsync(x => x.Id == vehicleId);
-                if (vechicleById != null) 
+                if (vechicleById != null)
                 {
                     VehicleTripDTO vehicleTripDTO = new VehicleTripDTO
                     {
@@ -111,25 +117,13 @@ namespace MyAPI.Repositories.Impls
                         UpdateBy = null
                     };
                     var vehicleTripMapper = _mapper.Map<VehicleTrip>(vehicleTripDTO);
-                     _context.VehicleTrips.Add(vehicleTripMapper);
+                    _context.VehicleTrips.Add(vehicleTripMapper);
                 }
                 await _context.SaveChangesAsync();
             }
             catch (Exception ex)
             {
                 throw new Exception("addTrips: " + ex.Message, ex);
-            }
-        }
-
-        public Task AssgineTripToVehicle(int tripId, List<int> vehicleId)
-        {
-            try
-            {
-                return null;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("AssgineTripToVehicle:" + ex.Message);
             }
         }
 
@@ -170,7 +164,7 @@ namespace MyAPI.Repositories.Impls
                 var tripById = await _context.Trips.FirstOrDefaultAsync(x => x.Id == id);
                 if (tripById != null)
                 {
-                    tripById.Status = (tripById.Status == true) ? false : true; 
+                    tripById.Status = (tripById.Status == true) ? false : true;
                     tripById.UpdateBy = userId;
                     tripById.UpdateAt = DateTime.Now;
                     await _context.SaveChangesAsync();
@@ -185,5 +179,39 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception("updateStatusTrip: " + ex.Message);
             }
         }
-    }
+        public async Task confirmAddValidEntryImport(List<Trip> validEntry)
+        {
+            try
+            {
+                _context.Trips.AddRange(validEntry);
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<List<TripDTO>> getListTripNotVehicle()
+        {
+            try
+            {
+                var result = await (from t in _context.Trips
+                             join vt in _context.VehicleTrips on t.Id equals vt.TripId into tripVehicle
+                             from vt in tripVehicle.DefaultIfEmpty()
+                             join v in _context.Vehicles on vt.VehicleId equals v.Id into vehicleGroup
+                             from v in vehicleGroup.DefaultIfEmpty()
+                             where vt == null 
+                             select t
+                             ).ToListAsync();
+
+                var listTripNoVehicleMapper = _mapper.Map<List<TripDTO>>(result);
+                return listTripNoVehicleMapper;
+            }
+            catch (Exception ex) 
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+    }  
 }

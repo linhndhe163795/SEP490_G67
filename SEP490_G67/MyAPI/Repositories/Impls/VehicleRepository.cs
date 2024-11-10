@@ -42,86 +42,160 @@ namespace MyAPI.Repositories.Impls
 
         public async Task<bool> AddVehicleAsync(VehicleAddDTO vehicleAddDTO, string driverName)
         {
-            var checkUserNameDrive = await _context.Drivers.SingleOrDefaultAsync(s => s.Name.Equals(driverName));
-
-            var token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
-            int userId = _tokenHelper.GetIdInHeader(token);
-
-            if (userId == -1)
+            try
             {
-                throw new Exception("Invalid user ID from token.");
-            }
+                var checkUserNameDrive = await _context.Drivers.SingleOrDefaultAsync(s => s.Name.Equals(driverName));
 
-            var user = await _context.Users.FindAsync(userId);
-            if (user == null)
-            {
-                throw new Exception("User does not exist.");
-            }
+                var token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+                int userId = _tokenHelper.GetIdInHeader(token);
 
-            if (checkUserNameDrive == null)
-            {
-                throw new Exception("Driver not found in the system.");
-            }
-
-            var checkLicensePlate = await _context.Vehicles.FirstOrDefaultAsync(s => s.LicensePlate.Equals(vehicleAddDTO.LicensePlate));
-            if (checkLicensePlate != null)
-            {
-                throw new Exception("License plate is duplicate.");
-            }
-
-            bool isStaff = user.UserRoles.Any(s => s.Role.RoleName == "Staff");
-
-            Vehicle vehicle = new Vehicle
-            {
-                NumberSeat = vehicleAddDTO.NumberSeat,
-                VehicleTypeId = vehicleAddDTO.VehicleTypeId,
-                Image = vehicleAddDTO.Image,
-                Status = isStaff,
-                DriverId = checkUserNameDrive.Id,
-                VehicleOwner = userId,
-                LicensePlate = vehicleAddDTO.LicensePlate,
-                Description = vehicleAddDTO.Description,
-                CreatedBy = userId,
-                CreatedAt = vehicleAddDTO.CreatedAt,
-                UpdateAt = vehicleAddDTO.UpdateAt,
-                UpdateBy = vehicleAddDTO.UpdateBy,
-            };
-
-            _context.Vehicles.Add(vehicle);
-
-
-            if (!isStaff)
-            {
-                var requestDTO = new RequestDTO
+                if (userId == -1)
                 {
-                    UserId = userId,
-                    TypeId = 1,
-                    Description = "Yêu cầu thêm xe",
-                    Note = "Đang chờ xác nhận",
-                };
-
-                var createdRequest = await _requestRepository.CreateRequestVehicleAsync(requestDTO);
-                if (createdRequest == null)
-                {
-                    throw new Exception("Failed to create request.");
+                    throw new Exception("Invalid user ID from token.");
                 }
 
-                var requestDetailDTO = new RequestDetailDTO
+                var user = await _context.Users.FindAsync(userId);
+                if (user == null)
                 {
-                    RequestId = createdRequest.Id,
-                    VehicleId = vehicle.Id,
-                    Seats = vehicle.NumberSeat,
+                    throw new Exception("User does not exist.");
+                }
+
+                //if (checkUserNameDrive == null)
+                //{
+                //    throw new Exception("Driver not found in the system.");
+                //}
+
+                var checkLicensePlate = await _context.Vehicles.FirstOrDefaultAsync(s => s.LicensePlate.Equals(vehicleAddDTO.LicensePlate));
+                if (checkLicensePlate != null)
+                {
+                    throw new Exception("License plate is duplicate.");
+                }
+
+                bool isStaff = user.UserRoles.Any(s => s.Role.RoleName == "Staff");
+
+                Vehicle vehicle = new Vehicle
+                {
+                    NumberSeat = vehicleAddDTO.NumberSeat,
+                    VehicleTypeId = vehicleAddDTO.VehicleTypeId,
+                    Image = vehicleAddDTO.Image,
+                    Status = isStaff,
+                    DriverId = checkUserNameDrive != null ? checkUserNameDrive.Id : 0,
+                    VehicleOwner = userId,
+                    LicensePlate = vehicleAddDTO.LicensePlate,
+                    Description = vehicleAddDTO.Description,
+                    CreatedBy = userId,
+                    CreatedAt = vehicleAddDTO.CreatedAt,
+                    UpdateAt = vehicleAddDTO.UpdateAt,
+                    UpdateBy = vehicleAddDTO.UpdateBy,
                 };
 
-                await _requestDetailRepository.CreateRequestDetailAsync(requestDetailDTO);
+                _context.Vehicles.Add(vehicle);
+
+
+                if (!isStaff)
+                {
+                    var requestDTO = new RequestDTO
+                    {
+                        UserId = userId,
+                        TypeId = 1,
+                        Description = "Yêu cầu thêm xe",
+                        Note = "Đang chờ xác nhận",
+                    };
+
+                    var createdRequest = await _requestRepository.CreateRequestVehicleAsync(requestDTO);
+                    if (createdRequest == null)
+                    {
+                        throw new Exception("Failed to create request.");
+                    }
+
+                    var requestDetailDTO = new RequestDetailDTO
+                    {
+                        RequestId = createdRequest.Id,
+                        VehicleId = vehicle.Id,
+                        Seats = vehicle.NumberSeat,
+                    };
+
+                    await _requestDetailRepository.CreateRequestDetailAsync(requestDetailDTO);
+
+                    SendMailDTO mail = new SendMailDTO
+                    {
+                        FromEmail = "nhaxenhanam@gmail.com",
+                        Password = "vzgq unyk xtpt xyjp",
+                        ToEmail = user.Email,
+                        Subject = "Thông báo về việc đăng ký xe vào hệ thống",
+                        Body = "Thông tin của bạn đã được chúng tôi tiếp nhận xin vui lòng chờ đợi kiểm duyệt"
+                    };
+
+                    var checkMail = await _sendMail.SendEmail(mail);
+                    if (!checkMail)
+                    {
+                        throw new Exception("Send mail fail!!");
+                    }
+                }
+
+                await _context.SaveChangesAsync();
+                return true;
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("AddVehicleAsync: " + ex.Message);
+            }
+           
+        }
+        public async Task<bool> AddVehicleByStaffcheckAsync(int requestId, bool isApprove)
+        {
+            try
+            {
+                var checkRequestExits = await _context.Requests.FirstOrDefaultAsync(s => s.Id == requestId);
+
+                var token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+                int userId = _tokenHelper.GetIdInHeader(token);
+
+                if (userId == -1)
+                {
+                    throw new Exception("Invalid user ID from token.");
+                }
+
+                var user = await _context.Users.FindAsync(userId);
+                if (user == null)
+                {
+                    throw new Exception("User does not exist.");
+                }
+
+                if (checkRequestExits == null)
+                {
+                    return false;
+                }
+
+                checkRequestExits.Note = isApprove ? "Đã xác nhận" : "Từ chối xác nhận";
+                checkRequestExits.Status = isApprove;
+                var updateRequest = await _requestRepository.UpdateRequestVehicleAsync(requestId, checkRequestExits);
+
+                if (!updateRequest)
+                {
+                    throw new Exception("Failed to update request.");
+                }
+
+
+                var emailOfUser = await _context.Users
+                                              .Where(rq => rq.Id == checkRequestExits.UserId)
+                                              .Select(rq => rq.Email)
+                                              .FirstOrDefaultAsync();
+
+                if (string.IsNullOrEmpty(emailOfUser))
+                {
+                    throw new Exception("User email not found.");
+                }
 
                 SendMailDTO mail = new SendMailDTO
                 {
                     FromEmail = "nhaxenhanam@gmail.com",
                     Password = "vzgq unyk xtpt xyjp",
-                    ToEmail = user.Email,
+                    ToEmail = emailOfUser,
                     Subject = "Thông báo về việc đăng ký xe vào hệ thống",
-                    Body = "Thông tin của bạn đã được chúng tôi tiếp nhận xin vui lòng chờ đợi kiểm duyệt"
+                    Body = isApprove ? "Hệ thống đã xác nhận yêu cầu xe của bạn. Xe của bạn đã tham gia hệ thống."
+                                     : "Rất tiếc, yêu cầu xe của bạn đã bị từ chối xác nhận."
                 };
 
                 var checkMail = await _sendMail.SendEmail(mail);
@@ -129,100 +203,50 @@ namespace MyAPI.Repositories.Impls
                 {
                     throw new Exception("Send mail fail!!");
                 }
+
+                var vehicleID = await _context.Requests
+                                              .Where(rq => rq.Id == checkRequestExits.Id)
+                                              .SelectMany(rq => rq.RequestDetails)
+                                              .Select(rq => rq.VehicleId)
+                                              .FirstOrDefaultAsync();
+
+                if (vehicleID == 0)
+                {
+                    throw new Exception("Vehicle ID not found in request details.");
+                }
+
+                UpdateVehicleByStaff(vehicleID.Value, user.Id, isApprove);
+
+                return isApprove;
             }
-
-            await _context.SaveChangesAsync();
-            return true;
-        }
-        public async Task<bool> AddVehicleByStaffcheckAsync(int requestId, bool isApprove)
-        {
-            var checkRequestExits = await _context.Requests.FirstOrDefaultAsync(s => s.Id == requestId);
-
-            var token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
-            int userId = _tokenHelper.GetIdInHeader(token);
-
-            if (userId == -1)
+            catch (Exception ex)
             {
-                throw new Exception("Invalid user ID from token.");
+                throw new Exception("AddVehicleByStaffcheckAsync: " + ex.Message);
             }
-
-            var user = await _context.Users.FindAsync(userId);
-            if (user == null)
-            {
-                throw new Exception("User does not exist.");
-            }
-
-            if (checkRequestExits == null)
-            {
-                return false;
-            }
-
-            checkRequestExits.Note = isApprove ? "Đã xác nhận" : "Từ chối xác nhận";
-            checkRequestExits.Status = isApprove;
-            var updateRequest = await _requestRepository.UpdateRequestVehicleAsync(requestId, checkRequestExits);
-
-            if (!updateRequest)
-            {
-                throw new Exception("Failed to update request.");
-            }
-
-
-            var emailOfUser = await _context.Users
-                                          .Where(rq => rq.Id == checkRequestExits.UserId)
-                                          .Select(rq => rq.Email)
-                                          .FirstOrDefaultAsync();
-
-            if (string.IsNullOrEmpty(emailOfUser))
-            {
-                throw new Exception("User email not found.");
-            }
-
-            SendMailDTO mail = new SendMailDTO
-            {
-                FromEmail = "nhaxenhanam@gmail.com",
-                Password = "vzgq unyk xtpt xyjp",
-                ToEmail = emailOfUser,
-                Subject = "Thông báo về việc đăng ký xe vào hệ thống",
-                Body = isApprove ? "Hệ thống đã xác nhận yêu cầu xe của bạn. Xe của bạn đã tham gia hệ thống."
-                                 : "Rất tiếc, yêu cầu xe của bạn đã bị từ chối xác nhận."
-            };
-
-            var checkMail = await _sendMail.SendEmail(mail);
-            if (!checkMail)
-            {
-                throw new Exception("Send mail fail!!");
-            }
-
-            var vehicleID = await _context.Requests
-                                          .Where(rq => rq.Id == checkRequestExits.Id)
-                                          .SelectMany(rq => rq.RequestDetails)
-                                          .Select(rq => rq.VehicleId)
-                                          .FirstOrDefaultAsync();
-
-            if (vehicleID == 0)
-            {
-                throw new Exception("Vehicle ID not found in request details.");
-            }
-
-            UpdateVehicleByStaff(vehicleID.Value, user.Id, isApprove);
-
-            return isApprove;
         }
 
 
         public async Task<bool> DeleteVehicleAsync(int id)
         {
-            var checkVehicle = await _context.Vehicles.SingleOrDefaultAsync(s => s.Id == id);
-            if (checkVehicle != null)
+            try
             {
-                checkVehicle.Status = false;
-                await _context.SaveChangesAsync();
-                return true;
+                var checkVehicle = await _context.Vehicles.SingleOrDefaultAsync(s => s.Id == id);
+                if (checkVehicle != null)
+                {
+                    checkVehicle.Status = false;
+                    await _context.SaveChangesAsync();
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
             }
-            else
+            catch (Exception ex)
             {
-                return false;
+                throw new Exception("DeleteVehicleAsync: " + ex.Message);
             }
+            
         }
 
         public async Task<List<EndPointDTO>> GetListEndPointByVehicleId(int vehicleId)
@@ -261,44 +285,57 @@ namespace MyAPI.Repositories.Impls
 
         public async Task<List<VehicleTypeDTO>> GetVehicleTypeDTOsAsync()
         {
-            var listVehicleType = await _context.VehicleTypes.ToListAsync();
+            try
+            {
+                var listVehicleType = await _context.VehicleTypes.ToListAsync();
 
-            var vehicleTypeListDTOs = _mapper.Map<List<VehicleTypeDTO>>(listVehicleType);
+                var vehicleTypeListDTOs = _mapper.Map<List<VehicleTypeDTO>>(listVehicleType);
 
-            return vehicleTypeListDTOs;
+                return vehicleTypeListDTOs;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("GetVehicleTypeDTOsAsync: " + ex.Message);
+            }
+            
         }
 
         public async Task<bool> UpdateVehicleAsync(int id, string driverName)
         {
-
-            var token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
-            int userId = _tokenHelper.GetIdInHeader(token);
-
-            if (userId == -1)
+            try
             {
-                throw new Exception("Invalid user ID from token.");
-            }
+                var token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+                int userId = _tokenHelper.GetIdInHeader(token);
 
-            var vehicleUpdate = await _context.Vehicles.SingleOrDefaultAsync(vehicle => vehicle.Id == id);
+                if (userId == -1)
+                {
+                    throw new Exception("Invalid user ID from token.");
+                }
 
-            var checkUserNameDrive = _context.Drivers.SingleOrDefault(s => s.Name.Equals(driverName));
+                var vehicleUpdate = await _context.Vehicles.SingleOrDefaultAsync(vehicle => vehicle.Id == id);
 
-            if (vehicleUpdate != null && checkUserNameDrive != null)
+                var checkUserNameDrive = _context.Drivers.SingleOrDefault(s => s.Name.Equals(driverName));
+
+                if (vehicleUpdate != null && checkUserNameDrive != null)
+                {
+                    vehicleUpdate.DriverId = userId;
+
+                    vehicleUpdate.UpdateBy = checkUserNameDrive.Id;
+
+                    vehicleUpdate.UpdateAt = DateTime.Now;
+
+                    await _context.SaveChangesAsync();
+
+                    return true;
+
+                }
+                else
+                {
+                    throw new Exception("Not found user name in system");
+                }
+            }catch (Exception ex)
             {
-                vehicleUpdate.DriverId = userId;
-
-                vehicleUpdate.UpdateBy = checkUserNameDrive.Id;
-
-                vehicleUpdate.UpdateAt = DateTime.Now;
-
-                await _context.SaveChangesAsync();
-
-                return true;
-
-            }
-            else
-            {
-                throw new Exception("Not found user name in system");
+                throw new Exception("UpdateVehicleAsync: " + ex.Message);
             }
         }
 
@@ -338,61 +375,79 @@ namespace MyAPI.Repositories.Impls
 
         public async Task<List<VehicleListDTO>> GetVehicleDTOsAsync()
         {
-            var listVehicle = await _context.Vehicles.ToListAsync();
+            try
+            {
+                var listVehicle = await _context.Vehicles.ToListAsync();
 
-            var vehicleListDTOs = _mapper.Map<List<VehicleListDTO>>(listVehicle);
+                var vehicleListDTOs = _mapper.Map<List<VehicleListDTO>>(listVehicle);
 
-            return vehicleListDTOs;
+                return vehicleListDTOs;
+            }catch (Exception ex)
+            {
+                throw new Exception("GetVehicleDTOsAsync: " + ex.Message);
+            }
         }
 
         public async Task<bool> UpdateVehicleAsync(int id, string driverName, int userIdUpdate)
         {
-            var vehicleUpdate = await _context.Vehicles.SingleOrDefaultAsync(vehicle => vehicle.Id == id);
-
-            var checkUserNameDrive = _context.Drivers.SingleOrDefault(s => s.Name.Equals(driverName));
-
-            if (vehicleUpdate != null && checkUserNameDrive != null)
+            try
             {
-                vehicleUpdate.DriverId = userIdUpdate;
+                var vehicleUpdate = await _context.Vehicles.SingleOrDefaultAsync(vehicle => vehicle.Id == id);
 
-                vehicleUpdate.UpdateBy = checkUserNameDrive.Id;
+                var checkUserNameDrive = _context.Drivers.SingleOrDefault(s => s.Name.Equals(driverName));
 
-                vehicleUpdate.UpdateAt = DateTime.Now;
+                if (vehicleUpdate != null && checkUserNameDrive != null)
+                {
+                    vehicleUpdate.DriverId = userIdUpdate;
 
-                //await _context.SaveChangesAsync();
+                    vehicleUpdate.UpdateBy = checkUserNameDrive.Id;
 
-                return true;
+                    vehicleUpdate.UpdateAt = DateTime.Now;
 
-            }
-            else
+                    //await _context.SaveChangesAsync();
+
+                    return true;
+
+                }
+                else
+                {
+                    throw new Exception("Not found user name in system");
+                }
+            }catch (Exception ex)
             {
-                throw new Exception("Not found user name in system");
+                throw new Exception("UpdateVehicleAsync: " + ex.Message);
             }
         }
 
         private bool UpdateVehicleByStaff(int id, int userIdUpdate, bool updateStatus)
         {
-            var vehicleUpdate = _context.Vehicles.SingleOrDefault(vehicle => vehicle.Id == id);
-
-
-            if (vehicleUpdate != null)
+            try
             {
-                vehicleUpdate.Status = updateStatus;
+                var vehicleUpdate = _context.Vehicles.SingleOrDefault(vehicle => vehicle.Id == id);
 
-                vehicleUpdate.UpdateBy = userIdUpdate;
 
-                vehicleUpdate.UpdateAt = DateTime.Now;
+                if (vehicleUpdate != null)
+                {
+                    vehicleUpdate.Status = updateStatus;
 
-                _context.Vehicles.Update(vehicleUpdate);
+                    vehicleUpdate.UpdateBy = userIdUpdate;
 
-                _context.SaveChanges();
+                    vehicleUpdate.UpdateAt = DateTime.Now;
 
-                return true;
+                    _context.Vehicles.Update(vehicleUpdate);
 
-            }
-            else
+                    _context.SaveChanges();
+
+                    return true;
+
+                }
+                else
+                {
+                    throw new Exception("Not found vehicle in system");
+                }
+            }catch(Exception ex)
             {
-                throw new Exception("Not found vehicle in system");
+                throw new Exception("UpdateVehicleByStaff: " + ex.Message);
             }
         }
     }
