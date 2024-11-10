@@ -97,8 +97,26 @@ namespace MyAPI.Controllers
             return Ok("Driver deleted successfully");
         }
 
+        [HttpGet("drivers-without-vehicle-for-rent")]
+        public async Task<IActionResult> GetDriversWithoutVehicle()
+        {
+            var drivers = await _driverRepository.GetDriversWithoutVehicleAsync();
+            return Ok(drivers);
+        }
 
+        [HttpGet("send-mail-to-drivers-without-vehicle-for-rent")]
+        public async Task<IActionResult> SendMailToDriverWithoutVehicle()
+        {
+            try
+            {
+                await _driverRepository.SendEmailToDriversWithoutVehicle();
 
-
+                return Ok("Emails sent successfully to all drivers without vehicles.");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "An error occurred while sending emails: " + ex.Message);
+            }
+        }
     }
 }
