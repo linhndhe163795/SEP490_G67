@@ -13,5 +13,6 @@ namespace MyAPI.Infrastructure.Interfaces
         Task AssgineTripToVehicle(int tripId, List<int> vehicleId);
         Task UpdateTripById(int tripId, TripDTO trip, int userId);
         Task updateStatusTrip(int id, int userId);
+        Task confirmAddValidEntryImport(List<Trip> validEntry);
     }
 }

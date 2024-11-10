@@ -160,23 +160,38 @@ namespace MyAPI.Controllers
                 }
             }
         }
+            [Authorize(Roles ="Staff")]
+            [HttpPost("importTrip")]
+            public async Task<IActionResult> importTrip(IFormFile fileExcelTrip)
+            {
 
-        [HttpPost]
-        public async Task<IActionResult> importTrip(IFormFile fileExcelTrip)
+                string token = Request.Headers["Authorization"];
+                if (token.StartsWith("Bearer"))
+                {
+                    token = token.Substring("Bearer ".Length).Trim();
+                }
+                if (string.IsNullOrEmpty(token))
+                {
+                    return BadRequest("Token is required.");
+                }
+                var staffId = _getInforFromToken.GetIdInHeader(token);
+                var (validEntries, invalidEntries) = await _serviceImport.ImportTrip(fileExcelTrip, staffId);
+                return Ok(new
+                {
+                    validEntries,
+                    invalidEntries
+                });
+            }
+        [Authorize(Roles = "Staff")]
+        [HttpPost("confirmImportTrip")]
+        public async Task<IActionResult> ConfirmImportTrip([FromBody] List<Trip> validEntries)
         {
-
-            string token = Request.Headers["Authorization"];
-            if (token.StartsWith("Bearer"))
+            if (validEntries == null || !validEntries.Any())
             {
-                token = token.Substring("Bearer ".Length).Trim();
+                return BadRequest("No valid entries to import.");
             }
-            if (string.IsNullOrEmpty(token))
-            {
-                return BadRequest("Token is required.");
-            }
-            var staffId = _getInforFromToken.GetIdInHeader(token);
-            await _serviceImport.ImportTrip(fileExcelTrip, staffId);
-            return Ok();
+            await _tripRepository.confirmAddValidEntryImport(validEntries);
+            return Ok("Successfully imported valid entries.");
         }
 
         [Authorize(Roles = "Staff")]
