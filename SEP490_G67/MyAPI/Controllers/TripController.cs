@@ -245,5 +245,19 @@ namespace MyAPI.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        [HttpGet("listTripNotVehicle")]
+        public async Task<IActionResult> getListTripNotVehicel()
+        {
+            try
+            {
+                var listTripNotHaveVehicel = await _tripRepository.getListTripNotVehicle();
+                return Ok(listTripNotHaveVehicel);
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }
