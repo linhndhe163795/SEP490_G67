@@ -83,7 +83,6 @@ namespace MyAPI.Repositories.Impls
                 Description = requestDTO.Description,
                 Note = requestDTO.Note,
                 CreatedAt = DateTime.UtcNow,
-                CreatedAt = DateTime.UtcNow,
                 CreatedBy = requestDTO.CreatedBy,
                 UpdatedAt = DateTime.UtcNow,
                 UpdatedBy = Constant.ADMIN,
@@ -110,6 +109,7 @@ namespace MyAPI.Repositories.Impls
                     CreatedAt = DateTime.UtcNow,
                     CreatedBy = requestDTO.CreatedBy,
                     UpdatedAt = DateTime.UtcNow,
+                    UpdatedBy = Constant.ADMIN,
                 };
                 await _context.RequestDetails.AddAsync(requestDetail);
             }
