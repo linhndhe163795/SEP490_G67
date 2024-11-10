@@ -105,10 +105,9 @@ namespace MyAPI.Repositories.Impls
                     StartTime = detailDto.StartTime,
                     EndTime = detailDto.EndTime,
                     Seats = detailDto.Seats,
-                    RequestId = maxId,
-                    CreatedAt = DateTime.UtcNow,
+                    CreatedAt = DateTime.UtcNow,    
                     CreatedBy = requestDTO.CreatedBy,
-                    UpdatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow,    
                     UpdatedBy = Constant.ADMIN,
                 };
                 await _context.RequestDetails.AddAsync(requestDetail);
