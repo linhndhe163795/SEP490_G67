@@ -23,5 +23,7 @@ namespace MyAPI.Infrastructure.Interfaces
         Task<List<EndPointDTO>> GetListEndPointByVehicleId(int vehicleId);
         Task<List<StartPointDTO>> GetListStartPointByVehicleId(int vehicleId);
 
+        Task<bool> AssignDriverToVehicleAsync(int vehicleId, int driverId);
+
     }
 }

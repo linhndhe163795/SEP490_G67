@@ -105,11 +105,11 @@ namespace MyAPI.Controllers
         }
 
         [HttpGet("send-mail-to-drivers-without-vehicle-for-rent")]
-        public async Task<IActionResult> SendMailToDriverWithoutVehicle()
+        public async Task<IActionResult> SendMailToDriverWithoutVehicle(int price)
         {
             try
             {
-                await _driverRepository.SendEmailToDriversWithoutVehicle();
+                await _driverRepository.SendEmailToDriversWithoutVehicle(price);
 
                 return Ok("Emails sent successfully to all drivers without vehicles.");
             }

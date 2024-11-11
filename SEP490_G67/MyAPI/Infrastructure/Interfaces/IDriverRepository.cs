@@ -15,7 +15,7 @@ namespace MyAPI.Infrastructure.Interfaces
 
         Task<IEnumerable<Driver>> GetDriversWithoutVehicleAsync();
 
-        Task SendEmailToDriversWithoutVehicle();
+        Task SendEmailToDriversWithoutVehicle(int price);
 
     }
 }

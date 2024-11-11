@@ -106,6 +106,7 @@ namespace MyAPI.Repositories.Impls
                     EndTime = detailDto.EndTime,
                     Seats = detailDto.Seats,
                     RequestId = maxId,
+                    Price = detailDto.Price,
                     CreatedAt = DateTime.UtcNow,
                 };
                 await _context.RequestDetails.AddAsync(requestDetail);
