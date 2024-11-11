@@ -5,8 +5,8 @@ namespace MyAPI.Infrastructure.Interfaces
 {
     public interface ITicketRepository : IRepository<Ticket>
     {
-        Task<int> CreateTicketByUser(string? promotionCode, int tripDetailsId, BookTicketDTOs ticketDTOs, int userId);
-        Task CreatTicketFromDriver(int vehicleId,int priceTrip, TicketFromDriverDTOs ticket, int driverId);
+        Task<int> CreateTicketByUser(string? promotionCode, int tripDetailsId, BookTicketDTOs ticketDTOs, int userId, int numberTicket);
+        Task CreatTicketFromDriver(int vehicleId,int priceTrip, TicketFromDriverDTOs ticket, int driverId, int numberTicket);
         Task<List<ListTicketDTOs>> getAllTicket();
         Task<int> GetPriceFromPoint(TicketFromDriverDTOs ticket, int vehicleId);
         Task<List<TicketNotPaid>> GetListTicketNotPaid (int vehicleId);

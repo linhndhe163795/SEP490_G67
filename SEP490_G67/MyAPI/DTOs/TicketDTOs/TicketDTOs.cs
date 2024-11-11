@@ -8,7 +8,7 @@ namespace MyAPI.DTOs.TicketDTOs
         public string? CodePromotion { get; set; }
         [JsonIgnore]
         public decimal? PricePromotion { get; set; }
-        public string? SeatCode { get; set; }
+        public int NumberTicket { get; set; }
         public string? PointStart { get; set; }
         public string? PointEnd { get; set; }
         public DateTime? TimeFrom { get; set; }

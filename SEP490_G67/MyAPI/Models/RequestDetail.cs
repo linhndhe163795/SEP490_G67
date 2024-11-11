@@ -14,6 +14,7 @@ namespace MyAPI.Models
         public DateTime? StartTime { get; set; }
         public DateTime? EndTime { get; set; }
         public int? Seats { get; set; }
+        public decimal? Price { get; set; }
         public DateTime? CreatedAt { get; set; }
         public int? CreatedBy { get; set; }
         public DateTime? UpdateAt { get; set; }

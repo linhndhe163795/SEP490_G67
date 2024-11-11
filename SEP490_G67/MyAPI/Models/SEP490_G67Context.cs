@@ -51,8 +51,7 @@ namespace MyAPI.Models
         {
             if (!optionsBuilder.IsConfigured)
             {
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-                optionsBuilder.UseSqlServer("Server=LAPTOP-HK5HU0DA;Database=SEP490_G67;User Id=sa;Password=123;TrustServerCertificate=true;");
+
             }
         }
 
@@ -640,6 +639,10 @@ namespace MyAPI.Models
                     .HasColumnType("datetime")
                     .HasColumnName("end_time");
 
+                entity.Property(e => e.Price)
+                 .HasColumnType("decimal(18, 2)")
+                 .HasColumnName("price");
+
                 entity.Property(e => e.RequestId).HasColumnName("request_id");
 
                 entity.Property(e => e.Seats).HasColumnName("seats");
@@ -779,7 +782,7 @@ namespace MyAPI.Models
                     .HasColumnType("decimal(18, 2)")
                     .HasColumnName("price_promotion");
 
-                entity.Property(e => e.SeatCode).HasMaxLength(50);
+                entity.Property(e => e.NumberTicket).HasColumnName("numberTicket");
 
                 entity.Property(e => e.Status)
                     .HasMaxLength(255)

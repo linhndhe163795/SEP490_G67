@@ -24,7 +24,7 @@ namespace MyAPI.Controllers
         }
         [Authorize]
         [HttpPost("bookTicket/{tripDetailsId}")]
-        public async Task<IActionResult> createTicket(BookTicketDTOs ticketDTOs, int tripDetailsId, string? promotionCode)
+        public async Task<IActionResult> createTicket(BookTicketDTOs ticketDTOs, int tripDetailsId, string? promotionCode, int numberTicket)
         {
             try
             {
@@ -39,7 +39,7 @@ namespace MyAPI.Controllers
                 }
                 var userId = _getInforFromToken.GetIdInHeader(token);
 
-                var ticketId = await _ticketRepository.CreateTicketByUser(promotionCode, tripDetailsId, ticketDTOs, userId);
+                var ticketId = await _ticketRepository.CreateTicketByUser(promotionCode, tripDetailsId, ticketDTOs, userId, numberTicket);
                 return Ok(new { ticketId, ticketDetails = ticketDTOs });
             }
             catch (Exception ex)
@@ -50,7 +50,7 @@ namespace MyAPI.Controllers
        
         [Authorize(Roles = "Staff")]
         [HttpPost("createTicketFromDriver/{vehicleId}")]
-        public async Task<IActionResult> creatTicketFromDriver([FromBody] TicketFromDriverDTOs ticketFromDriver, [FromForm] int vehicleId)
+        public async Task<IActionResult> creatTicketFromDriver([FromBody] TicketFromDriverDTOs ticketFromDriver, [FromForm] int vehicleId, int numberTicket)
         {
             try
             {
@@ -66,9 +66,8 @@ namespace MyAPI.Controllers
                 var driverId = _getInforFromToken.GetIdInHeader(token);
 
                 var priceTrip = await _ticketRepository.GetPriceFromPoint(ticketFromDriver, vehicleId);
-                await _ticketRepository.CreatTicketFromDriver(priceTrip, vehicleId, ticketFromDriver, driverId);
+                await _ticketRepository.CreatTicketFromDriver(priceTrip, vehicleId, ticketFromDriver, driverId, numberTicket);
                 return Ok();
-
             }
             catch (Exception ex)
             {

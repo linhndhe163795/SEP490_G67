@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using AutoMapper.Configuration.Conventions;
 using Microsoft.EntityFrameworkCore;
 using MyAPI.DTOs;
 using MyAPI.DTOs.TicketDTOs;
@@ -24,7 +25,7 @@ namespace MyAPI.Repositories.Impls
             _sendMail = sendMail;
         }
 
-        public async Task<int> CreateTicketByUser(string? promotionCode, int tripDetailsId, BookTicketDTOs ticketDTOs, int userId)
+        public async Task<int> CreateTicketByUser(string? promotionCode, int tripDetailsId, BookTicketDTOs ticketDTOs, int userId, int numberTicket)
         {
             try
             {
@@ -65,9 +66,9 @@ namespace MyAPI.Repositories.Impls
                     PointEnd = tripDetails.TripDetails.PointEndDetails,
                     TimeFrom = _parseToDateTime.ParseToDateTime(dateString, tripDetails.TripDetails.TimeStartDetils),
                     TimeTo = _parseToDateTime.ParseToDateTime(dateString, tripDetails.TripDetails.TimeEndDetails),
-                    Price = tripDetails.Trip.Price,
-                    PricePromotion = tripDetails.Trip.Price - (tripDetails.Trip.Price * (promotionUser?.Discount ?? 0) / 100),
-                    SeatCode = null,
+                    Price = tripDetails.Trip.Price * numberTicket,
+                    PricePromotion = (tripDetails.Trip.Price * numberTicket) - (tripDetails.Trip.Price * numberTicket * (promotionUser?.Discount ?? 0) / 100),
+                    NumberTicket = numberTicket,
                     TypeOfPayment = ticketDTOs.TypeOfPayment,
                     Status = (ticketDTOs.TypeOfPayment == Constant.CHUYEN_KHOAN) ? "Chờ thanh toán" : "Thanh toán bằng tiền mặt",
                     VehicleId = tripDetails.Vehicle.Id,
@@ -94,7 +95,7 @@ namespace MyAPI.Repositories.Impls
             }
         }
 
-        public async Task CreatTicketFromDriver(int priceTrip, int vehicleId, TicketFromDriverDTOs ticket, int driverId)
+        public async Task CreatTicketFromDriver(int priceTrip, int vehicleId, TicketFromDriverDTOs ticket, int driverId, int numberTicket)
         {
             try
             {
@@ -103,11 +104,12 @@ namespace MyAPI.Repositories.Impls
                 {
                     TicketDTOs createTicketFromDriver = new TicketDTOs
                     {
-                        Price = priceTrip,
-                        PricePromotion = priceTrip,
+                        Price = priceTrip * numberTicket,
+                        PricePromotion = priceTrip * numberTicket,
                         PointStart = ticket.PointStart,
                         PointEnd = ticket.PointEnd,
                         TimeFrom = DateTime.Now,
+                        NumberTicket = numberTicket,
                         Description = "Khách bắt dọc đường di chuyển từ " + ticket.PointStart + " đến " + ticket.PointEnd,
                         VehicleId = vehicleId,
                         TypeOfPayment = ticket.TypeOfPayment,
@@ -125,7 +127,6 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception(ex.Message);
             }
         }
-        
         public async Task CreateTicketForRentCar(int vehicleId, decimal price, TicketForRentCarDTO ticketRentalDTO, int userId)
         {
             try
@@ -144,7 +145,7 @@ namespace MyAPI.Repositories.Impls
                     VehicleId = vehicleId,
                     Price = price,
                     CodePromotion = promotionUser?.Description,
-                    SeatCode = ticketRentalDTO.seatCode,
+                    NumberTicket = ticketRentalDTO.NumberTicket,
                     PointStart = ticketRentalDTO.PointStart,
                     PointEnd = ticketRentalDTO.PointEnd,
                     TimeFrom = ticketRentalDTO.TimeFrom,
