@@ -1,5 +1,6 @@
 ﻿using ClosedXML.Excel;
 using DocumentFormat.OpenXml.Spreadsheet;
+using Microsoft.EntityFrameworkCore;
 using MyAPI.Models;
 using System.Globalization;
 
@@ -23,6 +24,25 @@ namespace MyAPI.Helper
                 trip.Price <= 0 || trip.Price == null || 
                 string.IsNullOrEmpty(trip.PointStart) ||
                 string.IsNullOrEmpty(trip.PointEnd))
+            {
+                return false;
+            }
+            return true;
+        }
+        private async Task<bool> checkTypeVehicle(int? typeVehicel)
+        {
+            var typeOfVehicel =  await _context.VehicleTypes.FirstOrDefaultAsync(x => x.Id == typeVehicel);
+            if (typeOfVehicel == null)
+            {
+                return false;
+            }
+            return true;
+        }
+        private bool IsValidVehicel(Vehicle vehicel)
+        {
+            if (vehicel.NumberSeat <= 0 ||
+                vehicel.VehicleTypeId == null ||
+                string.IsNullOrEmpty(vehicel.LicensePlate))
             {
                 return false;
             }
@@ -86,10 +106,13 @@ namespace MyAPI.Helper
                     } 
                 } 
             }
-            //await _context.Trips.AddRangeAsync(validEntries); 
-            //await _context.SaveChangesAsync(); 
+            //await _context.Trips.AddRangeAsync(validEntries);
+            //await _context.SaveChangesAsync();
             return (validEntries, invalidEntries);
         }
+
+
+
         public async Task ImportTripDetailsByTripId(IFormFile excelFileTripDetails, int staffId, int tripId)
         {
             string path = Path.GetFileName(excelFileTripDetails.FileName);
@@ -124,6 +147,53 @@ namespace MyAPI.Helper
             {
                 throw new Exception("File không hợp lệ");
             }
+        }
+
+
+        public async Task<(List<Vehicle> validEntries, List<Vehicle> invalidEntries)> ImportVehicel(IFormFile excelFile, int staffId)
+        {
+            string path = Path.GetFileName(excelFile.FileName);
+            if (!checkFile(path))
+            {
+                throw new Exception("File không hợp lệ");
+            }
+            var validEntries = new List<Vehicle>();
+            var invalidEntries = new List<Vehicle>();
+            using (var stream = new MemoryStream())
+            {
+                await excelFile.CopyToAsync(stream);
+                using (var workbook = new XLWorkbook(stream))
+                {
+                    var tripSheets = workbook.Worksheet("Vehicle");
+                    foreach (var row in tripSheets.RowsUsed().Skip(1))
+                    {
+                        var vehicle = new Vehicle
+                        {
+                            NumberSeat = row.Cell(1).GetValue<Int32>(),
+                            VehicleTypeId = row.Cell(2).GetValue<Int32>(),
+                            LicensePlate = row.Cell(3).GetValue<string>(),
+                            Description = row.Cell(4).GetValue<string>(),
+                            Status = true,
+                            CreatedAt = DateTime.Now,
+                            CreatedBy = staffId,
+                            UpdateAt = null,
+                            UpdateBy = null,
+                        };
+
+                        if (IsValidVehicel(vehicle) && await checkTypeVehicle(vehicle.VehicleTypeId))
+                        {
+                            validEntries.Add(vehicle);
+                        }
+                        else
+                        {
+                            invalidEntries.Add(vehicle);
+                        }
+                    }
+                }
+            }
+            //await _context.Trips.AddRangeAsync(validEntries);
+            //await _context.SaveChangesAsync();
+            return (validEntries, invalidEntries);
         }
     }
 }

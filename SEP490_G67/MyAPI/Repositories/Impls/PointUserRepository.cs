@@ -11,7 +11,29 @@ namespace MyAPI.Repositories.Impls
         private readonly IMapper _mapper;
         public PointUserRepository(SEP490_G67Context _context, IMapper mapper) : base(_context)
         {
-           _mapper = mapper;
+            _mapper = mapper;
+        }
+
+        public async Task addNewPointUser( int userId)
+        {
+            try
+            {
+                var addNewPointUser = new PointUser
+                {
+                    UserId = userId,
+                    Points = 0,
+                    PointsMinus = 0,
+                    CreatedBy = userId,
+                    CreatedAt = DateTime.Now,
+                    Date = DateTime.Now,
+                };
+                _context.PointUsers.Add(addNewPointUser);
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
         }
 
         public async Task<bool> addPointUser(PointUserAddDTO pointUserAddDTO)
@@ -38,7 +60,6 @@ namespace MyAPI.Repositories.Impls
             {
                 throw new Exception(ex.Message);
             }
-            
         }
 
         public async Task<PointUserDTOs> getPointUserById(int userId)
@@ -71,7 +92,8 @@ namespace MyAPI.Repositories.Impls
                 checkPoint.UpdateBy = pointUserUpdateDTO.UpdateBy;
                 await _context.SaveChangesAsync();
                 return true;
-            }else
+            }
+            else
             {
                 throw new Exception("Update point user!!!");
             }

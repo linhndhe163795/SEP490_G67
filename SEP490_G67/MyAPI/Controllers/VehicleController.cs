@@ -3,6 +3,7 @@ using AutoMapper.Internal;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MyAPI.DTOs.VehicleDTOs;
+using MyAPI.Helper;
 using MyAPI.Infrastructure.Interfaces;
 using MyAPI.Repositories.Impls;
 
@@ -15,9 +16,13 @@ namespace MyAPI.Controllers
     {
 
         private readonly IVehicleRepository _vehicleRepository;
-        public VehicleController(IVehicleRepository vehicleRepository)
+        private readonly GetInforFromToken _inforFromToken;
+        private readonly ServiceImport _serviceImport;
+        public VehicleController(IVehicleRepository vehicleRepository,GetInforFromToken inforFromToken, ServiceImport serviceImport)
         {
             _vehicleRepository = vehicleRepository;
+            _inforFromToken = inforFromToken;
+            _serviceImport = serviceImport;
         }
         [Authorize(Roles = "Staff")]
         [HttpGet("listVehicleType")]
@@ -178,6 +183,34 @@ namespace MyAPI.Controllers
             catch (Exception ex)
             {
                 return BadRequest(new { ex.Message });
+            }
+        }
+        [Authorize]
+        [HttpPost("import_vehicle")]
+        public async Task<IActionResult> importVehicel(IFormFile fileExcleVehicel)
+        {
+            try
+            {
+                string token = Request.Headers["Authorization"];
+                if (token.StartsWith("Bearer"))
+                {
+                    token = token.Substring("Bearer ".Length).Trim();
+                }
+                if (string.IsNullOrEmpty(token))
+                {
+                    return BadRequest("Token is required.");
+                }
+                var staffId = _inforFromToken.GetIdInHeader(token);
+                var (validEntries, invalidEntries) = await _serviceImport.ImportVehicel(fileExcleVehicel, staffId);
+                return Ok(new
+                {
+                    validEntries,
+                    invalidEntries
+                });
+            }
+            catch(Exception e)
+            {
+                return BadRequest(e.Message);
             }
         }
     }
