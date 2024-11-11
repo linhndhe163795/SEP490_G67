@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using MyAPI.DTOs.TicketDTOs;
 using MyAPI.Helper;
 using MyAPI.Infrastructure.Interfaces;
+using MyAPI.Models;
 
 namespace MyAPI.Controllers
 {
@@ -38,38 +39,15 @@ namespace MyAPI.Controllers
                 }
                 var userId = _getInforFromToken.GetIdInHeader(token);
 
-                await _ticketRepository.CreateTicketByUser(promotionCode, tripDetailsId, ticketDTOs, userId);
-                return Ok(ticketDTOs);
+                var ticketId = await _ticketRepository.CreateTicketByUser(promotionCode, tripDetailsId, ticketDTOs, userId);
+                return Ok(new { ticketId, ticketDetails = ticketDTOs });
             }
             catch (Exception ex)
             {
                 return BadRequest("createTicket: " + ex.Message);
             }
         }
-        //[HttpPost("bookTicketBefortUsePromotion")]
-        //public async Task<IActionResult> createTicketBefortUsePromotion(BookTicketDTOs ticketDTOs, int tripDetailsId, string? promotionCode)
-        //{
-        //    try
-        //    {
-        //        string token = Request.Headers["Authorization"];
-        //        if (token.StartsWith("Bearer"))
-        //        {
-        //            token = token.Substring("Bearer ".Length).Trim();
-        //        }
-        //        if (string.IsNullOrEmpty(token))
-        //        {
-        //            return BadRequest("Token is required.");
-        //        }
-        //        var userId = _getInforFromToken.GetIdInHeader(token);
-
-        //        await _ticketRepository.CreateTicketByUser(promotionCode, tripDetailsId, ticketDTOs, userId);
-        //        return Ok(ticketDTOs);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return BadRequest("createTicket: " + ex.Message);
-        //    }
-        //}
+       
         [Authorize(Roles = "Staff")]
         [HttpPost("createTicketFromDriver/{vehicleId}")]
         public async Task<IActionResult> creatTicketFromDriver([FromBody] TicketFromDriverDTOs ticketFromDriver, [FromForm] int vehicleId)

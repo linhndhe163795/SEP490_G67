@@ -24,7 +24,7 @@ namespace MyAPI.Repositories.Impls
             _sendMail = sendMail;
         }
 
-        public async Task CreateTicketByUser(string? promotionCode, int tripDetailsId, BookTicketDTOs ticketDTOs, int userId)
+        public async Task<int> CreateTicketByUser(string? promotionCode, int tripDetailsId, BookTicketDTOs ticketDTOs, int userId)
         {
             try
             {
@@ -81,9 +81,12 @@ namespace MyAPI.Repositories.Impls
                 };
                 var createTicketMapper = _mapper.Map<Ticket>(createTicket);
                 _context.Tickets.Add(createTicketMapper);
+                await _context.SaveChangesAsync();
+                var ticketId = createTicketMapper.Id;
                 var promotionUserMapper = _mapper.Map<PromotionUser>(promotionUserUsed);
                 if (promotionUser != null) _context.PromotionUsers.Remove(promotionUserMapper);
                 await _context.SaveChangesAsync();
+                return ticketId;
             }
             catch (Exception ex)
             {
