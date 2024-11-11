@@ -6,7 +6,7 @@ using MyAPI.Helper;
 using MyAPI.Infrastructure.Interfaces;
 using MyAPI.Models;
 using System.Reflection.Metadata;
-
+using Constant = MyAPI.Helper.Constant;
 
 namespace MyAPI.Repositories.Impls
 {
@@ -82,7 +82,10 @@ namespace MyAPI.Repositories.Impls
                 Status = requestDTO.Status,
                 Description = requestDTO.Description,
                 Note = requestDTO.Note,
-                CreatedAt = DateTime.UtcNow
+                CreatedAt = DateTime.UtcNow,
+                CreatedBy = requestDTO.CreatedBy,
+                UpdateAt = DateTime.UtcNow,
+                UpdateBy = Constant.ADMIN,
             };
 
             await _context.Requests.AddAsync(newRequest);
@@ -96,12 +99,15 @@ namespace MyAPI.Repositories.Impls
                 var requestDetail = new RequestDetail
                 {
                     VehicleId = detailDto.VehicleId,
+                    TicketId = detailDto.TicketId,
                     StartLocation = detailDto.StartLocation,
                     EndLocation = detailDto.EndLocation,
                     StartTime = detailDto.StartTime,
                     EndTime = detailDto.EndTime,
                     Seats = detailDto.Seats,
-                    RequestId = detailDto.RequestId,
+                    RequestId = maxId,
+                    Price = detailDto.Price,
+                    CreatedAt = DateTime.UtcNow,
                 };
                 await _context.RequestDetails.AddAsync(requestDetail);
             }
@@ -109,6 +115,7 @@ namespace MyAPI.Repositories.Impls
             await _context.SaveChangesAsync();
             return newRequest;
         }
+
 
 
         public async Task<IEnumerable<Request>> GetAllRequestsWithDetailsAsync()
@@ -369,5 +376,7 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception(ex.Message);
             }
         }
+
+        
     }
 }

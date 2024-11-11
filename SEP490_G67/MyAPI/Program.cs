@@ -54,6 +54,7 @@ builder.Services.AddScoped<SendMail>();
 builder.Services.AddScoped<Jwt>();
 builder.Services.AddScoped<GetInforFromToken>();
 builder.Services.AddScoped<ParseStringToDateTime>();
+builder.Services.AddScoped<ServiceImport>();
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddHttpContextAccessor();
 builder.Services.Configure<CookiePolicyOptions>(options =>

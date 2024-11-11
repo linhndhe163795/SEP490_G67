@@ -1,7 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using MyAPI.DTOs;
 using MyAPI.DTOs.DriverDTOs;
+using MyAPI.Helper;
 using MyAPI.Infrastructure.Interfaces;
 using MyAPI.Models;
+using System.Globalization;
 
 namespace MyAPI.Repositories.Impls
 {
@@ -9,11 +12,13 @@ namespace MyAPI.Repositories.Impls
     {
         private readonly SEP490_G67Context _context;
         private readonly ITypeOfDriverRepository _typeOfDriverRepository;
+        private readonly SendMail _sendMail;
 
-        public DriverRepository(SEP490_G67Context context, ITypeOfDriverRepository typeOfDriverRepository) : base(context)
+        public DriverRepository(SEP490_G67Context context, ITypeOfDriverRepository typeOfDriverRepository, SendMail sendMail) : base(context)
         {
             _context = context;
             _typeOfDriverRepository = typeOfDriverRepository;
+            _sendMail = sendMail;
         }
 
         public async Task<Driver> GetDriverWithVehicle(int id)
@@ -73,5 +78,61 @@ namespace MyAPI.Repositories.Impls
             await Update(existingDriver);
             return existingDriver;
         }
+
+        public async Task<IEnumerable<Driver>> GetDriversWithoutVehicleAsync()
+        {
+            return await _context.Drivers
+                .Where(d => !_context.Vehicles.Any(v => v.DriverId == d.Id))
+                .ToListAsync();
+        }
+
+        
+
+        public async Task SendEmailToDriversWithoutVehicle(int price)
+        {
+        try
+        {
+            var driversWithoutVehicle = await GetDriversWithoutVehicleAsync();
+
+            if (!driversWithoutVehicle.Any())
+            {
+                Console.WriteLine("No drivers without vehicles found.");
+                return;
+            }
+
+            string formattedPrice = string.Format(new CultureInfo("vi-VN"), "{0:N0} VND", price);
+
+            foreach (var driver in driversWithoutVehicle)
+            {
+                if (string.IsNullOrWhiteSpace(driver.Email))
+                {
+                    Console.WriteLine($"Driver {driver.Name} does not have an email address. Skipping...");
+                    continue;
+                }
+
+                SendMailDTO sendMailDTO = new()
+                {
+                    FromEmail = "duclinh5122002@gmail.com",
+                    Password = "jetj haze ijdw euci",
+                    ToEmail = driver.Email,
+                    Subject = "Vehicle Rental Opportunity",
+                    Body = $"Hello {driver.Name},\n\nWe currently have vehicles available and would like to hire you at a rate of {formattedPrice}. Please contact us if you are interested in renting a vehicle.\n\nBest regards,\nYour Company Name"
+                };
+
+                if (!await _sendMail.SendEmail(sendMailDTO))
+                {
+                    Console.WriteLine($"Failed to send email to driver {driver.Email}.");
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("SendEmailToDriversWithoutVehicle error: " + ex.Message);
+            throw new Exception("Failed to send email to drivers without vehicles.", ex);
+        }
     }
+
+
+
+}
 }

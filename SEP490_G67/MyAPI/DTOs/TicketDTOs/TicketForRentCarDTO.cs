@@ -5,7 +5,7 @@
         public decimal? Price { get; set; }
         public string? CodePromotion { get; set; }
         public decimal? PricePromotion { get; set; }
-        public string? seatCode { get; set; }
+        public int NumberTicket { get; set; }
         public string? PointStart { get; set; }
         public string? PointEnd { get; set; }
         public DateTime? TimeFrom { get; set; }

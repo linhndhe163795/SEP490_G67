@@ -8,7 +8,9 @@
             public string? Description { get; set; }
             public string? Note { get; set; }
             public DateTime? CreatedAt { get; set; }
-
-            public List<RequestDetailDTO> RequestDetails { get; set; } = new List<RequestDetailDTO>();
+            public int? CreatedBy { get; set; }
+            public DateTime? UpdatedAt { get; set; }
+            public int? UpdatedBy { get; set; }
+        public List<RequestDetailDTO> RequestDetails { get; set; } = new List<RequestDetailDTO>();
         }
     }

@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using MyAPI.DTOs.TicketDTOs;
 using MyAPI.Helper;
 using MyAPI.Infrastructure.Interfaces;
+using MyAPI.Models;
 
 namespace MyAPI.Controllers
 {
@@ -21,8 +22,9 @@ namespace MyAPI.Controllers
             _mapper = mapper;
             _getInforFromToken = getInforFromToken;
         }
+        [Authorize]
         [HttpPost("bookTicket/{tripDetailsId}")]
-        public async Task<IActionResult> createTicket(BookTicketDTOs ticketDTOs, int tripDetailsId, string? promotionCode)
+        public async Task<IActionResult> createTicket(BookTicketDTOs ticketDTOs, int tripDetailsId, string? promotionCode, int numberTicket)
         {
             try
             {
@@ -37,41 +39,18 @@ namespace MyAPI.Controllers
                 }
                 var userId = _getInforFromToken.GetIdInHeader(token);
 
-                await _ticketRepository.CreateTicketByUser(promotionCode, tripDetailsId, ticketDTOs, userId);
-                return Ok(ticketDTOs);
+                var ticketId = await _ticketRepository.CreateTicketByUser(promotionCode, tripDetailsId, ticketDTOs, userId, numberTicket);
+                return Ok(new { ticketId, ticketDetails = ticketDTOs });
             }
             catch (Exception ex)
             {
                 return BadRequest("createTicket: " + ex.Message);
             }
         }
-        [HttpPost("bookTicketBefortUsePromotion")]
-        public async Task<IActionResult> createTicketBefortUsePromotion(BookTicketDTOs ticketDTOs, int tripDetailsId, string? promotionCode)
-        {
-            try
-            {
-                string token = Request.Headers["Authorization"];
-                if (token.StartsWith("Bearer"))
-                {
-                    token = token.Substring("Bearer ".Length).Trim();
-                }
-                if (string.IsNullOrEmpty(token))
-                {
-                    return BadRequest("Token is required.");
-                }
-                var userId = _getInforFromToken.GetIdInHeader(token);
-
-                await _ticketRepository.CreateTicketByUser(promotionCode, tripDetailsId, ticketDTOs, userId);
-                return Ok(ticketDTOs);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest("createTicket: " + ex.Message);
-            }
-        }
+       
         [Authorize(Roles = "Staff")]
         [HttpPost("createTicketFromDriver/{vehicleId}")]
-        public async Task<IActionResult> creatTicketFromDriver([FromBody] TicketFromDriverDTOs ticketFromDriver, [FromForm] int vehicleId)
+        public async Task<IActionResult> creatTicketFromDriver([FromBody] TicketFromDriverDTOs ticketFromDriver, [FromForm] int vehicleId, int numberTicket)
         {
             try
             {
@@ -87,9 +66,8 @@ namespace MyAPI.Controllers
                 var driverId = _getInforFromToken.GetIdInHeader(token);
 
                 var priceTrip = await _ticketRepository.GetPriceFromPoint(ticketFromDriver, vehicleId);
-                await _ticketRepository.CreatTicketFromDriver(priceTrip, vehicleId, ticketFromDriver, driverId);
+                await _ticketRepository.CreatTicketFromDriver(priceTrip, vehicleId, ticketFromDriver, driverId, numberTicket);
                 return Ok();
-
             }
             catch (Exception ex)
             {

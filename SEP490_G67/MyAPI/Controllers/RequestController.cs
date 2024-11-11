@@ -38,16 +38,34 @@ namespace MyAPI.Controllers
                 return NotFound();
             return Ok(request);
         }
-        [Authorize]
-        [HttpPost]
+        
+        [HttpPost("/CreateTicketForRentCar")]
         public async Task<IActionResult> CreateRequestForRentCar(RequestDTO requestWithDetailsDto)
         {
             var createdRequest = await _requestRepository.CreateRequestRentCarAsync(requestWithDetailsDto);
             return CreatedAtAction(nameof(GetRequestById), new { id = createdRequest.Id }, createdRequest);
         }
         [Authorize(Roles = "Staff")]
-        [HttpPut("{id}")]
+        [HttpPut("/UpdateRequestForRentCar/{id}")]
         public async Task<IActionResult> UpdateRequestForRentCar(int id, RequestDTO requestDto)
+        {
+            var updated = await _requestRepository.UpdateRequestRentCarAsync(id, requestDto);
+            if (updated == null)
+            {
+                return NotFound();
+            }
+            return NoContent();
+        }
+        [Authorize]
+        [HttpPost("/CreateTicketForHireDriver")]
+        public async Task<IActionResult> CreateRequestForHireDriver(RequestDTO requestWithDetailsDto)
+        {
+            var createdRequest = await _requestRepository.CreateRequestRentCarAsync(requestWithDetailsDto);
+            return CreatedAtAction(nameof(GetRequestById), new { id = createdRequest.Id }, createdRequest);
+        }
+        [Authorize(Roles = "Staff")]
+        [HttpPut("/UpdateRequestForHireDriver/{id}")]
+        public async Task<IActionResult> UpdateRequestForHireDriver(int id, RequestDTO requestDto)
         {
             var updated = await _requestRepository.UpdateRequestRentCarAsync(id, requestDto);
             if (updated == null)
