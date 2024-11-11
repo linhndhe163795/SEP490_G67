@@ -37,5 +37,28 @@ namespace MyAPI.Controllers
                 return BadRequest(new { Message = "Payment history failed", Details = ex.Message });
             }
         }
+
+
+        [HttpGet("RandomCode")]
+        public async Task<IActionResult> getRandomAsync()
+        {
+            try
+            {
+                var randomCode = _paymentRepository.GenerateRandomNumbers();
+                if (randomCode != null)
+                {
+                    return Ok(new { Message = "Payment generate code successfully.", RandomNumbers = randomCode });
+                }
+                else
+                {
+                    return BadRequest(new { Message = "Payment generate code fail!!!" });
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Message = "Payment history failed", Details = ex.Message });
+            }
+        }
+
     }
 }

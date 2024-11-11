@@ -195,6 +195,12 @@ namespace MyAPI.Repositories.Impls
             }
             
         }
+
+        public async Task<int> GenerateRandomNumbers()
+        {
+            Random random = new Random();
+            return random.Next(100000, 1000000);
+        }
     }
 }
 

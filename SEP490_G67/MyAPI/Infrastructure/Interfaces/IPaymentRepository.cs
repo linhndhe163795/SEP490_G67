@@ -8,5 +8,7 @@ namespace MyAPI.Infrastructure.Interfaces
         Task<bool> checkHistoryPayment(int amout, string description, string codePayment, int ticketID, int typePayment, string email);
 
         Task<Payment> addPayment(PaymentAddDTO paymentAddDTO);
+
+        Task<int> GenerateRandomNumbers();
     }
 }
