@@ -20,12 +20,12 @@ namespace MyAPI.Infrastructure.Repositories
 
         
 
-        public async Task<Review> CreateReviewAsync(ReviewDTO reviewDto)
+        public async Task<Review> CreateReviewAsync(ReviewDTO reviewDto, int userId)
         {
             var review = new Review
             {
                 Description = reviewDto.Description,
-                UserId = reviewDto.UserId,
+                UserId = userId,
                 TripId = reviewDto.TripId,
                 CreatedAt = reviewDto.CreatedAt ?? DateTime.Now,
                 CreatedBy = reviewDto.CreatedBy,
@@ -39,7 +39,7 @@ namespace MyAPI.Infrastructure.Repositories
             return review;
         }
 
-        public async Task<Review> UpdateReviewAsync(int id, ReviewDTO reviewDto)
+        public async Task<Review> UpdateReviewAsync(int id, ReviewDTO reviewDto, int userId)
         {
             var review = await _context.Reviews.FindAsync(id);
             if (review == null)
@@ -48,7 +48,7 @@ namespace MyAPI.Infrastructure.Repositories
             }
 
             review.Description = reviewDto.Description;
-            review.UserId = reviewDto.UserId;
+            review.UserId = userId;
             review.TripId = reviewDto.TripId;
             review.UpdateAt = DateTime.Now;
             review.UpdateBy = reviewDto.UpdateBy;

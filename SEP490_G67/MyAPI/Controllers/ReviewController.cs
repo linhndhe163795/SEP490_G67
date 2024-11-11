@@ -51,10 +51,10 @@ namespace MyAPI.Controllers
             var token = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", string.Empty);
             var userId = _getInforFromToken.GetIdInHeader(token);
 
-            // Gán userId vào reviewDto
-            reviewDto.UserId = userId;
+            
+            
 
-            var review = await _reviewRepository.CreateReviewAsync(reviewDto);
+            var review = await _reviewRepository.CreateReviewAsync(reviewDto, userId);
             return CreatedAtAction(nameof(GetReviewById), new { id = review.Id }, review);
         }
         [Authorize]
@@ -66,14 +66,14 @@ namespace MyAPI.Controllers
                 return BadRequest(ModelState);
             }
 
-            // Lấy token từ header Authorization
+            
             var token = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", string.Empty);
             var userId = _getInforFromToken.GetIdInHeader(token);
 
-            // Gán userId vào reviewDto
-            reviewDto.UserId = userId;
+            
+            
 
-            var review = await _reviewRepository.UpdateReviewAsync(id, reviewDto);
+            var review = await _reviewRepository.UpdateReviewAsync(id, reviewDto, userId);
             if (review == null)
             {
                 return NotFound();
