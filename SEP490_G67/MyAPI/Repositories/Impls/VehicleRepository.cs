@@ -450,6 +450,21 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception("UpdateVehicleByStaff: " + ex.Message);
             }
         }
+
+        public async Task<bool> AssignDriverToVehicleAsync(int vehicleId, int driverId)
+        {
+            var vehicle = await _context.Vehicles.FindAsync(vehicleId);
+            if (vehicle == null || driverId <= 0)
+            {
+                return false;
+            }
+
+            vehicle.DriverId = driverId;
+            _context.Vehicles.Update(vehicle);
+
+            return await _context.SaveChangesAsync() > 0;
+        }
+
     }
 }
 

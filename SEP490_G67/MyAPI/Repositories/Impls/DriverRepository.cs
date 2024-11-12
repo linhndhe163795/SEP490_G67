@@ -4,6 +4,7 @@ using MyAPI.DTOs.DriverDTOs;
 using MyAPI.Helper;
 using MyAPI.Infrastructure.Interfaces;
 using MyAPI.Models;
+using System.Globalization;
 
 namespace MyAPI.Repositories.Impls
 {
@@ -85,41 +86,53 @@ namespace MyAPI.Repositories.Impls
                 .ToListAsync();
         }
 
-        public async Task SendEmailToDriversWithoutVehicle()
+        
+
+        public async Task SendEmailToDriversWithoutVehicle(int price)
         {
-            //try
-            //{
-            //    var driversWithoutVehicle = await GetDriversWithoutVehicleAsync();
+        try
+        {
+            var driversWithoutVehicle = await GetDriversWithoutVehicleAsync();
 
-            //    if (!driversWithoutVehicle.Any())
-            //    {
-            //        Console.WriteLine("No drivers without vehicles found.");
-            //        return;
-            //    }
+            if (!driversWithoutVehicle.Any())
+            {
+                Console.WriteLine("No drivers without vehicles found.");
+                return;
+            }
 
-            //    foreach (var driver in driversWithoutVehicle)
-            //    {
-            //        SendMailDTO sendMailDTO = new()
-            //        {
-            //            FromEmail = "duclinh5122002@gmail.com",
-            //            Password = "jetj haze ijdw euci",
-            //            ToEmail = driver.Email,
-            //            Subject = "Vehicle Rental Opportunity",
-            //            Body = $"Hello {driver.Name},\n\nWe currently have vehicles available for rent. Please contact us if you are interested in renting a vehicle.\n\nBest regards,\nYour Company Name"
-            //        };
+            string formattedPrice = string.Format(new CultureInfo("vi-VN"), "{0:N0} VND", price);
 
-            //        if (!await _sendMail.SendEmail(sendMailDTO))
-            //        {
-            //            Console.WriteLine($"Failed to send email to driver {driver.Email}.");
-            //        }
-            //    }
-            //}
-            //catch (Exception ex)
-            //{
-            //    Console.WriteLine("SendEmailToDriversWithoutVehicle error: " + ex.Message);
-            //    throw new Exception("Failed to send email to drivers without vehicles.", ex);
-            //}
+            foreach (var driver in driversWithoutVehicle)
+            {
+                if (string.IsNullOrWhiteSpace(driver.Email))
+                {
+                    Console.WriteLine($"Driver {driver.Name} does not have an email address. Skipping...");
+                    continue;
+                }
+
+                SendMailDTO sendMailDTO = new()
+                {
+                    FromEmail = "duclinh5122002@gmail.com",
+                    Password = "jetj haze ijdw euci",
+                    ToEmail = driver.Email,
+                    Subject = "Vehicle Rental Opportunity",
+                    Body = $"Hello {driver.Name},\n\nWe currently have vehicles available and would like to hire you at a rate of {formattedPrice}. Please contact us if you are interested in renting a vehicle.\n\nBest regards,\nYour Company Name"
+                };
+
+                if (!await _sendMail.SendEmail(sendMailDTO))
+                {
+                    Console.WriteLine($"Failed to send email to driver {driver.Email}.");
+                }
+            }
         }
-
+        catch (Exception ex)
+        {
+            Console.WriteLine("SendEmailToDriversWithoutVehicle error: " + ex.Message);
+            throw new Exception("Failed to send email to drivers without vehicles.", ex);
+        }
     }
+
+
+
+}
 }

@@ -185,6 +185,30 @@ namespace MyAPI.Controllers
                 return BadRequest(new { ex.Message });
             }
         }
+
+        [Authorize(Roles = "Staff")]
+        [HttpPut("assignDriverForVehicle/{vehicleId}/{driverId}")]
+        public async Task<IActionResult> AssignDriverForVehicle(int vehicleId, int driverId)
+        {
+            try
+            {
+                var isAssigned = await _vehicleRepository.AssignDriverToVehicleAsync(vehicleId, driverId);
+
+                if (isAssigned)
+                {
+                    return Ok(new { Message = "Driver assigned to vehicle successfully." });
+                }
+                else
+                {
+                    return BadRequest(new { Message = "Assignment failed. Check if vehicle or driver exists." });
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Message = "AssignDriverForVehicle failed", Details = ex.Message });
+            }
+        }
+
         [Authorize]
         [HttpPost("import_vehicle")]
         public async Task<IActionResult> importVehicel(IFormFile fileExcleVehicel)
