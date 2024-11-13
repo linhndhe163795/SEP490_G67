@@ -179,16 +179,41 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception("updateStatusTrip: " + ex.Message);
             }
         }
-        public async Task confirmAddValidEntryImport(List<Trip> validEntry)
+        public async Task confirmAddValidEntryImport(List<TripImportDTO> validEntries)
         {
             try
             {
-                _context.Trips.AddRange(validEntry);
+                List<VehicleTrip> vt = new List<VehicleTrip>();
+                var tripMapper = _mapper.Map<List<Trip>>(validEntries);
+                _context.Trips.AddRange(tripMapper);
+                await _context.SaveChangesAsync();
+
+                for (int i = 0; i < tripMapper.Count; i++)
+                {
+                    var trip = tripMapper[i];
+                    int newTripId = trip.Id; 
+                    string licensePlate = validEntries[i].LicensePlate; 
+                    
+                    var vehicle = await _context.Vehicles.FirstOrDefaultAsync(v => v.LicensePlate == licensePlate);
+
+                    if (vehicle != null)
+                    {
+                        int vehicleId = vehicle.Id;
+                        var vehicleTrip = new VehicleTrip
+                        {
+                            TripId = newTripId,
+                            VehicleId = vehicleId
+                        };
+                        vt.Add(vehicleTrip);
+                    }
+                }
+
+                await _context.VehicleTrips.AddRangeAsync(vt);
                 await _context.SaveChangesAsync();
             }
             catch (Exception ex)
             {
-                throw new Exception(ex.Message);
+                throw new Exception("Error during import: " + ex.Message);
             }
         }
 
