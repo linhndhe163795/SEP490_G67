@@ -9,16 +9,21 @@ namespace MyAPI.Repositories.Impls
         {
         }
 
-        public async void assginVehicleToTrip(int staffId,List<int> vehicleId, int tripId)
+        public Task addVehiceleToTrip(IFormFile tripData)
+        {
+          throw new NotImplementedException();
+        }
+
+        public async Task assginVehicleToTrip(int staffId, List<int> vehicleId, int tripId)
         {
             try
             {
-                if (vehicleId == null) 
+                if (vehicleId == null)
                 {
                     throw new NullReferenceException("Không có xe nào hợp lệ");
                 }
                 List<VehicleTrip> vehicleTrip = new List<VehicleTrip>();
-                for (int i = 0; i < vehicleId.Count; i++) 
+                for (int i = 0; i < vehicleId.Count; i++)
                 {
                     VehicleTrip vht = new VehicleTrip
                     {
@@ -32,10 +37,12 @@ namespace MyAPI.Repositories.Impls
                 await _context.AddRangeAsync(vehicleTrip);
                 await _context.SaveChangesAsync();
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 throw new Exception(ex.Message);
             }
         }
+
+
     }
 }

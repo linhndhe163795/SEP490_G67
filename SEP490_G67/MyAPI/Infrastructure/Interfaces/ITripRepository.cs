@@ -12,7 +12,7 @@ namespace MyAPI.Infrastructure.Interfaces
         Task AddTrip(TripDTO trip, int? vehicleId, int userId);  
         Task UpdateTripById(int tripId, TripDTO trip, int userId);
         Task updateStatusTrip(int id, int userId);
-        Task confirmAddValidEntryImport(List<Trip> validEntry);
+        Task confirmAddValidEntryImport(List<TripImportDTO> validEntry);
         Task<List<TripDTO>> getListTripNotVehicle();
     }
 }

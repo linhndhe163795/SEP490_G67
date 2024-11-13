@@ -19,12 +19,14 @@ namespace MyAPI.Controllers
         private readonly IUserRepository _userRepository;
         private readonly GetInforFromToken _getInforFromToken;
         private readonly IUserRoleRepository _userRoleRepository;
+        private readonly IPointUserRepository _pointUserRepository;
         private readonly SendMail _sendMail;
         private readonly IMapper _mapper;
         private readonly Jwt _Jwt;
-        public AuthController(IUserRepository userRepository, Jwt Jwt, GetInforFromToken getInforFromToken, IUserRoleRepository userRoleRepository, SendMail sendMail, IMapper mapper)
+        public AuthController(IPointUserRepository pointUserRepository,IUserRepository userRepository, Jwt Jwt, GetInforFromToken getInforFromToken, IUserRoleRepository userRoleRepository, SendMail sendMail, IMapper mapper)
         {
             _mapper = mapper;
+            _pointUserRepository = pointUserRepository;
             _sendMail = sendMail;
             _userRoleRepository = userRoleRepository;
             _userRepository = userRepository;
@@ -49,6 +51,7 @@ namespace MyAPI.Controllers
                         UserId = lastIdUser.Result
                     };
                     await _userRoleRepository.Add(ur);
+                    await _pointUserRepository.addNewPointUser(lastIdUser.Result);
                     return Ok(user);
                 }
                 return BadRequest("ton tai account");

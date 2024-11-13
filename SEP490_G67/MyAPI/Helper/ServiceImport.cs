@@ -1,6 +1,7 @@
 ﻿using ClosedXML.Excel;
 using DocumentFormat.OpenXml.Spreadsheet;
 using Microsoft.EntityFrameworkCore;
+using MyAPI.DTOs.TripDTOs;
 using MyAPI.Models;
 using System.Globalization;
 
@@ -17,13 +18,15 @@ namespace MyAPI.Helper
             string extension = Path.GetExtension(path); 
             return extension == ".xls" || extension == ".xlsx";
         }
-        private bool IsValidTrip(Trip trip)
+        private bool IsValidTrip(TripImportDTO trip)
         {
             if (string.IsNullOrEmpty(trip.Name) ||
                 trip.StartTime == default ||
-                trip.Price <= 0 || trip.Price == null || 
+                trip.Price <= 0 || trip.Price == null ||
                 string.IsNullOrEmpty(trip.PointStart) ||
-                string.IsNullOrEmpty(trip.PointEnd))
+                string.IsNullOrEmpty(trip.PointEnd)  ||
+                string.IsNullOrEmpty(trip.LicensePlate))
+
             {
                 return false;
             }
@@ -48,15 +51,15 @@ namespace MyAPI.Helper
             }
             return true;
         }
-        public async Task<(List<Trip> validEntries, List<Trip> invalidEntries)> ImportTrip(IFormFile excelFile, int staffId)
+        public async Task<(List<TripImportDTO> validEntries, List<TripImportDTO> invalidEntries)> ImportTrip(IFormFile excelFile, int staffId)
         {
             string path = Path.GetFileName(excelFile.FileName); 
             if (!checkFile(path)) 
             {
                 throw new Exception("File không hợp lệ"); 
             }
-            var validEntries = new List<Trip>(); 
-            var invalidEntries = new List<Trip>(); 
+            var validEntries = new List<TripImportDTO>(); 
+            var invalidEntries = new List<TripImportDTO>(); 
             using (var stream = new MemoryStream()) 
             {
                 await excelFile.CopyToAsync(stream); 
@@ -64,16 +67,16 @@ namespace MyAPI.Helper
                 { var tripSheets = workbook.Worksheet("Trip"); 
                     foreach (var row in tripSheets.RowsUsed().Skip(1)) 
                     { 
-                        var trip = new Trip 
+                        var trip = new TripImportDTO 
                         { 
                             Name = row.Cell(1).GetValue<string>(), 
                             Description = row.Cell(3).GetValue<string>(), 
                             PointStart = row.Cell(5).GetValue<string>(), 
-                            PointEnd = row.Cell(6).GetValue<string>(), 
+                            PointEnd = row.Cell(6).GetValue<string>(),
+                            LicensePlate = row.Cell(7).GetValue<string>(),
                             Status = true, CreatedAt = DateTime.Now, 
                             CreatedBy = staffId, 
-                            UpdateAt = null, 
-                            UpdateBy = null, 
+                         
                         };
                         var startTimeCellValue = row.Cell(2).GetString();
                         if (TimeSpan.TryParse(startTimeCellValue, out TimeSpan parsedStartTime))
