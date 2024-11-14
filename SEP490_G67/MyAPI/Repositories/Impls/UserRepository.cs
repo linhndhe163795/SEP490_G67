@@ -17,13 +17,15 @@ namespace MyAPI.Repositories.Impls
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly GetInforFromToken _tokenHelper;
         private readonly HashPassword _hassPassword;
-        public UserRepository(SEP490_G67Context _context, SendMail sendMail, IMapper mapper, HashPassword hashPassword, IHttpContextAccessor httpContextAccessor, GetInforFromToken tokenHelper) : base(_context)
+        private readonly IPointUserRepository _pointUserRepository;
+        public UserRepository(SEP490_G67Context _context,IPointUserRepository pointUserRepository, SendMail sendMail, IMapper mapper, HashPassword hashPassword, IHttpContextAccessor httpContextAccessor, GetInforFromToken tokenHelper) : base(_context)
         {
             _httpContextAccessor = httpContextAccessor;
             _tokenHelper = tokenHelper;
             _mapper = mapper;
             _hassPassword = hashPassword;
             _sendMail = sendMail;
+            _pointUserRepository = pointUserRepository;
         }
 
         public async Task<User> Register(UserRegisterDTO entity)
@@ -56,6 +58,8 @@ namespace MyAPI.Repositories.Impls
                 var userMapper = _mapper.Map<User>(userRegisterDTO);
                 await _context.AddAsync(userMapper);
                 await base.SaveChange();
+                int userId = userMapper.Id;
+                await _pointUserRepository.addNewPointUser(userId);
                 return userMapper;
             }
             else

@@ -184,7 +184,7 @@ namespace MyAPI.Controllers
             }
         [Authorize(Roles = "Staff")]
         [HttpPost("confirmImportTrip")]
-        public async Task<IActionResult> ConfirmImportTrip([FromBody] List<Trip> validEntries)
+        public async Task<IActionResult> ConfirmImportTrip([FromBody] List<TripImportDTO> validEntries)
         {
             if (validEntries == null || !validEntries.Any())
             {
