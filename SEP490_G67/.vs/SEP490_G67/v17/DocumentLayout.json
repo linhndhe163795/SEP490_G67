@@ -3,16 +3,124 @@
   "WorkspaceRootPath": "C:\\Users\\trinh\\OneDrive\\Ta\u0300i li\u00EA\u0323u\\GitHub\\SEP490_G67\\SEP490_G67\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|c:\\users\\trinh\\onedrive\\ta\u0300i li\u00EA\u0323u\\github\\sep490_g67\\sep490_g67\\myapi\\repositories\\impls\\requestdetailrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|solutionrelative:myapi\\repositories\\impls\\requestdetailrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|c:\\users\\trinh\\onedrive\\ta\u0300i li\u00EA\u0323u\\github\\sep490_g67\\sep490_g67\\myapi\\infrastructure\\interfaces\\irequestdetailrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|solutionrelative:myapi\\infrastructure\\interfaces\\irequestdetailrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|c:\\users\\trinh\\onedrive\\ta\u0300i li\u00EA\u0323u\\github\\sep490_g67\\sep490_g67\\myapi\\controllers\\requestdetailcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|solutionrelative:myapi\\controllers\\requestdetailcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|c:\\users\\trinh\\onedrive\\ta\u0300i li\u00EA\u0323u\\github\\sep490_g67\\sep490_g67\\myapi\\infrastructure\\interfaces\\irequestrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|solutionrelative:myapi\\infrastructure\\interfaces\\irequestrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|c:\\users\\trinh\\onedrive\\ta\u0300i li\u00EA\u0323u\\github\\sep490_g67\\sep490_g67\\myapi\\controllers\\historyrentvehiclecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|solutionrelative:myapi\\controllers\\historyrentvehiclecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|c:\\users\\trinh\\onedrive\\ta\u0300i li\u00EA\u0323u\\github\\sep490_g67\\sep490_g67\\myapi\\repositories\\impls\\historyrentvehiclerepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|solutionrelative:myapi\\repositories\\impls\\historyrentvehiclerepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|c:\\users\\trinh\\onedrive\\ta\u0300i li\u00EA\u0323u\\github\\sep490_g67\\sep490_g67\\myapi\\infrastructure\\interfaces\\ihistoryrentvehiclerepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|solutionrelative:myapi\\infrastructure\\interfaces\\ihistoryrentvehiclerepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|c:\\users\\trinh\\onedrive\\ta\u0300i li\u00EA\u0323u\\github\\sep490_g67\\sep490_g67\\myapi\\repositories\\impls\\vehiclerepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|solutionrelative:myapi\\repositories\\impls\\vehiclerepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|c:\\users\\trinh\\onedrive\\ta\u0300i li\u00EA\u0323u\\github\\sep490_g67\\sep490_g67\\myapi\\repositories\\impls\\requestrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|solutionrelative:myapi\\repositories\\impls\\requestrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|c:\\users\\trinh\\onedrive\\ta\u0300i li\u00EA\u0323u\\github\\sep490_g67\\sep490_g67\\myapi\\models\\vehicle.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|solutionrelative:myapi\\models\\vehicle.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|c:\\users\\trinh\\onedrive\\ta\u0300i li\u00EA\u0323u\\github\\sep490_g67\\sep490_g67\\myapi\\infrastructure\\interfaces\\ilosscosttyperepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|solutionrelative:myapi\\infrastructure\\interfaces\\ilosscosttyperepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|c:\\users\\trinh\\onedrive\\ta\u0300i li\u00EA\u0323u\\github\\sep490_g67\\sep490_g67\\myapi\\models\\historyrentvehicle.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|solutionrelative:myapi\\models\\historyrentvehicle.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|c:\\users\\trinh\\onedrive\\ta\u0300i li\u00EA\u0323u\\github\\sep490_g67\\sep490_g67\\myapi\\controllers\\rentvehiclecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|solutionrelative:myapi\\controllers\\rentvehiclecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|c:\\users\\trinh\\onedrive\\ta\u0300i li\u00EA\u0323u\\github\\sep490_g67\\sep490_g67\\myapi\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|solutionrelative:myapi\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|c:\\users\\trinh\\onedrive\\ta\u0300i li\u00EA\u0323u\\github\\sep490_g67\\sep490_g67\\myapi\\controllers\\vehiclecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|solutionrelative:myapi\\controllers\\vehiclecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|c:\\users\\trinh\\onedrive\\ta\u0300i li\u00EA\u0323u\\github\\sep490_g67\\sep490_g67\\myapi\\controllers\\drivercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|solutionrelative:myapi\\controllers\\drivercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|c:\\users\\trinh\\onedrive\\ta\u0300i li\u00EA\u0323u\\github\\sep490_g67\\sep490_g67\\myapi\\controllers\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|solutionrelative:myapi\\controllers\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|c:\\users\\trinh\\onedrive\\ta\u0300i li\u00EA\u0323u\\github\\sep490_g67\\sep490_g67\\myapi\\controllers\\accountcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|solutionrelative:myapi\\controllers\\accountcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|c:\\users\\trinh\\onedrive\\ta\u0300i li\u00EA\u0323u\\github\\sep490_g67\\sep490_g67\\myapi\\models\\historyrentdriver.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|solutionrelative:myapi\\models\\historyrentdriver.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|c:\\users\\trinh\\onedrive\\ta\u0300i li\u00EA\u0323u\\github\\sep490_g67\\sep490_g67\\myapi\\dtos\\historyrentvehicledtos\\historyvehiclerentdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|solutionrelative:myapi\\dtos\\historyrentvehicledtos\\historyvehiclerentdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|c:\\users\\trinh\\onedrive\\ta\u0300i li\u00EA\u0323u\\github\\sep490_g67\\sep490_g67\\myapi\\dtos\\historyrentvehicledtos\\rentvehicleadddto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|solutionrelative:myapi\\dtos\\historyrentvehicledtos\\rentvehicleadddto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|c:\\users\\trinh\\onedrive\\ta\u0300i li\u00EA\u0323u\\github\\sep490_g67\\sep490_g67\\myapi\\controllers\\requestcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|solutionrelative:myapi\\controllers\\requestcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|c:\\users\\trinh\\onedrive\\ta\u0300i li\u00EA\u0323u\\github\\sep490_g67\\sep490_g67\\myapi\\repositories\\impls\\losscosttyperepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|solutionrelative:myapi\\repositories\\impls\\losscosttyperepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|c:\\users\\trinh\\onedrive\\ta\u0300i li\u00EA\u0323u\\github\\sep490_g67\\sep490_g67\\myapi\\repositories\\impls\\genericrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|solutionrelative:myapi\\repositories\\impls\\genericrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|c:\\users\\trinh\\onedrive\\ta\u0300i li\u00EA\u0323u\\github\\sep490_g67\\sep490_g67\\myapi\\infrastructure\\interfaces\\ivehicleowner.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|solutionrelative:myapi\\infrastructure\\interfaces\\ivehicleowner.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|c:\\users\\trinh\\onedrive\\ta\u0300i li\u00EA\u0323u\\github\\sep490_g67\\sep490_g67\\myapi\\models\\requestdetail.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|solutionrelative:myapi\\models\\requestdetail.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|c:\\users\\trinh\\onedrive\\ta\u0300i li\u00EA\u0323u\\github\\sep490_g67\\sep490_g67\\myapi\\infrastructure\\interfaces\\ivehiclerepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|solutionrelative:myapi\\infrastructure\\interfaces\\ivehiclerepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|c:\\users\\trinh\\onedrive\\ta\u0300i li\u00EA\u0323u\\github\\sep490_g67\\sep490_g67\\myapi\\models\\request.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|solutionrelative:myapi\\models\\request.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|c:\\users\\trinh\\onedrive\\ta\u0300i li\u00EA\u0323u\\github\\sep490_g67\\sep490_g67\\myapi\\repositories\\impls\\paymentrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|solutionrelative:myapi\\repositories\\impls\\paymentrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|c:\\users\\trinh\\onedrive\\ta\u0300i li\u00EA\u0323u\\github\\sep490_g67\\sep490_g67\\myapi\\controllers\\paymentcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|solutionrelative:myapi\\controllers\\paymentcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|c:\\users\\trinh\\onedrive\\ta\u0300i li\u00EA\u0323u\\github\\sep490_g67\\sep490_g67\\myapi\\controllers\\vehiclecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|solutionrelative:myapi\\controllers\\vehiclecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|c:\\users\\trinh\\onedrive\\ta\u0300i li\u00EA\u0323u\\github\\sep490_g67\\sep490_g67\\myapi\\infrastructure\\interfaces\\ipaymentrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -34,7 +142,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 220,
-          "SelectedChildIndex": 5,
+          "SelectedChildIndex": 4,
           "Children": [
             {
               "$type": "Bookmark",
@@ -51,19 +159,353 @@
             {
               "$type": "Document",
               "DocumentIndex": 2,
-              "Title": "VehicleController.cs",
-              "DocumentMoniker": "C:\\Users\\trinh\\OneDrive\\Ta\u0300i li\u00EA\u0323u\\GitHub\\SEP490_G67\\SEP490_G67\\MyAPI\\Controllers\\VehicleController.cs",
-              "RelativeDocumentMoniker": "MyAPI\\Controllers\\VehicleController.cs",
-              "ToolTip": "C:\\Users\\trinh\\OneDrive\\Ta\u0300i li\u00EA\u0323u\\GitHub\\SEP490_G67\\SEP490_G67\\MyAPI\\Controllers\\VehicleController.cs",
-              "RelativeToolTip": "MyAPI\\Controllers\\VehicleController.cs",
-              "ViewState": "AgIAADgAAAAAAAAAAAAwwEsAAABgAAAAAAAAAA==",
+              "Title": "RequestDetailController.cs",
+              "DocumentMoniker": "C:\\Users\\trinh\\OneDrive\\Ta\u0300i li\u00EA\u0323u\\GitHub\\SEP490_G67\\SEP490_G67\\MyAPI\\Controllers\\RequestDetailController.cs",
+              "RelativeDocumentMoniker": "MyAPI\\Controllers\\RequestDetailController.cs",
+              "ToolTip": "C:\\Users\\trinh\\OneDrive\\Ta\u0300i li\u00EA\u0323u\\GitHub\\SEP490_G67\\SEP490_G67\\MyAPI\\Controllers\\RequestDetailController.cs",
+              "RelativeToolTip": "MyAPI\\Controllers\\RequestDetailController.cs",
+              "ViewState": "AgIAABMAAAAAAAAAAAAgwAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-11-11T18:24:01.046Z",
+              "WhenOpened": "2024-11-14T00:06:02.567Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "RequestDetailRepository.cs",
+              "DocumentMoniker": "C:\\Users\\trinh\\OneDrive\\Ta\u0300i li\u00EA\u0323u\\GitHub\\SEP490_G67\\SEP490_G67\\MyAPI\\Repositories\\Impls\\RequestDetailRepository.cs",
+              "RelativeDocumentMoniker": "MyAPI\\Repositories\\Impls\\RequestDetailRepository.cs",
+              "ToolTip": "C:\\Users\\trinh\\OneDrive\\Ta\u0300i li\u00EA\u0323u\\GitHub\\SEP490_G67\\SEP490_G67\\MyAPI\\Repositories\\Impls\\RequestDetailRepository.cs",
+              "RelativeToolTip": "MyAPI\\Repositories\\Impls\\RequestDetailRepository.cs",
+              "ViewState": "AgIAABUAAAAAAAAAAAAwwCgAAABJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-11-13T23:29:45.394Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 16,
+              "Title": "AuthController.cs",
+              "DocumentMoniker": "C:\\Users\\trinh\\OneDrive\\Ta\u0300i li\u00EA\u0323u\\GitHub\\SEP490_G67\\SEP490_G67\\MyAPI\\Controllers\\AuthController.cs",
+              "RelativeDocumentMoniker": "MyAPI\\Controllers\\AuthController.cs",
+              "ToolTip": "C:\\Users\\trinh\\OneDrive\\Ta\u0300i li\u00EA\u0323u\\GitHub\\SEP490_G67\\SEP490_G67\\MyAPI\\Controllers\\AuthController.cs",
+              "RelativeToolTip": "MyAPI\\Controllers\\AuthController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-11-13T16:44:15.482Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 17,
+              "Title": "AccountController.cs",
+              "DocumentMoniker": "C:\\Users\\trinh\\OneDrive\\Ta\u0300i li\u00EA\u0323u\\GitHub\\SEP490_G67\\SEP490_G67\\MyAPI\\Controllers\\AccountController.cs",
+              "RelativeDocumentMoniker": "MyAPI\\Controllers\\AccountController.cs",
+              "ToolTip": "C:\\Users\\trinh\\OneDrive\\Ta\u0300i li\u00EA\u0323u\\GitHub\\SEP490_G67\\SEP490_G67\\MyAPI\\Controllers\\AccountController.cs",
+              "RelativeToolTip": "MyAPI\\Controllers\\AccountController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-11-13T16:44:14.485Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 15,
+              "Title": "DriverController.cs",
+              "DocumentMoniker": "C:\\Users\\trinh\\OneDrive\\Ta\u0300i li\u00EA\u0323u\\GitHub\\SEP490_G67\\SEP490_G67\\MyAPI\\Controllers\\DriverController.cs",
+              "RelativeDocumentMoniker": "MyAPI\\Controllers\\DriverController.cs",
+              "ToolTip": "C:\\Users\\trinh\\OneDrive\\Ta\u0300i li\u00EA\u0323u\\GitHub\\SEP490_G67\\SEP490_G67\\MyAPI\\Controllers\\DriverController.cs",
+              "RelativeToolTip": "MyAPI\\Controllers\\DriverController.cs",
+              "ViewState": "AgIAAAYAAAAAAAAAAAAAABgAAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-11-13T16:43:51.943Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "HistoryRentVehicleController.cs",
+              "DocumentMoniker": "C:\\Users\\trinh\\OneDrive\\Ta\u0300i li\u00EA\u0323u\\GitHub\\SEP490_G67\\SEP490_G67\\MyAPI\\Controllers\\HistoryRentVehicleController.cs",
+              "RelativeDocumentMoniker": "MyAPI\\Controllers\\HistoryRentVehicleController.cs",
+              "ToolTip": "C:\\Users\\trinh\\OneDrive\\Ta\u0300i li\u00EA\u0323u\\GitHub\\SEP490_G67\\SEP490_G67\\MyAPI\\Controllers\\HistoryRentVehicleController.cs",
+              "RelativeToolTip": "MyAPI\\Controllers\\HistoryRentVehicleController.cs",
+              "ViewState": "AgIAAB4AAAAAAAAAAAAowCwAAAAPAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-11-13T16:43:49.074Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "Vehicle.cs",
+              "DocumentMoniker": "C:\\Users\\trinh\\OneDrive\\Ta\u0300i li\u00EA\u0323u\\GitHub\\SEP490_G67\\SEP490_G67\\MyAPI\\Models\\Vehicle.cs",
+              "RelativeDocumentMoniker": "MyAPI\\Models\\Vehicle.cs",
+              "ToolTip": "C:\\Users\\trinh\\OneDrive\\Ta\u0300i li\u00EA\u0323u\\GitHub\\SEP490_G67\\SEP490_G67\\MyAPI\\Models\\Vehicle.cs",
+              "RelativeToolTip": "MyAPI\\Models\\Vehicle.cs",
+              "ViewState": "AgIAABUAAAAAAAAAAAA4wCAAAAAbAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-11-13T16:19:08.165Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 18,
+              "Title": "HistoryRentDriver.cs",
+              "DocumentMoniker": "C:\\Users\\trinh\\OneDrive\\Ta\u0300i li\u00EA\u0323u\\GitHub\\SEP490_G67\\SEP490_G67\\MyAPI\\Models\\HistoryRentDriver.cs",
+              "RelativeDocumentMoniker": "MyAPI\\Models\\HistoryRentDriver.cs",
+              "ToolTip": "C:\\Users\\trinh\\OneDrive\\Ta\u0300i li\u00EA\u0323u\\GitHub\\SEP490_G67\\SEP490_G67\\MyAPI\\Models\\HistoryRentDriver.cs",
+              "RelativeToolTip": "MyAPI\\Models\\HistoryRentDriver.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-11-13T16:11:08.789Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 19,
+              "Title": "HistoryVehicleRentDTO.cs",
+              "DocumentMoniker": "C:\\Users\\trinh\\OneDrive\\Ta\u0300i li\u00EA\u0323u\\GitHub\\SEP490_G67\\SEP490_G67\\MyAPI\\DTOs\\HistoryRentVehicleDTOs\\HistoryVehicleRentDTO.cs",
+              "RelativeDocumentMoniker": "MyAPI\\DTOs\\HistoryRentVehicleDTOs\\HistoryVehicleRentDTO.cs",
+              "ToolTip": "C:\\Users\\trinh\\OneDrive\\Ta\u0300i li\u00EA\u0323u\\GitHub\\SEP490_G67\\SEP490_G67\\MyAPI\\DTOs\\HistoryRentVehicleDTOs\\HistoryVehicleRentDTO.cs",
+              "RelativeToolTip": "MyAPI\\DTOs\\HistoryRentVehicleDTOs\\HistoryVehicleRentDTO.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAIAAAAmAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-11-12T11:32:19.033Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "HistoryRentVehicle.cs",
+              "DocumentMoniker": "C:\\Users\\trinh\\OneDrive\\Ta\u0300i li\u00EA\u0323u\\GitHub\\SEP490_G67\\SEP490_G67\\MyAPI\\Models\\HistoryRentVehicle.cs",
+              "RelativeDocumentMoniker": "MyAPI\\Models\\HistoryRentVehicle.cs",
+              "ToolTip": "C:\\Users\\trinh\\OneDrive\\Ta\u0300i li\u00EA\u0323u\\GitHub\\SEP490_G67\\SEP490_G67\\MyAPI\\Models\\HistoryRentVehicle.cs",
+              "RelativeToolTip": "MyAPI\\Models\\HistoryRentVehicle.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABUAAAAqAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-11-12T11:31:50Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 13,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Users\\trinh\\OneDrive\\Ta\u0300i li\u00EA\u0323u\\GitHub\\SEP490_G67\\SEP490_G67\\MyAPI\\Program.cs",
+              "RelativeDocumentMoniker": "MyAPI\\Program.cs",
+              "ToolTip": "C:\\Users\\trinh\\OneDrive\\Ta\u0300i li\u00EA\u0323u\\GitHub\\SEP490_G67\\SEP490_G67\\MyAPI\\Program.cs",
+              "RelativeToolTip": "MyAPI\\Program.cs",
+              "ViewState": "AgIAAB4AAAAAAAAAAAAAACoAAABaAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-11-11T20:02:58.795Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 12,
+              "Title": "RentVehicleController.cs",
+              "DocumentMoniker": "C:\\Users\\trinh\\OneDrive\\Ta\u0300i li\u00EA\u0323u\\GitHub\\SEP490_G67\\SEP490_G67\\MyAPI\\Controllers\\RentVehicleController.cs",
+              "RelativeDocumentMoniker": "MyAPI\\Controllers\\RentVehicleController.cs",
+              "ToolTip": "C:\\Users\\trinh\\OneDrive\\Ta\u0300i li\u00EA\u0323u\\GitHub\\SEP490_G67\\SEP490_G67\\MyAPI\\Controllers\\RentVehicleController.cs",
+              "RelativeToolTip": "MyAPI\\Controllers\\RentVehicleController.cs",
+              "ViewState": "AgIAAAkAAAAAAAAAAAAkwBsAAABnAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-11-11T20:00:07.229Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 22,
+              "Title": "LossCostTypeRepository.cs",
+              "DocumentMoniker": "C:\\Users\\trinh\\OneDrive\\Ta\u0300i li\u00EA\u0323u\\GitHub\\SEP490_G67\\SEP490_G67\\MyAPI\\Repositories\\Impls\\LossCostTypeRepository.cs",
+              "RelativeDocumentMoniker": "MyAPI\\Repositories\\Impls\\LossCostTypeRepository.cs",
+              "ToolTip": "C:\\Users\\trinh\\OneDrive\\Ta\u0300i li\u00EA\u0323u\\GitHub\\SEP490_G67\\SEP490_G67\\MyAPI\\Repositories\\Impls\\LossCostTypeRepository.cs",
+              "RelativeToolTip": "MyAPI\\Repositories\\Impls\\LossCostTypeRepository.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAABiAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-11-11T19:30:25.185Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 23,
+              "Title": "GenericRepository.cs",
+              "DocumentMoniker": "C:\\Users\\trinh\\OneDrive\\Ta\u0300i li\u00EA\u0323u\\GitHub\\SEP490_G67\\SEP490_G67\\MyAPI\\Repositories\\Impls\\GenericRepository.cs",
+              "RelativeDocumentMoniker": "MyAPI\\Repositories\\Impls\\GenericRepository.cs",
+              "ToolTip": "C:\\Users\\trinh\\OneDrive\\Ta\u0300i li\u00EA\u0323u\\GitHub\\SEP490_G67\\SEP490_G67\\MyAPI\\Repositories\\Impls\\GenericRepository.cs",
+              "RelativeToolTip": "MyAPI\\Repositories\\Impls\\GenericRepository.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-11-11T19:30:23.818Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "HistoryRentVehicleRepository.cs",
+              "DocumentMoniker": "C:\\Users\\trinh\\OneDrive\\Ta\u0300i li\u00EA\u0323u\\GitHub\\SEP490_G67\\SEP490_G67\\MyAPI\\Repositories\\Impls\\HistoryRentVehicleRepository.cs",
+              "RelativeDocumentMoniker": "MyAPI\\Repositories\\Impls\\HistoryRentVehicleRepository.cs",
+              "ToolTip": "C:\\Users\\trinh\\OneDrive\\Ta\u0300i li\u00EA\u0323u\\GitHub\\SEP490_G67\\SEP490_G67\\MyAPI\\Repositories\\Impls\\HistoryRentVehicleRepository.cs",
+              "RelativeToolTip": "MyAPI\\Repositories\\Impls\\HistoryRentVehicleRepository.cs",
+              "ViewState": "AgIAAFUAAAAAAAAAAAArwGQAAAA4AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-11-11T19:30:21.021Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 21,
+              "Title": "RequestController.cs",
+              "DocumentMoniker": "C:\\Users\\trinh\\OneDrive\\Ta\u0300i li\u00EA\u0323u\\GitHub\\SEP490_G67\\SEP490_G67\\MyAPI\\Controllers\\RequestController.cs",
+              "RelativeDocumentMoniker": "MyAPI\\Controllers\\RequestController.cs",
+              "ToolTip": "C:\\Users\\trinh\\OneDrive\\Ta\u0300i li\u00EA\u0323u\\GitHub\\SEP490_G67\\SEP490_G67\\MyAPI\\Controllers\\RequestController.cs",
+              "RelativeToolTip": "MyAPI\\Controllers\\RequestController.cs",
+              "ViewState": "AgIAAAwAAAAAAAAAAAAAABoAAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-11-11T19:10:31.03Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "VehicleRepository.cs",
+              "DocumentMoniker": "C:\\Users\\trinh\\OneDrive\\Ta\u0300i li\u00EA\u0323u\\GitHub\\SEP490_G67\\SEP490_G67\\MyAPI\\Repositories\\Impls\\VehicleRepository.cs",
+              "RelativeDocumentMoniker": "MyAPI\\Repositories\\Impls\\VehicleRepository.cs",
+              "ToolTip": "C:\\Users\\trinh\\OneDrive\\Ta\u0300i li\u00EA\u0323u\\GitHub\\SEP490_G67\\SEP490_G67\\MyAPI\\Repositories\\Impls\\VehicleRepository.cs",
+              "RelativeToolTip": "MyAPI\\Repositories\\Impls\\VehicleRepository.cs",
+              "ViewState": "AgIAAD8AAAAAAAAAAAAowFIAAAApAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-11-11T18:57:21.7Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "RequestRepository.cs",
+              "DocumentMoniker": "C:\\Users\\trinh\\OneDrive\\Ta\u0300i li\u00EA\u0323u\\GitHub\\SEP490_G67\\SEP490_G67\\MyAPI\\Repositories\\Impls\\RequestRepository.cs",
+              "RelativeDocumentMoniker": "MyAPI\\Repositories\\Impls\\RequestRepository.cs",
+              "ToolTip": "C:\\Users\\trinh\\OneDrive\\Ta\u0300i li\u00EA\u0323u\\GitHub\\SEP490_G67\\SEP490_G67\\MyAPI\\Repositories\\Impls\\RequestRepository.cs",
+              "RelativeToolTip": "MyAPI\\Repositories\\Impls\\RequestRepository.cs",
+              "ViewState": "AgIAAJcAAAAAAAAAAAAAwLAAAAAvAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-11-11T18:55:07.561Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 1,
+              "Title": "IRequestDetailRepository.cs",
+              "DocumentMoniker": "C:\\Users\\trinh\\OneDrive\\Ta\u0300i li\u00EA\u0323u\\GitHub\\SEP490_G67\\SEP490_G67\\MyAPI\\Infrastructure\\Interfaces\\IRequestDetailRepository.cs",
+              "RelativeDocumentMoniker": "MyAPI\\Infrastructure\\Interfaces\\IRequestDetailRepository.cs",
+              "ToolTip": "C:\\Users\\trinh\\OneDrive\\Ta\u0300i li\u00EA\u0323u\\GitHub\\SEP490_G67\\SEP490_G67\\MyAPI\\Infrastructure\\Interfaces\\IRequestDetailRepository.cs",
+              "RelativeToolTip": "MyAPI\\Infrastructure\\Interfaces\\IRequestDetailRepository.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAqwAcAAAAcAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-11-11T18:54:28.406Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "IRequestRepository.cs",
+              "DocumentMoniker": "C:\\Users\\trinh\\OneDrive\\Ta\u0300i li\u00EA\u0323u\\GitHub\\SEP490_G67\\SEP490_G67\\MyAPI\\Infrastructure\\Interfaces\\IRequestRepository.cs",
+              "RelativeDocumentMoniker": "MyAPI\\Infrastructure\\Interfaces\\IRequestRepository.cs",
+              "ToolTip": "C:\\Users\\trinh\\OneDrive\\Ta\u0300i li\u00EA\u0323u\\GitHub\\SEP490_G67\\SEP490_G67\\MyAPI\\Infrastructure\\Interfaces\\IRequestRepository.cs",
+              "RelativeToolTip": "MyAPI\\Infrastructure\\Interfaces\\IRequestRepository.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAqwAkAAAATAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-11-11T18:54:24.802Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 26,
+              "Title": "IVehicleRepository.cs",
+              "DocumentMoniker": "C:\\Users\\trinh\\OneDrive\\Ta\u0300i li\u00EA\u0323u\\GitHub\\SEP490_G67\\SEP490_G67\\MyAPI\\Infrastructure\\Interfaces\\IVehicleRepository.cs",
+              "RelativeDocumentMoniker": "MyAPI\\Infrastructure\\Interfaces\\IVehicleRepository.cs",
+              "ToolTip": "C:\\Users\\trinh\\OneDrive\\Ta\u0300i li\u00EA\u0323u\\GitHub\\SEP490_G67\\SEP490_G67\\MyAPI\\Infrastructure\\Interfaces\\IVehicleRepository.cs",
+              "RelativeToolTip": "MyAPI\\Infrastructure\\Interfaces\\IVehicleRepository.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-11-11T18:53:52.31Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 24,
+              "Title": "IVehicleOwner.cs",
+              "DocumentMoniker": "C:\\Users\\trinh\\OneDrive\\Ta\u0300i li\u00EA\u0323u\\GitHub\\SEP490_G67\\SEP490_G67\\MyAPI\\Infrastructure\\Interfaces\\IVehicleOwner.cs",
+              "RelativeDocumentMoniker": "MyAPI\\Infrastructure\\Interfaces\\IVehicleOwner.cs",
+              "ToolTip": "C:\\Users\\trinh\\OneDrive\\Ta\u0300i li\u00EA\u0323u\\GitHub\\SEP490_G67\\SEP490_G67\\MyAPI\\Infrastructure\\Interfaces\\IVehicleOwner.cs",
+              "RelativeToolTip": "MyAPI\\Infrastructure\\Interfaces\\IVehicleOwner.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-11-11T18:53:51.347Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "ILossCostTypeRepository.cs",
+              "DocumentMoniker": "C:\\Users\\trinh\\OneDrive\\Ta\u0300i li\u00EA\u0323u\\GitHub\\SEP490_G67\\SEP490_G67\\MyAPI\\Infrastructure\\Interfaces\\ILossCostTypeRepository.cs",
+              "RelativeDocumentMoniker": "MyAPI\\Infrastructure\\Interfaces\\ILossCostTypeRepository.cs",
+              "ToolTip": "C:\\Users\\trinh\\OneDrive\\Ta\u0300i li\u00EA\u0323u\\GitHub\\SEP490_G67\\SEP490_G67\\MyAPI\\Infrastructure\\Interfaces\\ILossCostTypeRepository.cs",
+              "RelativeToolTip": "MyAPI\\Infrastructure\\Interfaces\\ILossCostTypeRepository.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAABIAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-11-11T18:53:19.525Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "IHistoryRentVehicleRepository.cs",
+              "DocumentMoniker": "C:\\Users\\trinh\\OneDrive\\Ta\u0300i li\u00EA\u0323u\\GitHub\\SEP490_G67\\SEP490_G67\\MyAPI\\Infrastructure\\Interfaces\\IHistoryRentVehicleRepository.cs",
+              "RelativeDocumentMoniker": "MyAPI\\Infrastructure\\Interfaces\\IHistoryRentVehicleRepository.cs",
+              "ToolTip": "C:\\Users\\trinh\\OneDrive\\Ta\u0300i li\u00EA\u0323u\\GitHub\\SEP490_G67\\SEP490_G67\\MyAPI\\Infrastructure\\Interfaces\\IHistoryRentVehicleRepository.cs",
+              "RelativeToolTip": "MyAPI\\Infrastructure\\Interfaces\\IHistoryRentVehicleRepository.cs",
+              "ViewState": "AgIAAAIAAAAAAAAAAAAlwA4AAAATAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-11-11T18:53:10.475Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 25,
+              "Title": "RequestDetail.cs",
+              "DocumentMoniker": "C:\\Users\\trinh\\OneDrive\\Ta\u0300i li\u00EA\u0323u\\GitHub\\SEP490_G67\\SEP490_G67\\MyAPI\\Models\\RequestDetail.cs",
+              "RelativeDocumentMoniker": "MyAPI\\Models\\RequestDetail.cs",
+              "ToolTip": "C:\\Users\\trinh\\OneDrive\\Ta\u0300i li\u00EA\u0323u\\GitHub\\SEP490_G67\\SEP490_G67\\MyAPI\\Models\\RequestDetail.cs",
+              "RelativeToolTip": "MyAPI\\Models\\RequestDetail.cs",
+              "ViewState": "AgIAAAUAAAAAAAAAAAAxwA4AAAAuAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-11-11T18:51:43.635Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 27,
+              "Title": "Request.cs",
+              "DocumentMoniker": "C:\\Users\\trinh\\OneDrive\\Ta\u0300i li\u00EA\u0323u\\GitHub\\SEP490_G67\\SEP490_G67\\MyAPI\\Models\\Request.cs",
+              "RelativeDocumentMoniker": "MyAPI\\Models\\Request.cs",
+              "ToolTip": "C:\\Users\\trinh\\OneDrive\\Ta\u0300i li\u00EA\u0323u\\GitHub\\SEP490_G67\\SEP490_G67\\MyAPI\\Models\\Request.cs",
+              "RelativeToolTip": "MyAPI\\Models\\Request.cs",
+              "ViewState": "AgIAAAcAAAAAAAAAAAA1wBUAAAAqAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-11-11T18:51:08.225Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 20,
+              "Title": "RentVehicleAddDTO.cs",
+              "DocumentMoniker": "C:\\Users\\trinh\\OneDrive\\Ta\u0300i li\u00EA\u0323u\\GitHub\\SEP490_G67\\SEP490_G67\\MyAPI\\DTOs\\HistoryRentVehicleDTOs\\RentVehicleAddDTO.cs",
+              "RelativeDocumentMoniker": "MyAPI\\DTOs\\HistoryRentVehicleDTOs\\RentVehicleAddDTO.cs",
+              "ToolTip": "C:\\Users\\trinh\\OneDrive\\Ta\u0300i li\u00EA\u0323u\\GitHub\\SEP490_G67\\SEP490_G67\\MyAPI\\DTOs\\HistoryRentVehicleDTOs\\RentVehicleAddDTO.cs",
+              "RelativeToolTip": "MyAPI\\DTOs\\HistoryRentVehicleDTOs\\RentVehicleAddDTO.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAqwAUAAAAwAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-11-11T18:50:49.783Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 14,
+              "Title": "VehicleController.cs",
+              "DocumentMoniker": "C:\\Users\\trinh\\OneDrive\\Ta\u0300i li\u00EA\u0323u\\GitHub\\SEP490_G67\\SEP490_G67\\MyAPI\\Controllers\\VehicleController.cs",
+              "RelativeDocumentMoniker": "MyAPI\\Controllers\\VehicleController.cs",
+              "ToolTip": "C:\\Users\\trinh\\OneDrive\\Ta\u0300i li\u00EA\u0323u\\GitHub\\SEP490_G67\\SEP490_G67\\MyAPI\\Controllers\\VehicleController.cs",
+              "RelativeToolTip": "MyAPI\\Controllers\\VehicleController.cs",
+              "ViewState": "AgIAAA4AAAAAAAAAAAAQwCsAAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-11-11T18:24:01.046Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 29,
               "Title": "PaymentController.cs",
               "DocumentMoniker": "C:\\Users\\trinh\\OneDrive\\Ta\u0300i li\u00EA\u0323u\\GitHub\\SEP490_G67\\SEP490_G67\\MyAPI\\Controllers\\PaymentController.cs",
               "RelativeDocumentMoniker": "MyAPI\\Controllers\\PaymentController.cs",
@@ -71,25 +513,24 @@
               "RelativeToolTip": "MyAPI\\Controllers\\PaymentController.cs",
               "ViewState": "AgIAAB8AAAAAAAAAAAAkwCgAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-11-11T15:38:15.981Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-11-11T15:38:15.981Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 28,
               "Title": "PaymentRepository.cs",
               "DocumentMoniker": "C:\\Users\\trinh\\OneDrive\\Ta\u0300i li\u00EA\u0323u\\GitHub\\SEP490_G67\\SEP490_G67\\MyAPI\\Repositories\\Impls\\PaymentRepository.cs",
               "RelativeDocumentMoniker": "MyAPI\\Repositories\\Impls\\PaymentRepository.cs",
               "ToolTip": "C:\\Users\\trinh\\OneDrive\\Ta\u0300i li\u00EA\u0323u\\GitHub\\SEP490_G67\\SEP490_G67\\MyAPI\\Repositories\\Impls\\PaymentRepository.cs",
               "RelativeToolTip": "MyAPI\\Repositories\\Impls\\PaymentRepository.cs",
-              "ViewState": "AgIAAGQAAAAAAAAAAAAYwFgAAAA2AAAAAAAAAA==",
+              "ViewState": "AgIAALoAAAAAAAAAAAAkwG0AAAAiAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-11-11T15:37:43.422Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 30,
               "Title": "IPaymentRepository.cs",
               "DocumentMoniker": "C:\\Users\\trinh\\OneDrive\\Ta\u0300i li\u00EA\u0323u\\GitHub\\SEP490_G67\\SEP490_G67\\MyAPI\\Infrastructure\\Interfaces\\IPaymentRepository.cs",
               "RelativeDocumentMoniker": "MyAPI\\Infrastructure\\Interfaces\\IPaymentRepository.cs",
@@ -97,12 +538,11 @@
               "RelativeToolTip": "MyAPI\\Infrastructure\\Interfaces\\IPaymentRepository.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAqwAsAAAAqAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-11-11T15:10:51.935Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-11-11T15:10:51.935Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 31,
               "Title": "TicketRepository.cs",
               "DocumentMoniker": "C:\\Users\\trinh\\OneDrive\\Ta\u0300i li\u00EA\u0323u\\GitHub\\SEP490_G67\\SEP490_G67\\MyAPI\\Repositories\\Impls\\TicketRepository.cs",
               "RelativeDocumentMoniker": "MyAPI\\Repositories\\Impls\\TicketRepository.cs",
@@ -110,12 +550,11 @@
               "RelativeToolTip": "MyAPI\\Repositories\\Impls\\TicketRepository.cs",
               "ViewState": "AgIAABMAAAAAAAAAAAAywBkAAAAJAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-11-11T12:15:44.424Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-11-11T12:15:44.424Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 32,
               "Title": "TicketController.cs",
               "DocumentMoniker": "C:\\Users\\trinh\\OneDrive\\Ta\u0300i li\u00EA\u0323u\\GitHub\\SEP490_G67\\SEP490_G67\\MyAPI\\Controllers\\TicketController.cs",
               "RelativeDocumentMoniker": "MyAPI\\Controllers\\TicketController.cs",
@@ -123,8 +562,7 @@
               "RelativeToolTip": "MyAPI\\Controllers\\TicketController.cs",
               "ViewState": "AgIAAA4AAAAAAAAAAAAtwCkAAABJAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-11-11T12:12:55.715Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-11-11T12:12:55.715Z"
             }
           ]
         },

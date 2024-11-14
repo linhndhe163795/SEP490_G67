@@ -1,9 +1,12 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MyAPI.DTOs.HistoryRentVehicle;
 using MyAPI.DTOs.RequestDTOs;
+using MyAPI.DTOs.VehicleDTOs;
 using MyAPI.Helper;
 using MyAPI.Infrastructure.Interfaces;
 using MyAPI.Models;
+using MyAPI.Repositories.Impls;
 using System.Data;
 
 namespace MyAPI.Controllers
@@ -185,6 +188,23 @@ namespace MyAPI.Controllers
             catch (Exception ex)
             {
                 return BadRequest(ex.Message);
+            }
+        }
+
+
+        [HttpPost("addRentVehicleRequest")]
+        public async Task<IActionResult> AddVehicle(RentVehicleAddDTO rentVehicleAddDTO)
+        {
+            try
+            {
+
+                var isAdded = await _requestRepository.CreateRequestRentVehicleAsync(rentVehicleAddDTO);
+                return Ok(new { Message = "Vehicle rent added successfully.", VehicleRent = rentVehicleAddDTO });
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Message = "AddVehicle rent Add failed", Details = ex.Message });
             }
         }
     }

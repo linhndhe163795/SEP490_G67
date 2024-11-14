@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualBasic;
 using MyAPI.DTOs;
+using MyAPI.DTOs.HistoryRentVehicle;
 using MyAPI.DTOs.RequestDTOs;
 using MyAPI.Helper;
 using MyAPI.Infrastructure.Interfaces;
@@ -12,9 +13,13 @@ namespace MyAPI.Repositories.Impls
 {
     public class RequestRepository : GenericRepository<Request>, IRequestRepository
     {
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly GetInforFromToken _tokenHelper;
 
-        public RequestRepository(SEP490_G67Context _context) : base(_context)
+        public RequestRepository(SEP490_G67Context _context, IHttpContextAccessor httpContextAccessor, GetInforFromToken tokenHelper) : base(_context)
         {
+            _httpContextAccessor = httpContextAccessor;
+            _tokenHelper = tokenHelper;
         }
 
         public async Task<Request> UpdateRequestRentCarAsync(int id, RequestDTO requestDTO)
@@ -169,6 +174,7 @@ namespace MyAPI.Repositories.Impls
             {
                 update.Status = request.Status;
                 update.Note = request.Note;
+                update.UpdateAt = DateTime.Now;
 
                 await _context.SaveChangesAsync();
                 return true;
@@ -377,6 +383,64 @@ namespace MyAPI.Repositories.Impls
             }
         }
 
-        
+        public async Task<bool> CreateRequestRentVehicleAsync(RentVehicleAddDTO rentVehicleAddDTO)
+        {
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                var token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+                int userId = _tokenHelper.GetIdInHeader(token);
+
+                if (userId == -1)
+                {
+                    throw new Exception("Invalid user ID from token.");
+                }
+
+                var addRentVehicle = new Request
+                {
+                    UserId = userId,
+                    TypeId = 4,
+                    Status = false,
+                    Description = "Yêu cầu thuê xe tiện chuyến",
+                    CreatedAt = DateTime.Now,
+                    Note = "Chờ xác nhận",
+                    CreatedBy = userId,
+                    UpdateAt = DateTime.Now,
+                    UpdateBy = userId,
+                };
+
+                await _context.Requests.AddAsync(addRentVehicle);
+                await _context.SaveChangesAsync();
+
+                var addRentVehicelRequestDetails = new RequestDetail
+                {
+                    RequestId = addRentVehicle.Id,
+                    VehicleId = null,
+                    TicketId = null,
+                    StartLocation = rentVehicleAddDTO?.StartLocation,
+                    EndLocation = rentVehicleAddDTO?.EndLocation,
+                    StartTime = rentVehicleAddDTO?.StartTime,
+                    EndTime = rentVehicleAddDTO?.EndTime,
+                    Seats = rentVehicleAddDTO?.Seats,
+                    Price = rentVehicleAddDTO?.Price,
+                    CreatedAt = DateTime.Now,
+                    CreatedBy = userId,
+                    UpdateAt = DateTime.Now,
+                    UpdateBy = userId,
+                };
+
+                await _context.RequestDetails.AddAsync(addRentVehicelRequestDetails);
+                await _context.SaveChangesAsync();
+
+                await transaction.CommitAsync();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                throw; 
+            }
+        }
+
     }
 }
