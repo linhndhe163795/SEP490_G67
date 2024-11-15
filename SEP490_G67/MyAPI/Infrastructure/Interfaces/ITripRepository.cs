@@ -17,5 +17,7 @@ namespace MyAPI.Infrastructure.Interfaces
 
         Task<(List<Trip>, List<string>)> ImportExcel(Stream excelStream);
 
+        Task<decimal> SearchVehicleConvenient(string startPoint, string endPoint, int typeOfTrip);
+
     }
 }

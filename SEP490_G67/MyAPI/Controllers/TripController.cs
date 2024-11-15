@@ -320,5 +320,30 @@ namespace MyAPI.Controllers
                 });
             }
         }
+
+        [HttpGet("searchTripForConvenient/{startPoint}/{endPoint}/{typeOfTrip}")]
+        public async Task<IActionResult> SearchTripForConvenient(string startPoint, string endPoint,int typeOfTrip)
+        {
+            try
+            {
+                var price = await _tripRepository.SearchVehicleConvenient(startPoint, endPoint, typeOfTrip);
+
+                if (price == 0)
+                {
+                    return NotFound(new { Message = "No trips found for the specified start and end points." });
+                }
+
+                return Ok(new { Price = price });
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { Message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(400, new { Message = "An unexpected error occurred.", Detail = ex.Message });
+            }
+        }
+
     }
 }

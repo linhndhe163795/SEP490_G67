@@ -358,5 +358,22 @@ namespace MyAPI.Repositories.Impls
             return (correctTrips, errorAdd);
 
         }
-    }  
+
+        public async Task<decimal> SearchVehicleConvenient(string startPoint, string endPoint, int typeOfTrip)
+        {
+            if (string.IsNullOrEmpty(startPoint) || string.IsNullOrEmpty(endPoint))
+                throw new ArgumentException("Start point and end point must not be empty.");
+
+            var price = await _context.Trips
+                .Where(t => t.PointStart.Contains(startPoint) && t.PointEnd.Contains(endPoint) && t.TypeOfTrip == typeOfTrip)
+                .Select(s => s.Price)
+                .FirstOrDefaultAsync();
+
+            if (price == 0 || price == null)
+                throw new Exception("Start or end point or typeOfTrip is invalid!");
+
+            return price.Value; 
+        }
+
+    }
 }

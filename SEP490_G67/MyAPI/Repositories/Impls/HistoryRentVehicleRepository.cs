@@ -32,6 +32,15 @@ namespace MyAPI.Repositories.Impls
 
         public async Task<bool> AccpetOrDeninedRentVehicle(int requestId, bool choose)
         {
+            var checkRequest = await _context.Requests.FirstOrDefaultAsync(s => s.Id == requestId);
+
+            var token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+            int userId = _tokenHelper.GetIdInHeader(token);
+
+            if (userId == -1)
+            {
+                throw new Exception("Invalid user ID from token.");
+            }
             try
             {
                 var requestDetail = await _context.Requests.Include(s => s.RequestDetails)
@@ -75,10 +84,16 @@ namespace MyAPI.Repositories.Impls
 
                 var updateRequestDetail = new RequestDetailDTO
                 {
+                    UpdatedBy = userId,
                     UpdatedAt = DateTime.Now,
                 };
 
                 var updateRequestDetailRentVehicle = await _requestDetailRepository.CreateRequestDetailAsync(updateRequestDetail);
+
+                if (!choose)
+                {
+                    return true;
+                }
 
                 var addHistoryVehicle = new HistoryRentVehicle
                 {

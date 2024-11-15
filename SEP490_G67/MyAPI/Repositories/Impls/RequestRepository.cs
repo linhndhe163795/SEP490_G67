@@ -3,6 +3,7 @@ using Microsoft.VisualBasic;
 using MyAPI.DTOs;
 using MyAPI.DTOs.HistoryRentVehicle;
 using MyAPI.DTOs.RequestDTOs;
+using MyAPI.DTOs.TripDTOs;
 using MyAPI.Helper;
 using MyAPI.Infrastructure.Interfaces;
 using MyAPI.Models;
@@ -15,11 +16,13 @@ namespace MyAPI.Repositories.Impls
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly GetInforFromToken _tokenHelper;
+        private readonly IRequestDetailRepository _requestDetailRepository;
 
-        public RequestRepository(SEP490_G67Context _context, IHttpContextAccessor httpContextAccessor, GetInforFromToken tokenHelper) : base(_context)
+        public RequestRepository(SEP490_G67Context _context, IHttpContextAccessor httpContextAccessor, GetInforFromToken tokenHelper, IRequestDetailRepository requestDetailRepository) : base(_context)
         {
             _httpContextAccessor = httpContextAccessor;
             _tokenHelper = tokenHelper;
+            _requestDetailRepository = requestDetailRepository;
         }
 
         public async Task<Request> UpdateRequestRentCarAsync(int id, RequestDTO requestDTO)
@@ -440,6 +443,188 @@ namespace MyAPI.Repositories.Impls
                 await transaction.RollbackAsync();
                 throw; 
             }
+        }
+
+        public async Task<bool> CreateRequestCovenient(ConvenientTripDTO convenientTripDTO)
+        {
+            // Lấy User ID từ token
+            var token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+            int userId = _tokenHelper.GetIdInHeader(token);
+
+            if (userId == -1)
+            {
+                throw new UnauthorizedAccessException("Invalid user ID from token.");
+            }
+
+            int type_Of_Trip;
+            string descriptionType = "";
+            if (convenientTripDTO.TypeOfTrip == 2)
+            {
+                type_Of_Trip = 5;
+                descriptionType = "Yêu cầu đặt vé xe ghép";
+            }
+            else if (convenientTripDTO.TypeOfTrip == 3)
+            {
+                type_Of_Trip = 6;
+                descriptionType = "Yêu cầu bao xe ghép";
+            }
+            else
+            {
+                throw new ArgumentException("Invalid TypeOfTrip. Only values 2 or 3 are allowed.");
+            }
+
+            if (string.IsNullOrEmpty(convenientTripDTO.PointStart) || string.IsNullOrEmpty(convenientTripDTO.PointEnd))
+            {
+                throw new ArgumentException("PointStart and PointEnd cannot be null or empty.");
+            }
+
+            if (convenientTripDTO.Price <= 0)
+            {
+                throw new ArgumentException("Price must be greater than 0.");
+            }
+
+            if (string.IsNullOrEmpty(convenientTripDTO.UserName) || string.IsNullOrEmpty(convenientTripDTO.PhoneNumber))
+            {
+                throw new ArgumentException("UserName and PhoneNumber cannot be null or empty.");
+            }
+
+            var addConvenientRequest = new Request
+            {
+                UserId = userId,
+                TypeId = type_Of_Trip,
+                Status = false,
+                Description = descriptionType,
+                Note = "Đang chờ xác nhận",
+                CreatedAt = DateTime.Now,
+                CreatedBy = userId,
+                UpdateAt = DateTime.Now,
+                UpdateBy = userId,
+            };
+
+            await _context.Requests.AddAsync(addConvenientRequest);
+
+            await _context.SaveChangesAsync();
+
+            var addConvenientRequest_Details = new RequestDetail
+            {
+                RequestId = addConvenientRequest.Id,
+                VehicleId = null,
+                TicketId = null,
+                StartLocation = convenientTripDTO.PointStart,
+                EndLocation = convenientTripDTO.PointEnd,
+                StartTime = convenientTripDTO.StartTime,
+                EndTime = null,
+                Seats = null,
+                Price = convenientTripDTO.Price,
+                CreatedAt = DateTime.Now,
+                CreatedBy = userId,
+                UpdateAt = DateTime.Now,
+                UpdateBy = userId,
+                UserName = convenientTripDTO.UserName,
+                PhoneNumber = convenientTripDTO.PhoneNumber,
+            };
+
+            await _context.RequestDetails.AddAsync(addConvenientRequest_Details);
+
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
+
+
+        public async Task<bool> UpdateStatusRequestConvenient(int requestId, bool choose)
+        {
+            var checkRequest = await _context.Requests.FirstOrDefaultAsync(s => s.Id == requestId);
+            if (checkRequest == null)
+            {
+                throw new Exception("RequestId not found");
+            }
+
+            var token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+            int userId = _tokenHelper.GetIdInHeader(token);
+            if (userId == -1)
+            {
+                throw new UnauthorizedAccessException("Invalid user ID from token.");
+            }
+
+            checkRequest.Note = choose ? "Đã xác nhận" : "Từ chối xác nhận";
+            checkRequest.Status = choose;
+
+            await UpdateRequestVehicleAsync(requestId, checkRequest);
+
+            var updateRequestDetail = new RequestDetailDTO
+            {
+                UpdatedAt = DateTime.Now,
+                UpdatedBy = userId,
+                EndTime = DateTime.Now,
+            };
+
+            var updateRequestDetailRentVehicle = await _requestDetailRepository.CreateRequestDetailAsync(updateRequestDetail);
+            if (updateRequestDetailRentVehicle == null)
+            {
+                throw new Exception("Failed to create request detail.");
+            }
+
+            if(!choose)
+            {
+                return true;   
+            }
+
+            var checkRequestDetail = await _context.RequestDetails.SingleOrDefaultAsync(s => s.RequestId == requestId);
+            if (checkRequestDetail == null)
+            {
+                throw new Exception("Request detail not found for the given requestId.");
+            }
+
+            var tripId = await _context.Trips
+                .Where(t => t.PointStart.Contains(checkRequestDetail.StartLocation) && t.PointEnd.Contains(checkRequestDetail.EndLocation))
+                .Select(s => s.Id)
+                .FirstOrDefaultAsync();
+
+            if (tripId == 0)
+            {
+                throw new Exception("TripId not found for the given start and end locations.");
+            }
+
+            int typeOfTrip;
+            if (checkRequest.TypeId == 5)
+            {
+                typeOfTrip = 2;
+            }
+            else if (checkRequest.TypeId == 6)
+            {
+                typeOfTrip = 4;
+            }
+            else
+            {
+                throw new Exception("Invalid TypeId for determining TypeOfTrip.");
+            }
+
+            var addTicket = new Ticket
+            {
+                Price = checkRequestDetail.Price,
+                CodePromotion = null,
+                PricePromotion = null,
+                NumberTicket = 2,
+                PointEnd = checkRequestDetail.EndLocation,
+                PointStart = checkRequestDetail.StartLocation,
+                TimeFrom = checkRequestDetail.StartTime,
+                TimeTo = DateTime.Now,
+                UserId = checkRequest.UserId,
+                VehicleId = checkRequestDetail.VehicleId,
+                TripId = tripId,
+                TypeOfTicket = typeOfTrip,
+                TypeOfPayment = 2,
+                Status = "Thanh toán bằng tiền mặt",
+                CreatedAt = DateTime.Now,
+                CreatedBy = userId,
+                UpdateAt = DateTime.Now,
+                UpdateBy = userId,
+            };
+
+            await _context.Tickets.AddAsync(addTicket);
+            await _context.SaveChangesAsync();
+            return true;
         }
 
     }

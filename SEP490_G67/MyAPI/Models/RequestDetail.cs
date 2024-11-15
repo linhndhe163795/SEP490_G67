@@ -19,6 +19,8 @@ namespace MyAPI.Models
         public int? CreatedBy { get; set; }
         public DateTime? UpdateAt { get; set; }
         public int? UpdateBy { get; set; }
+        public string? PhoneNumber { get; set; }
+        public string? UserName { get; set; }
 
         public virtual Request? Request { get; set; }
         public virtual Vehicle? Vehicle { get; set; }
