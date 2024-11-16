@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MyAPI.DTOs.HistoryRentDriverDTOs;
 using MyAPI.DTOs.HistoryRentVehicle;
 using MyAPI.DTOs.RequestDTOs;
 using MyAPI.DTOs.TripDTOs;
@@ -195,6 +196,22 @@ namespace MyAPI.Controllers
 
         [HttpPost("addRentVehicleRequest")]
         public async Task<IActionResult> AddVehicle(RentVehicleAddDTO rentVehicleAddDTO)
+        {
+            try
+            {
+
+                var isAdded = await _requestRepository.CreateRequestRentVehicleAsync(rentVehicleAddDTO);
+                return Ok(new { Message = "Vehicle rent added successfully.", VehicleRent = rentVehicleAddDTO });
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Message = "AddVehicle rent Add failed", Details = ex.Message });
+            }
+        }
+
+        [HttpPost("addRenDriverRequest")]
+        public async Task<IActionResult> RentDriver(RequestDetailForRentDriver rentVehicleAddDTO)
         {
             try
             {

@@ -1,4 +1,5 @@
-﻿using MyAPI.DTOs.HistoryRentVehicle;
+﻿using MyAPI.DTOs.HistoryRentDriverDTOs;
+using MyAPI.DTOs.HistoryRentVehicle;
 using MyAPI.DTOs.RequestDTOs;
 using MyAPI.DTOs.TripDTOs;
 using MyAPI.Models;
@@ -20,7 +21,9 @@ namespace MyAPI.Infrastructure.Interfaces
         Task<List<ResponeCancleTicketDTOs>> getListRequestCancle();
         Task updateStatusRequestCancleTicket(int requestId, int staffId);
 
-        Task<bool> CreateRequestRentVehicleAsync(RentVehicleAddDTO rentVehicleAddDTO);
+        Task<bool> CreateRequestRentVehicleAsync(RequestDetailForRentDriver rentVehicleAddDTO);
+
+        Task<bool> CreateRequestRentDriverAsync(RequestDetailForRentDriver rentVehicleAddDTO);
 
         Task<bool> CreateRequestCovenient(ConvenientTripDTO convenientTripDTO);
 
