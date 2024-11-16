@@ -15,8 +15,8 @@ namespace MyAPI.Repositories.Impls
         private readonly ParseStringToDateTime _parseToDateTime;
         private readonly IMapper _mapper;
         private readonly SendMail _sendMail;
-        
-       
+
+
         public TicketRepository(SEP490_G67Context _context, IHttpContextAccessor httpContextAccessor, ParseStringToDateTime parseToDateTime, IMapper mapper, SendMail sendMail) : base(_context)
         {
             _httpContextAccessor = httpContextAccessor;
@@ -30,7 +30,7 @@ namespace MyAPI.Repositories.Impls
             try
             {
                 var user = await _context.Users.FirstOrDefaultAsync(x => x.Id == userId);
-                if (user == null) 
+                if (user == null)
                 {
                     throw new NullReferenceException();
                 }
@@ -56,7 +56,7 @@ namespace MyAPI.Repositories.Impls
                                              VehicleTrip = vt,
                                              Vehicle = v
                                          }).FirstOrDefaultAsync();
-             
+
                 var createTicket = new TicketDTOs
                 {
                     TripId = tripDetails.Trip.Id,
@@ -164,23 +164,23 @@ namespace MyAPI.Repositories.Impls
                     ticket.PricePromotion = price - (price * (promotionUser.Discount / 100.0m));
                 }
 
-                
+
                 await _context.Tickets.AddAsync(ticket);
 
-                
+
                 if (promotionUserUsed != null)
                 {
                     _context.PromotionUsers.Remove(promotionUserUsed);
                 }
 
-               
+
                 await _context.SaveChangesAsync();
 
-                
+
                 var user = await _context.Users.FindAsync(userId);
                 if (user != null)
                 {
-                    
+
                     SendMailDTO sendMailDTO = new()
                     {
                         FromEmail = "duclinh5122002@gmail.com",
@@ -315,14 +315,18 @@ namespace MyAPI.Repositories.Impls
                     checkTicket.UpdateAt = DateTime.Now;
                     await _context.SaveChangesAsync();
                     return true;
-                }else
+                }
+                else
                 {
                     throw new Exception("Update for payment");
                 }
-            }catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 throw new Exception(ex.Message);
             }
         }
+
+       
     }
 }

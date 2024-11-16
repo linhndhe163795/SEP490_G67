@@ -20,6 +20,7 @@ namespace MyAPI.Repositories.Impls
         private readonly IRequestRepository _requestRepository;
         private readonly IRequestDetailRepository _requestDetailRepository;
         private readonly SendMail _sendMail;
+        private readonly ITripRepository _tripRepository;
 
 
 
@@ -29,6 +30,7 @@ namespace MyAPI.Repositories.Impls
             GetInforFromToken tokenHelper,
             IRequestRepository requestRepository,
             IRequestDetailRepository requestDetailRepository,
+            ITripRepository tripRepository,
             SendMail sendMail) : base(context)
 
         {
@@ -38,6 +40,7 @@ namespace MyAPI.Repositories.Impls
             _requestRepository = requestRepository;
             _requestDetailRepository = requestDetailRepository;
             _sendMail = sendMail;
+            _tripRepository = tripRepository;
         }
 
         public async Task<bool> AddVehicleAsync(VehicleAddDTO vehicleAddDTO, string driverName)
@@ -464,7 +467,21 @@ namespace MyAPI.Repositories.Impls
 
             return await _context.SaveChangesAsync() > 0;
         }
+        public async Task<int> GetNumberSeatAvaiable(int vehicleId)
+        {
+            try
+            {
+                var ticketCount = await _tripRepository.GetTicketCount(vehicleId);
+                var vehicel = await _context.Vehicles.FirstOrDefaultAsync(x => x.Id == vehicleId);
+                var seatAvaiable = vehicel.NumberSeat - ticketCount;
+                return seatAvaiable.Value;
 
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
     }
 }
 

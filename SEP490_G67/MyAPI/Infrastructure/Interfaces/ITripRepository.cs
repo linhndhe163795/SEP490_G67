@@ -14,5 +14,6 @@ namespace MyAPI.Infrastructure.Interfaces
         Task updateStatusTrip(int id, int userId);
         Task confirmAddValidEntryImport(List<TripImportDTO> validEntry);
         Task<List<TripDTO>> getListTripNotVehicle();
+        Task<int> GetTicketCount(int tripId);
     }
 }

@@ -16,5 +16,6 @@ namespace MyAPI.Infrastructure.Interfaces
 
         Task CreateTicketForRentCar(int vehicleId, decimal price, TicketForRentCarDTO ticketRentalDTO, int userId);
         Task<TicketByIdDTOs> getTicketById(int ticketId);
+        
     }
 }
