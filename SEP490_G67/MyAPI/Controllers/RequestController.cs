@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using MyAPI.DTOs.HistoryRentVehicle;
 using MyAPI.DTOs.RequestDTOs;
+using MyAPI.DTOs.TripDTOs;
 using MyAPI.DTOs.VehicleDTOs;
 using MyAPI.Helper;
 using MyAPI.Infrastructure.Interfaces;
@@ -207,5 +208,73 @@ namespace MyAPI.Controllers
                 return BadRequest(new { Message = "AddVehicle rent Add failed", Details = ex.Message });
             }
         }
+
+        [HttpPost("ConvenientTripCreateForUser")]
+        public async Task<IActionResult> CreateRequestConvenientTrip(ConvenientTripDTO convenientTripDTO)
+        {
+            try
+            {
+                var result = await _requestRepository.CreateRequestCovenient(convenientTripDTO);
+
+                if (result)
+                {
+                    return Ok(new
+                    {
+                        success = true,
+                        message = "Convenient trip request created successfully."
+                    });
+                }
+
+                return BadRequest(new
+                {
+                    success = false,
+                    message = "Failed to create convenient trip request."
+                });
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Unauthorized(new
+                {
+                    success = false,
+                    message = ex.Message
+                });
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new
+                {
+                    success = false,
+                    message = ex.Message
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    success = false,
+                    message = "An unexpected error occurred.",
+                    details = ex.Message
+                });
+            }
+        }
+
+        [HttpPost("ConvenientTripUpdateForStaff")]
+        public async Task<IActionResult> UpdateRequestConvenientTrip(int requestId, bool choose)
+        {
+            try
+            {
+                var result = await _requestRepository.UpdateStatusRequestConvenient(requestId, choose);
+                return Ok(new { success = true, message = "Request updated successfully." });
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Unauthorized(new { success = false, message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { success = false, message = ex.Message });
+            }
+        }
+
     }
 }

@@ -6,6 +6,7 @@ using MyAPI.DTOs.TripDTOs;
 using MyAPI.Helper;
 using MyAPI.Infrastructure.Interfaces;
 using MyAPI.Models;
+using OfficeOpenXml;
 
 namespace MyAPI.Controllers
 {
@@ -259,5 +260,90 @@ namespace MyAPI.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+
+        [HttpGet("export_Template")]
+        public async Task<IActionResult> ExportTemplateExcel()
+        {
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            using (var package = new ExcelPackage())
+            {
+                var worksheet = package.Workbook.Worksheets.Add("TripTemplate");
+
+                worksheet.Cells[1, 1].Value = "Name";
+                worksheet.Cells[1, 2].Value = "StartTime";
+                worksheet.Cells[1, 3].Value = "Description";
+                worksheet.Cells[1, 4].Value = "Price";
+                worksheet.Cells[1, 5].Value = "PointStart";
+                worksheet.Cells[1, 6].Value = "PointEnd";
+                worksheet.Cells[1, 7].Value = "Status";
+                worksheet.Cells[1, 8].Value = "TypeOfTrip";
+
+                var sampleData = new List<object[]>
+            {
+                new object[] { "Trip A", "10:00", "Trip to ha noi", 50.0m, "Ha Noi", "Bac Giang", true, 1 },
+                new object[] { "Trip B", "12:00", "Trip to Bac Giang", 80.0m, "Bac Giang", "Ha Noi", false, 2 }
+            };
+
+                for (int i = 0; i < sampleData.Count; i++)
+                {
+                    for (int j = 0; j < sampleData[i].Length; j++)
+                    {
+                        worksheet.Cells[i + 2, j + 1].Value = sampleData[i][j];
+                    }
+                }
+
+                var stream = new MemoryStream();
+                await package.SaveAsAsync(stream);
+                stream.Position = 0;
+
+                string fileName = "TripTemplate.xlsx";
+                string contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+                return File(stream, contentType, fileName);
+            }
+        }
+
+        [HttpPost("import")]
+        public async Task<IActionResult> ImportExcel(IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+                return BadRequest("File is empty.");
+
+            using (var stream = file.OpenReadStream())
+            {
+                var (validRows, errorRows) = await _tripRepository.ImportExcel(stream);
+
+                return Ok(new
+                {
+                    SuccessRows = validRows.Count,
+                    ErrorRows = errorRows
+                });
+            }
+        }
+
+        [HttpGet("searchTripForConvenient/{startPoint}/{endPoint}/{typeOfTrip}")]
+        public async Task<IActionResult> SearchTripForConvenient(string startPoint, string endPoint,int typeOfTrip)
+        {
+            try
+            {
+                var price = await _tripRepository.SearchVehicleConvenient(startPoint, endPoint, typeOfTrip);
+
+                if (price == 0)
+                {
+                    return NotFound(new { Message = "No trips found for the specified start and end points." });
+                }
+
+                return Ok(new { Price = price });
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { Message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(400, new { Message = "An unexpected error occurred.", Detail = ex.Message });
+            }
+        }
+
     }
 }

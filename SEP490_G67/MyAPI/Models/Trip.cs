@@ -25,7 +25,9 @@ namespace MyAPI.Models
         public int? CreatedBy { get; set; }
         public DateTime? UpdateAt { get; set; }
         public int? UpdateBy { get; set; }
+        public int? TypeOfTrip { get; set; }
 
+        public virtual TypeOfTrip? TypeOfTripNavigation { get; set; }
         public virtual ICollection<Review> Reviews { get; set; }
         public virtual ICollection<Ticket> Tickets { get; set; }
         public virtual ICollection<TripDetail> TripDetails { get; set; }

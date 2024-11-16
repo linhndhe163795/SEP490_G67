@@ -23,11 +23,11 @@ namespace MyAPI.Models
         public string? StatusWork { get; set; }
         public int? TypeOfDriver { get; set; }
         public bool? Status { get; set; }
+        public string? Email { get; set; }
         public DateTime? CreatedAt { get; set; }
         public int? CreatedBy { get; set; }
         public DateTime? UpdateAt { get; set; }
         public int? UpdateBy { get; set; }
-        public string? Email { get; set; }
 
         public virtual TypeOfDriver? TypeOfDriverNavigation { get; set; }
         public virtual ICollection<HistoryRentDriver> HistoryRentDrivers { get; set; }

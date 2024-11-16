@@ -10,18 +10,24 @@ using MyAPI.DTOs.DriverDTOs;
 using MyAPI.DTOs.TripDTOs;
 using MyAPI.DTOs.VehicleDTOs;
 using MyAPI.DTOs.VehicleTripDTOs;
+using MyAPI.Helper;
 using MyAPI.Infrastructure.Interfaces;
 using MyAPI.Models;
+using OfficeOpenXml;
 
 namespace MyAPI.Repositories.Impls
 {
     public class TripRepository : GenericRepository<Trip>, ITripRepository
     {
         private readonly IMapper _mapper;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly GetInforFromToken _tokenHelper;
 
-        public TripRepository(SEP490_G67Context _context, IMapper mapper) : base(_context)
+        public TripRepository(SEP490_G67Context _context, IMapper mapper, IHttpContextAccessor httpContextAccessor, GetInforFromToken tokenHelper) : base(_context)
         {
             _mapper = mapper;
+            _httpContextAccessor = httpContextAccessor;
+            _tokenHelper = tokenHelper;
         }
 
         public async Task<List<TripDTO>> GetListTrip()
@@ -275,12 +281,146 @@ namespace MyAPI.Repositories.Impls
                                                    select t.NumberTicket
                                          ).ToListAsync();
                 var sum = listTicketByVehicelID.Sum();
-                return sum;
+                return sum ?? 0;
             }
             catch (Exception ex)
             {
                 throw new Exception(ex.Message);
             }
         }
-    }  
+      
+        
+
+        public async Task<(List<Trip>, List<string>)> ImportExcel(Stream excelStream)
+        {
+
+            var token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+            int userId = _tokenHelper.GetIdInHeader(token);
+
+            if (userId == -1)
+            {
+                throw new Exception("Invalid user ID from token.");
+            }
+            var correctTrips = new List<Trip>();    
+            var errorAdd = new List<string>();
+
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+
+            using (var package = new ExcelPackage(excelStream))
+            {
+                var worksheet = package.Workbook.Worksheets[0];
+                int rowCount = worksheet.Dimension.Rows;
+
+                for(int row = 2; row <= rowCount; row++)
+                {
+                    try
+                    {
+                        var name = worksheet.Cells[row, 1].Text;
+                        var startTimeText = worksheet.Cells[row, 2].Text;
+                        var description = worksheet.Cells[row, 3].Text;
+                        var priceText = worksheet.Cells[row, 4].Text;
+                        var pointStart = worksheet.Cells[row, 5].Text;
+                        var pointEnd = worksheet.Cells[row, 6].Text;
+                        var statusText = worksheet.Cells[row, 7].Text;
+                        var typeOfTripText = worksheet.Cells[row, 8].Text;
+
+                        if(string.IsNullOrEmpty(name))
+                        {
+                            errorAdd.Add($"Row{row}: Name is required");
+                            continue;
+                        }
+
+                        if (string.IsNullOrEmpty(pointStart))
+                        {
+                            errorAdd.Add($"Row{row}: pointStart is required");
+                            continue;
+                        }
+
+                        if (string.IsNullOrEmpty(pointEnd))
+                        {
+                            errorAdd.Add($"Row{row}: pointEnd is required");
+                            continue;
+                        }
+
+                        if (!TimeSpan.TryParse(startTimeText, out TimeSpan startTime))
+                        {
+                            errorAdd.Add($"Row{row}: Invalid Start Time format. Use hh:mm:ss.");
+                            continue;
+                        }
+
+                        if(!decimal.TryParse(priceText, out decimal price) || price < 0)
+                        {
+                            errorAdd.Add($"Row{row}: Price invalid or not negative");
+                            continue;
+                        }
+
+                        bool? status = statusText.ToLower() switch { "true" => true, "false" => false, _ => (bool?)null };
+
+                        if(!int.TryParse(typeOfTripText, out int typeOfTrip))
+                        {
+                            errorAdd.Add($"Row{row}: Invalid typeOfTripText");
+                            continue;
+                        }
+
+
+                        var tripAdd = new Trip
+                        {
+                            Name = name,
+                            StartTime = startTime,
+                            Description = description, 
+                            Price = price,
+                            PointStart = pointStart,
+                            PointEnd = pointEnd,
+                            Status = status,
+                            TypeOfTrip = typeOfTrip,
+                            CreatedAt = DateTime.Now,
+                            CreatedBy = userId,
+                            UpdateAt = DateTime.Now,
+                            UpdateBy = userId,
+                        };
+
+                        correctTrips.Add(tripAdd);
+
+                    }catch (Exception ex)
+                    {
+                        errorAdd.Add($"Row {row}: {ex.Message}");
+                    }
+                }
+            }
+
+            try
+            {
+                if (correctTrips.Count > 0)
+                {
+                    await _context.Trips.AddRangeAsync(correctTrips);
+                    await _context.SaveChangesAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                errorAdd.Add($"Error adding to database: {ex.Message}");
+            }
+
+            return (correctTrips, errorAdd);
+
+        }
+
+
+        public async Task<decimal> SearchVehicleConvenient(string startPoint, string endPoint, int typeOfTrip)
+        {
+            if (string.IsNullOrEmpty(startPoint) || string.IsNullOrEmpty(endPoint))
+                throw new ArgumentException("Start point and end point must not be empty.");
+
+            var price = await _context.Trips
+                .Where(t => t.PointStart.Contains(startPoint) && t.PointEnd.Contains(endPoint) && t.TypeOfTrip == typeOfTrip)
+                .Select(s => s.Price)
+                .FirstOrDefaultAsync();
+
+            if (price == 0 || price == null)
+                throw new Exception("Start or end point or typeOfTrip is invalid!");
+
+            return price.Value; 
+        }
+
+    }
 }
