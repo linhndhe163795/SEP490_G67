@@ -19,5 +19,6 @@ namespace MyAPI.Infrastructure.Interfaces
 
         Task<decimal> SearchVehicleConvenient(string startPoint, string endPoint, int typeOfTrip);
 
+        Task<int> GetTicketCount(int tripId);
     }
 }

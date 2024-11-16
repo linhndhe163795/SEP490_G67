@@ -176,8 +176,6 @@ namespace MyAPI.Repositories.Impls
         {
             try
             {
-
-
                 int limit = 5;
 
                 var result = new List<HistoryRentVehicleListDTO>();

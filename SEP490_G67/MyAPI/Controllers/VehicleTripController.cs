@@ -31,7 +31,7 @@ namespace MyAPI.Controllers
                     return BadRequest("Token is required.");
                 }
                 var staffId = _inforFromToken.GetIdInHeader(token);
-                _vehicleTripRepository.assginVehicleToTrip(staffId, vehicleId, tripId);
+                await _vehicleTripRepository.assginVehicleToTrip(staffId, vehicleId, tripId);
                 return Ok(new
                 {
                     vehicleId,

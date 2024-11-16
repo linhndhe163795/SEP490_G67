@@ -13,5 +13,8 @@
         public string LicensePlate { get; set; }
         public DateTime? CreatedAt { get; set; }
         public int? CreatedBy { get; set; }
+        public Dictionary<string, TimeSpan> PointStartDetail { get; set; } = new Dictionary<string, TimeSpan>();
+        public Dictionary<string, TimeSpan> PointEndDetail { get; set; } = new Dictionary<string, TimeSpan>();
     }
+    
 }

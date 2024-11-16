@@ -190,28 +190,54 @@ namespace MyAPI.Repositories.Impls
             try
             {
                 List<VehicleTrip> vt = new List<VehicleTrip>();
+                List<TripDetail> td = new List<TripDetail>();
+
                 var tripMapper = _mapper.Map<List<Trip>>(validEntries);
-                _context.Trips.AddRange(tripMapper);
-                await _context.SaveChangesAsync();
+                //_context.Trips.AddRange(tripMapper);
+                //await _context.SaveChangesAsync();
 
                 for (int i = 0; i < tripMapper.Count; i++)
                 {
-                    var trip = tripMapper[i];
-                    int newTripId = trip.Id; 
-                    string licensePlate = validEntries[i].LicensePlate; 
-                    
-                    var vehicle = await _context.Vehicles.FirstOrDefaultAsync(v => v.LicensePlate == licensePlate);
-
-                    if (vehicle != null)
+                    //for (int j = 0; j < validEntries[i].PointStartDetail.Count; j++)
+                    //{
+                    //    string pointStartDetails = validEntries[i].PointStartDetail[j];
+                    //    string pointEndDetails = validEntries[i].pointEndDetail;
+                    //    var tripDetails = new TripDetail
+                    //    {
+                    //        PointEndDetails = pointEndDetails,
+                    //        PointStartDetails = pointStartDetails,
+                    //        TimeStartDetils = validEntries[i].StartTime
+                    //    };
+                    //}
+                    foreach (var point in validEntries[i].PointStartDetail)
                     {
-                        int vehicleId = vehicle.Id;
-                        var vehicleTrip = new VehicleTrip
+                        var tripDetail = new TripDetail
                         {
-                            TripId = newTripId,
-                            VehicleId = vehicleId
+                            PointStartDetails = point.Key,
+                            //PointEndDetails = validEntries[i].pointEndDetail.Key,
+                            TimeStartDetils = point.Value // Chuyển đổi giá trị từ Dictionary thành TimeSpan
                         };
-                        vt.Add(vehicleTrip);
+                        td.Add(tripDetail);
+                        var trip = tripMapper[i];
+                        int newTripId = trip.Id;
+                        string licensePlate = validEntries[i].LicensePlate;
+
+                        var vehicle = await _context.Vehicles.FirstOrDefaultAsync(v => v.LicensePlate == licensePlate);
+
+                        if (vehicle != null)
+                        {
+                            int vehicleId = vehicle.Id;
+                            var vehicleTrip = new VehicleTrip
+                            {
+                                TripId = newTripId,
+                                VehicleId = vehicleId
+                            };
+                            vt.Add(vehicleTrip);
+                        }
+
                     }
+                    
+
                 }
 
                 await _context.VehicleTrips.AddRangeAsync(vt);
@@ -244,6 +270,26 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception(ex.Message);
             }
         }
+        public async Task<int> GetTicketCount(int tripId)
+        {
+            try
+            {
+                var vehicelID = await _context.VehicleTrips.FirstOrDefaultAsync(x => x.TripId == tripId);
+
+                var listTicketByVehicelID = await (from t in _context.Tickets
+                                                   where t.VehicleId == vehicelID.VehicleId
+                                                   select t.NumberTicket
+                                         ).ToListAsync();
+                var sum = listTicketByVehicelID.Sum();
+                return sum ?? 0;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+      
+        
 
         public async Task<(List<Trip>, List<string>)> ImportExcel(Stream excelStream)
         {
@@ -358,6 +404,7 @@ namespace MyAPI.Repositories.Impls
             return (correctTrips, errorAdd);
 
         }
+
 
         public async Task<decimal> SearchVehicleConvenient(string startPoint, string endPoint, int typeOfTrip)
         {

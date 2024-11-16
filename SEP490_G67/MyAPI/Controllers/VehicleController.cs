@@ -19,7 +19,7 @@ namespace MyAPI.Controllers
         private readonly IVehicleRepository _vehicleRepository;
         private readonly GetInforFromToken _inforFromToken;
         private readonly ServiceImport _serviceImport;
-        public VehicleController(IVehicleRepository vehicleRepository,GetInforFromToken inforFromToken, ServiceImport serviceImport)
+        public VehicleController(IVehicleRepository vehicleRepository, GetInforFromToken inforFromToken, ServiceImport serviceImport)
         {
             _vehicleRepository = vehicleRepository;
             _inforFromToken = inforFromToken;
@@ -32,7 +32,7 @@ namespace MyAPI.Controllers
             try
             {
                 var requests = await _vehicleRepository.GetVehicleTypeDTOsAsync();
-                if(requests != null )
+                if (requests != null)
                 {
                     return Ok(requests);
                 }
@@ -40,13 +40,13 @@ namespace MyAPI.Controllers
                 {
                     return NotFound("Vehicle Type not found");
                 }
-                
+
             }
             catch (Exception ex)
             {
                 return BadRequest(new { Message = "Get List Vehicle Typle failed", Details = ex.Message });
             }
-            
+
         }
         [Authorize(Roles = "Staff")]
         [HttpGet("listVehicle")]
@@ -63,7 +63,7 @@ namespace MyAPI.Controllers
                 {
                     return NotFound("Vehicle list not found");
                 }
-                
+
             }
             catch (Exception ex)
             {
@@ -94,7 +94,7 @@ namespace MyAPI.Controllers
             try
             {
                 var responseVehicle = await _vehicleRepository.AddVehicleByStaffcheckAsync(requestID, isApprove);
-                if(responseVehicle)
+                if (responseVehicle)
                 {
                     return Ok(new { Message = "Vehicle added successfully." });
                 }
@@ -102,7 +102,7 @@ namespace MyAPI.Controllers
                 {
                     return BadRequest(new { Message = "Vehicle addition denied." });
                 }
-                
+
             }
             catch (Exception ex)
             {
@@ -117,8 +117,8 @@ namespace MyAPI.Controllers
             try
             {
                 var checkUpdate = await _vehicleRepository.UpdateVehicleAsync(id, driverName);
-                
-                    return Ok(new { Message = "Vehicle Update successfully." });
+
+                return Ok(new { Message = "Vehicle Update successfully." });
 
             }
             catch (Exception ex)
@@ -156,8 +156,8 @@ namespace MyAPI.Controllers
         {
             try
             {
-                var listStartPoint = await _vehicleRepository.GetListStartPointByVehicleId(vehicleId);   
-                if(listStartPoint == null)
+                var listStartPoint = await _vehicleRepository.GetListStartPointByVehicleId(vehicleId);
+                if (listStartPoint == null)
                 {
                     return NotFound();
                 }
@@ -174,7 +174,7 @@ namespace MyAPI.Controllers
         {
             try
             {
-                var listEndPoint =  await _vehicleRepository.GetListEndPointByVehicleId(vehicleId);
+                var listEndPoint = await _vehicleRepository.GetListEndPointByVehicleId(vehicleId);
                 if (listEndPoint == null)
                 {
                     return NotFound();
@@ -217,7 +217,7 @@ namespace MyAPI.Controllers
             {
                 using (var workbook = new XLWorkbook())
                 {
-                    
+
                     var Vehicel = workbook.Worksheets.Add("Vehicle");
                     Vehicel.Cell(1, 1).Value = "Point Start Details";
                     Vehicel.Cell(1, 2).Value = "Point End Details";
@@ -285,9 +285,22 @@ namespace MyAPI.Controllers
                     invalidEntries
                 });
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 return BadRequest(e.Message);
+            }
+        }
+        [HttpGet("getNumberSeatAvaiable")]
+        public async Task<IActionResult> getNumberSeatAvaiable(int vehicelId)
+        {
+            try
+            {
+                var count = await _vehicleRepository.GetNumberSeatAvaiable(vehicelId);
+                return Ok(count);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
             }
         }
     }
