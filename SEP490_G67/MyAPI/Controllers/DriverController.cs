@@ -96,14 +96,14 @@ namespace MyAPI.Controllers
             await _driverRepository.Delete(driver);
             return Ok("Driver deleted successfully");
         }
-
+        [Authorize(Roles = "Staff")]
         [HttpGet("drivers-without-vehicle-for-rent")]
         public async Task<IActionResult> GetDriversWithoutVehicle()
         {
             var drivers = await _driverRepository.GetDriversWithoutVehicleAsync();
             return Ok(drivers);
         }
-
+        [Authorize(Roles = "Staff")]
         [HttpGet("send-mail-to-drivers-without-vehicle-for-rent")]
         public async Task<IActionResult> SendMailToDriverWithoutVehicle(int price)
         {

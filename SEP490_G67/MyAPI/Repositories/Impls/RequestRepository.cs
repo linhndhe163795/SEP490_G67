@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualBasic;
 using MyAPI.DTOs;
+using MyAPI.DTOs.HistoryRentDriverDTOs;
 using MyAPI.DTOs.HistoryRentVehicle;
 using MyAPI.DTOs.RequestDTOs;
 using MyAPI.DTOs.TripDTOs;
@@ -444,6 +445,67 @@ namespace MyAPI.Repositories.Impls
                 throw; 
             }
         }
+
+        public async Task<bool> CreateRequestRentDriverAsync(RequestDetailForRentDriver rentDriverAddDTO)
+        {
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                var token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+                int userId = _tokenHelper.GetIdInHeader(token);
+
+                if (userId == -1)
+                {
+                    throw new Exception("Invalid user ID from token.");
+                }
+
+                var addRentDriver = new Request
+                {
+                    UserId = userId,
+                    TypeId = 5,
+                    Status = false,
+                    Description = "Yêu cầu thuê tài xế",
+                    CreatedAt = DateTime.Now,
+                    Note = "Chờ xác nhận",
+                    CreatedBy = userId,
+                    UpdateAt = DateTime.Now,
+                    UpdateBy = userId,
+                };
+
+                await _context.Requests.AddAsync(addRentDriver);
+                await _context.SaveChangesAsync();
+
+                var addRentDriverRequestDetails = new RequestDetail
+                {
+                    RequestId = addRentDriver.Id,
+                    DriverId = rentDriverAddDTO?.DriverId,
+                    VehicleId = null,
+                    TicketId = null,
+                    StartLocation = rentDriverAddDTO?.StartLocation,
+                    EndLocation = rentDriverAddDTO?.EndLocation,
+                    StartTime = rentDriverAddDTO?.StartTime,
+                    EndTime = rentDriverAddDTO?.EndTime,
+                    Seats = rentDriverAddDTO?.Seats,
+                    Price = rentDriverAddDTO?.Price,
+                    CreatedAt = DateTime.Now,
+                    CreatedBy = userId,
+                    UpdateAt = DateTime.Now,
+                    UpdateBy = userId,
+                };
+
+                await _context.RequestDetails.AddAsync(addRentDriverRequestDetails);
+                await _context.SaveChangesAsync();
+
+                await transaction.CommitAsync();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                throw new Exception($"Error in CreateRequestRentDriverAsync: {ex.Message}");
+            }
+        }
+
 
         public async Task<bool> CreateRequestCovenient(ConvenientTripDTO convenientTripDTO)
         {
