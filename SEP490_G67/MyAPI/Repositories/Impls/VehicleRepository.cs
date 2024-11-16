@@ -2,13 +2,14 @@
 using Microsoft.EntityFrameworkCore;
 using MyAPI.DTOs;
 using MyAPI.DTOs.AccountDTOs;
+using MyAPI.DTOs.DriverDTOs;
 using MyAPI.DTOs.RequestDTOs;
 using MyAPI.DTOs.TripDTOs;
 using MyAPI.DTOs.VehicleDTOs;
 using MyAPI.Helper;
 using MyAPI.Infrastructure.Interfaces;
 using MyAPI.Models;
-
+using HistoryRentDriver = MyAPI.Models.HistoryRentDriver;
 
 namespace MyAPI.Repositories.Impls
 {
@@ -451,18 +452,84 @@ namespace MyAPI.Repositories.Impls
             }
         }
 
-        public async Task<bool> AssignDriverToVehicleAsync(int vehicleId, int driverId)
+        //public async Task<bool> AssignDriverToVehicleAsync(int vehicleId, int driverId)
+        //{
+        //    var vehicle = await _context.Vehicles.FindAsync(vehicleId);
+        //    if (vehicle == null || driverId <= 0)
+        //    {
+        //        return false;
+        //    }
+
+        //    vehicle.DriverId = driverId;
+        //    _context.Vehicles.Update(vehicle);
+
+        //    return await _context.SaveChangesAsync() > 0;
+        //}
+
+        public async Task<bool> RegisterDriverAsync(RentDriverDTO dto)
         {
-            var vehicle = await _context.Vehicles.FindAsync(vehicleId);
-            if (vehicle == null || driverId <= 0)
+            using (var transaction = await _context.Database.BeginTransactionAsync())
             {
-                return false;
+                try
+                {
+                    // 1. Kiểm tra xem xe có tồn tại không
+                    var vehicle = await _context.Vehicles.FindAsync(dto.VehicleId);
+                    if (vehicle == null)
+                    {
+                        throw new Exception("Vehicle not found.");
+                    }
+
+                    // 2. Kiểm tra xem tài xế có tồn tại không
+                    var driver = await _context.Drivers.FindAsync(dto.DriverId);
+                    if (driver == null)
+                    {
+                        throw new Exception("Driver not found.");
+                    }
+
+                    // 3. Tạo bản ghi trong bảng HistoryRentDriver
+                    var historyRentDriver = new HistoryRentDriver
+                    {
+                        DriverId = dto.DriverId,
+                        VehicleId = dto.VehicleId,
+                        TimeStart = dto.TimeStart,
+                        EndStart = dto.EndStart,
+                        CreatedAt = DateTime.UtcNow,
+                        CreatedBy = dto.CreatedBy
+                    };
+
+                    await _context.HistoryRentDrivers.AddAsync(historyRentDriver);
+                    await _context.SaveChangesAsync();
+
+                    // 4. Tạo bản ghi trong bảng PaymentRentDriver
+                    var paymentRentDriver = new PaymentRentDriver
+                    {
+                        DriverId = dto.DriverId,
+                        VehicleId = dto.VehicleId,
+                        Description = dto.Description,
+                        Price = dto.Price,
+                        HistoryRentDriverId = historyRentDriver.HistoryId,
+                        CreatedAt = DateTime.UtcNow,
+                        CreatedBy = dto.CreatedBy
+                    };
+
+                    await _context.PaymentRentDrivers.AddAsync(paymentRentDriver);
+                    await _context.SaveChangesAsync();
+
+                    vehicle.DriverId = dto.DriverId;
+                    _context.Vehicles.Update(vehicle);
+                    await _context.SaveChangesAsync();
+
+                    // 5. Commit transaction
+                    await transaction.CommitAsync();
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    // Rollback transaction nếu có lỗi
+                    await transaction.RollbackAsync();
+                    throw new Exception("RegisterDriverAsync: " + ex.Message);
+                }
             }
-
-            vehicle.DriverId = driverId;
-            _context.Vehicles.Update(vehicle);
-
-            return await _context.SaveChangesAsync() > 0;
         }
 
     }

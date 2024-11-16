@@ -2,6 +2,7 @@
 using AutoMapper.Internal;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MyAPI.DTOs.DriverDTOs;
 using MyAPI.DTOs.VehicleDTOs;
 using MyAPI.Infrastructure.Interfaces;
 using MyAPI.Repositories.Impls;
@@ -181,13 +182,14 @@ namespace MyAPI.Controllers
             }
         }
 
-        [Authorize(Roles = "Staff")]
-        [HttpPut("assignDriverForVehicle/{vehicleId}/{driverId}")]
-        public async Task<IActionResult> AssignDriverForVehicle(int vehicleId, int driverId)
+        //[Authorize(Roles = "Staff")]
+        [HttpPut("assignDriverForVehicle/")]
+        public async Task<IActionResult> AssignDriverForVehicle([FromBody] RentDriverDTO dto)
+
         {
             try
             {
-                var isAssigned = await _vehicleRepository.AssignDriverToVehicleAsync(vehicleId, driverId);
+                var isAssigned = await _vehicleRepository.RegisterDriverAsync(dto);
 
                 if (isAssigned)
                 {

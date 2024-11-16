@@ -1,4 +1,5 @@
-﻿using MyAPI.DTOs.TripDetailsDTOs;
+﻿using MyAPI.DTOs.DriverDTOs;
+using MyAPI.DTOs.TripDetailsDTOs;
 using MyAPI.DTOs.TripDTOs;
 using MyAPI.DTOs.VehicleDTOs;
 using MyAPI.Models;
@@ -23,7 +24,7 @@ namespace MyAPI.Infrastructure.Interfaces
         Task<List<EndPointDTO>> GetListEndPointByVehicleId(int vehicleId);
         Task<List<StartPointDTO>> GetListStartPointByVehicleId(int vehicleId);
 
-        Task<bool> AssignDriverToVehicleAsync(int vehicleId, int driverId);
+        Task<bool> RegisterDriverAsync(RentDriverDTO dto);
 
     }
 }
