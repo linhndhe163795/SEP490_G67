@@ -29,6 +29,9 @@
         public const int CHI_PHI_CO_DINH = 1;
         public const double TICH_DIEM = 0.0001;
 
+        public const int CHUYEN_DI_LIEN_TINH = 1;
+
+       
 
     }
 }

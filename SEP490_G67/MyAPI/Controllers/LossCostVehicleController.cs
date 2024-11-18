@@ -23,7 +23,7 @@ namespace MyAPI.Controllers
             _mapper = mapper;
         }
         [HttpGet("lossCostCar/vehicleId/startDate/endDate")]
-        public async Task<IActionResult> lossCostVehicleByDate(int? vehicleId, DateTime? startDate, DateTime? endDate)
+        public async Task<IActionResult> lossCostVehicleByDate(int? vehicleId, DateTime? startDate, DateTime? endDate, int vehicleOwnerId)
         {
             try
             {
@@ -34,7 +34,7 @@ namespace MyAPI.Controllers
                 }
                 else
                 {
-                    var listLostCostByDate = await _lossCostVehicleRepository.GetLossCostVehicleByDate(vehicleId, startDate, endDate);
+                    var listLostCostByDate = await _lossCostVehicleRepository.GetLossCostVehicleByDate(vehicleId, startDate, endDate, vehicleOwnerId);
                     return Ok(listLostCostByDate);
                 }
 
