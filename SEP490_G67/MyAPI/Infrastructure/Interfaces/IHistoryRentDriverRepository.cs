@@ -6,5 +6,7 @@ namespace MyAPI.Infrastructure.Interfaces
     {
         Task<IEnumerable<HistoryRentDriverListDTOs>> GetListHistoryRentDriver();
         Task<bool> AcceptOrDenyRentDriver(int requestId, bool choose);
+
+        Task<object> GetRentDetailsWithTotalForOwner(DateTime startDate, DateTime endDate);
     }
 }

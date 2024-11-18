@@ -52,6 +52,7 @@ namespace MyAPI.Repositories.Impls
                                                            .Select(rd => new
                                                            {
                                                                rd.CreatedBy,
+                                                               rd.VehicleId,
                                                                rd.DriverId,
                                                                rd.StartTime,
                                                                rd.EndTime,
@@ -130,6 +131,58 @@ namespace MyAPI.Repositories.Impls
             catch (Exception ex)
             {
                 throw new Exception($"Error in AcceptOrDenyRentDriver: {ex.Message}");
+            }
+        }
+
+        public async Task<object> GetRentDetailsWithTotalForOwner(DateTime startDate, DateTime endDate)
+        {
+            try
+            {
+                
+                var token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+                int userId = _tokenHelper.GetIdInHeader(token);
+                
+                if (userId == -1)
+                {
+                    throw new Exception("Invalid user ID from token.");
+                }
+
+                var vehicles = await _context.Vehicles
+                    .Where(v => v.VehicleOwner == userId)
+                    .Select(v => v.Id)
+                    .ToListAsync();
+
+                if (!vehicles.Any())
+                {
+                    throw new Exception("No vehicles found for this owner.");
+                }
+
+                var rentDetails = await (from hr in _context.HistoryRentDrivers
+                                         join pr in _context.PaymentRentDrivers on hr.HistoryId equals pr.HistoryRentDriverId
+                                         where vehicles.Contains((int)hr.VehicleId)
+                                               && pr.CreatedAt >= startDate
+                               && pr.CreatedAt <= endDate
+
+                                         select new
+                                         {
+                                             hr.DriverId,
+                                             pr.CreatedAt,
+                                             pr.Price
+                                         })
+                                         .ToListAsync();
+
+                decimal totalCost = (decimal)rentDetails.Sum(r => r.Price);
+
+                return new
+                {
+                    RentDetails = rentDetails,
+                    TotalCost = totalCost
+                };
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error fetching rent details for owner: {ex.Message}");
+                throw;
             }
         }
 
