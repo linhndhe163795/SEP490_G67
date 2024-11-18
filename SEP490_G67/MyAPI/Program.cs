@@ -41,6 +41,7 @@ builder.Services.AddScoped<IVehicleRepository, VehicleRepository>();
 builder.Services.AddScoped<IUserCancleTicketRepository, UserCancleTicketRepository>();
 builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
 builder.Services.AddScoped<IHistoryRentVehicleRepository, HistoryRentVehicleRepository>();
+builder.Services.AddScoped<IHistoryRentDriverRepository, HistoryRentDriverRepository>();
 
 //builder.Services.AddScoped<ITicketRepository, TicketRepository>();
 builder.Services.AddScoped<ITripDetailsRepository, TripDetailsRepository>();
