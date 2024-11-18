@@ -21,7 +21,7 @@ namespace MyAPI.Infrastructure.Interfaces
         Task<List<ResponeCancleTicketDTOs>> getListRequestCancle();
         Task updateStatusRequestCancleTicket(int requestId, int staffId);
 
-        Task<bool> CreateRequestRentVehicleAsync(RequestDetailForRentDriver rentVehicleAddDTO);
+        Task<bool> CreateRequestRentVehicleAsync(RentVehicleAddDTO rentVehicleAddDTO);
 
         Task<bool> CreateRequestRentDriverAsync(RequestDetailForRentDriver rentVehicleAddDTO);
 
