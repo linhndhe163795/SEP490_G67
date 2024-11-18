@@ -216,7 +216,7 @@ namespace MyAPI.Controllers
             try
             {
 
-                var isAdded = await _requestRepository.CreateRequestRentVehicleAsync(rentVehicleAddDTO);
+                var isAdded = await _requestRepository.CreateRequestRentDriverAsync(rentVehicleAddDTO);
                 return Ok(new { Message = "Vehicle rent added successfully.", VehicleRent = rentVehicleAddDTO });
 
             }
