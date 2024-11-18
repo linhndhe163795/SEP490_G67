@@ -47,7 +47,7 @@ namespace MyAPI.Controllers
                 return BadRequest("createTicket: " + ex.Message);
             }
         }
-       
+
         [Authorize(Roles = "Staff")]
         [HttpPost("createTicketFromDriver/{vehicleId}")]
         public async Task<IActionResult> creatTicketFromDriver([FromBody] TicketFromDriverDTOs ticketFromDriver, [FromForm] int vehicleId, int numberTicket)
@@ -151,6 +151,31 @@ namespace MyAPI.Controllers
             catch (Exception ex)
             {
                 return BadRequest(ex.Message);
+            }
+        }
+        [Authorize(Roles = "VehicleOwner, Staff")]
+        [HttpGet("RevenueTicket")]
+        public async Task<IActionResult> getRevenueTicket(int? vehicle, int? vehicleOwner)
+        {
+            try
+            {
+                string token = Request.Headers["Authorization"];
+                if (token.StartsWith("Bearer"))
+                {
+                    token = token.Substring("Bearer ".Length).Trim();
+                }
+                if (string.IsNullOrEmpty(token))
+                {
+                    return BadRequest("Token is required.");
+                }
+                var userId = _getInforFromToken.GetIdInHeader(token);
+                var respone = await _ticketRepository.getRevenueTicket(vehicle, vehicleOwner, userId);
+                return Ok(respone);
+
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
             }
         }
     }

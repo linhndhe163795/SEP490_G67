@@ -47,10 +47,10 @@ namespace MyAPI.Controllers
                 throw new Exception("GetListTrip: " + ex.Message);
             }
         }
+        // xe liên tỉnh
         [HttpGet("searchTrip/startPoint/endPoint/time")]
-        public async Task<IActionResult> searchTrip(string startPoint,  string endPoint, DateTime time)
+        public async Task<IActionResult> searchTrip(string startPoint, string endPoint, DateTime time)
         {
-
             try
             {
                 var timeonly = time.ToString("HH:ss:mm");
@@ -129,13 +129,12 @@ namespace MyAPI.Controllers
         {
             using (var workbook = new XLWorkbook())
             {
-                // Tạo sheet cho Trip
                 var tripSheet = workbook.Worksheets.Add("TripDetail");
                 tripSheet.Cell(1, 1).Value = "Point Start Details";
                 tripSheet.Cell(1, 2).Value = "Point End Details";
                 tripSheet.Cell(1, 3).Value = "Time Start Details";
                 tripSheet.Cell(1, 4).Value = "Time End Details";
-              
+
                 tripSheet.Cell(2, 1).Value = "Bến Xe Mỹ Đình";
                 tripSheet.Cell(2, 2).Value = "Bến Xe Ninh Bình";
                 tripSheet.Cell(2, 3).Value = "08:00:00";
@@ -161,28 +160,28 @@ namespace MyAPI.Controllers
                 }
             }
         }
-            [Authorize(Roles ="Staff")]
-            [HttpPost("importTrip")]
-            public async Task<IActionResult> importTrip(IFormFile fileExcelTrip)
-            {
+        [Authorize(Roles = "Staff")]
+        [HttpPost("importTrip/{typeOfTrip}")]
+        public async Task<IActionResult> importTrip(IFormFile fileExcelTrip, int typeOfTrip)
+        {
 
-                string token = Request.Headers["Authorization"];
-                if (token.StartsWith("Bearer"))
-                {
-                    token = token.Substring("Bearer ".Length).Trim();
-                }
-                if (string.IsNullOrEmpty(token))
-                {
-                    return BadRequest("Token is required.");
-                }
-                var staffId = _getInforFromToken.GetIdInHeader(token);
-                var (validEntries, invalidEntries) = await _serviceImport.ImportTrip(fileExcelTrip, staffId);
-                return Ok(new
-                {
-                    validEntries,
-                    invalidEntries
-                });
+            string token = Request.Headers["Authorization"];
+            if (token.StartsWith("Bearer"))
+            {
+                token = token.Substring("Bearer ".Length).Trim();
             }
+            if (string.IsNullOrEmpty(token))
+            {
+                return BadRequest("Token is required.");
+            }
+            var staffId = _getInforFromToken.GetIdInHeader(token);
+            var (validEntries, invalidEntries) = await _serviceImport.ImportTrip(fileExcelTrip, staffId, typeOfTrip);
+            return Ok(new
+            {
+                validEntries,
+                invalidEntries
+            });
+        }
         [Authorize(Roles = "Staff")]
         [HttpPost("confirmImportTrip")]
         public async Task<IActionResult> ConfirmImportTrip([FromBody] List<TripImportDTO> validEntries)
@@ -322,7 +321,7 @@ namespace MyAPI.Controllers
         }
 
         [HttpGet("searchTripForConvenient/{startPoint}/{endPoint}/{typeOfTrip}")]
-        public async Task<IActionResult> SearchTripForConvenient(string startPoint, string endPoint,int typeOfTrip)
+        public async Task<IActionResult> SearchTripForConvenient(string startPoint, string endPoint, int typeOfTrip)
         {
             try
             {

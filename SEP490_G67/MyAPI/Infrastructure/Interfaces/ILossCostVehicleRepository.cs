@@ -9,7 +9,7 @@ namespace MyAPI.Infrastructure.Interfaces
         Task AddLossCost(LossCostAddDTOs lossCostAddDTOs, int userID);
         Task DeleteLossCost(int id);
         Task<List<AddLostCostVehicleDTOs>> GetAllLostCost();
-        Task<TotalLossCost> GetLossCostVehicleByDate(int? vehicleId, DateTime? startDate, DateTime? endDate);
+        Task<TotalLossCost> GetLossCostVehicleByDate(int? vehicleId, DateTime? startDate, DateTime? endDate, int? vehicel_owner_id);
         Task UpdateLossCostById(int id, LossCostUpdateDTO lossCostupdateDTOs, int userId);
 
         //Task AddLossCostVehicle(AddLostCostVehicleDTOs lossCost, int VehicleId);

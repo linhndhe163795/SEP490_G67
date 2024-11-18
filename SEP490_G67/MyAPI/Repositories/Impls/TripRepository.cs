@@ -1,12 +1,5 @@
 ﻿using AutoMapper;
-using DocumentFormat.OpenXml.Drawing.Charts;
-using DocumentFormat.OpenXml.InkML;
-using DocumentFormat.OpenXml.VariantTypes;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Internal;
-using MyAPI.DTOs.DriverDTOs;
 using MyAPI.DTOs.TripDTOs;
 using MyAPI.DTOs.VehicleDTOs;
 using MyAPI.DTOs.VehicleTripDTOs;
@@ -43,7 +36,6 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception("GetListTrip: " + ex.Message);
             }
         }
-
         public async Task<List<TripVehicleDTO>> SreachTrip(string startPoint, string endPoint, string? time)
         {
             try
@@ -55,7 +47,12 @@ namespace MyAPI.Repositories.Impls
                                         join v in _context.Vehicles
                                         on tv.VehicleId equals v.Id
                                         join u in _context.Users on v.VehicleOwner equals u.Id
-                                        where t.PointStart.Contains(startPoint) && t.PointEnd.Contains(endPoint) && t.StartTime >= timeSpan && t.Status == true && v.Status == true
+                                        where t.PointStart.Contains(startPoint) &&
+                                            t.PointEnd.Contains(endPoint) &&
+                                            t.StartTime >= timeSpan &&
+                                            t.TypeOfTrip == Constant.CHUYEN_DI_LIEN_TINH &&
+                                            t.Status == true &&
+                                            v.Status == true
                                         group new { t, v, u } by new
                                         {
                                             t.Id,
@@ -110,6 +107,27 @@ namespace MyAPI.Repositories.Impls
                 };
                 _context.Add(addTrip);
                 await _context.SaveChangesAsync();
+                List<TripDetail> td = new List<TripDetail>();
+                var pointEndDetails = trip.PointEndDetail.First();
+                var pointEndDetail = pointEndDetails.Key;
+                var timeEndDetail = pointEndDetails.Value;
+                foreach(var pointStart in trip.PointStartDetail)
+                {
+                    var PointStartDetails = pointStart.Key;
+                    var TimeStartDetails = pointStart.Value;
+                    var tripDetail = new TripDetail
+                    {
+                        PointStartDetails = PointStartDetails,
+                        TimeStartDetils = TimeStartDetails,
+                        PointEndDetails = pointEndDetail,
+                        TimeEndDetails = timeEndDetail,
+                        TripId = addTrip.Id,
+                        Status = true
+                    };
+                    td.Add(tripDetail);
+                }
+                await _context.AddRangeAsync(td);
+                await _context.SaveChangesAsync();
                 var vechicleById = await _context.Vehicles.FirstOrDefaultAsync(x => x.Id == vehicleId);
                 if (vechicleById != null)
                 {
@@ -132,7 +150,6 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception("addTrips: " + ex.Message, ex);
             }
         }
-
         public async Task UpdateTripById(int tripId, TripDTO trip, int userId)
         {
             try
@@ -162,7 +179,6 @@ namespace MyAPI.Repositories.Impls
             }
 
         }
-
         public async Task updateStatusTrip(int id, int userId)
         {
             try
@@ -193,54 +209,50 @@ namespace MyAPI.Repositories.Impls
                 List<TripDetail> td = new List<TripDetail>();
 
                 var tripMapper = _mapper.Map<List<Trip>>(validEntries);
-                //_context.Trips.AddRange(tripMapper);
-                //await _context.SaveChangesAsync();
+                _context.Trips.AddRange(tripMapper);
+                await _context.SaveChangesAsync();
 
                 for (int i = 0; i < tripMapper.Count; i++)
                 {
-                    //for (int j = 0; j < validEntries[i].PointStartDetail.Count; j++)
-                    //{
-                    //    string pointStartDetails = validEntries[i].PointStartDetail[j];
-                    //    string pointEndDetails = validEntries[i].pointEndDetail;
-                    //    var tripDetails = new TripDetail
-                    //    {
-                    //        PointEndDetails = pointEndDetails,
-                    //        PointStartDetails = pointStartDetails,
-                    //        TimeStartDetils = validEntries[i].StartTime
-                    //    };
-                    //}
-                    foreach (var point in validEntries[i].PointStartDetail)
+                    var pointEndDetail = validEntries[i].PointEndDetail.First();
+                    var PointEndDetails = pointEndDetail.Key;
+                    var TimeEndDetails = pointEndDetail.Value;
+                    foreach (var pointStart in validEntries[i].PointStartDetail)
                     {
+
+                        var PointStartDetails = pointStart.Key; 
+                        var TimeStartDetails = pointStart.Value;
                         var tripDetail = new TripDetail
                         {
-                            PointStartDetails = point.Key,
-                            //PointEndDetails = validEntries[i].pointEndDetail.Key,
-                            TimeStartDetils = point.Value // Chuyển đổi giá trị từ Dictionary thành TimeSpan
-                        };
+                            PointStartDetails = PointStartDetails,
+                            TimeStartDetils = TimeStartDetails,
+                            PointEndDetails = PointEndDetails,
+                            TimeEndDetails = TimeEndDetails,
+                            TripId = tripMapper[i].Id,
+                            Status = true
+                        }; 
                         td.Add(tripDetail);
-                        var trip = tripMapper[i];
-                        int newTripId = trip.Id;
-                        string licensePlate = validEntries[i].LicensePlate;
-
-                        var vehicle = await _context.Vehicles.FirstOrDefaultAsync(v => v.LicensePlate == licensePlate);
-
-                        if (vehicle != null)
-                        {
-                            int vehicleId = vehicle.Id;
-                            var vehicleTrip = new VehicleTrip
-                            {
-                                TripId = newTripId,
-                                VehicleId = vehicleId
-                            };
-                            vt.Add(vehicleTrip);
-                        }
-
                     }
-                    
+                    string licensePlate = validEntries[i].LicensePlate;
+
+                    var vehicle = await _context.Vehicles.FirstOrDefaultAsync(v => v.LicensePlate == licensePlate);
+                    // assgin vehicle
+                    if (vehicle != null)
+                    {
+                        int vehicleId = vehicle.Id;
+                        var vehicleTrip = new VehicleTrip
+                        {
+                            TripId = tripMapper[i].Id,
+                            VehicleId = vehicleId,  
+                            CreatedAt = tripMapper[i].CreatedAt,
+                            CreatedBy = tripMapper[i].CreatedBy,
+                        };
+                        vt.Add(vehicleTrip);
+                    }
 
                 }
-
                 await _context.VehicleTrips.AddRangeAsync(vt);
+                //await _context.TripDetails.AddRangeAsync(td);
                 await _context.SaveChangesAsync();
             }
             catch (Exception ex)
@@ -254,18 +266,18 @@ namespace MyAPI.Repositories.Impls
             try
             {
                 var result = await (from t in _context.Trips
-                             join vt in _context.VehicleTrips on t.Id equals vt.TripId into tripVehicle
-                             from vt in tripVehicle.DefaultIfEmpty()
-                             join v in _context.Vehicles on vt.VehicleId equals v.Id into vehicleGroup
-                             from v in vehicleGroup.DefaultIfEmpty()
-                             where vt == null 
-                             select t
+                                    join vt in _context.VehicleTrips on t.Id equals vt.TripId into tripVehicle
+                                    from vt in tripVehicle.DefaultIfEmpty()
+                                    join v in _context.Vehicles on vt.VehicleId equals v.Id into vehicleGroup
+                                    from v in vehicleGroup.DefaultIfEmpty()
+                                    where vt == null
+                                    select t
                              ).ToListAsync();
 
                 var listTripNoVehicleMapper = _mapper.Map<List<TripDTO>>(result);
                 return listTripNoVehicleMapper;
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 throw new Exception(ex.Message);
             }
@@ -288,8 +300,8 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception(ex.Message);
             }
         }
-      
-        
+
+
 
         public async Task<(List<Trip>, List<string>)> ImportExcel(Stream excelStream)
         {
@@ -301,7 +313,7 @@ namespace MyAPI.Repositories.Impls
             {
                 throw new Exception("Invalid user ID from token.");
             }
-            var correctTrips = new List<Trip>();    
+            var correctTrips = new List<Trip>();
             var errorAdd = new List<string>();
 
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
@@ -311,7 +323,7 @@ namespace MyAPI.Repositories.Impls
                 var worksheet = package.Workbook.Worksheets[0];
                 int rowCount = worksheet.Dimension.Rows;
 
-                for(int row = 2; row <= rowCount; row++)
+                for (int row = 2; row <= rowCount; row++)
                 {
                     try
                     {
@@ -324,7 +336,7 @@ namespace MyAPI.Repositories.Impls
                         var statusText = worksheet.Cells[row, 7].Text;
                         var typeOfTripText = worksheet.Cells[row, 8].Text;
 
-                        if(string.IsNullOrEmpty(name))
+                        if (string.IsNullOrEmpty(name))
                         {
                             errorAdd.Add($"Row{row}: Name is required");
                             continue;
@@ -348,7 +360,7 @@ namespace MyAPI.Repositories.Impls
                             continue;
                         }
 
-                        if(!decimal.TryParse(priceText, out decimal price) || price < 0)
+                        if (!decimal.TryParse(priceText, out decimal price) || price < 0)
                         {
                             errorAdd.Add($"Row{row}: Price invalid or not negative");
                             continue;
@@ -356,7 +368,7 @@ namespace MyAPI.Repositories.Impls
 
                         bool? status = statusText.ToLower() switch { "true" => true, "false" => false, _ => (bool?)null };
 
-                        if(!int.TryParse(typeOfTripText, out int typeOfTrip))
+                        if (!int.TryParse(typeOfTripText, out int typeOfTrip))
                         {
                             errorAdd.Add($"Row{row}: Invalid typeOfTripText");
                             continue;
@@ -367,7 +379,7 @@ namespace MyAPI.Repositories.Impls
                         {
                             Name = name,
                             StartTime = startTime,
-                            Description = description, 
+                            Description = description,
                             Price = price,
                             PointStart = pointStart,
                             PointEnd = pointEnd,
@@ -381,7 +393,8 @@ namespace MyAPI.Repositories.Impls
 
                         correctTrips.Add(tripAdd);
 
-                    }catch (Exception ex)
+                    }
+                    catch (Exception ex)
                     {
                         errorAdd.Add($"Row {row}: {ex.Message}");
                     }
@@ -419,7 +432,7 @@ namespace MyAPI.Repositories.Impls
             if (price == 0 || price == null)
                 throw new Exception("Start or end point or typeOfTrip is invalid!");
 
-            return price.Value; 
+            return price.Value;
         }
 
     }

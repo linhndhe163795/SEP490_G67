@@ -141,8 +141,6 @@ namespace MyAPI.Repositories.Impls
         {
             try
             {
-
-
                 var token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
                 int userId = _tokenHelper.GetIdInHeader(token);
 
@@ -223,10 +221,6 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception($"historyRentVehicleListDTOs { ex.Message}");
             }
         }
-
-       
-
-
 
         public async Task<bool> sendMailRequestRentVehicle(string description)
         {
