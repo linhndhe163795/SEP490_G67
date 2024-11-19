@@ -154,8 +154,8 @@ namespace MyAPI.Controllers
             }
         }
         [Authorize(Roles = "VehicleOwner, Staff")]
-        [HttpGet("RevenueTicket")]
-        public async Task<IActionResult> getRevenueTicket(int? vehicle, int? vehicleOwner)
+        [HttpGet("RevenueTicket/{startTime}/{endTime}")]
+        public async Task<IActionResult> getRevenueTicket(DateTime startTime, DateTime endTime, int? vehicle, int? vehicleOwner)
         {
             try
             {
@@ -169,7 +169,7 @@ namespace MyAPI.Controllers
                     return BadRequest("Token is required.");
                 }
                 var userId = _getInforFromToken.GetIdInHeader(token);
-                var respone = await _ticketRepository.getRevenueTicket(vehicle, vehicleOwner, userId);
+                var respone = await _ticketRepository.getRevenueTicket(startTime, endTime, vehicle, vehicleOwner, userId);
                 return Ok(respone);
 
             }

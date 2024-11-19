@@ -327,7 +327,7 @@ namespace MyAPI.Repositories.Impls
             }
         }
 
-        public async Task<RevenueTicketDTO> getRevenueTicket(int? vehicleId, int? vehicleOwner, int userId)
+        public async Task<RevenueTicketDTO> getRevenueTicket(DateTime startTime, DateTime endTime, int? vehicleId, int? vehicleOwner, int userId)
         {
             try
             {
@@ -338,11 +338,11 @@ namespace MyAPI.Repositories.Impls
                 }
                 if (IsUserRole(getInforUser, "VehicleOwner"))
                 {
-                    return await GetRevenueForVehicleOwner(vehicleId, userId);
+                    return await GetRevenueForVehicleOwner(startTime, endTime, vehicleId, userId);
                 }
                 if (IsUserRole(getInforUser, "Staff"))
                 {
-                    return await GetRevenueForStaff(vehicleId, vehicleOwner, userId);
+                    return await GetRevenueForStaff(startTime, endTime, vehicleId, vehicleOwner, userId);
                 }
                 throw new Exception("User role is not supported.");
             }
@@ -351,11 +351,11 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception(ex.Message);
             }
         }
-        private bool IsUserRole(User user, string roleName)
+        public bool IsUserRole(User user, string roleName)
         {
             return user.UserRoles.Any(ur => ur.Role.RoleName == roleName);
         }
-        private async Task<RevenueTicketDTO> GetRevenueForVehicleOwner(int? vehicleId, int userId)
+        private async Task<RevenueTicketDTO> GetRevenueForVehicleOwner(DateTime startTime, DateTime endTime, int? vehicleId, int userId)
         {
             var query = _context.Tickets.Include(x => x.Vehicle).Where(x => x.Vehicle.VehicleOwner == userId);
             if (vehicleId.HasValue && vehicleId != 0)
@@ -364,9 +364,9 @@ namespace MyAPI.Repositories.Impls
             }
             return await GetRevenueTicketDTO(query);
         }
-        private async Task<RevenueTicketDTO> GetRevenueForStaff(int? vehicleId, int? vehicleOwner, int userId)
+        private async Task<RevenueTicketDTO> GetRevenueForStaff(DateTime startTime, DateTime endTime, int? vehicleId, int? vehicleOwner, int userId)
         {
-            var query = _context.Tickets.Include(x => x.Vehicle).AsQueryable();
+            var query = _context.Tickets.Include(x => x.Vehicle).Where(x => x.CreatedAt >= startTime && x.CreatedAt <= endTime);
             if (vehicleId.HasValue && vehicleId != 0)
             {
                 query = query.Where(x => x.VehicleId == vehicleId);
@@ -374,6 +374,10 @@ namespace MyAPI.Repositories.Impls
             if (vehicleOwner.HasValue && vehicleOwner != 0)
             {
                 query = query.Where(x => x.Vehicle.VehicleOwner == vehicleOwner);
+            }
+            if (!vehicleId.HasValue && vehicleId == 0 && !vehicleOwner.HasValue && vehicleOwner == 0)
+            {
+                query = query;
             }
             return await GetRevenueTicketDTO(query);
         }

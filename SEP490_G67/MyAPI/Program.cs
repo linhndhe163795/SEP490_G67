@@ -53,6 +53,7 @@ builder.Services.AddAutoMapper(typeof(AutoMappings));
 
 
 builder.Services.AddScoped<HashPassword>();
+builder.Services.AddScoped<RevenueRepository>();
 builder.Services.AddScoped<SendMail>();
 builder.Services.AddScoped<Jwt>();
 builder.Services.AddScoped<GetInforFromToken>();
