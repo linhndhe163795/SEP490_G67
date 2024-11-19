@@ -8,6 +8,8 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using MyAPI.DTOs.RequestDTOs;
 using MyAPI.Helper;
+using DocumentFormat.OpenXml.Wordprocessing;
+using MyAPI.DTOs.PaymentRentDriver;
 
 namespace MyAPI.Repositories.Impls
 {
@@ -134,56 +136,94 @@ namespace MyAPI.Repositories.Impls
             }
         }
 
-        public async Task<object> GetRentDetailsWithTotalForOwner(DateTime startDate, DateTime endDate)
+        public async Task<TotalPayementRentDriver> GetRentDetailsWithTotalForOwner(DateTime startDate, DateTime endDate, int? vehicleId, int? vehicleOwnerId)
         {
             try
             {
-                
                 var token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
                 int userId = _tokenHelper.GetIdInHeader(token);
-                
+
                 if (userId == -1)
                 {
                     throw new Exception("Invalid user ID from token.");
                 }
-
-                var vehicles = await _context.Vehicles
-                    .Where(v => v.VehicleOwner == userId)
-                    .Select(v => v.Id)
-                    .ToListAsync();
-
-                if (!vehicles.Any())
+                var getInforUser = _context.Users.Include(x => x.UserRoles).ThenInclude(x => x.Role).Where(x => x.Id == userId).FirstOrDefault();
+                if (IsUserRole(getInforUser, "VehicleOwner"))
                 {
-                    throw new Exception("No vehicles found for this owner.");
+                    return await GetRentDriverTotalForOwner(startDate, endDate, vehicleId, userId);
                 }
-
-                var rentDetails = await (from hr in _context.HistoryRentDrivers
-                                         join pr in _context.PaymentRentDrivers on hr.HistoryId equals pr.HistoryRentDriverId
-                                         where vehicles.Contains((int)hr.VehicleId)
-                                               && pr.CreatedAt >= startDate
-                               && pr.CreatedAt <= endDate
-
-                                         select new
-                                         {
-                                             hr.DriverId,
-                                             pr.CreatedAt,
-                                             pr.Price
-                                         })
-                                         .ToListAsync();
-
-                decimal totalCost = (decimal)rentDetails.Sum(r => r.Price);
-
-                return new
+                else if (IsUserRole(getInforUser, "Staff"))
                 {
-                    RentDetails = rentDetails,
-                    TotalCost = totalCost
-                };
+                    return await GetRentDriverTotalForStaff(startDate, endDate, vehicleId, vehicleOwnerId);
+                }
+                else
+                {
+                    return await GetRentDriverTotalForDriver(startDate, endDate, userId);
+                }
+                
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error fetching rent details for owner: {ex.Message}");
                 throw;
             }
+        }
+        public async Task<TotalPayementRentDriver> GetRentDriver(IQueryable<PaymentRentDriver> query)
+        {
+            var rentDetails = await query.Select(x => new PaymentRentDriverDTO
+            {
+                Price = x.Price,
+                DriverId = x.DriverId,
+                VehicleId = x.VehicleId,
+                CreatedAt = x.CreatedAt,
+            }).ToListAsync();
+            var total = query.Sum(x => x.Price);
+            var combine = new TotalPayementRentDriver
+            {
+                Total = total,
+                PaymentRentDriverDTOs = rentDetails
+            };
+            return combine;
+        }
+        private Task<TotalPayementRentDriver> GetRentDriverTotalForOwner(DateTime startDate, DateTime endDate, int? vehicleId, int? vehicleOwner)
+        {
+            IQueryable<PaymentRentDriver> query = _context.PaymentRentDrivers.Where(x => x.CreatedAt >= startDate && x.CreatedAt <= endDate);
+            if (vehicleId != 0 && vehicleId.HasValue)
+            {
+                query = query.Where(x => x.VehicleId == vehicleId);
+            }
+            else
+            {
+                query = query.Include(x => x.HistoryRentDriver).ThenInclude(hrd => hrd.Vehicle).Where(x => x.HistoryRentDriver.Vehicle.VehicleOwner == vehicleOwner);
+            }
+            return GetRentDriver(query);
+
+        }
+        private Task<TotalPayementRentDriver> GetRentDriverTotalForStaff(DateTime startDate, DateTime endDate, int? vehicleId, int? vehicleOwner)
+        {
+            IQueryable<PaymentRentDriver> query = _context.PaymentRentDrivers.Where(x => x.CreatedAt >= startDate && x.CreatedAt <= endDate);
+            if (vehicleId != 0 && vehicleId.HasValue)
+            {
+                query = query.Where(x => x.VehicleId == vehicleId);
+            }
+            else if (vehicleOwner != 0 && vehicleOwner.HasValue)
+            {
+                query = query.Include(x => x.HistoryRentDriver).ThenInclude(hrd => hrd.Vehicle).Where(x => x.HistoryRentDriver.Vehicle.VehicleOwner == vehicleOwner);
+            }
+            return GetRentDriver(query);
+        }
+        private Task<TotalPayementRentDriver> GetRentDriverTotalForDriver(DateTime startDate, DateTime endDate, int driverId)
+        {
+            IQueryable<PaymentRentDriver> query = _context.PaymentRentDrivers.Where(x => x.CreatedAt >= startDate && x.CreatedAt <= endDate);
+            if(driverId != 0)
+            {
+                query = query.Where(x => x.DriverId == driverId);
+            }
+            return GetRentDriver(query);
+        }
+        private bool IsUserRole(User user, string roleName)
+        {
+            return user.UserRoles.Any(ur => ur.Role.RoleName == roleName);
         }
 
         public async Task<IEnumerable<HistoryRentDriverListDTOs>> GetListHistoryRentDriver()

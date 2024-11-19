@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MyAPI.DTOs;
 using MyAPI.DTOs.DriverDTOs;
+using MyAPI.DTOs.UserDTOs;
 using MyAPI.Helper;
 using MyAPI.Infrastructure.Interfaces;
 using MyAPI.Models;
@@ -13,12 +14,13 @@ namespace MyAPI.Repositories.Impls
         private readonly SEP490_G67Context _context;
         private readonly ITypeOfDriverRepository _typeOfDriverRepository;
         private readonly SendMail _sendMail;
-
-        public DriverRepository(SEP490_G67Context context, ITypeOfDriverRepository typeOfDriverRepository, SendMail sendMail) : base(context)
+        private readonly HashPassword _hashPassword;
+        public DriverRepository(SEP490_G67Context context, ITypeOfDriverRepository typeOfDriverRepository, SendMail sendMail, HashPassword hashPassword) : base(context)
         {
             _context = context;
             _typeOfDriverRepository = typeOfDriverRepository;
             _sendMail = sendMail;
+            _hashPassword = hashPassword;
         }
 
         public async Task<Driver> GetDriverWithVehicle(int id)
@@ -132,7 +134,39 @@ namespace MyAPI.Repositories.Impls
         }
     }
 
+        public async Task<bool> checkLogin(LoginDriverDTO login)
+        {
+            try
+            {
+                var hashPassword = _hashPassword.HashMD5Password(login.Password);
+                var driver = await _context.Drivers.FirstOrDefaultAsync((x => (x.UserName == login.UserName || x.Email == login.Email) && x.Password == hashPassword));
+                return driver != null ? true : false;
 
+            }
+            catch (Exception ex) 
+            {
+                throw new Exception(ex.Message);
+            }
+        }
 
-}
+        public async Task<DriverLoginRespone> getDriverLogin(LoginDriverDTO login)
+        {
+            try
+            {
+                var hashPassword = _hashPassword.HashMD5Password(login.Password);
+                var driver = await _context.Drivers.FirstOrDefaultAsync((x => (x.UserName == login.UserName || x.Email == login.Email) && x.Password == hashPassword));
+                var driverLoginRespone = new DriverLoginRespone
+                {
+                    Email = driver.Email,
+                    Id = driver.Id,
+                    RoleName = "Driver"
+                };
+                return driverLoginRespone;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+    }
 }

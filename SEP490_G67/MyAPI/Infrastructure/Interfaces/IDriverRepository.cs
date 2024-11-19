@@ -16,6 +16,7 @@ namespace MyAPI.Infrastructure.Interfaces
         Task<IEnumerable<Driver>> GetDriversWithoutVehicleAsync();
 
         Task SendEmailToDriversWithoutVehicle(int price);
-
+        Task<bool> checkLogin(LoginDriverDTO login);
+        Task<DriverLoginRespone> getDriverLogin(LoginDriverDTO login);
     }
 }
