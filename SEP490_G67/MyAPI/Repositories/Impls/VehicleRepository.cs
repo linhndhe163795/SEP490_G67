@@ -99,7 +99,6 @@ namespace MyAPI.Repositories.Impls
                 {
                     var requestDTO = new RequestDTO
                     {
-                        UserId = userId,
                         TypeId = 1,
                         Description = "Yêu cầu thêm xe",
                         Note = "Đang chờ xác nhận",
