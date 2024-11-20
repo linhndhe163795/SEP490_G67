@@ -42,6 +42,7 @@ builder.Services.AddScoped<IUserCancleTicketRepository, UserCancleTicketReposito
 builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
 builder.Services.AddScoped<IHistoryRentVehicleRepository, HistoryRentVehicleRepository>();
 builder.Services.AddScoped<IHistoryRentDriverRepository, HistoryRentDriverRepository>();
+builder.Services.AddScoped<IPaymentRentVehicleRepository, PaymentRentVehicleRepository>();
 
 //builder.Services.AddScoped<ITicketRepository, TicketRepository>();
 builder.Services.AddScoped<ITripDetailsRepository, TripDetailsRepository>();
@@ -52,6 +53,7 @@ builder.Services.AddAutoMapper(typeof(AutoMappings));
 
 
 builder.Services.AddScoped<HashPassword>();
+builder.Services.AddScoped<RevenueRepository>();
 builder.Services.AddScoped<SendMail>();
 builder.Services.AddScoped<Jwt>();
 builder.Services.AddScoped<GetInforFromToken>();

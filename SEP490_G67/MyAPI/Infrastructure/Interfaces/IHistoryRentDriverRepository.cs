@@ -1,4 +1,5 @@
 ﻿using MyAPI.DTOs.HistoryRentDriverDTOs;
+using MyAPI.DTOs.PaymentRentDriver;
 
 namespace MyAPI.Infrastructure.Interfaces
 {
@@ -7,6 +8,7 @@ namespace MyAPI.Infrastructure.Interfaces
         Task<IEnumerable<HistoryRentDriverListDTOs>> GetListHistoryRentDriver();
         Task<bool> AcceptOrDenyRentDriver(int requestId, bool choose);
 
-        Task<object> GetRentDetailsWithTotalForOwner(DateTime startDate, DateTime endDate);
+        Task<TotalPayementRentDriver> GetRentDetailsWithTotalForOwner(DateTime startDate, DateTime endDate, int? vehicleId, int? vehicleOwnerId);
+
     }
 }

@@ -47,10 +47,10 @@ namespace MyAPI.Controllers
                 throw new Exception("GetListTrip: " + ex.Message);
             }
         }
+        // xe liên tỉnh
         [HttpGet("searchTrip/startPoint/endPoint/time")]
-        public async Task<IActionResult> searchTrip(string startPoint,  string endPoint, DateTime time)
+        public async Task<IActionResult> searchTrip(string startPoint, string endPoint, DateTime time)
         {
-
             try
             {
                 var timeonly = time.ToString("HH:ss:mm");
@@ -94,95 +94,45 @@ namespace MyAPI.Controllers
         [HttpGet("download_template_trip")]
         public IActionResult DownloadTemplateTrip()
         {
-            using (var workbook = new XLWorkbook())
+            var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "templates", "TemplateTrip.xlsx");
+            if
+                (!System.IO.File.Exists(filePath))
             {
-                // Tạo sheet cho Trip
-                var tripSheet = workbook.Worksheets.Add("Trip");
-                tripSheet.Cell(1, 1).Value = "name";
-                tripSheet.Cell(1, 2).Value = "start_time";
-                tripSheet.Cell(1, 3).Value = "description";
-                tripSheet.Cell(1, 4).Value = "price";
-                tripSheet.Cell(1, 5).Value = "point_start";
-                tripSheet.Cell(1, 6).Value = "point_end";
-                tripSheet.Cell(2, 1).Value = "Trip to Ninh Bình";
-                tripSheet.Cell(2, 2).Value = "08:00:00";
-                tripSheet.Cell(2, 3).Value = "Mỹ Đình - Ninh Bình";
-                tripSheet.Cell(2, 4).Value = "80000";
-                tripSheet.Cell(2, 5).Value = "Mỹ Đình";
-                tripSheet.Cell(2, 6).Value = "Ninh Bình";
-                var tripHeaderRow = tripSheet.Row(1);
-                tripHeaderRow.Style.Font.Bold = true;
-                tripHeaderRow.Style.Fill.BackgroundColor = XLColor.Gray;
-                tripHeaderRow.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
-                using (var stream = new MemoryStream())
+                return NotFound();
+            }
+            byte[] fileBytes;
+            using (var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read))
+            {
+                using (var memoryStream = new MemoryStream())
                 {
-                    workbook.SaveAs(stream);
-                    stream.Seek(0, SeekOrigin.Begin);
-
-                    var content = stream.ToArray();
-                    return File(content, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "TemplateDataTrip.xlsx");
+                    stream.CopyTo(memoryStream);
+                    fileBytes = memoryStream.ToArray();
                 }
+                return File(fileBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "TemplateDataTrip.xlsx");
             }
         }
-        [HttpGet("download_template_tripDetails")]
-        public IActionResult DownloadTemplateTripDetails()
+        [Authorize(Roles = "Staff")]
+        [HttpPost("importTrip/{typeOfTrip}")]
+        public async Task<IActionResult> importTrip(IFormFile fileExcelTrip, int typeOfTrip)
         {
-            using (var workbook = new XLWorkbook())
+
+            string token = Request.Headers["Authorization"];
+            if (token.StartsWith("Bearer"))
             {
-                // Tạo sheet cho Trip
-                var tripSheet = workbook.Worksheets.Add("TripDetail");
-                tripSheet.Cell(1, 1).Value = "Point Start Details";
-                tripSheet.Cell(1, 2).Value = "Point End Details";
-                tripSheet.Cell(1, 3).Value = "Time Start Details";
-                tripSheet.Cell(1, 4).Value = "Time End Details";
-              
-                tripSheet.Cell(2, 1).Value = "Bến Xe Mỹ Đình";
-                tripSheet.Cell(2, 2).Value = "Bến Xe Ninh Bình";
-                tripSheet.Cell(2, 3).Value = "08:00:00";
-                tripSheet.Cell(2, 4).Value = "11:00:00";
-
-                tripSheet.Cell(3, 1).Value = "Big C Thăng Long";
-                tripSheet.Cell(3, 2).Value = "Bến Xe Ninh Bình";
-                tripSheet.Cell(3, 3).Value = "08:15:00";
-                tripSheet.Cell(3, 4).Value = "11:00:00";
-
-                var tripHeaderRow = tripSheet.Row(1);
-                tripHeaderRow.Style.Font.Bold = true;
-                tripHeaderRow.Style.Fill.BackgroundColor = XLColor.Gray;
-                tripHeaderRow.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
-                tripSheet.Columns().AdjustToContents();
-                using (var stream = new MemoryStream())
-                {
-                    workbook.SaveAs(stream);
-                    stream.Seek(0, SeekOrigin.Begin);
-
-                    var content = stream.ToArray();
-                    return File(content, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "TemplateDataTripDetails.xlsx");
-                }
+                token = token.Substring("Bearer ".Length).Trim();
             }
+            if (string.IsNullOrEmpty(token))
+            {
+                return BadRequest("Token is required.");
+            }
+            var staffId = _getInforFromToken.GetIdInHeader(token);
+            var (validEntries, invalidEntries) = await _serviceImport.ImportTrip(fileExcelTrip, staffId, typeOfTrip);
+            return Ok(new
+            {
+                validEntries,
+                invalidEntries
+            });
         }
-            [Authorize(Roles ="Staff")]
-            [HttpPost("importTrip")]
-            public async Task<IActionResult> importTrip(IFormFile fileExcelTrip)
-            {
-
-                string token = Request.Headers["Authorization"];
-                if (token.StartsWith("Bearer"))
-                {
-                    token = token.Substring("Bearer ".Length).Trim();
-                }
-                if (string.IsNullOrEmpty(token))
-                {
-                    return BadRequest("Token is required.");
-                }
-                var staffId = _getInforFromToken.GetIdInHeader(token);
-                var (validEntries, invalidEntries) = await _serviceImport.ImportTrip(fileExcelTrip, staffId);
-                return Ok(new
-                {
-                    validEntries,
-                    invalidEntries
-                });
-            }
         [Authorize(Roles = "Staff")]
         [HttpPost("confirmImportTrip")]
         public async Task<IActionResult> ConfirmImportTrip([FromBody] List<TripImportDTO> validEntries)
@@ -322,7 +272,7 @@ namespace MyAPI.Controllers
         }
 
         [HttpGet("searchTripForConvenient/{startPoint}/{endPoint}/{typeOfTrip}")]
-        public async Task<IActionResult> SearchTripForConvenient(string startPoint, string endPoint,int typeOfTrip)
+        public async Task<IActionResult> SearchTripForConvenient(string startPoint, string endPoint, int typeOfTrip)
         {
             try
             {

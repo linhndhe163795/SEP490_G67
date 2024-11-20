@@ -23,22 +23,12 @@ namespace MyAPI.Controllers
             _mapper = mapper;
         }
         [HttpGet("lossCostCar/vehicleId/startDate/endDate")]
-        public async Task<IActionResult> lossCostVehicleByDate(int? vehicleId, DateTime? startDate, DateTime? endDate)
+        public async Task<IActionResult> lossCostVehicleByDate(int? vehicleId, DateTime? startDate, DateTime? endDate, int? vehicleOwnerId)
         {
             try
             {
-                if (vehicleId == null && startDate == null && endDate == null)
-                {
-                    var listLossCost = await _lossCostVehicleRepository.GetAllLostCost();
-                    return Ok(listLossCost);
-                }
-                else
-                {
-                    var listLostCostByDate = await _lossCostVehicleRepository.GetLossCostVehicleByDate(vehicleId, startDate, endDate);
-                    return Ok(listLostCostByDate);
-                }
-
-
+                var listLossCost = await _lossCostVehicleRepository.GetAllLostCost();
+                return Ok(listLossCost);
             }
             catch (Exception ex)
             {
@@ -105,6 +95,29 @@ namespace MyAPI.Controllers
             catch (Exception ex)
             {
                 return BadRequest("deleteCostById: " + ex.Message);
+            }
+        }
+        [HttpGet("totalLossVehicel/{startDate}/{endDate}")]
+        public async Task<IActionResult> getTotalLossVvehicle(DateTime startDate, DateTime endDate, int? vehicleId, int? vehicleOwner)
+        {
+            try
+            {
+                string token = Request.Headers["Authorization"];
+                if (token.StartsWith("Bearer"))
+                {
+                    token = token.Substring("Bearer ".Length).Trim();
+                }
+                if (string.IsNullOrEmpty(token))
+                {
+                    return BadRequest("Token is required.");
+                }
+                var userId = _getInforFromToken.GetIdInHeader(token);
+                var result = await _lossCostVehicleRepository.GetLossCostVehicleByDate(vehicleId, startDate, endDate, vehicleOwner, userId);  
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
             }
         }
     }

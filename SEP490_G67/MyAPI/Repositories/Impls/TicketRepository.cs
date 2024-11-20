@@ -327,6 +327,78 @@ namespace MyAPI.Repositories.Impls
             }
         }
 
-       
+        public async Task<RevenueTicketDTO> getRevenueTicket(DateTime startTime, DateTime endTime, int? vehicleId, int? vehicleOwner, int userId)
+        {
+            try
+            {
+                var getInforUser = _context.Users.Include(x => x.UserRoles).ThenInclude(x => x.Role).Where(x => x.Id == userId).FirstOrDefault();
+                if (getInforUser == null)
+                {
+                    throw new Exception("User not found.");
+                }
+                if (IsUserRole(getInforUser, "VehicleOwner"))
+                {
+                    return await GetRevenueForVehicleOwner(startTime, endTime, vehicleId, userId);
+                }
+                if (IsUserRole(getInforUser, "Staff"))
+                {
+                    return await GetRevenueForStaff(startTime, endTime, vehicleId, vehicleOwner, userId);
+                }
+                throw new Exception("User role is not supported.");
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+        public bool IsUserRole(User user, string roleName)
+        {
+            return user.UserRoles.Any(ur => ur.Role.RoleName == roleName);
+        }
+        private async Task<RevenueTicketDTO> GetRevenueForVehicleOwner(DateTime startTime, DateTime endTime, int? vehicleId, int userId)
+        {
+            var query = _context.Tickets.Include(x => x.Vehicle).Where(x => x.Vehicle.VehicleOwner == userId);
+            if (vehicleId.HasValue && vehicleId != 0)
+            {
+                query = query.Where(x => x.VehicleId == vehicleId);
+            }
+            return await GetRevenueTicketDTO(query);
+        }
+        private async Task<RevenueTicketDTO> GetRevenueForStaff(DateTime startTime, DateTime endTime, int? vehicleId, int? vehicleOwner, int userId)
+        {
+            var query = _context.Tickets.Include(x => x.Vehicle).Where(x => x.CreatedAt >= startTime && x.CreatedAt <= endTime);
+            if (vehicleId.HasValue && vehicleId != 0)
+            {
+                query = query.Where(x => x.VehicleId == vehicleId);
+            }
+            if (vehicleOwner.HasValue && vehicleOwner != 0)
+            {
+                query = query.Where(x => x.Vehicle.VehicleOwner == vehicleOwner);
+            }
+            if (!vehicleId.HasValue && vehicleId == 0 && !vehicleOwner.HasValue && vehicleOwner == 0)
+            {
+                query = query;
+            }
+            return await GetRevenueTicketDTO(query);
+        }
+        private async Task<RevenueTicketDTO> GetRevenueTicketDTO(IQueryable<Ticket> query)
+        {
+            var listTicket =
+                await query.Select(
+                    x => new TicketDTOs
+                    {
+                        Price = x.Price,
+                        CreatedAt = x.CreatedAt,
+                        VehicleId = x.VehicleId,
+                        TypeOfTicket = x.TypeOfTicket,
+                    }).ToListAsync();
+            var sumPriceTicket = query.Sum(x => x.Price);
+            var combineResult = new RevenueTicketDTO
+            {
+                total = sumPriceTicket,
+                listTicket = listTicket
+            };
+            return combineResult;
+        }
     }
 }

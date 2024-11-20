@@ -11,6 +11,7 @@ namespace MyAPI.Models
             HistoryRentVehicles = new HashSet<HistoryRentVehicle>();
             LossCosts = new HashSet<LossCost>();
             RequestDetails = new HashSet<RequestDetail>();
+            Tickets = new HashSet<Ticket>();
             VehicleSeatStatuses = new HashSet<VehicleSeatStatus>();
             VehicleTrips = new HashSet<VehicleTrip>();
         }
@@ -36,6 +37,7 @@ namespace MyAPI.Models
         public virtual ICollection<HistoryRentVehicle> HistoryRentVehicles { get; set; }
         public virtual ICollection<LossCost> LossCosts { get; set; }
         public virtual ICollection<RequestDetail> RequestDetails { get; set; }
+        public virtual ICollection<Ticket> Tickets { get; set; }
         public virtual ICollection<VehicleSeatStatus> VehicleSeatStatuses { get; set; }
         public virtual ICollection<VehicleTrip> VehicleTrips { get; set; }
     }

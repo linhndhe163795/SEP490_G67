@@ -6,6 +6,8 @@ using AutoMapper;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using MyAPI.Helper;
+using MyAPI.Repositories.Impls;
 
 namespace MyAPI.Controllers
 {
@@ -16,13 +18,46 @@ namespace MyAPI.Controllers
         private readonly IDriverRepository _driverRepository;
         ITypeOfDriverRepository _typeOfDriverRepository;
         private readonly IMapper _mapper;
+        private readonly Jwt _Jwt;
 
-        public DriverController(IDriverRepository driverRepository, ITypeOfDriverRepository typeOfDriverRepository, IMapper mapper)
+
+        public DriverController(IDriverRepository driverRepository, ITypeOfDriverRepository typeOfDriverRepository, IMapper mapper, Jwt jwt)
         {
             _driverRepository = driverRepository;
             _typeOfDriverRepository = typeOfDriverRepository;
             _mapper = mapper;
+            _Jwt = jwt;
         }
+        [HttpPost("/loginDriver")]
+        public async Task<IActionResult> loginDriver(LoginDriverDTO login)
+        {
+            try
+            {
+                if (await _driverRepository.checkLogin(login))
+                {
+                    var getDriverLogin = await _driverRepository.getDriverLogin(login);
+                    var tokenString = _Jwt.CreateTokenDriver(getDriverLogin);
+                    var cookieOptions = new CookieOptions
+                    {
+                        HttpOnly = false,
+                        Secure = false,
+                        SameSite = SameSiteMode.Strict,
+                        Expires = DateTime.UtcNow.AddHours(1)
+                    };
+                    Response.Cookies.Append("AuthToken", tokenString, cookieOptions);
+                    return Ok(tokenString);
+                }
+                else
+                {
+                    return NotFound("Incorrect Email or Password");
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
         [Authorize(Roles = "Staff,Admin")]
         [HttpGet]
         public async Task<IActionResult> GetAllDrivers()

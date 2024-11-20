@@ -51,7 +51,7 @@ namespace MyAPI.Helper
             }
             return true;
         }
-        public async Task<(List<TripImportDTO> validEntries, List<TripImportDTO> invalidEntries)> ImportTrip(IFormFile excelFile, int staffId)
+        public async Task<(List<TripImportDTO> validEntries, List<TripImportDTO> invalidEntries)> ImportTrip(IFormFile excelFile, int staffId, int typeOfTrip)
         {
             string path = Path.GetFileName(excelFile.FileName); 
             if (!checkFile(path)) 
@@ -59,14 +59,14 @@ namespace MyAPI.Helper
                 throw new Exception("File không hợp lệ"); 
             }
             var validEntries = new List<TripImportDTO>(); 
-            var invalidEntries = new List<TripImportDTO>(); 
+            var invalidEntries = new List<TripImportDTO>();
+            var existingLicensePlates = await _context.Vehicles.Select(v => v.LicensePlate).ToListAsync();
+
+            var licensePlateSet = new HashSet<string>(existingLicensePlates);
             using (var stream = new MemoryStream()) 
             {
                 await excelFile.CopyToAsync(stream);
-
                 stream.Position = 0;
-                
-
                 using (var workbook = new XLWorkbook(stream)) 
                 {
                     var tripSheets = workbook.Worksheet("Trip");
@@ -79,28 +79,39 @@ namespace MyAPI.Helper
                             PointStart = row.Cell(5).GetValue<string>(),
                             PointEnd = row.Cell(6).GetValue<string>(),
                             LicensePlate = row.Cell(7).GetValue<string>(),
+                            TypeOfTrip = Constant.CHUYEN_DI_LIEN_TINH,
                             Status = true,
                             CreatedAt = DateTime.Now, CreatedBy = staffId,
-                        }; 
-                        if (!TimeSpan.TryParse(row.Cell(2).GetString(), out var parsedStartTime)) 
-                        { 
-                            invalidEntries.Add(trip);
-                            continue;
-                        } 
-                        trip.StartTime = parsedStartTime;
-                        if (!int.TryParse(row.Cell(4).GetString(), out var parsedPrice) || parsedPrice <= 0) 
-                        { 
-                            invalidEntries.Add(trip); 
-                            continue;
-                        } 
-                        trip.Price = parsedPrice;
+                        };
+
+                        if (!TimeSpan.TryParse(row.Cell(2).GetString(), out var parsedStartTime))
+                        {
+                            trip.ErrorMessages.Add("Invalid StartTime format in row : " + row.ToString() + " col: " + row.Cell(2).Value);
+                        }
+                        else
+                        {
+                            trip.StartTime = parsedStartTime;
+                        }
+                        if (!int.TryParse(row.Cell(4).GetString(), out var parsedPrice) || parsedPrice <= 0)
+                        {
+                            trip.ErrorMessages.Add("Invalid or negative Price in row: " + row.ToString() + " col: " + row.Cell(4).Value);
+                        }
+                        else
+                        {
+                            trip.Price = parsedPrice;
+                        }
+                        if (!licensePlateSet.Contains(trip.LicensePlate))
+                        {
+                            trip.ErrorMessages.Add($"License plate '{trip.LicensePlate}' does not exist in row: " + row.ToString());
+                        }
                         for (int col = 8; col <= tripSheets?.LastColumnUsed()?.ColumnNumber(); col += 2) 
                         {
                             var pointDetail = row.Cell(col).GetValue<string>();
                             var pointEnd = row.Cell(col + 3).GetValue<string>();
                             if (TimeSpan.TryParse(row.Cell(col + 1).GetString(), out var pointTimeDetails))
                             {
-                                if (!string.IsNullOrEmpty(pointDetail))
+                                
+                                if (!string.IsNullOrEmpty(pointDetail) && !string.IsNullOrEmpty(pointEnd) )
                                 {
                                     trip.PointStartDetail[pointDetail] = pointTimeDetails;
                                 }
@@ -113,20 +124,27 @@ namespace MyAPI.Helper
                                     }
                                 }
                             }
-                        }                 
-                        if (IsValidTrip(trip) && (trip.PointEndDetail.Count != 0 &&  trip.PointStartDetail.Count != 0)) 
+                            if (pointTimeDetails == TimeSpan.Zero && !string.IsNullOrEmpty(pointDetail))
+                            {
+                                trip.ErrorMessages.Add("Incorrect format time in row: " + row.ToString() + " col: " + col);
+                            }
+
+                        }
+                        if (trip.PointStartDetail.Count == 0 || trip.PointEndDetail.Count == 0)
+                        {
+                            trip.ErrorMessages.Add("PointStartDetail or PointEndDetail are missing in row: " + row.ToString() + " col: ");
+                        }
+                        if (IsValidTrip(trip) && trip.ErrorMessages.Count == 0) 
                         { 
                             validEntries.Add(trip); 
                         }
                         else
-                        { 
+                        {
                             invalidEntries.Add(trip);
                         } 
                     }
                 } 
             }
-            //await _context.Trips.AddRangeAsync(validEntries);
-            //await _context.SaveChangesAsync();
             return (validEntries, invalidEntries);
         }
         public async Task ImportTripDetailsByTripId(IFormFile excelFileTripDetails, int staffId, int tripId)
@@ -207,7 +225,7 @@ namespace MyAPI.Helper
                         else if (IsValidVehicel(vehicle) && await checkTypeVehicle(vehicle.VehicleTypeId))
                         {
                             validEntries.Add(vehicle);
-                            licensePlateSet.Add(vehicle.LicensePlate); // Thêm vào danh sách biển số đã kiểm tra
+                            licensePlateSet.Add(vehicle.LicensePlate); 
                         }
                         else
                         {

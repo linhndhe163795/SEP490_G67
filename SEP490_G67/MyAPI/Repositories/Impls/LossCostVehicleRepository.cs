@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using DocumentFormat.OpenXml.Wordprocessing;
 using Microsoft.EntityFrameworkCore;
 using MyAPI.DTOs.LossCostDTOs.LossCostVehicelDTOs;
 using MyAPI.DTOs.LossCostDTOs.LossCostVehicleDTOs;
@@ -19,17 +20,17 @@ namespace MyAPI.Repositories.Impls
         {
             try
             {
-                if (lossCostAddDTOs == null) 
+                if (lossCostAddDTOs == null)
                 {
                     throw new NullReferenceException();
                 }
                 lossCostAddDTOs.CreatedBy = userID;
                 lossCostAddDTOs.CreatedAt = DateTime.Now;
-                var lossCostAddMapper = _mapper.Map<LossCost>(lossCostAddDTOs); 
+                var lossCostAddMapper = _mapper.Map<LossCost>(lossCostAddDTOs);
                 _context.LossCosts.Add(lossCostAddMapper);
                 await _context.SaveChangesAsync();
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 throw new Exception("AddLossCost: " + ex.Message);
             }
@@ -40,7 +41,7 @@ namespace MyAPI.Repositories.Impls
             try
             {
                 var lossCostbyID = await _context.LossCosts.FirstOrDefaultAsync(x => x.Id == id);
-                if(lossCostbyID == null)
+                if (lossCostbyID == null)
                 {
                     throw new NullReferenceException();
                 }
@@ -51,7 +52,7 @@ namespace MyAPI.Repositories.Impls
                 }
 
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 throw new Exception("DeleteLossCost: " + ex.Message);
             }
@@ -61,7 +62,7 @@ namespace MyAPI.Repositories.Impls
         {
             try
             {
-                var lossCostVehicle = await _context.LossCosts.Include(x => x.Vehicle).Include(x => x.LossCostType)                                        
+                var lossCostVehicle = await _context.LossCosts.Include(x => x.Vehicle).Include(x => x.LossCostType)
                                             .Select(ls => new AddLostCostVehicleDTOs
                                             {
                                                 VehicleId = ls.VehicleId,
@@ -87,62 +88,115 @@ namespace MyAPI.Repositories.Impls
             }
         }
 
-        public async Task<TotalLossCost> GetLossCostVehicleByDate(int? vehicleId, DateTime? startDate, DateTime? endDate)
+        public async Task<TotalLossCost> GetLossCostVehicleByDate(int? vehicleId, DateTime startDate, DateTime endDate, int? vehicleOwnerId, int userId)
         {
             try
             {
-       
-               
-                var lossCostVehicleByDate = await _context.LossCosts.Include(x => x.Vehicle).Include(x => x.LossCostType)
-                                            .Where(x => x.VehicleId == vehicleId && x.DateIncurred >= startDate && x.DateIncurred <= endDate)
-                                            .Select(ls => new AddLostCostVehicleDTOs
-                                            {
-                                                VehicleId = vehicleId,
-                                                LicensePlate = ls.Vehicle.LicensePlate,
-                                                DateIncurred = ls.DateIncurred,
-                                                Description = ls.Description,
-                                                Price = ls.Price,
-                                                LossCostTypeId = ls.LossCostTypeId,
-                                            }).ToListAsync();
-                if (!lossCostVehicleByDate.Any())
+                var getInforUser = _context.Users.Include(x => x.UserRoles).ThenInclude(x => x.Role).Where(x => x.Id == userId).FirstOrDefault();
+                if (getInforUser == null)
                 {
-                    throw new Exception("No loss cost data found for the specified vehicle and date range.");
+                    throw new Exception("User not found.");
                 }
-
-                var totalCost = lossCostVehicleByDate.Sum(x => x.Price);
-
-                var response = new TotalLossCost
+                if (IsUserRole(getInforUser, "VehicleOwner"))
                 {
-                    listLossCostVehicle = lossCostVehicleByDate,
-                    TotalCost = totalCost
-                };
-
-                if (lossCostVehicleByDate == null)
-                {
-                    throw new NullReferenceException();
+                    return await GetLossCosstForVehicleOwner(startDate, endDate, userId, vehicleId);
                 }
-                else
+                if (IsUserRole(getInforUser, "Staff"))
                 {
-                    return response;
+                    return await GetLossCosstForStaff(startDate,endDate, vehicleOwnerId, vehicleId, userId);
                 }
-
+                throw new Exception("User role is not supported.");
             }
             catch (Exception ex)
             {
                 throw new Exception("GetLossCostVehicleByDate: " + ex.Message);
             }
         }
+        public bool IsUserRole(User user, string roleName)
+        {
+            return user.UserRoles.Any(ur => ur.Role.RoleName == roleName);
+        }
+        private async Task<TotalLossCost> GetLossCosstForVehicleOwner(DateTime? startDate, DateTime? endDate, int? vehicleOwner, int? vechileId)
+        {
+            var query =  _context.LossCosts.Include(x => x.Vehicle)
+                                          .Include(x => x.LossCostType)
+                                          .Where(x => x.DateIncurred >= startDate && 
+                                                 x.DateIncurred <= endDate &&
+                                                 x.Vehicle.VehicleOwner == vehicleOwner);
+            if(vechileId.HasValue && vechileId != 0)
+            {
+                query = query.Where(x => x.VehicleId == vechileId);
+            }
 
+            var totalLossCost = query.Sum(x => x.Price);
+            var lossCostVehicleByDate = await query
+                                            .Select(ls => new AddLostCostVehicleDTOs
+                                            {
+                                                VehicleId = ls.VehicleId,
+                                                LicensePlate = ls.Vehicle.LicensePlate,
+                                                DateIncurred = ls.DateIncurred,
+                                                Description = ls.Description,
+                                                Price = ls.Price,
+                                                LossCostTypeId = ls.LossCostTypeId,
+                                                VehicleOwner = ls.Vehicle.VehicleOwner
+                                            }).ToListAsync();
+            if (!lossCostVehicleByDate.Any())
+            {
+                throw new Exception("No loss cost data found for the specified criteria.");
+            }
+            var combineResult = new TotalLossCost
+            {
+                listLossCostVehicle = lossCostVehicleByDate,
+                TotalCost = totalLossCost
+            };
+            return combineResult;
+        }
+        private async Task<TotalLossCost> GetLossCosstForStaff(DateTime startDate, DateTime endDate, int? vehicleOwner, int? vehicleId ,int userId)
+        {
+            var query = _context.LossCosts.Include(x => x.Vehicle)
+                                          .Include(x => x.LossCostType)
+                                          .Where(x => x.DateIncurred >= startDate && x.DateIncurred <= endDate);
+            if(vehicleOwner.HasValue && vehicleOwner != 0)
+            {
+                query = query.Where(x => x.Vehicle.VehicleOwner == vehicleOwner.Value);
+            }
+            if (vehicleId.HasValue && vehicleId != 0) 
+            {
+                query = query.Where(x => x.VehicleId == vehicleId);
+            }
+            
+            var totalLossCost = query.Sum(x => x.Price);
+            var lossCostVehicleByDate = await query
+                                            .Select(ls => new AddLostCostVehicleDTOs
+                                            {
+                                                VehicleId = ls.VehicleId,
+                                                LicensePlate = ls.Vehicle.LicensePlate,
+                                                DateIncurred = ls.DateIncurred,
+                                                Description = ls.Description,
+                                                Price = ls.Price,
+                                                LossCostTypeId = ls.LossCostTypeId,
+                                                VehicleOwner = ls.Vehicle.VehicleOwner
+                                            }).ToListAsync();
+            //if (!lossCostVehicleByDate.Any())
+            //{
+            //    throw new Exception("No loss cost data found for the specified criteria.");
+            //}
+            var combineResult = new TotalLossCost
+            {
+                listLossCostVehicle = lossCostVehicleByDate,
+                TotalCost = totalLossCost
+            };
+            return combineResult;
+        }
         public async Task UpdateLossCostById(int id, LossCostUpdateDTO lossCostupdateDTOs, int userId)
         {
             try
             {
                 var lossCostId = await _context.LossCosts.FirstOrDefaultAsync(x => x.Id == id);
-                if (lossCostId == null) 
+                if (lossCostId == null)
                 {
                     throw new NullReferenceException(nameof(id));
                 }
-
                 lossCostId.DateIncurred = lossCostupdateDTOs.DateIncurred;
                 lossCostId.Price = lossCostupdateDTOs.Price;
                 lossCostId.VehicleId = lossCostupdateDTOs.VehicleId;
@@ -153,7 +207,7 @@ namespace MyAPI.Repositories.Impls
                 _context.LossCosts.Update(lossCostId);
                 await _context.SaveChangesAsync();
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 throw new Exception("UpdateLossCostById: " + ex.Message);
             }
