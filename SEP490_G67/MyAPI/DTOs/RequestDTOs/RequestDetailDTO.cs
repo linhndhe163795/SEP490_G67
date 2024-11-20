@@ -6,6 +6,8 @@
 
         public int? TicketId { get; set; }
         public int? VehicleId { get; set; }
+
+        public int? DriverId { get; set; }
         public string? StartLocation { get; set; }
         public string? EndLocation { get; set; }
         public DateTime? StartTime { get; set; }

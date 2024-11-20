@@ -1,5 +1,4 @@
-﻿using MyAPI.DTOs.HistoryRentDriverDTOs;
-using MyAPI.DTOs.HistoryRentVehicle;
+﻿using MyAPI.DTOs.HistoryRentVehicle;
 using MyAPI.DTOs.RequestDTOs;
 using MyAPI.DTOs.TripDTOs;
 using MyAPI.Models;

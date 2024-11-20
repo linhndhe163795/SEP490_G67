@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualBasic;
 using MyAPI.DTOs;
-using MyAPI.DTOs.HistoryRentDriverDTOs;
 using MyAPI.DTOs.HistoryRentVehicle;
 using MyAPI.DTOs.RequestDTOs;
 using MyAPI.DTOs.TripDTOs;
@@ -500,7 +499,7 @@ namespace MyAPI.Repositories.Impls
                 var addRentDriverRequestDetails = new RequestDetail
                 {
                     RequestId = addRentDriver.Id,
-                    VehicleId = null,
+                    VehicleId = rentDriverAddDTO.,
                     TicketId = null,
                     StartLocation = rentDriverAddDTO?.StartLocation,
                     EndLocation = rentDriverAddDTO?.EndLocation,
