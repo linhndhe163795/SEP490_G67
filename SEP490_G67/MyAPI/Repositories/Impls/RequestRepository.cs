@@ -34,7 +34,15 @@ namespace MyAPI.Repositories.Impls
                 throw new KeyNotFoundException("Request not found");
             }
 
-            existingRequest.UserId = requestDTO.UserId;
+            var token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+            int userId = _tokenHelper.GetIdInHeader(token);
+
+            if (userId == -1)
+            {
+                throw new Exception("Invalid user ID from token.");
+            }
+
+            existingRequest.UserId = userId;
             existingRequest.TypeId = requestDTO.TypeId;
             existingRequest.Status = requestDTO.Status;
             existingRequest.Description = requestDTO.Description;
@@ -84,9 +92,16 @@ namespace MyAPI.Repositories.Impls
 
         public async Task<Request> CreateRequestRentCarAsync(RequestDTO requestDTO)
         {
+            var token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+            int userId = _tokenHelper.GetIdInHeader(token);
+
+            if (userId == -1)
+            {
+                throw new Exception("Invalid user ID from token.");
+            }
             var newRequest = new Request
             {
-                UserId = requestDTO.UserId,
+                UserId = userId,
                 TypeId = requestDTO.TypeId,
                 Status = requestDTO.Status,
                 Description = requestDTO.Description,
@@ -155,6 +170,13 @@ namespace MyAPI.Repositories.Impls
 
         public async Task<Request> CreateRequestVehicleAsync(RequestDTO requestDTO)
         {
+            var token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+            int userId = _tokenHelper.GetIdInHeader(token);
+
+            if (userId == -1)
+            {
+                throw new Exception("Invalid user ID from token.");
+            }
             var newRequest = new Request
             {
                 CreatedAt = DateTime.Now,
@@ -162,7 +184,7 @@ namespace MyAPI.Repositories.Impls
                 Note = requestDTO.Note,
                 Status = requestDTO.Status,
                 TypeId = requestDTO.TypeId,
-                UserId = requestDTO.UserId,
+                UserId = userId,
             };
 
             await _context.Requests.AddAsync(newRequest);
@@ -478,7 +500,6 @@ namespace MyAPI.Repositories.Impls
                 var addRentDriverRequestDetails = new RequestDetail
                 {
                     RequestId = addRentDriver.Id,
-                    DriverId = rentDriverAddDTO?.DriverId,
                     VehicleId = null,
                     TicketId = null,
                     StartLocation = rentDriverAddDTO?.StartLocation,
