@@ -44,14 +44,14 @@ namespace MyAPI.Controllers
             return Ok(request);
         }
         
-        [HttpPost("/CreateTicketForRentCar")]
+        [HttpPost("/CreateTicketForRentFullCar")]
         public async Task<IActionResult> CreateRequestForRentCar(RequestDTO requestWithDetailsDto)
         {
             var createdRequest = await _requestRepository.CreateRequestRentCarAsync(requestWithDetailsDto);
             return CreatedAtAction(nameof(GetRequestById), new { id = createdRequest.Id }, createdRequest);
         }
         [Authorize(Roles = "Staff")]
-        [HttpPut("/UpdateRequestForRentCar/{id}")]
+        [HttpPut("/UpdateRequestForRentFullCar/{id}")]
         public async Task<IActionResult> UpdateRequestForRentCar(int id, RequestDTO requestDto)
         {
             var updated = await _requestRepository.UpdateRequestRentCarAsync(id, requestDto);
@@ -61,24 +61,24 @@ namespace MyAPI.Controllers
             }
             return NoContent();
         }
-        [Authorize]
-        [HttpPost("/CreateTicketForHireDriver")]
-        public async Task<IActionResult> CreateRequestForHireDriver(RequestDTO requestWithDetailsDto)
-        {
-            var createdRequest = await _requestRepository.CreateRequestRentCarAsync(requestWithDetailsDto);
-            return CreatedAtAction(nameof(GetRequestById), new { id = createdRequest.Id }, createdRequest);
-        }
-        [Authorize(Roles = "Staff")]
-        [HttpPut("/UpdateRequestForHireDriver/{id}")]
-        public async Task<IActionResult> UpdateRequestForHireDriver(int id, RequestDTO requestDto)
-        {
-            var updated = await _requestRepository.UpdateRequestRentCarAsync(id, requestDto);
-            if (updated == null)
-            {
-                return NotFound();
-            }
-            return NoContent();
-        }
+        //[Authorize]
+        //[HttpPost("/CreateTicketForHireDriver")]
+        //public async Task<IActionResult> CreateRequestForHireDriver(RequestDTO requestWithDetailsDto)
+        //{
+        //    var createdRequest = await _requestRepository.CreateRequestRentDriverAsync(requestWithDetailsDto);
+        //    return CreatedAtAction(nameof(GetRequestById), new { id = createdRequest.Id }, createdRequest);
+        //}
+        //[Authorize(Roles = "Staff")]
+        //[HttpPut("/UpdateRequestForHireDriver/{id}")]
+        //public async Task<IActionResult> UpdateRequestForHireDriver(int id, RequestDTO requestDto)
+        //{
+        //    var updated = await _requestRepository.UpdateRequestRentCarAsync(id, requestDto);
+        //    if (updated == null)
+        //    {
+        //        return NotFound();
+        //    }
+        //    return NoContent();
+        //}
         [Authorize(Roles = "Staff")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteRequest(int id)
@@ -100,33 +100,33 @@ namespace MyAPI.Controllers
             return NoContent();
         }
 
-        [HttpPost("accept/{id}")]
-        public async Task<IActionResult> AcceptRequest(int id)
-        {
-            try
-            {
-                await _requestRepository.AcceptRequestAsync(id);
-                return Ok("Request accepted.");
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
+        //[HttpPost("accept/{id}")]
+        //public async Task<IActionResult> AcceptRequest(int id)
+        //{
+        //    try
+        //    {
+        //        await _requestRepository.AcceptRequestAsync(id);
+        //        return Ok("Request accepted.");
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return BadRequest(ex.Message);
+        //    }
+        //}
 
-        [HttpPost("deny/{id}")]
-        public async Task<IActionResult> DenyRequest(int id)
-        {
-            try
-            {
-                await _requestRepository.DenyRequestAsync(id);
-                return Ok("Request denied.");
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
+        //[HttpPost("deny/{id}")]
+        //public async Task<IActionResult> DenyRequest(int id)
+        //{
+        //    try
+        //    {
+        //        await _requestRepository.DenyRequestAsync(id);
+        //        return Ok("Request denied.");
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return BadRequest(ex.Message);
+        //    }
+        //}
         [Authorize(Roles = "Staff")]
         [HttpPut("acceptCancleTicket/{id}")]
         public async Task<IActionResult> AcceptCancleTicketRequest(int id)
@@ -194,7 +194,7 @@ namespace MyAPI.Controllers
         }
 
 
-        [HttpPost("addRentVehicleRequest")]
+        [HttpPost("CreateRentVehicleForDriverRequest")]
         public async Task<IActionResult> AddVehicle(RentVehicleAddDTO rentVehicleAddDTO)
         {
             try
@@ -210,7 +210,7 @@ namespace MyAPI.Controllers
             }
         }
 
-        [HttpPost("addRenDriverRequest")]
+        [HttpPost("CreateRentDriverForOwnerRequest")]
         public async Task<IActionResult> RentDriver(RequestDetailForRentDriver rentVehicleAddDTO)
         {
             try
