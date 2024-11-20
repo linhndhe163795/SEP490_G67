@@ -273,11 +273,11 @@ namespace MyAPI.Controllers
         }
 
         [HttpGet("searchTripForConvenient/{startPoint}/{endPoint}/{typeOfTrip}")]
-        public async Task<IActionResult> SearchTripForConvenient(string startPoint, string endPoint, int typeOfTrip)
+        public async Task<IActionResult> SearchTripForConvenient(string startPoint, string endPoint, int typeOfTrip, string? promotion)
         {
             try
             {
-                var price = await _tripRepository.SearchVehicleConvenient(startPoint, endPoint, typeOfTrip);
+                var price = await _tripRepository.SearchVehicleConvenient(startPoint, endPoint, typeOfTrip, promotion);
 
                 if (price == 0)
                 {

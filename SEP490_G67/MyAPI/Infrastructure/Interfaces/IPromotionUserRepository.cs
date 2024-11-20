@@ -7,5 +7,7 @@ namespace MyAPI.Infrastructure.Interfaces
     {
         Task DeletePromotionUser(int id);
         Task AddPromotionAllUser(int promotionId);
+
+        Task<bool> DeletePromotionAfterPayment(int userId, int promotion_id);
     }
 }

@@ -47,7 +47,7 @@ namespace MyAPI.Repositories.Impls
         {
             try
             {
-                var checkUserNameDrive = await _context.Drivers.SingleOrDefaultAsync(s => s.Name.Equals(driverName));
+                var checkUserNameDrive = await _context.Drivers.SingleOrDefaultAsync(s => s.UserName.Equals(driverName));
 
                 var token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
                 int userId = _tokenHelper.GetIdInHeader(token);

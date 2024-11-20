@@ -17,12 +17,15 @@ namespace MyAPI.Repositories.Impls
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly GetInforFromToken _tokenHelper;
         private readonly IRequestDetailRepository _requestDetailRepository;
+        private readonly IPromotionUserRepository _promotionUserRepository;
 
-        public RequestRepository(SEP490_G67Context _context, IHttpContextAccessor httpContextAccessor, GetInforFromToken tokenHelper, IRequestDetailRepository requestDetailRepository) : base(_context)
+        public RequestRepository(SEP490_G67Context _context, IHttpContextAccessor httpContextAccessor
+            , GetInforFromToken tokenHelper, IRequestDetailRepository requestDetailRepository, IPromotionUserRepository promotionUserRepository) : base(_context)
         {
             _httpContextAccessor = httpContextAccessor;
             _tokenHelper = tokenHelper;
             _requestDetailRepository = requestDetailRepository;
+            _promotionUserRepository = promotionUserRepository;
         }
 
         public async Task<Request> UpdateRequestRentCarAsync(int id, RequestDTO requestDTO)
@@ -499,7 +502,7 @@ namespace MyAPI.Repositories.Impls
                 var addRentDriverRequestDetails = new RequestDetail
                 {
                     RequestId = addRentDriver.Id,
-                    VehicleId = rentDriverAddDTO.VehicleId,
+                    //VehicleId = rentDriverAddDTO.VehicleId,
                     TicketId = null,
                     StartLocation = rentDriverAddDTO?.StartLocation,
                     EndLocation = rentDriverAddDTO?.EndLocation,
@@ -604,6 +607,7 @@ namespace MyAPI.Repositories.Impls
                 UpdateBy = userId,
                 UserName = convenientTripDTO.UserName,
                 PhoneNumber = convenientTripDTO.PhoneNumber,
+                PromotionCode = convenientTripDTO.PromotionCode,
             };
 
             await _context.RequestDetails.AddAsync(addConvenientRequest_Details);
@@ -634,22 +638,10 @@ namespace MyAPI.Repositories.Impls
 
             await UpdateRequestVehicleAsync(requestId, checkRequest);
 
-            var updateRequestDetail = new RequestDetailDTO
+            if (!choose)
             {
-                UpdatedAt = DateTime.Now,
-                UpdatedBy = userId,
-                EndTime = DateTime.Now,
-            };
-
-            var updateRequestDetailRentVehicle = await _requestDetailRepository.CreateRequestDetailAsync(updateRequestDetail);
-            if (updateRequestDetailRentVehicle == null)
-            {
-                throw new Exception("Failed to create request detail.");
-            }
-
-            if(!choose)
-            {
-                return true;   
+                await _context.SaveChangesAsync();
+                return true;
             }
 
             var checkRequestDetail = await _context.RequestDetails.SingleOrDefaultAsync(s => s.RequestId == requestId);
@@ -668,25 +660,42 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception("TripId not found for the given start and end locations.");
             }
 
-            int typeOfTrip;
-            if (checkRequest.TypeId == 5)
-            {
-                typeOfTrip = 2;
-            }
-            else if (checkRequest.TypeId == 6)
-            {
-                typeOfTrip = 4;
-            }
-            else
+            if (checkRequest.TypeId != 5 && checkRequest.TypeId != 6)
             {
                 throw new Exception("Invalid TypeId for determining TypeOfTrip.");
             }
 
+            int typeOfTrip = checkRequest.TypeId == 5 ? 2 : 4;
+
+            decimal price = checkRequestDetail.Price ?? throw new Exception("Price is required.");
+            decimal? pricePromotion = null;
+
+            if (!string.IsNullOrEmpty(checkRequestDetail.PromotionCode))
+            {
+                var discount = await _context.Promotions
+                    .Where(p => p.CodePromotion == checkRequestDetail.PromotionCode)
+                    .Select(p => p.Discount)
+                    .FirstOrDefaultAsync();
+
+                if (discount == null || discount == 0)
+                {
+                    throw new Exception("Invalid promotion code or no discount available.");
+                }
+
+                pricePromotion = price;
+                price = price / (1 - (discount / 100m));
+            }
+
+            if(checkRequestDetail.VehicleId == 0 || checkRequestDetail.VehicleId == null)
+            {
+                throw new Exception("Vehicle Id null please update VehicleId before accpet!!");
+            } 
+
             var addTicket = new Ticket
             {
-                Price = checkRequestDetail.Price,
-                CodePromotion = null,
-                PricePromotion = null,
+                Price = price,
+                CodePromotion = checkRequestDetail.PromotionCode,
+                PricePromotion = pricePromotion,
                 NumberTicket = 2,
                 PointEnd = checkRequestDetail.EndLocation,
                 PointStart = checkRequestDetail.StartLocation,
@@ -705,9 +714,19 @@ namespace MyAPI.Repositories.Impls
             };
 
             await _context.Tickets.AddAsync(addTicket);
+
+            if (!string.IsNullOrEmpty(checkRequestDetail.PromotionCode))
+            {
+                var promotionUserId = await _context.Promotions
+                    .Where(p => p.CodePromotion == checkRequestDetail.PromotionCode)
+                    .Select(s => s.Id)
+                    .FirstOrDefaultAsync();
+
+                await _promotionUserRepository.DeletePromotionAfterPayment(checkRequest.UserId, promotionUserId);
+            }
+
             await _context.SaveChangesAsync();
             return true;
         }
-
     }
 }

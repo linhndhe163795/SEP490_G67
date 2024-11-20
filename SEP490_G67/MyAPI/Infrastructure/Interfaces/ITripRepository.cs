@@ -15,7 +15,7 @@ namespace MyAPI.Infrastructure.Interfaces
         Task confirmAddValidEntryImport(List<TripImportDTO> validEntry);
         Task<List<TripDTO>> getListTripNotVehicle();
         Task<(List<Trip>, List<string>)> ImportExcel(Stream excelStream);
-        Task<decimal> SearchVehicleConvenient(string startPoint, string endPoint, int typeOfTrip);
+        Task<decimal> SearchVehicleConvenient(string startPoint, string endPoint, int typeOfTrip, string? promotion);
         Task<int> GetTicketCount(int tripId);
 
         Task<List<ListCovenientStartEndDTO>> getListStartAndEndPoint();
