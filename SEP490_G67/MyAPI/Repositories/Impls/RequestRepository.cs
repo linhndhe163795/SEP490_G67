@@ -499,7 +499,7 @@ namespace MyAPI.Repositories.Impls
                 var addRentDriverRequestDetails = new RequestDetail
                 {
                     RequestId = addRentDriver.Id,
-                    VehicleId = rentDriverAddDTO.,
+                    VehicleId = rentDriverAddDTO.VehicleId,
                     TicketId = null,
                     StartLocation = rentDriverAddDTO?.StartLocation,
                     EndLocation = rentDriverAddDTO?.EndLocation,
