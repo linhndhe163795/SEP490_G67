@@ -79,7 +79,7 @@ namespace MyAPI.Repositories.Impls
                 Vehicle vehicle = new Vehicle
                 {
                     NumberSeat = vehicleAddDTO.NumberSeat,
-                    VehicleTypeId = vehicleAddDTO.VehicleTypeId,
+                    VehicleTypeId = 1,
                     Image = vehicleAddDTO.Image,
                     Status = isStaff,
                     DriverId = checkUserNameDrive != null ? checkUserNameDrive.Id : 0,

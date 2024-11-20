@@ -58,7 +58,7 @@ namespace MyAPI.Controllers
             }
         }
 
-        [Authorize(Roles = "Staff,Admin")]
+        //[Authorize(Roles = "Staff,Admin")]
         [HttpGet]
         public async Task<IActionResult> GetAllDrivers()
         {

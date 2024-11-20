@@ -6,6 +6,7 @@ using MyAPI.DTOs.TripDTOs;
 using MyAPI.Helper;
 using MyAPI.Infrastructure.Interfaces;
 using MyAPI.Models;
+using MyAPI.Repositories.Impls;
 using OfficeOpenXml;
 
 namespace MyAPI.Controllers
@@ -292,6 +293,28 @@ namespace MyAPI.Controllers
             catch (Exception ex)
             {
                 return StatusCode(400, new { Message = "An unexpected error occurred.", Detail = ex.Message });
+            }
+        }
+
+        [HttpGet("listConvenientStartEnd")]
+        public async Task<IActionResult> GetListconvenient()
+        {
+            try
+            {
+                var requests = await _tripRepository.getListStartAndEndPoint();
+                if (requests != null)
+                {
+                    return Ok(requests);
+                }
+                else
+                {
+                    return NotFound("start and end point list not found");
+                }
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Message = "GetListconvenient failed", Details = ex.Message });
             }
         }
 

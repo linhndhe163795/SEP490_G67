@@ -23,8 +23,18 @@ namespace MyAPI.Repositories.Impls
                 EndTime = requestDetailDto.EndTime,
                 Seats = requestDetailDto.Seats,
             };
-            _context.RequestDetails.Add(requestDetail);
-            await _context.SaveChangesAsync();
+            //_context.RequestDetails.Add(requestDetail);
+            //await _context.SaveChangesAsync();
+
+            try
+            {
+                _context.RequestDetails.Add(requestDetail);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                throw new Exception("Error saving data: " + ex.InnerException?.Message ?? ex.Message);
+            }
 
             return requestDetail;
         }

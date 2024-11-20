@@ -435,5 +435,16 @@ namespace MyAPI.Repositories.Impls
             return price.Value;
         }
 
+        public async Task<List<ListCovenientStartEndDTO>> getListStartAndEndPoint()
+        {
+            var listTripConvenient = await _context.Trips
+                .Where(trip => trip.TypeOfTrip == 1)
+                .ToListAsync();
+
+            var tripCovenientListDTOs = _mapper.Map<List<ListCovenientStartEndDTO>>(listTripConvenient);
+
+            return tripCovenientListDTOs;
+        }
+
     }
 }

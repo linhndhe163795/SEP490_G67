@@ -400,5 +400,19 @@ namespace MyAPI.Repositories.Impls
             };
             return combineResult;
         }
+
+        public async Task<bool> deleteTicketTimeOut(int ticketId)
+        {
+            var checkTicket = await _context.Tickets.FirstOrDefaultAsync(s => s.Id == ticketId);
+
+            if (checkTicket == null)
+            {
+                throw new Exception("Ticket id not found");
+            }
+
+            _context.Tickets.Remove(checkTicket);
+            await _context.SaveChangesAsync();
+            return true;
+        }
     }
 }
