@@ -118,6 +118,8 @@ namespace MyAPI.Repositories.Impls
                 {
                     DriverId = requestDetail.DriverId,
                     Price = requestDetail.Price,
+                    VehicleId = requestDetail.VehicleId,
+                    Description = _context.Requests.SingleOrDefault(x => x.Id == requestId).Description,
                     HistoryRentDriverId = addHistoryDriver.HistoryId,
                     CreatedBy = requestDetail.CreatedBy,
                     CreatedAt = requestDetail.CreatedAt,
