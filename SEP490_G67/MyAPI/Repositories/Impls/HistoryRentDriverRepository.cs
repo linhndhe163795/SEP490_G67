@@ -113,7 +113,7 @@ namespace MyAPI.Repositories.Impls
                 };
 
                 await _context.HistoryRentDrivers.AddAsync(addHistoryDriver);
-
+                await _context.SaveChangesAsync();
                 var addPaymentDriver = new PaymentRentDriver
                 {
                     DriverId = requestDetail.DriverId,
@@ -232,53 +232,41 @@ namespace MyAPI.Repositories.Impls
             {
                 int limit = 5;
 
-                var result = new List<HistoryRentDriverListDTOs>();
-                int takeCount = 0;
-                int currentMinRentCount = 0;
-
-                while (takeCount < limit)
-                {
-                    var driversWithCurrentRentCount = await _context.Drivers
-                        .Select(d => new
-                        {
-                            Driver = d,
-                            RentCount = _context.HistoryRentDrivers.Count(hrd => hrd.DriverId == d.Id)
-                        })
-                        .Where(d => d.RentCount > 0)
-                        .Take(limit - takeCount)
-                        .Select(d => new HistoryRentDriverListDTOs
-                        {
-                            Id = d.Driver.Id,
-                            UserName = d.Driver.UserName,
-                            Name = d.Driver.Name,
-                            NumberPhone = d.Driver.NumberPhone,
-                            License = d.Driver.License,
-                            Avatar = d.Driver.Avatar,
-                            Dob = d.Driver.Dob,
-                            StatusWork = d.Driver.StatusWork,
-                            TypeOfDriver = d.Driver.TypeOfDriver,
-                            Status = d.Driver.Status,
-                            Email = d.Driver.Email
-                        })
-                        .ToListAsync();
-
-                    result.AddRange(driversWithCurrentRentCount);
-                    takeCount += driversWithCurrentRentCount.Count;
-
-                    if (takeCount >= limit)
+                var driversWithRentCount = await _context.Drivers
+                    .Select(d => new
                     {
-                        break;
-                    }
+                        Driver = d,
+                        RentCount = _context.HistoryRentDrivers.Count(hrd => hrd.DriverId == d.Id)
+                    })
+                    .OrderBy(d => d.RentCount)
+                    .ThenBy(d => d.Driver.Id)
+                    .ToListAsync();
 
-                    currentMinRentCount++;
-                }
+                var result = driversWithRentCount
+                    .Select(d => new HistoryRentDriverListDTOs
+                    {
+                        Id = d.Driver.Id,
+                        UserName = d.Driver.UserName,
+                        Name = d.Driver.Name,
+                        NumberPhone = d.Driver.NumberPhone,
+                        License = d.Driver.License,
+                        Avatar = d.Driver.Avatar,
+                        Dob = d.Driver.Dob,
+                        StatusWork = d.Driver.StatusWork,
+                        TypeOfDriver = d.Driver.TypeOfDriver,
+                        Status = d.Driver.Status,
+                        Email = d.Driver.Email
+                    })
+                    .Take(limit)
+                    .ToList();
 
-                return result.Take(limit);
+                return result;
             }
             catch (Exception ex)
             {
                 throw new Exception($"Error in GetListHistoryRentDriver: {ex.Message}");
             }
         }
+
     }
 }
