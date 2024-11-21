@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MyAPI.DTOs.DriverDTOs;
 using MyAPI.DTOs.HistoryRentVehicle;
 using MyAPI.DTOs.RequestDTOs;
 using MyAPI.DTOs.TripDTOs;
@@ -20,29 +22,38 @@ namespace MyAPI.Controllers
         private readonly IRequestRepository _requestRepository;
         private readonly IUserCancleTicketRepository _userCancleTicketRepository;
         private readonly GetInforFromToken _token;
+        private readonly IMapper _mapper;
+        private readonly Jwt _Jwt;
 
-        public RequestController(IRequestRepository requestRepository, GetInforFromToken token)
+        public RequestController(IRequestRepository requestRepository, GetInforFromToken token, IMapper mapper, Jwt jwt)
         {
             _token = token;
             _requestRepository = requestRepository;
+            _mapper = mapper;
+            _Jwt = jwt;
         }
-        [Authorize(Roles = "Staff")]
+        [Authorize(Roles = "Staff,Admin")]
         [HttpGet]
-        public async Task<IActionResult> GetAllRequests()
+        public async Task<IActionResult> GetAllRequest()
         {
-            var requests = await _requestRepository.GetAllRequestsWithDetailsAsync();
-            return Ok(requests);
+            var requests = await _requestRepository.GetAll();
+            var UpdateRequestDto = _mapper.Map<IEnumerable<RequestDTO>>(requests);
+            return Ok(UpdateRequestDto);
         }
-        [Authorize(Roles = "Staff")]
+        [Authorize(Roles = "Staff,Admin")]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetRequestById(int id)
         {
-            var request = await _requestRepository.GetRequestWithDetailsByIdAsync(id);
-            if (request == null)
-                return NotFound();
-            return Ok(request);
+            var requests = await _requestRepository.Get(id);
+            if (requests == null)
+            {
+                return NotFound("Driver not found");
+            }
+
+            var UpdateRequestDto = _mapper.Map<RequestDTO>(requests);
+            return Ok(UpdateRequestDto);
         }
-        
+
         [HttpPost("/CreateTicketForRentFullCar")]
         public async Task<IActionResult> CreateRequestForRentCar(RequestDTOForRentCar requestWithDetailsDto)
         {
@@ -60,72 +71,35 @@ namespace MyAPI.Controllers
             }
             return NoContent();
         }
-        //[Authorize]
-        //[HttpPost("/CreateTicketForHireDriver")]
-        //public async Task<IActionResult> CreateRequestForHireDriver(RequestDTO requestWithDetailsDto)
-        //{
-        //    var createdRequest = await _requestRepository.CreateRequestRentDriverAsync(requestWithDetailsDto);
-        //    return CreatedAtAction(nameof(GetRequestById), new { id = createdRequest.Id }, createdRequest);
-        //}
-        //[Authorize(Roles = "Staff")]
-        //[HttpPut("/UpdateRequestForHireDriver/{id}")]
-        //public async Task<IActionResult> UpdateRequestForHireDriver(int id, RequestDTO requestDto)
-        //{
-        //    var updated = await _requestRepository.UpdateRequestRentCarAsync(id, requestDto);
-        //    if (updated == null)
-        //    {
-        //        return NotFound();
-        //    }
-        //    return NoContent();
-        //}
+
+        [Authorize(Roles = "Staff")]
+        [HttpGet("/GetRequestDetailById/{id}")]
+        public async Task<IActionResult> GetRequestDetail(int id)
+        {
+            var requestdetail = await _requestRepository.GetRequestDetailByIdAsync(id);
+            if (requestdetail == null)
+            {
+                return NotFound();
+            }
+            return Ok(requestdetail);
+        }
+
+
         [Authorize(Roles = "Staff")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteRequest(int id)
         {
 
-            var request = await _requestRepository.GetRequestWithDetailsByIdAsync(id);
-            if (request == null)
-                return NotFound();
-
-
-            foreach (var detail in request.RequestDetails)
+            var requests = await _requestRepository.Get(id);
+            if (requests == null)
             {
-                await _requestRepository.DeleteRequestDetailAsync(request.Id, detail.DetailId);
-            }
-
-
-            await _requestRepository.Delete(request);
+                return NotFound("request not found");
+            } 
+            await _requestRepository.Delete(requests);
 
             return NoContent();
         }
 
-        //[HttpPost("accept/{id}")]
-        //public async Task<IActionResult> AcceptRequest(int id)
-        //{
-        //    try
-        //    {
-        //        await _requestRepository.AcceptRequestAsync(id);
-        //        return Ok("Request accepted.");
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return BadRequest(ex.Message);
-        //    }
-        //}
-
-        //[HttpPost("deny/{id}")]
-        //public async Task<IActionResult> DenyRequest(int id)
-        //{
-        //    try
-        //    {
-        //        await _requestRepository.DenyRequestAsync(id);
-        //        return Ok("Request denied.");
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return BadRequest(ex.Message);
-        //    }
-        //}
         [Authorize(Roles = "Staff")]
         [HttpPut("acceptCancleTicket/{id}")]
         public async Task<IActionResult> AcceptCancleTicketRequest(int id)

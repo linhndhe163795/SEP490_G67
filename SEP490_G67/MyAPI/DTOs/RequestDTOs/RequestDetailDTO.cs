@@ -18,6 +18,6 @@
         public DateTime? UpdatedAt { get; set; }
         public int? UpdatedBy { get; set; }
 
-        public int? Price { get; set; }
+        public decimal? Price { get; set; }
     }
 }

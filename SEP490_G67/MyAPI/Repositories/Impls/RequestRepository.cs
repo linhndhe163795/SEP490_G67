@@ -28,6 +28,40 @@ namespace MyAPI.Repositories.Impls
             _promotionUserRepository = promotionUserRepository;
         }
 
+        public async Task<RequestDetailDTO> GetRequestDetailByIdAsync(int requestId)
+        {
+            var requestDetail = await _context.RequestDetails
+                .Where(rd => rd.RequestId == requestId) 
+                .Select(rd => new RequestDetailDTO
+                {
+                    RequestId = rd.RequestId,
+                    TicketId = rd.TicketId,
+                    VehicleId = rd.VehicleId,
+                    DriverId = rd.DriverId,
+                    StartLocation = rd.StartLocation,
+                    EndLocation = rd.EndLocation,
+                    StartTime = rd.StartTime,
+                    EndTime = rd.EndTime,
+                    Seats = rd.Seats,
+                    CreatedAt = rd.CreatedAt,
+                    CreatedBy = rd.CreatedBy,
+                    UpdatedAt = rd.UpdateAt,
+                    UpdatedBy = rd.UpdateBy,
+                    Price = rd.Price,
+                })
+                .FirstOrDefaultAsync();
+
+            if (requestDetail == null)
+            {
+                throw new KeyNotFoundException($"RequestDetail with RequestId {requestId} not found.");
+            }
+
+            return requestDetail;
+        }
+
+
+
+
         public async Task<Request> UpdateRequestRentCarAsync(int id, RequestDTOForRentCar requestDTO)
         {
             
@@ -152,19 +186,7 @@ namespace MyAPI.Repositories.Impls
 
 
 
-        public async Task<IEnumerable<Request>> GetAllRequestsWithDetailsAsync()
-        {
-            return await _context.Requests
-                .Include(r => r.RequestDetails)
-                .ToListAsync();
-        }
-
-        public async Task<Request> GetRequestWithDetailsByIdAsync(int id)
-        {
-            return await _context.Requests
-                .Include(r => r.RequestDetails)
-                .FirstOrDefaultAsync(r => r.Id == id);
-        }
+       
 
         public async Task DeleteRequestDetailAsync(int requestId, int detailId)
         {
@@ -225,29 +247,7 @@ namespace MyAPI.Repositories.Impls
             return false;
         }
 
-        public async Task<bool> AcceptRequestAsync(int requestId)
-        {
-            var request = await GetRequestWithDetailsByIdAsync(requestId);
-            if (request == null)
-            {
-                throw new KeyNotFoundException("Request not found");
-            }
-            request.Status = true;
-            await _context.SaveChangesAsync();
-            return true;
-        }
-
-        public async Task<bool> DenyRequestAsync(int requestId)
-        {
-            var request = await GetRequestWithDetailsByIdAsync(requestId);
-            if (request == null)
-            {
-                throw new KeyNotFoundException("Request not found");
-            }
-            request.Status = false;
-            await _context.SaveChangesAsync();
-            return true;
-        }
+       
 
         public async Task createRequestCancleTicket(RequestCancleTicketDTOs requestCancleTicketDTOs, int userId)
         {
