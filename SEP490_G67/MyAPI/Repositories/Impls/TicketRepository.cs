@@ -127,67 +127,77 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception(ex.Message);
             }
         }
-        public async Task CreateTicketForRentCar(int vehicleId, decimal price, TicketForRentCarDTO ticketRentalDTO, int userId)
+        public async Task AcceptOrDenyRequestRentCar(int requestId, bool choose)
         {
             try
             {
-                var promotionUser = await (from u in _context.Users
-                                           join pu in _context.PromotionUsers on u.Id equals pu.UserId
-                                           join p in _context.Promotions on pu.PromotionId equals p.Id
-                                           where u.Id == userId && p.CodePromotion.Equals(ticketRentalDTO.CodePromotion)
-                                           select p).FirstOrDefaultAsync();
+                var request = await _context.Requests
+                    .Include(r => r.RequestDetails) 
+                    .FirstOrDefaultAsync(r => r.Id == requestId);
 
-                var promotionUserUsed = await _context.PromotionUsers.Include(x => x.Promotion)
-                                                      .FirstOrDefaultAsync(x => x.Promotion.CodePromotion == ticketRentalDTO.CodePromotion && x.UserId == userId);
+                if (request == null)
+                {
+                    throw new Exception("Request not found");
+                }
+
+                if (!choose)
+                {
+                    request.Status = false;
+                    await _context.SaveChangesAsync();
+                    return;
+                }
+
+                var requestDetail = request.RequestDetails.FirstOrDefault(); 
+                if (requestDetail == null)
+                {
+                    throw new Exception("Request details not found");
+                }
 
                 var ticket = new Ticket
                 {
-                    VehicleId = vehicleId,
-                    Price = price,
-                    CodePromotion = promotionUser?.Description,
-                    NumberTicket = ticketRentalDTO.NumberTicket,
-                    PointStart = ticketRentalDTO.PointStart,
-                    PointEnd = ticketRentalDTO.PointEnd,
-                    TimeFrom = ticketRentalDTO.TimeFrom,
-                    TimeTo = ticketRentalDTO.TimeTo,
-                    Description = ticketRentalDTO.Description,
-                    Note = ticketRentalDTO.Note,
-                    UserId = userId,
+                    VehicleId = requestDetail.VehicleId,
+                    Price = requestDetail.Price,
+                    //CodePromotion = requestDetail.CodePromotion,
+                    NumberTicket = requestDetail.Seats,
+                    PointStart = requestDetail.StartLocation,
+                    PointEnd = requestDetail.EndLocation,
+                    TimeFrom = requestDetail.StartTime,
+                    TimeTo = requestDetail.EndTime,
+                    Description = request.Description,
+                    Note = request.Note,
+                    UserId = request.UserId,
                     TypeOfTicket = Constant.VE_XE_DU_LICH,
-                    TypeOfPayment = ticketRentalDTO.TypeOfPayment,
+                    TypeOfPayment = Constant.CHUYEN_KHOAN,
                     CreatedAt = DateTime.UtcNow,
-                    Status = "Đã thanh toán"
+                    Status = "Approved"
                 };
 
-                if (promotionUser != null)
-                {
-                    ticket.PricePromotion = price - (price * (promotionUser.Discount / 100.0m));
-                }
+                //if (!string.IsNullOrEmpty(requestDetail.CodePromotion))
+                //{
+                //    var promotion = await _context.Promotions
+                //        .FirstOrDefaultAsync(p => p.CodePromotion == requestDetail.CodePromotion);
 
+                //    if (promotion != null)
+                //    {
+                //        ticket.PricePromotion = requestDetail.Price - (requestDetail.Price * (promotion.Discount / 100.0m));
+                //    }
+                //}
 
                 await _context.Tickets.AddAsync(ticket);
 
-
-                if (promotionUserUsed != null)
-                {
-                    _context.PromotionUsers.Remove(promotionUserUsed);
-                }
-
-
+                request.Status = true;
                 await _context.SaveChangesAsync();
 
-
-                var user = await _context.Users.FindAsync(userId);
+                var user = await _context.Users.FindAsync(request.UserId);
                 if (user != null)
                 {
-
                     SendMailDTO sendMailDTO = new()
                     {
                         FromEmail = "duclinh5122002@gmail.com",
                         Password = "jetj haze ijdw euci",
                         ToEmail = user.Email,
-                        Subject = "Ticket Confirmation",
-                        Body = $"Your ticket from {ticket.PointStart} to {ticket.PointEnd} has been successfully created. Thank you for your purchase!"
+                        Subject = "Request Confirmation",
+                        Body = $"Your ticket request from {ticket.PointStart} to {ticket.PointEnd} has been approved. Thank you for your request!"
                     };
 
                     if (!await _sendMail.SendEmail(sendMailDTO))
@@ -198,9 +208,11 @@ namespace MyAPI.Repositories.Impls
             }
             catch (Exception ex)
             {
-                throw new Exception("CreateTicketForRentCar: " + ex.Message);
+                throw new Exception("AcceptOrDenyRequestRentCar: " + ex.Message);
             }
         }
+
+
         public async Task<List<ListTicketDTOs>> getAllTicket()
         {
             try

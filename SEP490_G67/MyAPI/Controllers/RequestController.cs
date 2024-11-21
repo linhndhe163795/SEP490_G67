@@ -44,14 +44,14 @@ namespace MyAPI.Controllers
         }
         
         [HttpPost("/CreateTicketForRentFullCar")]
-        public async Task<IActionResult> CreateRequestForRentCar(RequestDTO requestWithDetailsDto)
+        public async Task<IActionResult> CreateRequestForRentCar(RequestDTOForRentCar requestWithDetailsDto)
         {
             var createdRequest = await _requestRepository.CreateRequestRentCarAsync(requestWithDetailsDto);
             return CreatedAtAction(nameof(GetRequestById), new { id = createdRequest.Id }, createdRequest);
         }
         [Authorize(Roles = "Staff")]
         [HttpPut("/UpdateRequestForRentFullCar/{id}")]
-        public async Task<IActionResult> UpdateRequestForRentCar(int id, RequestDTO requestDto)
+        public async Task<IActionResult> UpdateRequestForRentCar(int id, RequestDTOForRentCar requestDto)
         {
             var updated = await _requestRepository.UpdateRequestRentCarAsync(id, requestDto);
             if (updated == null)

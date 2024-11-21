@@ -28,63 +28,72 @@ namespace MyAPI.Repositories.Impls
             _promotionUserRepository = promotionUserRepository;
         }
 
-        public async Task<Request> UpdateRequestRentCarAsync(int id, RequestDTO requestDTO)
+        public async Task<Request> UpdateRequestRentCarAsync(int id, RequestDTOForRentCar requestDTO)
         {
-            var existingRequest = await GetRequestWithDetailsByIdAsync(id);
+            
+            var existingRequest = await _context.Requests
+                .Include(r => r.RequestDetails) 
+                .FirstOrDefaultAsync(r => r.Id == id);
+
             if (existingRequest == null)
             {
                 throw new KeyNotFoundException("Request not found");
             }
 
-            var token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
-            int userId = _tokenHelper.GetIdInHeader(token);
-
-            if (userId == -1)
-            {
-                throw new Exception("Invalid user ID from token.");
-            }
-
-            existingRequest.UserId = userId;
+           
             existingRequest.TypeId = requestDTO.TypeId;
             existingRequest.Status = requestDTO.Status;
             existingRequest.Description = requestDTO.Description;
             existingRequest.Note = requestDTO.Note;
-            existingRequest.CreatedAt = requestDTO.CreatedAt ?? existingRequest.CreatedAt;
+            existingRequest.UpdateAt = DateTime.UtcNow;
+            existingRequest.UpdateBy = _tokenHelper.GetIdInHeader(
+                _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "")
+            );
 
-
+            
             var existingDetails = existingRequest.RequestDetails.ToList();
-            foreach (var detail in existingDetails)
+
+            
+            foreach (var detailDto in requestDTO.RequestDetails)
             {
-                var updatedDetail = requestDTO.RequestDetails.FirstOrDefault(d => d.VehicleId == detail.VehicleId);
-                if (updatedDetail == null)
+                
+                var existingDetail = existingDetails.FirstOrDefault(d => d.RequestId == detailDto.RequestId);
+
+                if (existingDetail != null)
                 {
-                    _context.RequestDetails.Remove(detail);
+                   
+                    existingDetail.StartLocation = detailDto.StartLocation;
+                    existingDetail.EndLocation = detailDto.EndLocation;
+                    existingDetail.StartTime = detailDto.StartTime;
+                    existingDetail.EndTime = detailDto.EndTime;
+                    existingDetail.Seats = detailDto.Seats;
+                    existingDetail.Price = detailDto.Price;
+                    existingDetail.UpdateAt = DateTime.UtcNow;
                 }
                 else
                 {
-                    detail.StartLocation = updatedDetail.StartLocation;
-                    detail.EndLocation = updatedDetail.EndLocation;
-                    detail.StartTime = updatedDetail.StartTime;
-                    detail.EndTime = updatedDetail.EndTime;
-                    detail.Seats = updatedDetail.Seats;
+                    
+                    var newDetail = new RequestDetail
+                    {
+                        StartLocation = detailDto.StartLocation,
+                        EndLocation = detailDto.EndLocation,
+                        StartTime = detailDto.StartTime,
+                        EndTime = detailDto.EndTime,
+                        Seats = detailDto.Seats,
+                        Price = detailDto.Price,
+                        RequestId = existingRequest.Id,
+                        CreatedAt = DateTime.UtcNow
+                    };
+                    await _context.RequestDetails.AddAsync(newDetail);
                 }
             }
 
-            foreach (var detail in requestDTO.RequestDetails)
+           
+            foreach (var existingDetail in existingDetails)
             {
-                if (!existingDetails.Any(d => d.VehicleId == detail.VehicleId))
+                if (!requestDTO.RequestDetails.Any(d => d.RequestId == existingDetail.RequestId))
                 {
-                    var newDetail = new RequestDetail
-                    {
-                        VehicleId = detail.VehicleId,
-                        StartLocation = detail.StartLocation,
-                        EndLocation = detail.EndLocation,
-                        StartTime = detail.StartTime,
-                        EndTime = detail.EndTime,
-                        Seats = detail.Seats,
-                        RequestId = existingRequest.Id
-                    };
-                    _context.RequestDetails.Add(newDetail);
+                    _context.RequestDetails.Remove(existingDetail);
                 }
             }
 
@@ -92,7 +101,8 @@ namespace MyAPI.Repositories.Impls
             return existingRequest;
         }
 
-        public async Task<Request> CreateRequestRentCarAsync(RequestDTO requestDTO)
+
+        public async Task<Request> CreateRequestRentCarAsync(RequestDTOForRentCar requestDTO)
         {
             var token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
             int userId = _tokenHelper.GetIdInHeader(token);
@@ -109,7 +119,7 @@ namespace MyAPI.Repositories.Impls
                 Description = requestDTO.Description,
                 Note = requestDTO.Note,
                 CreatedAt = DateTime.UtcNow,
-                CreatedBy = requestDTO.CreatedBy,
+                CreatedBy = userId,
                 UpdateAt = DateTime.UtcNow,
                 UpdateBy = Constant.ADMIN,
             };
@@ -124,8 +134,6 @@ namespace MyAPI.Repositories.Impls
             {
                 var requestDetail = new RequestDetail
                 {
-                    VehicleId = detailDto.VehicleId,
-                    TicketId = detailDto.TicketId,
                     StartLocation = detailDto.StartLocation,
                     EndLocation = detailDto.EndLocation,
                     StartTime = detailDto.StartTime,
