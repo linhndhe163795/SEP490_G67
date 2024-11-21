@@ -22,6 +22,7 @@ namespace MyAPI.Models
         public string? PhoneNumber { get; set; }
         public string? UserName { get; set; }
         public int? DriverId { get; set; }
+        public string? PromotionCode { get; set; }
 
         public virtual Request? Request { get; set; }
         public virtual Vehicle? Vehicle { get; set; }

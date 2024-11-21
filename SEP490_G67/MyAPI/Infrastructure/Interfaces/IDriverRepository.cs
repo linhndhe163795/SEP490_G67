@@ -18,5 +18,7 @@ namespace MyAPI.Infrastructure.Interfaces
         Task SendEmailToDriversWithoutVehicle(int price);
         Task<bool> checkLogin(LoginDriverDTO login);
         Task<DriverLoginRespone> getDriverLogin(LoginDriverDTO login);
+
+        Task<List<ListDriverDTO>> getListDriverForVehicle();
     }
 }

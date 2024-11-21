@@ -47,7 +47,7 @@ namespace MyAPI.Repositories.Impls
         {
             try
             {
-                var checkUserNameDrive = await _context.Drivers.SingleOrDefaultAsync(s => s.Name.Equals(driverName));
+                var checkUserNameDrive = await _context.Drivers.SingleOrDefaultAsync(s => s.UserName.Equals(driverName));
 
                 var token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
                 int userId = _tokenHelper.GetIdInHeader(token);
@@ -79,7 +79,7 @@ namespace MyAPI.Repositories.Impls
                 Vehicle vehicle = new Vehicle
                 {
                     NumberSeat = vehicleAddDTO.NumberSeat,
-                    VehicleTypeId = vehicleAddDTO.VehicleTypeId,
+                    VehicleTypeId = 1,
                     Image = vehicleAddDTO.Image,
                     Status = isStaff,
                     DriverId = checkUserNameDrive != null ? checkUserNameDrive.Id : 0,
@@ -99,7 +99,6 @@ namespace MyAPI.Repositories.Impls
                 {
                     var requestDTO = new RequestDTO
                     {
-                        UserId = userId,
                         TypeId = 1,
                         Description = "Yêu cầu thêm xe",
                         Note = "Đang chờ xác nhận",

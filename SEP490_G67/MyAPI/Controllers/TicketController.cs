@@ -6,6 +6,7 @@ using MyAPI.DTOs.TicketDTOs;
 using MyAPI.Helper;
 using MyAPI.Infrastructure.Interfaces;
 using MyAPI.Models;
+using MyAPI.Repositories.Impls;
 
 namespace MyAPI.Controllers
 {
@@ -176,6 +177,28 @@ namespace MyAPI.Controllers
             catch (Exception e)
             {
                 return BadRequest(e.Message);
+            }
+        }
+
+
+        [HttpDelete("deleteTicketTimeOut/{ticketId}")]
+        public async Task<IActionResult> deleteTicketByTicketId(int ticketId)
+        {
+            try
+            {
+                var requests = await _ticketRepository.deleteTicketTimeOut(ticketId);
+                if (requests)
+                {
+                    return Ok(requests);
+                }
+                else
+                {
+                    return NotFound("Id not found");
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Message = "deleteTicketByTicketId failed", Details = ex.Message });
             }
         }
     }

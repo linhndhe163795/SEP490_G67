@@ -419,7 +419,7 @@ namespace MyAPI.Repositories.Impls
         }
 
 
-        public async Task<decimal> SearchVehicleConvenient(string startPoint, string endPoint, int typeOfTrip)
+        public async Task<decimal> SearchVehicleConvenient(string startPoint, string endPoint, int typeOfTrip, string? promotion)
         {
             if (string.IsNullOrEmpty(startPoint) || string.IsNullOrEmpty(endPoint))
                 throw new ArgumentException("Start point and end point must not be empty.");
@@ -430,9 +430,33 @@ namespace MyAPI.Repositories.Impls
                 .FirstOrDefaultAsync();
 
             if (price == 0 || price == null)
-                throw new Exception("Start or end point or typeOfTrip is invalid!");
+                throw new Exception("Start point, end point, or typeOfTrip is invalid!");
 
-            return price.Value;
+            if (string.IsNullOrEmpty(promotion))
+                return price.Value;
+
+            var discount = await _context.Promotions
+                .Where(p => p.CodePromotion == promotion)
+                .Select(p => p.Discount)
+                .FirstOrDefaultAsync();
+
+            if (discount == null || discount == 0)
+                return price.Value;
+
+            var pricePromotion = price.Value * (1 - (discount / 100m));
+            return pricePromotion;
+        }
+
+
+        public async Task<List<ListCovenientStartEndDTO>> getListStartAndEndPoint()
+        {
+            var listTripConvenient = await _context.Trips
+                .Where(trip => trip.TypeOfTrip == 1)
+                .ToListAsync();
+
+            var tripCovenientListDTOs = _mapper.Map<List<ListCovenientStartEndDTO>>(listTripConvenient);
+
+            return tripCovenientListDTOs;
         }
 
     }

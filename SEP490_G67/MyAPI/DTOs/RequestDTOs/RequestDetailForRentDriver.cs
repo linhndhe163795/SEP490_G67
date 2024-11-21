@@ -1,8 +1,8 @@
-﻿namespace MyAPI.DTOs.HistoryRentDriverDTOs
+﻿namespace MyAPI.DTOs.RequestDTOs
 {
     public class RequestDetailForRentDriver
     {
-        public int? DriverId { get; set; }
+        public string VehicleId { get; set; }
         public string? StartLocation { get; set; }
         public string? EndLocation { get; set; }
         public DateTime? StartTime { get; set; }

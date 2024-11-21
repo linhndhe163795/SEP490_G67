@@ -153,5 +153,28 @@ namespace MyAPI.Controllers
                 return StatusCode(500, "An error occurred while sending emails: " + ex.Message);
             }
         }
+
+
+        [HttpGet("listDriveDTO")]
+        public async Task<IActionResult> GetDriveList()
+        {
+            try
+            {
+                var requests = await _driverRepository.getListDriverForVehicle();
+                if (requests != null)
+                {
+                    return Ok(requests);
+                }
+                else
+                {
+                    return NotFound("Drive list not found");
+                }
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Message = "Get List Drive failed", Details = ex.Message });
+            }
+        }
     }
 }

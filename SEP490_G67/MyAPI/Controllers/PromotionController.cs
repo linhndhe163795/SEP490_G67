@@ -6,6 +6,7 @@ using MyAPI.DTOs.PromotionDTOs;
 using MyAPI.Helper;
 using MyAPI.Infrastructure.Interfaces;
 using MyAPI.Models;
+using MyAPI.Repositories.Impls;
 
 namespace MyAPI.Controllers
 {
@@ -161,6 +162,28 @@ namespace MyAPI.Controllers
             catch (Exception ex) 
             {
                 return BadRequest("GivePromotionAllUser: " + ex.Message);
+            }
+        }
+
+
+        [HttpDelete("deletePromotionAfterPayment/{userId}/{promotionId}")]
+        public async Task<IActionResult> deletePromotionAfterPayment(int userId, int promotionId)
+        {
+            try
+            {
+                var requests = await _promotionUserRepository.DeletePromotionAfterPayment(userId, promotionId);
+                if (requests)
+                {
+                    return Ok(requests);
+                }
+                else
+                {
+                    return NotFound("Id not found");
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Message = "deletePromotionAfterPayment failed", Details = ex.Message });
             }
         }
     }
