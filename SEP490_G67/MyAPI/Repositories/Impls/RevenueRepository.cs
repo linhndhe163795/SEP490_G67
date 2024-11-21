@@ -45,15 +45,37 @@ namespace MyAPI.Repositories.Impls
             int userId = _tokenHelper.GetIdInHeader(token);
             var listRenvenueTicket = await _ticketRepository.getRevenueTicket(startTime, endTime, vehicleId, vehicleOwner, userId);
             var listRevenueRentVehicle = await _paymentRentVehicleRepository.getPaymentRentVehicleByDate(startTime, endTime, vehicleId, vehicleOwner, userId);
-            var listLossCost = await _lossCostVehicleRepository.GetLossCostVehicleByDate(vehicleId,startTime,endTime, vehicleOwner, userId);
+            var listLossCost = await _lossCostVehicleRepository.GetLossCostVehicleByDate(vehicleId, startTime, endTime, vehicleOwner, userId);
             var listExpenseRentDriver = await _historyRentDriverRepository.GetRentDetailsWithTotalForOwner(startTime, endTime, vehicleId, vehicleOwner);
 
             var revenue = new RevenueDTO
             {
-                revenueTicketDTOs = new List<RevenueTicketDTO> { listRenvenueTicket },
-                totalLossCosts = new List<TotalLossCost> { listLossCost},
-                totalPayementRentDrivers = new List<TotalPayementRentDriver> { listExpenseRentDriver},
-                totalPaymentRentVehicleDTOs = new List<TotalPaymentRentVehicleDTO> { listRevenueRentVehicle }
+                revenueTicketDTOs = new List<RevenueTicketDTO>{
+                    new RevenueTicketDTO
+                    {
+                        listTicket = listRenvenueTicket.listTicket
+                    }
+                },
+                totalLossCosts = new List<TotalLossCost> {
+                    new TotalLossCost
+                    {
+                        listLossCostVehicle = listLossCost.listLossCostVehicle
+                    }
+                },
+                totalPayementRentDrivers = new List<TotalPayementRentDriver> {
+                    new TotalPayementRentDriver
+                    {
+                        PaymentRentDriverDTOs = listExpenseRentDriver.PaymentRentDriverDTOs,
+                    }
+                },
+                totalPaymentRentVehicleDTOs = new List<TotalPaymentRentVehicleDTO> {
+                    new TotalPaymentRentVehicleDTO
+                    {
+                       PaymentRentVehicelDTOs = listRevenueRentVehicle.PaymentRentVehicelDTOs,
+                    }
+                },
+                totalRevenue = listRenvenueTicket.total + listRevenueRentVehicle.Total - listExpenseRentDriver.Total - listLossCost.TotalCost
+
             };
             return revenue;
         }

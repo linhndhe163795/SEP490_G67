@@ -172,29 +172,36 @@ namespace MyAPI.Repositories.Impls
 
         public async Task<Request> CreateRequestVehicleAsync(RequestDTO requestDTO)
         {
-            var token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
-            int userId = _tokenHelper.GetIdInHeader(token);
-
-            if (userId == -1)
+            try
             {
-                throw new Exception("Invalid user ID from token.");
+                var token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+                int userId = _tokenHelper.GetIdInHeader(token);
+
+                if (userId == -1)
+                {
+                    throw new Exception("Invalid user ID from token.");
+                }
+                var newRequest = new Request
+                {
+                    CreatedAt = DateTime.Now,
+                    Description = requestDTO.Description,
+                    Note = requestDTO.Note,
+                    Status = requestDTO.Status,
+                    TypeId = requestDTO.TypeId,
+                    UserId = userId,
+                };
+
+                await _context.Requests.AddAsync(newRequest);
+                await _context.SaveChangesAsync();
+
+                return newRequest;
             }
-            var newRequest = new Request
+            catch (Exception ex)
             {
-                CreatedAt = DateTime.Now,
-                Description = requestDTO.Description,
-                Note = requestDTO.Note,
-                Status = requestDTO.Status,
-                TypeId = requestDTO.TypeId,
-                UserId = userId,
-            };
-
-            await _context.Requests.AddAsync(newRequest);
-            await _context.SaveChangesAsync();
-
-            return newRequest;
+                throw new Exception(ex.Message);
+            }
         }
-
+          
         public async Task<bool> UpdateRequestVehicleAsync(int requestId, Request request)
         {
             var update = await _context.Requests.SingleOrDefaultAsync(s => s.Id == requestId);

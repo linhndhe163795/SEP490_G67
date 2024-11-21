@@ -385,12 +385,13 @@ namespace MyAPI.Repositories.Impls
         {
             var listTicket =
                 await query.Select(
-                    x => new TicketDTOs
+                    x => new TicketRevenue
                     {
-                        Price = x.Price,
+                        PricePromotion = x.PricePromotion,
                         CreatedAt = x.CreatedAt,
                         VehicleId = x.VehicleId,
                         TypeOfTicket = x.TypeOfTicket,
+                        TypeOfPayment = x.TypeOfPayment                        
                     }).ToListAsync();
             var sumPriceTicket = query.Sum(x => x.Price);
             var combineResult = new RevenueTicketDTO
