@@ -56,7 +56,7 @@ namespace MyAPI.Repositories.Impls
             {
                 throw new Exception("DeletePromotionUser " + ex.Message);
             }
-
+ 
         }
     }
 }

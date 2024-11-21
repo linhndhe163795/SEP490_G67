@@ -11,5 +11,6 @@ namespace MyAPI.DTOs.RevenueDTOs
         public List<TotalPaymentRentVehicleDTO> totalPaymentRentVehicleDTOs { get; set; } = new List<TotalPaymentRentVehicleDTO>();
         public List<TotalLossCost> totalLossCosts { get; set; } = new List<TotalLossCost>();
         public List<TotalPayementRentDriver> totalPayementRentDrivers { get; set; } = new List<TotalPayementRentDriver>();
+        public decimal? totalRevenue { get; set; }
     }
 }

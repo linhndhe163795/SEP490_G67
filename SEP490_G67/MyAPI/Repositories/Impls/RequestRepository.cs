@@ -155,20 +155,28 @@ namespace MyAPI.Repositories.Impls
 
         public async Task<Request> CreateRequestVehicleAsync(RequestDTO requestDTO)
         {
-            var newRequest = new Request
+            try
             {
-                CreatedAt = DateTime.Now,
-                Description = requestDTO.Description,
-                Note = requestDTO.Note,
-                Status = requestDTO.Status,
-                TypeId = requestDTO.TypeId,
-                UserId = requestDTO.UserId,
-            };
+                var newRequest = new Request
+                {
+                    CreatedAt = DateTime.Now,
+                    Description = requestDTO.Description,
+                    Note = requestDTO.Note,
+                    Status = requestDTO.Status,
+                    TypeId = requestDTO.TypeId,
+                    UserId = requestDTO.UserId,
+                };
 
-            await _context.Requests.AddAsync(newRequest);
-            await _context.SaveChangesAsync();
+                await _context.Requests.AddAsync(newRequest);
+                await _context.SaveChangesAsync();
 
-            return newRequest;
+                return newRequest;
+            }
+            catch (Exception ex) 
+            {
+                throw new Exception(ex.Message);
+            }
+          
         }
 
         public async Task<bool> UpdateRequestVehicleAsync(int requestId, Request request)

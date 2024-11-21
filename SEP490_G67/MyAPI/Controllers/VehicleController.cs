@@ -73,7 +73,7 @@ namespace MyAPI.Controllers
 
         [Authorize(Roles = "Staff, VehicleOwner")]
         [HttpPost("addVehicle")]
-        public async Task<IActionResult> AddVehicle(VehicleAddDTO vehicleAddDTO, string driverName)
+        public async Task<IActionResult> AddVehicle(VehicleAddDTO vehicleAddDTO, string? driverName)
         {
             try
             {
