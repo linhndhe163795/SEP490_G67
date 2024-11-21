@@ -68,6 +68,25 @@ namespace MyAPI.Controllers
             }
         }
         [Authorize(Roles = "Staff")]
+        [HttpPost("CreatePromotion")]
+        public async Task<IActionResult> CreatePromotion([FromBody] PromotionDTO promotionDTO)
+        {
+            try
+            {
+                if (promotionDTO == null)
+                    return BadRequest("Promotion data is required.");
+
+                var createdPromotion = await _promotionRepository.CreatePromotion(promotionDTO);
+                return CreatedAtAction(nameof(GetPromotionByUser), new { id = createdPromotion.CodePromotion }, createdPromotion);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+       
+        [Authorize(Roles = "Staff")]
         [HttpPut("updatePromotion/id")]
         public async Task<IActionResult> UpdatePromotion(int id, [FromForm] PromotionDTO promotionDTO, IFormFile? imageFile)
         {
@@ -77,6 +96,7 @@ namespace MyAPI.Controllers
                 if (getPromotionById == null) return NotFound("Not found promotion had id = " + id);
                 getPromotionById.Description = promotionDTO.Description;
                 getPromotionById.Discount = promotionDTO.Discount;
+                getPromotionById.ExchangePoint = promotionDTO.ExchangePoint;
                 getPromotionById.CodePromotion = promotionDTO.CodePromotion;
                 getPromotionById.ImagePromotion = promotionDTO.ImagePromotion;
                 getPromotionById.UpdateAt = DateTime.Now;
