@@ -9,13 +9,10 @@ namespace MyAPI.Infrastructure.Interfaces
     {
         Task<Request> CreateRequestVehicleAsync(RequestDTO requestDTO);
         Task<bool> UpdateRequestVehicleAsync(int requestId, Request request);
-        Task<IEnumerable<Request>> GetAllRequestsWithDetailsAsync();
-        Task<Request> GetRequestWithDetailsByIdAsync(int id);
         Task<Request> UpdateRequestRentCarAsync(int id, RequestDTOForRentCar requestDTO);
         Task<Request> CreateRequestRentCarAsync(RequestDTOForRentCar requestDTO);
+        Task<RequestDetailDTO> GetRequestDetailByIdAsync(int requestId);
         Task DeleteRequestDetailAsync(int requestId, int detailId);
-        //Task<bool> AcceptRequestAsync(int requestId);
-        //Task<bool> DenyRequestAsync(int requestId);
         Task createRequestCancleTicket(RequestCancleTicketDTOs requestCancleTicketDTOs, int userId);
         Task<List<ResponeCancleTicketDTOs>> getListRequestCancle();
         Task updateStatusRequestCancleTicket(int requestId, int staffId);
