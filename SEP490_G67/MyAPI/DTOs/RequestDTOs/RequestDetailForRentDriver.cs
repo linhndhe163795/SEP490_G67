@@ -2,7 +2,7 @@
 {
     public class RequestDetailForRentDriver
     {
-        public string VehicleId { get; set; }
+        public int? VehicleId { get; set; }
         public string? StartLocation { get; set; }
         public string? EndLocation { get; set; }
         public DateTime? StartTime { get; set; }
