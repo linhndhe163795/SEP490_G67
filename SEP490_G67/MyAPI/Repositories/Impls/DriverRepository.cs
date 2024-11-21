@@ -1,7 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using MyAPI.DTOs;
 using MyAPI.DTOs.DriverDTOs;
 using MyAPI.DTOs.UserDTOs;
+using MyAPI.DTOs.VehicleDTOs;
 using MyAPI.Helper;
 using MyAPI.Infrastructure.Interfaces;
 using MyAPI.Models;
@@ -15,12 +17,17 @@ namespace MyAPI.Repositories.Impls
         private readonly ITypeOfDriverRepository _typeOfDriverRepository;
         private readonly SendMail _sendMail;
         private readonly HashPassword _hashPassword;
-        public DriverRepository(SEP490_G67Context context, ITypeOfDriverRepository typeOfDriverRepository, SendMail sendMail, HashPassword hashPassword) : base(context)
+        private readonly IMapper _mapper;
+
+
+        public DriverRepository(SEP490_G67Context context, ITypeOfDriverRepository typeOfDriverRepository
+            , SendMail sendMail, HashPassword hashPassword, IMapper mapper) : base(context)
         {
             _context = context;
             _typeOfDriverRepository = typeOfDriverRepository;
             _sendMail = sendMail;
             _hashPassword = hashPassword;
+            _mapper = mapper;
         }
 
         public async Task<Driver> GetDriverWithVehicle(int id)
@@ -167,6 +174,15 @@ namespace MyAPI.Repositories.Impls
             {
                 throw new Exception(ex.Message);
             }
+        }
+
+        public async Task<List<ListDriverDTO>> getListDriverForVehicle()
+        {
+            var listDriver = await _context.Drivers.ToListAsync();
+
+            var driveListDTOs = _mapper.Map<List<ListDriverDTO>>(listDriver);
+
+            return driveListDTOs;
         }
     }
 }

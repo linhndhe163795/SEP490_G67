@@ -65,6 +65,8 @@ namespace MyAPI.MappingProfile
             CreateMap<LossCostAddDTOs, LossCost>().ReverseMap();
             CreateMap<PointUser, PointUserDTOs>().ReverseMap();
             CreateMap<Ticket, TicketByIdDTOs>().ReverseMap();
+            CreateMap<Trip, ListCovenientStartEndDTO>().ReverseMap();
+            CreateMap<Driver, ListDriverDTO>().ReverseMap();
 
         }
     }

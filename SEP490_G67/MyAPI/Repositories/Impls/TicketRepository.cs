@@ -385,12 +385,13 @@ namespace MyAPI.Repositories.Impls
         {
             var listTicket =
                 await query.Select(
-                    x => new TicketDTOs
+                    x => new TicketRevenue
                     {
-                        Price = x.Price,
+                        PricePromotion = x.PricePromotion,
                         CreatedAt = x.CreatedAt,
                         VehicleId = x.VehicleId,
                         TypeOfTicket = x.TypeOfTicket,
+                        TypeOfPayment = x.TypeOfPayment                        
                     }).ToListAsync();
             var sumPriceTicket = query.Sum(x => x.Price);
             var combineResult = new RevenueTicketDTO
@@ -399,6 +400,20 @@ namespace MyAPI.Repositories.Impls
                 listTicket = listTicket
             };
             return combineResult;
+        }
+
+        public async Task<bool> deleteTicketTimeOut(int ticketId)
+        {
+            var checkTicket = await _context.Tickets.FirstOrDefaultAsync(s => s.Id == ticketId);
+
+            if (checkTicket == null)
+            {
+                throw new Exception("Ticket id not found");
+            }
+
+            _context.Tickets.Remove(checkTicket);
+            await _context.SaveChangesAsync();
+            return true;
         }
     }
 }

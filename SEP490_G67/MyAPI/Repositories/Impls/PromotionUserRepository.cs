@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using MyAPI.DTOs.PromotionUserDTOs;
 using MyAPI.Infrastructure.Interfaces;
 using MyAPI.Models;
@@ -39,6 +40,21 @@ namespace MyAPI.Repositories.Impls
             }
         }
 
+        public async Task<bool> DeletePromotionAfterPayment(int userId, int promotion_id)
+        {
+            var checkExits = await _context.PromotionUsers.FirstOrDefaultAsync(s => s.UserId == userId && s.PromotionId == promotion_id);
+
+            if (checkExits != null)
+            {
+                _context.PromotionUsers.Remove(checkExits);
+                await _context.SaveChangesAsync(); 
+                return true;
+            }else
+            {
+                throw new Exception("Faild to deletePromotion");
+            }
+        }
+
         public async Task DeletePromotionUser(int id)
         {
             try
@@ -56,7 +72,7 @@ namespace MyAPI.Repositories.Impls
             {
                 throw new Exception("DeletePromotionUser " + ex.Message);
             }
-
+ 
         }
     }
 }
