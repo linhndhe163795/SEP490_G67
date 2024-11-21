@@ -77,16 +77,11 @@ namespace MyAPI.Controllers
         }
 
         [HttpPost("createTicketForRentCar/{vehicleId}")]
-        public async Task<IActionResult> CreateTicketForRentCar([FromBody] TicketForRentCarDTO ticketRentalDTO, int vehicleId, decimal price, int userId)
+        public async Task<IActionResult> CreateTicketForRentCar(int requestId, bool choose)
         {
-            if (ticketRentalDTO == null)
-            {
-                return BadRequest("Invalid ticket rental data.");
-            }
-
             try
             {
-                await _ticketRepository.CreateTicketForRentCar(vehicleId, price, ticketRentalDTO, userId);
+                await _ticketRepository.AcceptOrDenyRequestRentCar(requestId, choose);
 
                 return Ok("Ticket created successfully.");
             }
