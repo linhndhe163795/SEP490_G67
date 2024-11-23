@@ -70,7 +70,6 @@ namespace MyAPI.Repositories.Impls
                                                 DateIncurred = ls.DateIncurred,
                                                 Description = ls.Description,
                                                 Price = ls.Price,
-                                                LossCostTypeId = ls.LossCostTypeId,
                                             }).ToListAsync();
                 if (lossCostVehicle == null)
                 {
@@ -119,8 +118,8 @@ namespace MyAPI.Repositories.Impls
         private async Task<TotalLossCost> GetLossCosstForVehicleOwner(DateTime? startDate, DateTime? endDate, int? vehicleOwner, int? vechileId)
         {
             var query =  _context.LossCosts.Include(x => x.Vehicle)
-                                          .Include(x => x.LossCostType)
-                                          .Where(x => x.DateIncurred >= startDate && 
+                                           .Include(x => x.LossCostType)
+                                           .Where(x => x.DateIncurred >= startDate && 
                                                  x.DateIncurred <= endDate &&
                                                  x.Vehicle.VehicleOwner == vehicleOwner);
             if(vechileId.HasValue && vechileId != 0)
@@ -137,13 +136,13 @@ namespace MyAPI.Repositories.Impls
                                                 DateIncurred = ls.DateIncurred,
                                                 Description = ls.Description,
                                                 Price = ls.Price,
-                                                LossCostTypeId = ls.LossCostTypeId,
-                                                VehicleOwner = ls.Vehicle.VehicleOwner
+                                                LossCostType = ls.LossCostType.Description,
+                                                VehicleOwner = _context.Users.Include(uv => uv.Vehicles).Where(u => u.Id == ls.Vehicle.VehicleOwner).Select(u => u.FullName).FirstOrDefault()
                                             }).ToListAsync();
-            if (!lossCostVehicleByDate.Any())
-            {
-                throw new Exception("No loss cost data found for the specified criteria.");
-            }
+            //if (!lossCostVehicleByDate.Any())
+            //{
+            //    throw new Exception("No loss cost data found for the specified criteria.");
+            //}
             var combineResult = new TotalLossCost
             {
                 listLossCostVehicle = lossCostVehicleByDate,
@@ -154,6 +153,7 @@ namespace MyAPI.Repositories.Impls
         private async Task<TotalLossCost> GetLossCosstForStaff(DateTime startDate, DateTime endDate, int? vehicleOwner, int? vehicleId ,int userId)
         {
             var query = _context.LossCosts.Include(x => x.Vehicle)
+                                          .ThenInclude(x => x.VehicleOwnerNavigation)
                                           .Include(x => x.LossCostType)
                                           .Where(x => x.DateIncurred >= startDate && x.DateIncurred <= endDate);
             if(vehicleOwner.HasValue && vehicleOwner != 0)
@@ -174,8 +174,8 @@ namespace MyAPI.Repositories.Impls
                                                 DateIncurred = ls.DateIncurred,
                                                 Description = ls.Description,
                                                 Price = ls.Price,
-                                                LossCostTypeId = ls.LossCostTypeId,
-                                                VehicleOwner = ls.Vehicle.VehicleOwner
+                                                LossCostType = ls.LossCostType.Description,
+                                                VehicleOwner = _context.Users.Include(uv => uv.Vehicles).Where(u => u.Id == ls.Vehicle.VehicleOwner).Select(u => u.FullName).FirstOrDefault()
                                             }).ToListAsync();
             //if (!lossCostVehicleByDate.Any())
             //{

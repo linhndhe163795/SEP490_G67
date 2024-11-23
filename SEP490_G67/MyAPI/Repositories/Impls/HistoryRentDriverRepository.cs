@@ -175,8 +175,8 @@ namespace MyAPI.Repositories.Impls
             var rentDetails = await query.Select(x => new PaymentRentDriverDTO
             {
                 Price = x.Price,
-                DriverId = x.DriverId,
-                VehicleId = x.VehicleId,
+                LicenseVehicle = _context.Vehicles.Where(v => v.Id == x.VehicleId).Select(x => x.LicensePlate).FirstOrDefault(),
+                DriverName = _context.Drivers.Where(d => d.Id == x.DriverId).Select(x => x.Name).FirstOrDefault(),
                 CreatedAt = x.CreatedAt,
             }).ToListAsync();
             var total = query.Sum(x => x.Price);

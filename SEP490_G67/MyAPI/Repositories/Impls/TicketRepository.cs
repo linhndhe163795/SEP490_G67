@@ -369,7 +369,7 @@ namespace MyAPI.Repositories.Impls
         }
         private async Task<RevenueTicketDTO> GetRevenueForVehicleOwner(DateTime startTime, DateTime endTime, int? vehicleId, int userId)
         {
-            var query = _context.Tickets.Include(x => x.Vehicle).Where(x => x.Vehicle.VehicleOwner == userId);
+            var query = _context.Tickets.Include(x => x.Vehicle).Where(x => x.Vehicle.VehicleOwner == userId && x.CreatedAt >= startTime && x.CreatedAt <= endTime);
             if (vehicleId.HasValue && vehicleId != 0)
             {
                 query = query.Where(x => x.VehicleId == vehicleId);
@@ -401,11 +401,11 @@ namespace MyAPI.Repositories.Impls
                     {
                         PricePromotion = x.PricePromotion,
                         CreatedAt = x.CreatedAt,
-                        VehicleId = x.VehicleId,
-                        TypeOfTicket = x.TypeOfTicket,
-                        TypeOfPayment = x.TypeOfPayment                        
+                        LiscenseVehicle = x.Vehicle.LicensePlate,
+                        TypeOfTicket = x.TypeOfTicketNavigation.Description,
+                        TypeOfPayment = x.TypeOfPaymentNavigation.TypeOfPayment1,                     
                     }).ToListAsync();
-            var sumPriceTicket = query.Sum(x => x.Price);
+            var sumPriceTicket = query.Sum(x => x.PricePromotion);
             var combineResult = new RevenueTicketDTO
             {
                 total = sumPriceTicket,
