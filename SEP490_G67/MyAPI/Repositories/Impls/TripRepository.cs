@@ -334,7 +334,6 @@ namespace MyAPI.Repositories.Impls
                         var pointStart = worksheet.Cells[row, 5].Text;
                         var pointEnd = worksheet.Cells[row, 6].Text;
                         var statusText = worksheet.Cells[row, 7].Text;
-                        var typeOfTripText = worksheet.Cells[row, 8].Text;
 
                         if (string.IsNullOrEmpty(name))
                         {
@@ -368,12 +367,6 @@ namespace MyAPI.Repositories.Impls
 
                         bool? status = statusText.ToLower() switch { "true" => true, "false" => false, _ => (bool?)null };
 
-                        if (!int.TryParse(typeOfTripText, out int typeOfTrip))
-                        {
-                            errorAdd.Add($"Row{row}: Invalid typeOfTripText");
-                            continue;
-                        }
-
 
                         var tripAdd = new Trip
                         {
@@ -384,7 +377,7 @@ namespace MyAPI.Repositories.Impls
                             PointStart = pointStart,
                             PointEnd = pointEnd,
                             Status = status,
-                            TypeOfTrip = typeOfTrip,
+                            TypeOfTrip = 2,
                             CreatedAt = DateTime.Now,
                             CreatedBy = userId,
                             UpdateAt = DateTime.Now,
