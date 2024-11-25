@@ -9,7 +9,7 @@ namespace MyAPI.Infrastructure.Interfaces
     {
         Task<Request> CreateRequestVehicleAsync(RequestDTO requestDTO);
         Task<bool> UpdateRequestVehicleAsync(int requestId, Request request);
-        //Task<Request> UpdateRequestRentCarAsync(int id, RequestDTOForRentCar requestDTO);
+        Task<bool> UpdateRequestRentCarAsync(int id, RequestDTOForRentCar requestDTO);
         Task<bool> CreateRequestRentCarAsync(RequestDTOForRentCar requestDTO);
         Task<RequestDetailDTO> GetRequestDetailByIdAsync(int requestId);
         Task DeleteRequestDetailAsync(int requestId, int detailId);
