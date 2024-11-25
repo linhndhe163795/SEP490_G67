@@ -157,7 +157,6 @@ namespace MyAPI.Repositories.Impls
                 {
                     VehicleId = requestDetail.VehicleId,
                     Price = requestDetail.Price,
-                    //CodePromotion = requestDetail.CodePromotion,
                     NumberTicket = requestDetail.Seats,
                     PointStart = requestDetail.StartLocation,
                     PointEnd = requestDetail.EndLocation,
@@ -169,19 +168,11 @@ namespace MyAPI.Repositories.Impls
                     TypeOfTicket = Constant.VE_XE_DU_LICH,
                     TypeOfPayment = Constant.CHUYEN_KHOAN,
                     CreatedAt = DateTime.UtcNow,
+                    CreatedBy = request.UserId,
+                    UpdateAt = DateTime.UtcNow,
+                    UpdateBy = Constant.ADMIN,
                     Status = "Approved"
                 };
-
-                //if (!string.IsNullOrEmpty(requestDetail.CodePromotion))
-                //{
-                //    var promotion = await _context.Promotions
-                //        .FirstOrDefaultAsync(p => p.CodePromotion == requestDetail.CodePromotion);
-
-                //    if (promotion != null)
-                //    {
-                //        ticket.PricePromotion = requestDetail.Price - (requestDetail.Price * (promotion.Discount / 100.0m));
-                //    }
-                //}
 
                 await _context.Tickets.AddAsync(ticket);
 

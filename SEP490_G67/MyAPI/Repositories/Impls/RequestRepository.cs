@@ -62,131 +62,136 @@ namespace MyAPI.Repositories.Impls
 
 
 
-        public async Task<Request> UpdateRequestRentCarAsync(int id, RequestDTOForRentCar requestDTO)
+        //public async Task<Request> UpdateRequestRentCarAsync(int id, RequestDTOForRentCar requestDTO)
+        //{
+        //    // Tìm Request hiện tại trong cơ sở dữ liệu
+        //    var existingRequest = await _context.Requests
+        //        .Include(r => r.RequestDetails) // Bao gồm cả RequestDetails
+        //        .FirstOrDefaultAsync(r => r.Id == id);
+
+        //    if (existingRequest == null)
+        //    {
+        //        throw new KeyNotFoundException("Request not found");
+        //    }
+
+        //    // Cập nhật các thuộc tính của Request
+        //    existingRequest.TypeId = requestDTO.TypeId;
+        //    existingRequest.Status = requestDTO.Status;
+        //    existingRequest.Description = requestDTO.Description;
+        //    existingRequest.Note = requestDTO.Note;
+        //    existingRequest.UpdateAt = DateTime.UtcNow;
+        //    existingRequest.UpdateBy = _tokenHelper.GetIdInHeader(
+        //        _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "")
+        //    );
+
+        //    // Cập nhật hoặc thêm mới RequestDetail
+        //    var existingDetail = existingRequest.RequestDetails.FirstOrDefault();
+        //    if (existingDetail != null)
+        //    {
+        //        // Nếu RequestDetail đã tồn tại, cập nhật nó
+        //        existingDetail.StartLocation = requestDTO.StartLocation;
+        //        existingDetail.EndLocation = requestDTO.EndLocation;
+        //        existingDetail.StartTime = requestDTO.StartTime;
+        //        existingDetail.EndTime = requestDTO.EndTime;
+        //        existingDetail.Seats = requestDTO.Seats;
+        //        existingDetail.Price = requestDTO.Price;
+        //        existingDetail.UpdateAt = DateTime.UtcNow;
+        //    }
+        //    else
+        //    {
+        //        // Nếu chưa có RequestDetail, tạo mới
+        //        var newDetail = new RequestDetail
+        //        {
+        //            StartLocation = requestDTO.StartLocation,
+        //            EndLocation = requestDTO.EndLocation,
+        //            StartTime = requestDTO.StartTime,
+        //            EndTime = requestDTO.EndTime,
+        //            Seats = requestDTO.Seats,
+        //            Price = requestDTO.Price,
+        //            RequestId = existingRequest.Id,
+        //            CreatedAt = DateTime.UtcNow
+        //        };
+        //        await _context.RequestDetails.AddAsync(newDetail);
+        //    }
+
+        //    // Lưu các thay đổi vào cơ sở dữ liệu
+        //    await _context.SaveChangesAsync();
+
+        //    return existingRequest;
+        //}
+
+
+
+        public async Task<bool> CreateRequestRentCarAsync(RequestDTOForRentCar rentVehicleAddDTO)
         {
-            
-            var existingRequest = await _context.Requests
-                .Include(r => r.RequestDetails) 
-                .FirstOrDefaultAsync(r => r.Id == id);
-
-            if (existingRequest == null)
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
             {
-                throw new KeyNotFoundException("Request not found");
-            }
+                var token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+                int userId = _tokenHelper.GetIdInHeader(token);
 
-           
-            existingRequest.TypeId = requestDTO.TypeId;
-            existingRequest.Status = requestDTO.Status;
-            existingRequest.Description = requestDTO.Description;
-            existingRequest.Note = requestDTO.Note;
-            existingRequest.UpdateAt = DateTime.UtcNow;
-            existingRequest.UpdateBy = _tokenHelper.GetIdInHeader(
-                _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "")
-            );
-
-            
-            var existingDetails = existingRequest.RequestDetails.ToList();
-
-            
-            foreach (var detailDto in requestDTO.RequestDetails)
-            {
-                
-                var existingDetail = existingDetails.FirstOrDefault(d => d.RequestId == detailDto.RequestId);
-
-                if (existingDetail != null)
+                if (userId == -1)
                 {
-                   
-                    existingDetail.StartLocation = detailDto.StartLocation;
-                    existingDetail.EndLocation = detailDto.EndLocation;
-                    existingDetail.StartTime = detailDto.StartTime;
-                    existingDetail.EndTime = detailDto.EndTime;
-                    existingDetail.Seats = detailDto.Seats;
-                    existingDetail.Price = detailDto.Price;
-                    existingDetail.UpdateAt = DateTime.UtcNow;
+                    throw new Exception("Invalid user ID from token.");
                 }
-                else
+
+               
+                var addRentVehicle = new Request
                 {
-                    
-                    var newDetail = new RequestDetail
-                    {
-                        StartLocation = detailDto.StartLocation,
-                        EndLocation = detailDto.EndLocation,
-                        StartTime = detailDto.StartTime,
-                        EndTime = detailDto.EndTime,
-                        Seats = detailDto.Seats,
-                        Price = detailDto.Price,
-                        RequestId = existingRequest.Id,
-                        CreatedAt = DateTime.UtcNow
-                    };
-                    await _context.RequestDetails.AddAsync(newDetail);
-                }
-            }
-
-           
-            foreach (var existingDetail in existingDetails)
-            {
-                if (!requestDTO.RequestDetails.Any(d => d.RequestId == existingDetail.RequestId))
-                {
-                    _context.RequestDetails.Remove(existingDetail);
-                }
-            }
-
-            await _context.SaveChangesAsync();
-            return existingRequest;
-        }
-
-
-        public async Task<Request> CreateRequestRentCarAsync(RequestDTOForRentCar requestDTO)
-        {
-            var token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
-            int userId = _tokenHelper.GetIdInHeader(token);
-
-            if (userId == -1)
-            {
-                throw new Exception("Invalid user ID from token.");
-            }
-            var newRequest = new Request
-            {
-                UserId = userId,
-                TypeId = requestDTO.TypeId,
-                Status = requestDTO.Status,
-                Description = requestDTO.Description,
-                Note = requestDTO.Note,
-                CreatedAt = DateTime.UtcNow,
-                CreatedBy = userId,
-                UpdateAt = DateTime.UtcNow,
-                UpdateBy = Constant.ADMIN,
-            };
-
-            await _context.Requests.AddAsync(newRequest);
-            await _context.SaveChangesAsync();
-
-            var maxId = await _context.Requests.MaxAsync(r => (int?)r.Id) ?? 0;
-            var newRequestId = maxId + 1;
-
-            foreach (var detailDto in requestDTO.RequestDetails)
-            {
-                var requestDetail = new RequestDetail
-                {
-                    StartLocation = detailDto.StartLocation,
-                    EndLocation = detailDto.EndLocation,
-                    StartTime = detailDto.StartTime,
-                    EndTime = detailDto.EndTime,
-                    Seats = detailDto.Seats,
-                    RequestId = maxId,
-                    Price = detailDto.Price,
-                    CreatedAt = DateTime.UtcNow,
+                    UserId = userId,
+                    TypeId = 2, 
+                    Status = false, 
+                    Description = "Yêu cầu thuê xe du lịch",
+                    CreatedAt = DateTime.Now,
+                    Note = "Chờ xác nhận",
+                    CreatedBy = userId,
+                    UpdateAt = DateTime.Now,
+                    UpdateBy = userId,
                 };
-                await _context.RequestDetails.AddAsync(requestDetail);
-            }
 
-            await _context.SaveChangesAsync();
-            return newRequest;
+                
+                await _context.Requests.AddAsync(addRentVehicle);
+                await _context.SaveChangesAsync();
+
+               
+                var addRentVehicleRequestDetails = new RequestDetail
+                {
+                    RequestId = addRentVehicle.Id, 
+                    VehicleId = null,
+                    TicketId = null, 
+                    StartLocation = rentVehicleAddDTO?.StartLocation,
+                    EndLocation = rentVehicleAddDTO?.EndLocation,
+                    StartTime = rentVehicleAddDTO?.StartTime,
+                    EndTime = rentVehicleAddDTO?.EndTime,
+                    Seats = rentVehicleAddDTO?.Seats,
+                    Price = rentVehicleAddDTO?.Price,
+                    CreatedAt = DateTime.Now,
+                    CreatedBy = userId,
+                    UpdateAt = DateTime.Now,
+                    UpdateBy = userId,
+                };
+
+                // Lưu RequestDetail vào cơ sở dữ liệu
+                await _context.RequestDetails.AddAsync(addRentVehicleRequestDetails);
+                await _context.SaveChangesAsync();
+
+                // Cam kết giao dịch
+                await transaction.CommitAsync();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                throw new Exception($"Error in CreateRequestRentVehicleAsync: {ex.Message}");
+            }
         }
 
 
 
-       
+
+
+
+
 
         public async Task DeleteRequestDetailAsync(int requestId, int detailId)
         {
