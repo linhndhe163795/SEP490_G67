@@ -217,7 +217,6 @@ namespace MyAPI.Repositories.Impls
 
 
 
-
         public async Task DeleteRequestDetailAsync(int requestId, int detailId)
         {
             var detail = await _context.RequestDetails
