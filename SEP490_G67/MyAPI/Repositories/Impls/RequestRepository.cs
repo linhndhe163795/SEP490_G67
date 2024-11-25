@@ -62,62 +62,88 @@ namespace MyAPI.Repositories.Impls
 
 
 
-        //public async Task<Request> UpdateRequestRentCarAsync(int id, RequestDTOForRentCar requestDTO)
+        //public async task<request> updaterequestrentcarasync(int id, requestdtoforrentcar requestdto)
         //{
-        //    // Tìm Request hiện tại trong cơ sở dữ liệu
-        //    var existingRequest = await _context.Requests
-        //        .Include(r => r.RequestDetails) // Bao gồm cả RequestDetails
-        //        .FirstOrDefaultAsync(r => r.Id == id);
-
-        //    if (existingRequest == null)
+        //    using var transaction = await _context.database.begintransactionasync();
+        //    try
         //    {
-        //        throw new KeyNotFoundException("Request not found");
-        //    }
+        //        // lấy thông tin user từ token
+        //        var token = _httpcontextaccessor.httpcontext.request.headers["authorization"].tostring().replace("bearer ", "");
+        //        int userid = _tokenhelper.getidinheader(token);
 
-        //    // Cập nhật các thuộc tính của Request
-        //    existingRequest.TypeId = requestDTO.TypeId;
-        //    existingRequest.Status = requestDTO.Status;
-        //    existingRequest.Description = requestDTO.Description;
-        //    existingRequest.Note = requestDTO.Note;
-        //    existingRequest.UpdateAt = DateTime.UtcNow;
-        //    existingRequest.UpdateBy = _tokenHelper.GetIdInHeader(
-        //        _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "")
-        //    );
-
-        //    // Cập nhật hoặc thêm mới RequestDetail
-        //    var existingDetail = existingRequest.RequestDetails.FirstOrDefault();
-        //    if (existingDetail != null)
-        //    {
-        //        // Nếu RequestDetail đã tồn tại, cập nhật nó
-        //        existingDetail.StartLocation = requestDTO.StartLocation;
-        //        existingDetail.EndLocation = requestDTO.EndLocation;
-        //        existingDetail.StartTime = requestDTO.StartTime;
-        //        existingDetail.EndTime = requestDTO.EndTime;
-        //        existingDetail.Seats = requestDTO.Seats;
-        //        existingDetail.Price = requestDTO.Price;
-        //        existingDetail.UpdateAt = DateTime.UtcNow;
-        //    }
-        //    else
-        //    {
-        //        // Nếu chưa có RequestDetail, tạo mới
-        //        var newDetail = new RequestDetail
+        //        if (userid == -1)
         //        {
-        //            StartLocation = requestDTO.StartLocation,
-        //            EndLocation = requestDTO.EndLocation,
-        //            StartTime = requestDTO.StartTime,
-        //            EndTime = requestDTO.EndTime,
-        //            Seats = requestDTO.Seats,
-        //            Price = requestDTO.Price,
-        //            RequestId = existingRequest.Id,
-        //            CreatedAt = DateTime.UtcNow
-        //        };
-        //        await _context.RequestDetails.AddAsync(newDetail);
+        //            throw new exception("invalid user id from token.");
+        //        }
+
+        //        // lấy yêu cầu (request) từ cơ sở dữ liệu
+        //        var existingrequest = await _context.requests.findasync(id);
+        //        if (existingrequest == null)
+        //        {
+        //            return notfound($"request with id {id} not found.");
+        //        }
+
+        //        // cập nhật thông tin của request
+        //        existingrequest.typeid = 2; // cập nhật lại nếu cần
+        //        existingrequest.status = requestdto.status;
+        //        existingrequest.description = requestdto.description;
+        //        existingrequest.note = requestdto.note;
+        //        existingrequest.updateat = datetime.utcnow;
+        //        existingrequest.updateby = userid;
+
+        //        _context.requests.update(existingrequest);
+
+        //        // cập nhật thông tin của requestdetail
+        //        var existingrequestdetail = await _context.requestdetails
+        //            .firstordefaultasync(rd => rd.requestid == existingrequest.id);
+
+        //        if (existingrequestdetail != null)
+        //        {
+        //            existingrequestdetail.startlocation = requestdto.startlocation;
+        //            existingrequestdetail.endlocation = requestdto.endlocation;
+        //            existingrequestdetail.starttime = requestdto.starttime;
+        //            existingrequestdetail.endtime = requestdto.endtime;
+        //            existingrequestdetail.seats = requestdto.seats;
+        //            existingrequestdetail.price = requestdto.price;
+        //            existingrequestdetail.updateat = datetime.utcnow;
+        //            existingrequestdetail.updateby = userid;
+
+        //            _context.requestdetails.update(existingrequestdetail);
+        //        }
+        //        else
+        //        {
+        //            // nếu không tìm thấy requestdetail, bạn có thể tạo mới nếu cần thiết
+        //            var newrequestdetail = new requestdetail
+        //            {
+        //                requestid = existingrequest.id,
+        //                startlocation = requestdto.startlocation,
+        //                endlocation = requestdto.endlocation,
+        //                starttime = requestdto.starttime,
+        //                endtime = requestdto.endtime,
+        //                seats = requestdto.seats,
+        //                price = requestdto.price,
+        //                createdat = datetime.utcnow,
+        //                createdby = userid,
+        //                updateat = datetime.utcnow,
+        //                updateby = userid,
+        //            };
+
+        //            await _context.requestdetails.addasync(newrequestdetail);
+        //        }
+
+        //        // lưu tất cả thay đổi vào cơ sở dữ liệu
+        //        await _context.savechangesasync();
+
+        //        // cam kết giao dịch
+        //        await transaction.commitasync();
+
+        //        return nocontent(); // trả về 204 nếu cập nhật thành công
         //    }
-
-        //    // Lưu các thay đổi vào cơ sở dữ liệu
-        //    await _context.SaveChangesAsync();
-
-        //    return existingRequest;
+        //    catch (exception ex)
+        //    {
+        //        await transaction.rollbackasync();
+        //        throw new exception($"error in updaterequestrentcarasync: {ex.message}");
+        //    }
         //}
 
 
@@ -185,7 +211,6 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception($"Error in CreateRequestRentVehicleAsync: {ex.Message}");
             }
         }
-
 
 
 
