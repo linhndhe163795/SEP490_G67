@@ -69,17 +69,17 @@ namespace MyAPI.Controllers
                 return BadRequest(new { Message = "AddDriver rent Add failed", Details = ex.Message });
             }
         }
-        //[Authorize(Roles = "Staff")]
-        //[HttpPut("/UpdateRequestForRentFullCar/{id}")]
-        //public async Task<IActionResult> UpdateRequestForRentCar(int id, RequestDTOForRentCar requestDto)
-        //{
-        //    var updated = await _requestRepository.UpdateRequestRentCarAsync(id, requestDto);
-        //    if (updated == null)
-        //    {
-        //        return NotFound();
-        //    }
-        //    return NoContent();
-        //}
+        [Authorize(Roles = "Staff")]
+        [HttpPut("/UpdateRequestForRentFullCar/{id}")]
+        public async Task<IActionResult> UpdateRequestForRentCar(int id, RequestDTOForRentCar requestDto)
+        {
+            var isupdated = await _requestRepository.UpdateRequestRentCarAsync(id, requestDto);
+            if (isupdated == false)
+            {
+                return BadRequest();
+            }
+            return Ok("Update success!");
+        }
 
         [Authorize(Roles = "Staff")]
         [HttpGet("/GetRequestDetailById/{id}")]
