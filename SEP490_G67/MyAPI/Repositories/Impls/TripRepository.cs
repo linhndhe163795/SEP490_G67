@@ -47,8 +47,8 @@ namespace MyAPI.Repositories.Impls
                                         join v in _context.Vehicles
                                         on tv.VehicleId equals v.Id
                                         join u in _context.Users on v.VehicleOwner equals u.Id
-                                        where t.PointStart.Contains(startPoint) &&
-                                            t.PointEnd.Contains(endPoint) &&
+                                        where t.PointStart.Contains(startPoint.Trim()) &&
+                                            t.PointEnd.Contains(endPoint.Trim()) &&
                                             t.StartTime >= timeSpan &&
                                             t.TypeOfTrip == Constant.CHUYEN_DI_LIEN_TINH &&
                                             t.Status == true &&
@@ -252,7 +252,7 @@ namespace MyAPI.Repositories.Impls
 
                 }
                 await _context.VehicleTrips.AddRangeAsync(vt);
-                //await _context.TripDetails.AddRangeAsync(td);
+                await _context.TripDetails.AddRangeAsync(td);
                 await _context.SaveChangesAsync();
             }
             catch (Exception ex)

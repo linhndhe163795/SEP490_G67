@@ -3,11 +3,63 @@
   "WorkspaceRootPath": "C:\\Users\\trinh\\OneDrive\\Ta\u0300i li\u00EA\u0323u\\GitHub\\SEP490_G67\\SEP490_G67\\",
   "Documents": [
     {
+<<<<<<< HEAD
+      "AbsoluteMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|d:\\ky10\\sep490_g67\\sep490_g67\\myapi\\repositories\\impls\\triprepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|solutionrelative:myapi\\repositories\\impls\\triprepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|d:\\ky10\\sep490_g67\\sep490_g67\\myapi\\controllers\\tripcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|solutionrelative:myapi\\controllers\\tripcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|d:\\ky10\\sep490_g67\\sep490_g67\\myapi\\controllers\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|solutionrelative:myapi\\controllers\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|d:\\ky10\\sep490_g67\\sep490_g67\\myapi\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|solutionrelative:myapi\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|d:\\ky10\\sep490_g67\\sep490_g67\\myapi\\controllers\\requestcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|solutionrelative:myapi\\controllers\\requestcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|d:\\ky10\\sep490_g67\\sep490_g67\\myapi\\controllers\\vehiclecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|solutionrelative:myapi\\controllers\\vehiclecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|d:\\ky10\\sep490_g67\\sep490_g67\\myapi\\dtos\\tripdtos\\tripdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|solutionrelative:myapi\\dtos\\tripdtos\\tripdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|d:\\ky10\\sep490_g67\\sep490_g67\\myapi\\infrastructure\\interfaces\\itriprepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|solutionrelative:myapi\\infrastructure\\interfaces\\itriprepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|d:\\ky10\\sep490_g67\\sep490_g67\\myapi\\infrastructure\\interfaces\\ivehiclerepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|solutionrelative:myapi\\infrastructure\\interfaces\\ivehiclerepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|d:\\ky10\\sep490_g67\\sep490_g67\\myapi\\repositories\\impls\\vehiclerepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|solutionrelative:myapi\\repositories\\impls\\vehiclerepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|d:\\ky10\\sep490_g67\\sep490_g67\\myapi\\repositories\\impls\\requestrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|solutionrelative:myapi\\repositories\\impls\\requestrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|d:\\ky10\\sep490_g67\\sep490_g67\\myapi\\controllers\\ticketcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|solutionrelative:myapi\\controllers\\ticketcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|d:\\ky10\\sep490_g67\\sep490_g67\\myapi\\repositories\\impls\\ticketrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+=======
       "AbsoluteMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|c:\\users\\trinh\\onedrive\\ta\u0300i li\u00EA\u0323u\\github\\sep490_g67\\sep490_g67\\myapi\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
       "RelativeMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|solutionrelative:myapi\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|c:\\users\\trinh\\onedrive\\ta\u0300i li\u00EA\u0323u\\github\\sep490_g67\\sep490_g67\\myapi\\repositories\\impls\\ticketrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+>>>>>>> b2dc07e4b43dc01ac1d9ce4219ec4e4c760ce332
       "RelativeMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|solutionrelative:myapi\\repositories\\impls\\ticketrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
@@ -19,6 +71,13 @@
       "RelativeMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|solutionrelative:myapi\\controllers\\requestcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
+<<<<<<< HEAD
+      "AbsoluteMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|d:\\ky10\\sep490_g67\\sep490_g67\\myapi\\repositories\\impls\\losscostvehiclerepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|solutionrelative:myapi\\repositories\\impls\\losscostvehiclerepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|d:\\ky10\\sep490_g67\\sep490_g67\\myapi\\dtos\\losscostdtos\\losscostvehicledtos\\losscostvehicledtos.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+=======
       "AbsoluteMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|c:\\users\\trinh\\onedrive\\ta\u0300i li\u00EA\u0323u\\github\\sep490_g67\\sep490_g67\\myapi\\controllers\\ticketcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|solutionrelative:myapi\\controllers\\ticketcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
@@ -36,6 +95,7 @@
     },
     {
       "AbsoluteMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|c:\\users\\trinh\\onedrive\\ta\u0300i li\u00EA\u0323u\\github\\sep490_g67\\sep490_g67\\myapi\\dtos\\losscostdtos\\losscostvehicledtos\\losscostvehicledtos.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+>>>>>>> b2dc07e4b43dc01ac1d9ce4219ec4e4c760ce332
       "RelativeMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|solutionrelative:myapi\\dtos\\losscostdtos\\losscostvehicledtos\\losscostvehicledtos.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
@@ -43,6 +103,9 @@
       "RelativeMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|solutionrelative:myapi\\controllers\\losscostvehiclecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
+<<<<<<< HEAD
+      "AbsoluteMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|d:\\ky10\\sep490_g67\\sep490_g67\\myapi\\models\\promotion.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+=======
       "AbsoluteMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|c:\\users\\trinh\\onedrive\\ta\u0300i li\u00EA\u0323u\\github\\sep490_g67\\sep490_g67\\myapi\\dtos\\paymentrentvehicle\\paymentrentvehiceldto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|solutionrelative:myapi\\dtos\\paymentrentvehicle\\paymentrentvehiceldto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
@@ -84,6 +147,7 @@
     },
     {
       "AbsoluteMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|c:\\users\\trinh\\onedrive\\ta\u0300i li\u00EA\u0323u\\github\\sep490_g67\\sep490_g67\\myapi\\models\\promotion.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+>>>>>>> b2dc07e4b43dc01ac1d9ce4219ec4e4c760ce332
       "RelativeMoniker": "D:0:0:{C4C96E31-F4F7-43D4-A613-7752A0FB84C6}|MyAPI\\MyAPI.csproj|solutionrelative:myapi\\models\\promotion.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
@@ -106,7 +170,11 @@
       "DocumentGroups": [
         {
           "DockedWidth": 220,
+<<<<<<< HEAD
+          "SelectedChildIndex": 8,
+=======
           "SelectedChildIndex": 4,
+>>>>>>> b2dc07e4b43dc01ac1d9ce4219ec4e4c760ce332
           "Children": [
             {
               "$type": "Bookmark",
@@ -121,6 +189,79 @@
               "Name": "ST:128:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
             },
             {
+<<<<<<< HEAD
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "TripController.cs",
+              "DocumentMoniker": "D:\\Ky10\\SEP490_G67\\SEP490_G67\\MyAPI\\Controllers\\TripController.cs",
+              "RelativeDocumentMoniker": "MyAPI\\Controllers\\TripController.cs",
+              "ToolTip": "D:\\Ky10\\SEP490_G67\\SEP490_G67\\MyAPI\\Controllers\\TripController.cs",
+              "RelativeToolTip": "MyAPI\\Controllers\\TripController.cs",
+              "ViewState": "AQIAAGYAAAAAAAAAAAAUwIEAAABQAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-11-25T18:43:25.198Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "AuthController.cs",
+              "DocumentMoniker": "D:\\Ky10\\SEP490_G67\\SEP490_G67\\MyAPI\\Controllers\\AuthController.cs",
+              "RelativeDocumentMoniker": "MyAPI\\Controllers\\AuthController.cs",
+              "ToolTip": "D:\\Ky10\\SEP490_G67\\SEP490_G67\\MyAPI\\Controllers\\AuthController.cs",
+              "RelativeToolTip": "MyAPI\\Controllers\\AuthController.cs",
+              "ViewState": "AQIAAFkAAAAAAAAAAAAIwAAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-11-25T18:32:22.875Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "appsettings.json",
+              "DocumentMoniker": "D:\\Ky10\\SEP490_G67\\SEP490_G67\\MyAPI\\appsettings.json",
+              "RelativeDocumentMoniker": "MyAPI\\appsettings.json",
+              "ToolTip": "D:\\Ky10\\SEP490_G67\\SEP490_G67\\MyAPI\\appsettings.json",
+              "RelativeToolTip": "MyAPI\\appsettings.json",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2024-11-25T18:05:35.322Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "TripDTO.cs",
+              "DocumentMoniker": "D:\\Ky10\\SEP490_G67\\SEP490_G67\\MyAPI\\DTOs\\TripDTOs\\TripDTO.cs",
+              "RelativeDocumentMoniker": "MyAPI\\DTOs\\TripDTOs\\TripDTO.cs",
+              "ToolTip": "D:\\Ky10\\SEP490_G67\\SEP490_G67\\MyAPI\\DTOs\\TripDTOs\\TripDTO.cs",
+              "RelativeToolTip": "MyAPI\\DTOs\\TripDTOs\\TripDTO.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAsAAAAiAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-11-25T17:24:27.191Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "RequestRepository.cs",
+              "DocumentMoniker": "D:\\Ky10\\SEP490_G67\\SEP490_G67\\MyAPI\\Repositories\\Impls\\RequestRepository.cs",
+              "RelativeDocumentMoniker": "MyAPI\\Repositories\\Impls\\RequestRepository.cs",
+              "ToolTip": "D:\\Ky10\\SEP490_G67\\SEP490_G67\\MyAPI\\Repositories\\Impls\\RequestRepository.cs",
+              "RelativeToolTip": "MyAPI\\Repositories\\Impls\\RequestRepository.cs",
+              "ViewState": "AQIAALkAAAAAAAAAAAAgwL8AAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-11-20T04:19:42.099Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "TripRepository.cs",
+              "DocumentMoniker": "D:\\Ky10\\SEP490_G67\\SEP490_G67\\MyAPI\\Repositories\\Impls\\TripRepository.cs",
+              "RelativeDocumentMoniker": "MyAPI\\Repositories\\Impls\\TripRepository.cs",
+              "ToolTip": "D:\\Ky10\\SEP490_G67\\SEP490_G67\\MyAPI\\Repositories\\Impls\\TripRepository.cs*",
+              "RelativeToolTip": "MyAPI\\Repositories\\Impls\\TripRepository.cs*",
+              "ViewState": "AQIAAN4AAAAAAAAAAAAiwP4AAAA9AAAA",
+=======
               "$type": "Bookmark",
               "Name": "ST:0:0:{cce594b6-0c39-4442-ba28-10c64ac7e89f}"
             },
@@ -146,11 +287,46 @@
               "ToolTip": "C:\\Users\\trinh\\OneDrive\\Ta\u0300i li\u00EA\u0323u\\GitHub\\SEP490_G67\\SEP490_G67\\MyAPI\\Controllers\\TripController.cs",
               "RelativeToolTip": "MyAPI\\Controllers\\TripController.cs",
               "ViewState": "AQIAAHAAAAAAAAAAAAAcwIEAAABQAAAA",
+>>>>>>> b2dc07e4b43dc01ac1d9ce4219ec4e4c760ce332
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-11-25T17:10:47.896Z"
             },
             {
               "$type": "Document",
+<<<<<<< HEAD
+              "DocumentIndex": 13,
+              "Title": "ITicketRepository.cs",
+              "DocumentMoniker": "D:\\Ky10\\SEP490_G67\\SEP490_G67\\MyAPI\\Infrastructure\\Interfaces\\ITicketRepository.cs",
+              "RelativeDocumentMoniker": "MyAPI\\Infrastructure\\Interfaces\\ITicketRepository.cs",
+              "ToolTip": "D:\\Ky10\\SEP490_G67\\SEP490_G67\\MyAPI\\Infrastructure\\Interfaces\\ITicketRepository.cs",
+              "RelativeToolTip": "MyAPI\\Infrastructure\\Interfaces\\ITicketRepository.cs",
+              "ViewState": "AQIAAAMAAAAAAAAAAAApwBAAAAANAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-11-25T02:09:11.056Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "VehicleController.cs",
+              "DocumentMoniker": "D:\\Ky10\\SEP490_G67\\SEP490_G67\\MyAPI\\Controllers\\VehicleController.cs",
+              "RelativeDocumentMoniker": "MyAPI\\Controllers\\VehicleController.cs",
+              "ToolTip": "D:\\Ky10\\SEP490_G67\\SEP490_G67\\MyAPI\\Controllers\\VehicleController.cs",
+              "RelativeToolTip": "MyAPI\\Controllers\\VehicleController.cs",
+              "ViewState": "AQIAALwAAAAAAAAAAAAYwFABAAAIAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-11-20T04:15:18.228Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "VehicleRepository.cs",
+              "DocumentMoniker": "D:\\Ky10\\SEP490_G67\\SEP490_G67\\MyAPI\\Repositories\\Impls\\VehicleRepository.cs",
+              "RelativeDocumentMoniker": "MyAPI\\Repositories\\Impls\\VehicleRepository.cs",
+              "ToolTip": "D:\\Ky10\\SEP490_G67\\SEP490_G67\\MyAPI\\Repositories\\Impls\\VehicleRepository.cs",
+              "RelativeToolTip": "MyAPI\\Repositories\\Impls\\VehicleRepository.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAA4AAABTAAAA",
+=======
               "DocumentIndex": 12,
               "Title": "HistoryRentVehicleRepository.cs",
               "DocumentMoniker": "C:\\Users\\trinh\\OneDrive\\Ta\u0300i li\u00EA\u0323u\\GitHub\\SEP490_G67\\SEP490_G67\\MyAPI\\Repositories\\Impls\\HistoryRentVehicleRepository.cs",
@@ -182,6 +358,7 @@
               "ToolTip": "C:\\Users\\trinh\\OneDrive\\Ta\u0300i li\u00EA\u0323u\\GitHub\\SEP490_G67\\SEP490_G67\\MyAPI\\Repositories\\Impls\\LossCostVehicleRepository.cs",
               "RelativeToolTip": "MyAPI\\Repositories\\Impls\\LossCostVehicleRepository.cs",
               "ViewState": "AQIAAKwAAAAAAAAAAAAkwI8AAABdAAAA",
+>>>>>>> b2dc07e4b43dc01ac1d9ce4219ec4e4c760ce332
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-11-25T17:10:47.933Z"
             },
@@ -200,6 +377,51 @@
             },
             {
               "$type": "Document",
+<<<<<<< HEAD
+              "DocumentIndex": 7,
+              "Title": "ITripRepository.cs",
+              "DocumentMoniker": "D:\\Ky10\\SEP490_G67\\SEP490_G67\\MyAPI\\Infrastructure\\Interfaces\\ITripRepository.cs",
+              "RelativeDocumentMoniker": "MyAPI\\Infrastructure\\Interfaces\\ITripRepository.cs",
+              "ToolTip": "D:\\Ky10\\SEP490_G67\\SEP490_G67\\MyAPI\\Infrastructure\\Interfaces\\ITripRepository.cs",
+              "RelativeToolTip": "MyAPI\\Infrastructure\\Interfaces\\ITripRepository.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAqwBQAAAAqAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-11-25T16:36:26.833Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "IVehicleRepository.cs",
+              "DocumentMoniker": "D:\\Ky10\\SEP490_G67\\SEP490_G67\\MyAPI\\Infrastructure\\Interfaces\\IVehicleRepository.cs",
+              "RelativeDocumentMoniker": "MyAPI\\Infrastructure\\Interfaces\\IVehicleRepository.cs",
+              "ToolTip": "D:\\Ky10\\SEP490_G67\\SEP490_G67\\MyAPI\\Infrastructure\\Interfaces\\IVehicleRepository.cs",
+              "RelativeToolTip": "MyAPI\\Infrastructure\\Interfaces\\IVehicleRepository.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAqwBoAAABFAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-11-25T16:57:45.181Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "TicketController.cs",
+              "DocumentMoniker": "D:\\Ky10\\SEP490_G67\\SEP490_G67\\MyAPI\\Controllers\\TicketController.cs",
+              "RelativeDocumentMoniker": "MyAPI\\Controllers\\TicketController.cs",
+              "ToolTip": "D:\\Ky10\\SEP490_G67\\SEP490_G67\\MyAPI\\Controllers\\TicketController.cs",
+              "RelativeToolTip": "MyAPI\\Controllers\\TicketController.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAM4AAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-11-23T03:21:00.476Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "RequestController.cs",
+              "DocumentMoniker": "D:\\Ky10\\SEP490_G67\\SEP490_G67\\MyAPI\\Controllers\\RequestController.cs",
+              "RelativeDocumentMoniker": "MyAPI\\Controllers\\RequestController.cs",
+              "ToolTip": "D:\\Ky10\\SEP490_G67\\SEP490_G67\\MyAPI\\Controllers\\RequestController.cs",
+              "RelativeToolTip": "MyAPI\\Controllers\\RequestController.cs",
+              "ViewState": "AQIAAPMAAAAAAAAAAIAwwMcAAAAfAAAA",
+=======
               "DocumentIndex": 3,
               "Title": "RequestController.cs",
               "DocumentMoniker": "C:\\Users\\trinh\\OneDrive\\Ta\u0300i li\u00EA\u0323u\\GitHub\\SEP490_G67\\SEP490_G67\\MyAPI\\Controllers\\RequestController.cs",
@@ -268,6 +490,7 @@
               "ToolTip": "C:\\Users\\trinh\\OneDrive\\Ta\u0300i li\u00EA\u0323u\\GitHub\\SEP490_G67\\SEP490_G67\\MyAPI\\DTOs\\LossCostDTOs\\LossCostVehicleDTOs\\LossCostVehicleDTOs.cs",
               "RelativeToolTip": "MyAPI\\DTOs\\LossCostDTOs\\LossCostVehicleDTOs\\LossCostVehicleDTOs.cs",
               "ViewState": "AQIAAAAAAAAAAAAAAAAAAAkAAAAoAAAA",
+>>>>>>> b2dc07e4b43dc01ac1d9ce4219ec4e4c760ce332
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-11-25T17:10:47.961Z"
             },
@@ -285,6 +508,15 @@
             },
             {
               "$type": "Document",
+<<<<<<< HEAD
+              "DocumentIndex": 12,
+              "Title": "TicketRepository.cs",
+              "DocumentMoniker": "D:\\Ky10\\SEP490_G67\\SEP490_G67\\MyAPI\\Repositories\\Impls\\TicketRepository.cs",
+              "RelativeDocumentMoniker": "MyAPI\\Repositories\\Impls\\TicketRepository.cs",
+              "ToolTip": "D:\\Ky10\\SEP490_G67\\SEP490_G67\\MyAPI\\Repositories\\Impls\\TicketRepository.cs",
+              "RelativeToolTip": "MyAPI\\Repositories\\Impls\\TicketRepository.cs",
+              "ViewState": "AQIAAJQAAAAAAAAAAAAkwKcAAAAsAAAA",
+=======
               "DocumentIndex": 10,
               "Title": "PaymentRentVehicelDTO.cs",
               "DocumentMoniker": "C:\\Users\\trinh\\OneDrive\\Ta\u0300i li\u00EA\u0323u\\GitHub\\SEP490_G67\\SEP490_G67\\MyAPI\\DTOs\\PaymentRentVehicle\\PaymentRentVehicelDTO.cs",
@@ -292,11 +524,21 @@
               "ToolTip": "C:\\Users\\trinh\\OneDrive\\Ta\u0300i li\u00EA\u0323u\\GitHub\\SEP490_G67\\SEP490_G67\\MyAPI\\DTOs\\PaymentRentVehicle\\PaymentRentVehicelDTO.cs",
               "RelativeToolTip": "MyAPI\\DTOs\\PaymentRentVehicle\\PaymentRentVehicelDTO.cs",
               "ViewState": "AQIAAAAAAAAAAAAAAAAqwAIAAAARAAAA",
+>>>>>>> b2dc07e4b43dc01ac1d9ce4219ec4e4c760ce332
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-11-25T17:10:47.97Z"
             },
             {
               "$type": "Document",
+<<<<<<< HEAD
+              "DocumentIndex": 15,
+              "Title": "LossCostVehicleRepository.cs",
+              "DocumentMoniker": "D:\\Ky10\\SEP490_G67\\SEP490_G67\\MyAPI\\Repositories\\Impls\\LossCostVehicleRepository.cs",
+              "RelativeDocumentMoniker": "MyAPI\\Repositories\\Impls\\LossCostVehicleRepository.cs",
+              "ToolTip": "D:\\Ky10\\SEP490_G67\\SEP490_G67\\MyAPI\\Repositories\\Impls\\LossCostVehicleRepository.cs",
+              "RelativeToolTip": "MyAPI\\Repositories\\Impls\\LossCostVehicleRepository.cs",
+              "ViewState": "AQIAAKwAAAAAAAAAAAAkwI8AAABdAAAA",
+=======
               "DocumentIndex": 14,
               "Title": "HistoryRentDriverController.cs",
               "DocumentMoniker": "C:\\Users\\trinh\\OneDrive\\Ta\u0300i li\u00EA\u0323u\\GitHub\\SEP490_G67\\SEP490_G67\\MyAPI\\Controllers\\HistoryRentDriverController.cs",
@@ -304,11 +546,23 @@
               "ToolTip": "C:\\Users\\trinh\\OneDrive\\Ta\u0300i li\u00EA\u0323u\\GitHub\\SEP490_G67\\SEP490_G67\\MyAPI\\Controllers\\HistoryRentDriverController.cs",
               "RelativeToolTip": "MyAPI\\Controllers\\HistoryRentDriverController.cs",
               "ViewState": "AQIAAC8AAAAAAAAAAAAwwE0AAAAAAAAA",
+>>>>>>> b2dc07e4b43dc01ac1d9ce4219ec4e4c760ce332
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-11-25T17:10:47.973Z"
             },
             {
               "$type": "Document",
+<<<<<<< HEAD
+              "DocumentIndex": 14,
+              "Title": "Program.cs",
+              "DocumentMoniker": "D:\\Ky10\\SEP490_G67\\SEP490_G67\\MyAPI\\Program.cs",
+              "RelativeDocumentMoniker": "MyAPI\\Program.cs",
+              "ToolTip": "D:\\Ky10\\SEP490_G67\\SEP490_G67\\MyAPI\\Program.cs",
+              "RelativeToolTip": "MyAPI\\Program.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-11-25T02:19:57.479Z"
+=======
               "DocumentIndex": 15,
               "Title": "VehicleRepository.cs",
               "DocumentMoniker": "C:\\Users\\trinh\\OneDrive\\Ta\u0300i li\u00EA\u0323u\\GitHub\\SEP490_G67\\SEP490_G67\\MyAPI\\Repositories\\Impls\\VehicleRepository.cs",
@@ -319,6 +573,7 @@
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-11-25T17:10:47.977Z",
               "EditorCaption": ""
+>>>>>>> b2dc07e4b43dc01ac1d9ce4219ec4e4c760ce332
             },
             {
               "$type": "Document",
@@ -347,6 +602,8 @@
             {
               "$type": "Document",
               "DocumentIndex": 18,
+<<<<<<< HEAD
+=======
               "Title": "IHistoryRentDriverRepository.cs",
               "DocumentMoniker": "C:\\Users\\trinh\\OneDrive\\Ta\u0300i li\u00EA\u0323u\\GitHub\\SEP490_G67\\SEP490_G67\\MyAPI\\Infrastructure\\Interfaces\\IHistoryRentDriverRepository.cs",
               "RelativeDocumentMoniker": "MyAPI\\Infrastructure\\Interfaces\\IHistoryRentDriverRepository.cs",
@@ -384,6 +641,7 @@
             {
               "$type": "Document",
               "DocumentIndex": 20,
+>>>>>>> b2dc07e4b43dc01ac1d9ce4219ec4e4c760ce332
               "Title": "Promotion.cs",
               "DocumentMoniker": "C:\\Users\\trinh\\OneDrive\\Ta\u0300i li\u00EA\u0323u\\GitHub\\SEP490_G67\\SEP490_G67\\MyAPI\\Models\\Promotion.cs",
               "RelativeDocumentMoniker": "MyAPI\\Models\\Promotion.cs",
@@ -395,7 +653,11 @@
             },
             {
               "$type": "Document",
+<<<<<<< HEAD
+              "DocumentIndex": 19,
+=======
               "DocumentIndex": 21,
+>>>>>>> b2dc07e4b43dc01ac1d9ce4219ec4e4c760ce332
               "Title": "LossCostTypeRepository.cs",
               "DocumentMoniker": "C:\\Users\\trinh\\OneDrive\\Ta\u0300i li\u00EA\u0323u\\GitHub\\SEP490_G67\\SEP490_G67\\MyAPI\\Repositories\\Impls\\LossCostTypeRepository.cs",
               "RelativeDocumentMoniker": "MyAPI\\Repositories\\Impls\\LossCostTypeRepository.cs",
@@ -407,7 +669,11 @@
             },
             {
               "$type": "Document",
+<<<<<<< HEAD
+              "DocumentIndex": 20,
+=======
               "DocumentIndex": 22,
+>>>>>>> b2dc07e4b43dc01ac1d9ce4219ec4e4c760ce332
               "Title": "DriverRepository.cs",
               "DocumentMoniker": "C:\\Users\\trinh\\OneDrive\\Ta\u0300i li\u00EA\u0323u\\GitHub\\SEP490_G67\\SEP490_G67\\MyAPI\\Repositories\\Impls\\DriverRepository.cs",
               "RelativeDocumentMoniker": "MyAPI\\Repositories\\Impls\\DriverRepository.cs",
