@@ -141,7 +141,17 @@ namespace MyAPI.Controllers
         {
             try
             {
-                await _ticketRepository.UpdateStatusTicketNotPaid(id);
+                string token = Request.Headers["Authorization"];
+                if (token.StartsWith("Bearer"))
+                {
+                    token = token.Substring("Bearer ".Length).Trim();
+                }
+                if (string.IsNullOrEmpty(token))
+                {
+                    return BadRequest("Token is required.");
+                }
+                var driverId = _getInforFromToken.GetIdInHeader(token);
+                await _ticketRepository.UpdateStatusTicketNotPaid(id,driverId);
                 return Ok();
             }
             catch (Exception ex)
@@ -149,6 +159,7 @@ namespace MyAPI.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
         [Authorize(Roles = "VehicleOwner, Staff")]
         [HttpGet("RevenueTicket/{startTime}/{endTime}")]
         public async Task<IActionResult> getRevenueTicket(DateTime startTime, DateTime endTime, int? vehicle, int? vehicleOwner)
@@ -174,7 +185,6 @@ namespace MyAPI.Controllers
                 return BadRequest(e.Message);
             }
         }
-
 
         [HttpDelete("deleteTicketTimeOut/{ticketId}")]
         public async Task<IActionResult> deleteTicketByTicketId(int ticketId)

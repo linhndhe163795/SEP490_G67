@@ -72,11 +72,10 @@ namespace MyAPI.Repositories.Impls
                  await query.Select(x => new PaymentRentVehicelDTO
                  {
                      CreatedAt = x.CreatedAt,
-                     DriverId = x.DriverId,
+                     DriverName = _context.Drivers.Where(d => d.Id == x.DriverId).Select(d => d.Name).FirstOrDefault(),
                      Price = x.Price ?? 0,
-                     VehicleId = x.VehicleId,
-                     CarOwnerId = x.CarOwnerId,
-
+                     LicenseVehicle = _context.Vehicles.Where(v => v.Id == x.DriverId).Select(v => v.LicensePlate).FirstOrDefault(),
+                     CarOwner = _context.Users.Include(uv => uv.Vehicles).Where(u => u.Id == x.CarOwnerId).Select(u => u.FullName).FirstOrDefault()
                  }).ToListAsync();
             var sumPrice = query.Sum(x => x.Price);
             var combineResult = new TotalPaymentRentVehicleDTO

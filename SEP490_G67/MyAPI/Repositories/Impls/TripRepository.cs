@@ -111,7 +111,7 @@ namespace MyAPI.Repositories.Impls
                 var pointEndDetails = trip.PointEndDetail.First();
                 var pointEndDetail = pointEndDetails.Key;
                 var timeEndDetail = pointEndDetails.Value;
-                foreach(var pointStart in trip.PointStartDetail)
+                foreach (var pointStart in trip.PointStartDetail)
                 {
                     var PointStartDetails = pointStart.Key;
                     var TimeStartDetails = pointStart.Value;
@@ -220,7 +220,7 @@ namespace MyAPI.Repositories.Impls
                     foreach (var pointStart in validEntries[i].PointStartDetail)
                     {
 
-                        var PointStartDetails = pointStart.Key; 
+                        var PointStartDetails = pointStart.Key;
                         var TimeStartDetails = pointStart.Value;
                         var tripDetail = new TripDetail
                         {
@@ -230,7 +230,7 @@ namespace MyAPI.Repositories.Impls
                             TimeEndDetails = TimeEndDetails,
                             TripId = tripMapper[i].Id,
                             Status = true
-                        }; 
+                        };
                         td.Add(tripDetail);
                     }
                     string licensePlate = validEntries[i].LicensePlate;
@@ -243,7 +243,7 @@ namespace MyAPI.Repositories.Impls
                         var vehicleTrip = new VehicleTrip
                         {
                             TripId = tripMapper[i].Id,
-                            VehicleId = vehicleId,  
+                            VehicleId = vehicleId,
                             CreatedAt = tripMapper[i].CreatedAt,
                             CreatedBy = tripMapper[i].CreatedBy,
                         };
@@ -282,14 +282,14 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception(ex.Message);
             }
         }
-        public async Task<int> GetTicketCount(int tripId)
+        public async Task<int> GetTicketCount(int tripId, DateTime dateTime)
         {
             try
             {
                 var vehicelID = await _context.VehicleTrips.FirstOrDefaultAsync(x => x.TripId == tripId);
 
                 var listTicketByVehicelID = await (from t in _context.Tickets
-                                                   where t.VehicleId == vehicelID.VehicleId
+                                                   where t.VehicleId == vehicelID.VehicleId && t.TimeFrom == dateTime
                                                    select t.NumberTicket
                                          ).ToListAsync();
                 var sum = listTicketByVehicelID.Sum();
@@ -334,7 +334,6 @@ namespace MyAPI.Repositories.Impls
                         var pointStart = worksheet.Cells[row, 5].Text;
                         var pointEnd = worksheet.Cells[row, 6].Text;
                         var statusText = worksheet.Cells[row, 7].Text;
-                        var typeOfTripText = worksheet.Cells[row, 8].Text;
 
                         if (string.IsNullOrEmpty(name))
                         {
@@ -368,12 +367,6 @@ namespace MyAPI.Repositories.Impls
 
                         bool? status = statusText.ToLower() switch { "true" => true, "false" => false, _ => (bool?)null };
 
-                        if (!int.TryParse(typeOfTripText, out int typeOfTrip))
-                        {
-                            errorAdd.Add($"Row{row}: Invalid typeOfTripText");
-                            continue;
-                        }
-
 
                         var tripAdd = new Trip
                         {
@@ -384,7 +377,7 @@ namespace MyAPI.Repositories.Impls
                             PointStart = pointStart,
                             PointEnd = pointEnd,
                             Status = status,
-                            TypeOfTrip = typeOfTrip,
+                            TypeOfTrip = 2,
                             CreatedAt = DateTime.Now,
                             CreatedBy = userId,
                             UpdateAt = DateTime.Now,
@@ -459,5 +452,18 @@ namespace MyAPI.Repositories.Impls
             return tripCovenientListDTOs;
         }
 
+        public async Task<TripDTO> GetTripById(int id)
+        {
+            try
+            {
+                var trip = await _context.Trips.FirstOrDefaultAsync(x => x.Id == id);
+                var tripMapper = _mapper.Map<TripDTO>(trip);
+                return tripMapper;
+            }
+            catch (Exception ex) 
+            {
+                throw new Exception(ex.Message);
+            }
+        }
     }
 }
