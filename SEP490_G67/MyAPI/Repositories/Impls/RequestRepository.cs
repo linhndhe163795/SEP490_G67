@@ -2,6 +2,7 @@
 using Microsoft.VisualBasic;
 using MyAPI.DTOs;
 using MyAPI.DTOs.HistoryRentVehicle;
+using MyAPI.DTOs.PaymentDTOs;
 using MyAPI.DTOs.RequestDTOs;
 using MyAPI.DTOs.TripDTOs;
 using MyAPI.Helper;
@@ -18,14 +19,17 @@ namespace MyAPI.Repositories.Impls
         private readonly GetInforFromToken _tokenHelper;
         private readonly IRequestDetailRepository _requestDetailRepository;
         private readonly IPromotionUserRepository _promotionUserRepository;
+        private readonly IPaymentRepository _paymentRepository;
 
         public RequestRepository(SEP490_G67Context _context, IHttpContextAccessor httpContextAccessor
-            , GetInforFromToken tokenHelper, IRequestDetailRepository requestDetailRepository, IPromotionUserRepository promotionUserRepository) : base(_context)
+            , GetInforFromToken tokenHelper, IRequestDetailRepository requestDetailRepository
+            , IPromotionUserRepository promotionUserRepository, IPaymentRepository paymentRepository) : base(_context)
         {
             _httpContextAccessor = httpContextAccessor;
             _tokenHelper = tokenHelper;
             _requestDetailRepository = requestDetailRepository;
             _promotionUserRepository = promotionUserRepository;
+            _paymentRepository = paymentRepository;
         }
 
         public async Task<RequestDetailDTO> GetRequestDetailByIdAsync(int requestId)
@@ -739,8 +743,23 @@ namespace MyAPI.Repositories.Impls
 
                 await _promotionUserRepository.DeletePromotionAfterPayment(checkRequest.UserId, promotionUserId);
             }
-
             await _context.SaveChangesAsync();
+
+            var paymentDTO = new PaymentAddDTO
+            {
+                UserId = addTicket.UserId,
+                Code = addTicket.CodePromotion,
+                Description = "",
+                Price = addTicket.PricePromotion,
+                TicketId = addTicket.Id,
+                TypeOfPayment = 2,
+                Time = DateTime.Now,
+            };
+            var paymentResult = await _paymentRepository.addPayment(paymentDTO);
+            if (paymentResult == null)
+            {
+                throw new Exception("Add Payment Fails!!");
+            }
             return true;
         }
     }

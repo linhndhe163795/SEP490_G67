@@ -228,12 +228,10 @@ namespace MyAPI.Controllers
                 worksheet.Cells[1, 5].Value = "PointStart";
                 worksheet.Cells[1, 6].Value = "PointEnd";
                 worksheet.Cells[1, 7].Value = "Status";
-                worksheet.Cells[1, 8].Value = "TypeOfTrip";
-
                 var sampleData = new List<object[]>
             {
-                new object[] { "Trip A", "10:00", "Trip to ha noi", 50.0m, "Ha Noi", "Bac Giang", true, 1 },
-                new object[] { "Trip B", "12:00", "Trip to Bac Giang", 80.0m, "Bac Giang", "Ha Noi", false, 2 }
+                new object[] { "Trip A", "10:00", "Trip to ha noi", 50.0m, "Ha Noi", "Bac Giang", true },
+                new object[] { "Trip B", "12:00", "Trip to Bac Giang", 80.0m, "Bac Giang", "Ha Noi", false }
             };
 
                 for (int i = 0; i < sampleData.Count; i++)
