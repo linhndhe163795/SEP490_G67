@@ -211,12 +211,6 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception($"Error in CreateRequestRentVehicleAsync: {ex.Message}");
             }
         }
-
-
-
-
-
-
         public async Task DeleteRequestDetailAsync(int requestId, int detailId)
         {
             var detail = await _context.RequestDetails
