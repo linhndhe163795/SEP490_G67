@@ -141,7 +141,17 @@ namespace MyAPI.Controllers
         {
             try
             {
-                await _ticketRepository.UpdateStatusTicketNotPaid(id);
+                string token = Request.Headers["Authorization"];
+                if (token.StartsWith("Bearer"))
+                {
+                    token = token.Substring("Bearer ".Length).Trim();
+                }
+                if (string.IsNullOrEmpty(token))
+                {
+                    return BadRequest("Token is required.");
+                }
+                var driverId = _getInforFromToken.GetIdInHeader(token);
+                await _ticketRepository.UpdateStatusTicketNotPaid(id,driverId);
                 return Ok();
             }
             catch (Exception ex)
