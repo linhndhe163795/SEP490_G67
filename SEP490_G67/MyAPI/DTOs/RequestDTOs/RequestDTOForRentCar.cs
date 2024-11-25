@@ -2,11 +2,11 @@
     {
         public class RequestDTOForRentCar
         {
-            public int? TypeId { get; set; }
-            public bool Status { get; set; }
-            public string? Description { get; set; }
-            public string? Note { get; set; }
-            public DateTime? CreatedAt { get; set; }
-        public List<RequestDetailForRentCarDTO> RequestDetails { get; set; } = new List<RequestDetailForRentCarDTO>();
+            public string StartLocation { get; set; }
+            public string EndLocation { get; set; }
+            public DateTime StartTime { get; set; }
+            public DateTime EndTime { get; set; }
+            public int Seats { get; set; }
+            public decimal Price { get; set; }
         }
     }

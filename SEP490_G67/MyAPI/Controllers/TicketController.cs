@@ -76,7 +76,7 @@ namespace MyAPI.Controllers
             }
         }
 
-        [HttpPost("createTicketForRentCar/{vehicleId}")]
+        [HttpPost("createTicketForRentCar")]
         public async Task<IActionResult> CreateTicketForRentCar(int requestId, bool choose)
         {
             try

@@ -55,21 +55,30 @@ namespace MyAPI.Controllers
         }
 
         [HttpPost("/CreateTicketForRentFullCar")]
-        public async Task<IActionResult> CreateRequestForRentCar(RequestDTOForRentCar requestWithDetailsDto)
+        public async Task<IActionResult> CreateRequestForRentCar(RequestDTOForRentCar requestforrentcar)
         {
-            var createdRequest = await _requestRepository.CreateRequestRentCarAsync(requestWithDetailsDto);
-            return CreatedAtAction(nameof(GetRequestById), new { id = createdRequest.Id }, createdRequest);
+            try
+            {
+
+                var isAdded = await _requestRepository.CreateRequestRentCarAsync(requestforrentcar);
+                return Ok(new { Message = "Car rent added successfully.",CarRent = requestforrentcar });
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Message = "AddDriver rent Add failed", Details = ex.Message });
+            }
         }
         [Authorize(Roles = "Staff")]
         [HttpPut("/UpdateRequestForRentFullCar/{id}")]
         public async Task<IActionResult> UpdateRequestForRentCar(int id, RequestDTOForRentCar requestDto)
         {
-            var updated = await _requestRepository.UpdateRequestRentCarAsync(id, requestDto);
-            if (updated == null)
+            var isupdated = await _requestRepository.UpdateRequestRentCarAsync(id, requestDto);
+            if (isupdated == false)
             {
-                return NotFound();
+                return BadRequest();
             }
-            return NoContent();
+            return Ok("Update success!");
         }
 
         [Authorize(Roles = "Staff")]
@@ -182,18 +191,18 @@ namespace MyAPI.Controllers
         }
 
         [HttpPost("CreateRentDriverForOwnerRequest")]
-        public async Task<IActionResult> RentDriver(RequestDetailForRentDriver rentVehicleAddDTO)
+        public async Task<IActionResult> RentDriver(RequestDetailForRentDriver rentDriverAddDTO)
         {
             try
             {
 
-                var isAdded = await _requestRepository.CreateRequestRentDriverAsync(rentVehicleAddDTO);
-                return Ok(new { Message = "Vehicle rent added successfully.", VehicleRent = rentVehicleAddDTO });
+                var isAdded = await _requestRepository.CreateRequestRentDriverAsync(rentDriverAddDTO);
+                return Ok(new { Message = "Driver rent added successfully.", DriverRent = rentDriverAddDTO });
 
             }
             catch (Exception ex)
             {
-                return BadRequest(new { Message = "AddVehicle rent Add failed", Details = ex.Message });
+                return BadRequest(new { Message = "AddDriver rent Add failed", Details = ex.Message });
             }
         }
 
