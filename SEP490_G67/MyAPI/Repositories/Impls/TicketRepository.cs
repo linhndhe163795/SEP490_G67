@@ -132,7 +132,7 @@ namespace MyAPI.Repositories.Impls
             try
             {
                 var request = await _context.Requests
-                    .Include(r => r.RequestDetails) 
+                    .Include(r => r.RequestDetails)
                     .FirstOrDefaultAsync(r => r.Id == requestId);
 
                 if (request == null)
@@ -147,7 +147,7 @@ namespace MyAPI.Repositories.Impls
                     return;
                 }
 
-                var requestDetail = request.RequestDetails.FirstOrDefault(); 
+                var requestDetail = request.RequestDetails.FirstOrDefault();
                 if (requestDetail == null)
                 {
                     throw new Exception("Request details not found");
@@ -281,11 +281,40 @@ namespace MyAPI.Repositories.Impls
             }
         }
 
-        public async Task UpdateStatusTicketNotPaid(int id)
+        public async Task UpdateStatusTicketNotPaid(int id, int driverId)
         {
             try
             {
                 var ticketNotPaid = await _context.Tickets.FirstOrDefaultAsync(x => x.Id == id && x.TypeOfPayment == Constant.TIEN_MAT);
+
+                var pointTicket = ticketNotPaid.PricePromotion * 10 / 100;
+
+                var paymentTicket = new Payment
+                {
+                    UserId = ticketNotPaid.UserId,
+                    Code = "NULL",
+                    Description = "THANH TOÁN TIỀN MẶT",
+                    Price = ticketNotPaid.Price,
+                    Time = DateTime.Now,
+                    CreatedAt = DateTime.Now,
+                    CreatedBy = driverId,
+                    TypeOfPayment = Constant.TIEN_MAT,
+                };
+                await _context.Payments.AddAsync(paymentTicket);
+                await _context.SaveChangesAsync();
+
+                var addPointUser = new PointUser
+                {
+                    Points = (int)pointTicket,
+                    UserId = ticketNotPaid.UserId,
+                    Date = DateTime.Now,
+                    PaymentId = paymentTicket.PaymentId,
+                    CreatedBy = driverId,
+                    CreatedAt = DateTime.Now,
+                    PointsMinus = 0
+                };
+                await _context.PointUsers.AddAsync(addPointUser);
+                await _context.SaveChangesAsync();
                 if (ticketNotPaid != null)
                 {
                     ticketNotPaid.Status = "Đã thanh toán";
@@ -403,7 +432,7 @@ namespace MyAPI.Repositories.Impls
                         CreatedAt = x.CreatedAt,
                         LiscenseVehicle = x.Vehicle.LicensePlate,
                         TypeOfTicket = x.TypeOfTicketNavigation.Description,
-                        TypeOfPayment = x.TypeOfPaymentNavigation.TypeOfPayment1,                     
+                        TypeOfPayment = x.TypeOfPaymentNavigation.TypeOfPayment1,
                     }).ToListAsync();
             var sumPriceTicket = query.Sum(x => x.PricePromotion);
             var combineResult = new RevenueTicketDTO
