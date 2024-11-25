@@ -159,6 +159,7 @@ namespace MyAPI.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
         [Authorize(Roles = "VehicleOwner, Staff")]
         [HttpGet("RevenueTicket/{startTime}/{endTime}")]
         public async Task<IActionResult> getRevenueTicket(DateTime startTime, DateTime endTime, int? vehicle, int? vehicleOwner)
@@ -184,7 +185,6 @@ namespace MyAPI.Controllers
                 return BadRequest(e.Message);
             }
         }
-
 
         [HttpDelete("deleteTicketTimeOut/{ticketId}")]
         public async Task<IActionResult> deleteTicketByTicketId(int ticketId)

@@ -290,12 +290,12 @@ namespace MyAPI.Controllers
                 return BadRequest(e.Message);
             }
         }
-        [HttpGet("getNumberSeatAvaiable")]
-        public async Task<IActionResult> getNumberSeatAvaiable(int vehicelId)
+        [HttpGet("getNumberSeatAvaiable/{tripId}/{dateTime}")]
+        public async Task<IActionResult> getNumberSeatAvaiable(int tripId, DateTime dateTime)
         {
             try
             {
-                var count = await _vehicleRepository.GetNumberSeatAvaiable(vehicelId);
+                var count = await _vehicleRepository.GetNumberSeatAvaiable(tripId, dateTime);
                 return Ok(count);
             }
             catch (Exception ex)

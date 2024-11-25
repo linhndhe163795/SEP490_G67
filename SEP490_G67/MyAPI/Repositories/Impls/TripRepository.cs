@@ -282,14 +282,14 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception(ex.Message);
             }
         }
-        public async Task<int> GetTicketCount(int tripId)
+        public async Task<int> GetTicketCount(int tripId, DateTime dateTime)
         {
             try
             {
                 var vehicelID = await _context.VehicleTrips.FirstOrDefaultAsync(x => x.TripId == tripId);
 
                 var listTicketByVehicelID = await (from t in _context.Tickets
-                                                   where t.VehicleId == vehicelID.VehicleId
+                                                   where t.VehicleId == vehicelID.VehicleId && t.TimeFrom == dateTime
                                                    select t.NumberTicket
                                          ).ToListAsync();
                 var sum = listTicketByVehicelID.Sum();

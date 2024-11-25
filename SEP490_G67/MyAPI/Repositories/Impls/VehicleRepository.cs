@@ -466,13 +466,14 @@ namespace MyAPI.Repositories.Impls
 
             return await _context.SaveChangesAsync() > 0;
         }
-        public async Task<int> GetNumberSeatAvaiable(int vehicleId)
+        public async Task<int> GetNumberSeatAvaiable(int tripId, DateTime dateTime)
         {
             try
             {
-                var ticketCount = await _tripRepository.GetTicketCount(vehicleId);
-                var vehicel = await _context.Vehicles.FirstOrDefaultAsync(x => x.Id == vehicleId);
-                var seatAvaiable = vehicel.NumberSeat - ticketCount;
+                var ticketCount = await _tripRepository.GetTicketCount(tripId, dateTime);
+                var vehicleTrip = await _context.VehicleTrips.FirstOrDefaultAsync(x => x.TripId == tripId);
+                var vehicle = await _context.Vehicles.FirstOrDefaultAsync(x => x.Id == vehicleTrip.VehicleId);
+                var seatAvaiable = vehicle.NumberSeat - ticketCount;
                 return seatAvaiable.Value;
 
             }
