@@ -138,8 +138,6 @@ namespace MyAPI.Controllers
                 return BadRequest(ex.Message);
             }
         }
-
-
         // create request from user
         [Authorize]
         [HttpPost("createRequestCancleTicket")]
