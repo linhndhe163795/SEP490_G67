@@ -111,7 +111,7 @@ namespace MyAPI.Repositories.Impls
                 var pointEndDetails = trip.PointEndDetail.First();
                 var pointEndDetail = pointEndDetails.Key;
                 var timeEndDetail = pointEndDetails.Value;
-                foreach(var pointStart in trip.PointStartDetail)
+                foreach (var pointStart in trip.PointStartDetail)
                 {
                     var PointStartDetails = pointStart.Key;
                     var TimeStartDetails = pointStart.Value;
@@ -220,7 +220,7 @@ namespace MyAPI.Repositories.Impls
                     foreach (var pointStart in validEntries[i].PointStartDetail)
                     {
 
-                        var PointStartDetails = pointStart.Key; 
+                        var PointStartDetails = pointStart.Key;
                         var TimeStartDetails = pointStart.Value;
                         var tripDetail = new TripDetail
                         {
@@ -230,7 +230,7 @@ namespace MyAPI.Repositories.Impls
                             TimeEndDetails = TimeEndDetails,
                             TripId = tripMapper[i].Id,
                             Status = true
-                        }; 
+                        };
                         td.Add(tripDetail);
                     }
                     string licensePlate = validEntries[i].LicensePlate;
@@ -243,7 +243,7 @@ namespace MyAPI.Repositories.Impls
                         var vehicleTrip = new VehicleTrip
                         {
                             TripId = tripMapper[i].Id,
-                            VehicleId = vehicleId,  
+                            VehicleId = vehicleId,
                             CreatedAt = tripMapper[i].CreatedAt,
                             CreatedBy = tripMapper[i].CreatedBy,
                         };
@@ -452,5 +452,18 @@ namespace MyAPI.Repositories.Impls
             return tripCovenientListDTOs;
         }
 
+        public async Task<TripDTO> GetTripById(int id)
+        {
+            try
+            {
+                var trip = await _context.Trips.FirstOrDefaultAsync(x => x.Id == id);
+                var tripMapper = _mapper.Map<TripDTO>(trip);
+                return tripMapper;
+            }
+            catch (Exception ex) 
+            {
+                throw new Exception(ex.Message);
+            }
+        }
     }
 }

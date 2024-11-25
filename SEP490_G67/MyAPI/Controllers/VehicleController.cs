@@ -17,13 +17,17 @@ namespace MyAPI.Controllers
     {
 
         private readonly IVehicleRepository _vehicleRepository;
+        private readonly ITripRepository _tripRepository;
         private readonly GetInforFromToken _inforFromToken;
         private readonly ServiceImport _serviceImport;
-        public VehicleController(IVehicleRepository vehicleRepository, GetInforFromToken inforFromToken, ServiceImport serviceImport)
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        public VehicleController(IVehicleRepository vehicleRepository, GetInforFromToken inforFromToken, ServiceImport serviceImport, IHttpContextAccessor httpContextAccessor,ITripRepository tripRepository) 
         {
             _vehicleRepository = vehicleRepository;
             _inforFromToken = inforFromToken;
             _serviceImport = serviceImport;
+            _httpContextAccessor = httpContextAccessor;
+            _tripRepository = tripRepository;
         }
         [Authorize(Roles = "Staff")]
         [HttpGet("listVehicleType")]
@@ -290,18 +294,47 @@ namespace MyAPI.Controllers
                 return BadRequest(e.Message);
             }
         }
-        [HttpGet("getNumberSeatAvaiable/{tripId}/{dateTime}")]
-        public async Task<IActionResult> getNumberSeatAvaiable(int tripId, DateTime dateTime)
+        [HttpGet("getNumberSeatAvaiable/{tripId}")]
+        public async Task<IActionResult> GetNumberSeatAvailable(int tripId)
         {
             try
             {
-                var count = await _vehicleRepository.GetNumberSeatAvaiable(tripId, dateTime);
-                return Ok(count);
+                var date = _httpContextAccessor?.HttpContext.Session.GetString("date");
+                if (!string.IsNullOrEmpty(date) && DateTime.TryParse(date, out var parsedDate))
+                {
+                    var trip = await _tripRepository.GetTripById(tripId);
+                    if (trip != null)
+                    {
+                        if (trip.StartTime.HasValue) // Kiểm tra nếu StartTime không null
+                        {
+                            var dateTime = parsedDate.Date.Add(trip.StartTime.Value); // Lấy giá trị của TimeSpan
+                            Console.WriteLine($"DateTime: {dateTime}");
+
+                            var count = await _vehicleRepository.GetNumberSeatAvaiable(tripId, dateTime);
+                            return Ok(count);
+                        }
+                        else
+                        {
+                            return BadRequest("Trip StartTime is not available.");
+                        }
+                    }
+                    else
+                    {
+                        return NotFound($"Trip with ID {tripId} was not found.");
+                    }
+                }
+                else
+                {
+                    return BadRequest("Invalid or missing date in session.");
+                }
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                // Ghi log lỗi nếu cần
+                Console.WriteLine($"Error: {ex.Message}");
+                return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
+
     }
 }
