@@ -16,7 +16,7 @@ namespace MyAPI.Controllers
         {
             _historyRentVehicleRepository = historyRentVehicleRepository;
         }
-
+        //thiếu role
         [HttpGet("ListVehicleRent")]
         public async Task<IActionResult> GetVehicleUseRent()
         {
