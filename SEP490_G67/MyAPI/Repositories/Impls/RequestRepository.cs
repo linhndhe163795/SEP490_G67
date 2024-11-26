@@ -113,7 +113,6 @@ namespace MyAPI.Repositories.Impls
                 existingRequestDetail.StartTime = rentVehicleAddDTO?.StartTime;
                 existingRequestDetail.EndTime = rentVehicleAddDTO?.EndTime;
                 existingRequestDetail.Seats = rentVehicleAddDTO?.Seats;
-                existingRequestDetail.Price = rentVehicleAddDTO?.Price;
                 existingRequestDetail.UpdateAt = DateTime.Now;
                 existingRequestDetail.UpdateBy = userId;
 
@@ -175,7 +174,6 @@ namespace MyAPI.Repositories.Impls
                     StartTime = rentVehicleAddDTO?.StartTime,
                     EndTime = rentVehicleAddDTO?.EndTime,
                     Seats = rentVehicleAddDTO?.Seats,
-                    Price = rentVehicleAddDTO?.Price,
                     CreatedAt = DateTime.Now,
                     CreatedBy = userId,
                     UpdateAt = DateTime.Now,
