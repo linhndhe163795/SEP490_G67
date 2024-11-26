@@ -189,7 +189,7 @@ namespace MyAPI.Controllers
                 return BadRequest(new { Message = "AddVehicle rent Add failed", Details = ex.Message });
             }
         }
-
+        [Authorize(Roles = "VehicleOwner")]
         [HttpPost("CreateRentDriverForOwnerRequest")]
         public async Task<IActionResult> RentDriver(RequestDetailForRentDriver rentDriverAddDTO)
         {
