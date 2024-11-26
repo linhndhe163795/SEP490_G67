@@ -25,5 +25,7 @@ namespace MyAPI.Infrastructure.Interfaces
 
         Task<bool> AssignDriverToVehicleAsync(int vehicleId, int driverId);
         Task<int> GetNumberSeatAvaiable(int tripId, DateTime dateTime);
+
+        Task<VehicleAddDTO> GetVehicleById(int vehicleId);
     }
 }

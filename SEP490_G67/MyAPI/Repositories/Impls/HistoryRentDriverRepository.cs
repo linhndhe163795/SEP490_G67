@@ -259,7 +259,7 @@ namespace MyAPI.Repositories.Impls
             {
                 int limit = 5;
 
-                var driversWithRentCount = await _context.Drivers
+                var driversWithRentCount = await _context.Drivers.Include(x => x.Vehicles)
                     .Select(d => new
                     {
                         Driver = d,
@@ -268,6 +268,7 @@ namespace MyAPI.Repositories.Impls
                     .OrderBy(d => d.RentCount)
                     .ThenBy(d => d.Driver.Id)
                     .ToListAsync();
+
 
                 var result = driversWithRentCount
                     .Select(d => new HistoryRentDriverListDTOs

@@ -75,6 +75,19 @@ namespace MyAPI.Controllers
             }
         }
 
+        [HttpGet("getInforVehicle/{id}")]
+        public async Task<IActionResult> getVehicleDetailsById(int id)
+        {
+            try
+            {
+                var vehicleDetail = await _vehicleRepository.GetVehicleById(id);
+                return Ok(vehicleDetail);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
         //[Authorize(Roles = "Staff, VehicleOwner")]
         [HttpPost("addVehicle")]
         public async Task<IActionResult> AddVehicle(VehicleAddDTO vehicleAddDTO, string? driverName)
@@ -264,8 +277,6 @@ namespace MyAPI.Controllers
                 return BadRequest(ex.Message);
             }
         }
-
-
         [Authorize]
         [HttpPost("import_vehicle")]
         public async Task<IActionResult> importVehicel(IFormFile fileExcleVehicel)
@@ -335,6 +346,6 @@ namespace MyAPI.Controllers
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
-
+        //[HttpGet("listFiveVehicle")]
     }
 }
