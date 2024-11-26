@@ -235,6 +235,7 @@ namespace MyAPI.Repositories.Impls
                 int limit = 5;
 
                 var driversWithRentCount = await _context.Drivers
+                    .Where(d => !_context.Vehicles.Any(v => v.DriverId == d.Id)) 
                     .Select(d => new
                     {
                         Driver = d,
