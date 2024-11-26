@@ -76,6 +76,30 @@ namespace MyAPI.Controllers
             }
         }
 
+        [HttpPut("/AssignDriverForRent")]
+        public async Task<IActionResult> UpdateDriverInRequest(int driverId, int requestId)
+        {
+            try
+            {
+                // Gọi hàm repository để cập nhật driverId cho requestId
+                var result = await _historyRentDriverRepository.UpdateDriverInRequestAsync(driverId, requestId);
+
+                if (result)
+                {
+                    return Ok(new { Message = "Driver updated successfully for the request." });
+                }
+                else
+                {
+                    return NotFound(new { Message = "Request not found or update failed." });
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Message = "Failed to update driver for the request.", Details = ex.Message });
+            }
+        }
+
+
 
 
     }

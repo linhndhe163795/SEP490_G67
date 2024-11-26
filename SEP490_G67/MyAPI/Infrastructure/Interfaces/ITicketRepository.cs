@@ -1,4 +1,6 @@
-﻿using MyAPI.DTOs.TicketDTOs;
+﻿using Microsoft.AspNetCore.Mvc;
+using MyAPI.DTOs.TicketDTOs;
+using MyAPI.DTOs.VehicleDTOs;
 using MyAPI.Models;
 
 namespace MyAPI.Infrastructure.Interfaces
@@ -19,5 +21,9 @@ namespace MyAPI.Infrastructure.Interfaces
         Task<RevenueTicketDTO> getRevenueTicket(DateTime startTime, DateTime endTime, int? vehicle,int? vehicleOwner, int userId);
 
         Task<bool> deleteTicketTimeOut(int ticketId);
+
+        Task<bool> UpdateVehicleInRequestAsync(int vehicleId, int requestId);
+        Task<IEnumerable<VehicleBasicDto>> GetVehiclesByRequestIdAsync(int requestId);
+
     }
 }

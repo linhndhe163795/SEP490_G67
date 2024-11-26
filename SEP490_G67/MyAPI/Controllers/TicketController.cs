@@ -75,7 +75,7 @@ namespace MyAPI.Controllers
                 return BadRequest(ex.Message);
             }
         }
-
+        [Authorize]
         [HttpPost("createTicketForRentCar")]
         public async Task<IActionResult> CreateTicketForRentCar(int requestId, bool choose)
         {
@@ -90,6 +90,51 @@ namespace MyAPI.Controllers
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
+
+        [HttpGet("GetTravelCarByRequest/{requestId}")]
+        public async Task<IActionResult> GetVehiclesByRequestId(int requestId)
+        {
+            try
+            {
+                // Sử dụng repository để lấy danh sách phương tiện, giới hạn tối đa 5 xe
+                var vehicles = await _ticketRepository.GetVehiclesByRequestIdAsync(requestId);
+
+                if (vehicles == null || !vehicles.Any())
+                {
+                    return NotFound(new { Message = "No vehicles found with the specified criteria." });
+                }
+
+                return Ok(vehicles);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Message = "Failed to retrieve vehicles.", Details = ex.Message });
+            }
+        }
+
+        [HttpPut("AssignTravelCarForRent")]
+        public async Task<IActionResult> UpdateVehicleInRequest(int vehicleId, int requestId)
+        {
+            try
+            {
+                
+                var result = await _ticketRepository.UpdateVehicleInRequestAsync(vehicleId, requestId);
+
+                if (result)
+                {
+                    return Ok(new { Message = "Vehicle updated successfully for the request." });
+                }
+                else
+                {
+                    return NotFound(new { Message = "Request not found or update failed." });
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Message = "Failed to update vehicle for the request.", Details = ex.Message });
+            }
+        }
+
 
         [HttpGet]
         public async Task<IActionResult> getListTicket()

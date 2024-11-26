@@ -270,5 +270,33 @@ namespace MyAPI.Repositories.Impls
             }
         }
 
+        public async Task<bool> UpdateDriverInRequestAsync(int driverId, int requestId)
+        {
+            try
+            {
+                
+                var requestDetail = await _context.RequestDetails.FirstOrDefaultAsync(rd => rd.RequestId == requestId);
+
+                if (requestDetail == null)
+                {
+                    return false; 
+                }
+
+                
+                requestDetail.DriverId = driverId;
+
+               
+                _context.RequestDetails.Update(requestDetail);
+                await _context.SaveChangesAsync();
+
+                return true; 
+            }
+            catch
+            {
+                return false; 
+            }
+        }
+
+
     }
 }

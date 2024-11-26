@@ -3,6 +3,7 @@ using AutoMapper.Configuration.Conventions;
 using Microsoft.EntityFrameworkCore;
 using MyAPI.DTOs;
 using MyAPI.DTOs.TicketDTOs;
+using MyAPI.DTOs.VehicleDTOs;
 using MyAPI.Helper;
 using MyAPI.Infrastructure.Interfaces;
 using MyAPI.Models;
@@ -127,6 +128,8 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception(ex.Message);
             }
         }
+
+
         public async Task AcceptOrDenyRequestRentCar(int requestId, bool choose)
         {
             try
@@ -202,6 +205,71 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception("AcceptOrDenyRequestRentCar: " + ex.Message);
             }
         }
+
+        public async Task<bool> UpdateVehicleInRequestAsync(int vehicleId, int requestId)
+        {
+            try
+            {
+                
+                var requestDetail = await _context.RequestDetails.FirstOrDefaultAsync(rd => rd.RequestId == requestId);
+
+                if (requestDetail == null)
+                {
+                    return false;
+                }
+
+                
+                requestDetail.VehicleId = vehicleId;
+
+                
+                _context.RequestDetails.Update(requestDetail);
+                await _context.SaveChangesAsync();
+
+                return true; 
+            }
+            catch
+            {
+                return false; 
+            }
+        }
+
+        public async Task<IEnumerable<VehicleBasicDto>> GetVehiclesByRequestIdAsync(int requestId)
+        {
+            try
+            {
+                var requestDetail = await _context.RequestDetails
+                    .FirstOrDefaultAsync(rd => rd.RequestId == requestId);
+
+                if (requestDetail == null || requestDetail.Seats == null)
+                {
+                    return Enumerable.Empty<VehicleBasicDto>();
+                }
+
+                var seatCount = requestDetail.Seats.Value;
+
+                var vehicles = await _context.Vehicles
+                    .Where(v => v.VehicleTypeId == 3 && v.NumberSeat >= seatCount)
+                    .Take(5)
+                    .Select(v => new VehicleBasicDto
+                    {
+                        Id = v.Id,
+                        NumberSeat = v.NumberSeat,
+                        VehicleTypeId = v.VehicleTypeId,
+                        Status = v.Status,
+                        LicensePlate = v.LicensePlate,
+                        Description = v.Description
+                    })
+                    .ToListAsync();
+
+                return vehicles;
+            }
+            catch (Exception)
+            {
+                return Enumerable.Empty<VehicleBasicDto>();
+            }
+        }
+
+
 
 
         public async Task<List<ListTicketDTOs>> getAllTicket()

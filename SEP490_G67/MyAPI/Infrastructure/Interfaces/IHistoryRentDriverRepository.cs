@@ -9,6 +9,7 @@ namespace MyAPI.Infrastructure.Interfaces
         Task<bool> AcceptOrDenyRentDriver(int requestId, bool choose);
 
         Task<TotalPayementRentDriver> GetRentDetailsWithTotalForOwner(DateTime startDate, DateTime endDate, int? vehicleId, int? vehicleOwnerId);
+        Task<bool> UpdateDriverInRequestAsync(int driverId, int requestId);
 
     }
 }
