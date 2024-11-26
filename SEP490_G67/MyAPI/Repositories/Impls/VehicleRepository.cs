@@ -482,6 +482,20 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception(ex.Message);
             }
         }
+
+        public async Task<VehicleAddDTO> GetVehicleById(int vehicleId)
+        {
+            try
+            {
+                var vehicleById = await _context.Vehicles.FirstOrDefaultAsync(x => x.Id == vehicleId);
+                var vehicleMapper = _mapper.Map<VehicleAddDTO>(vehicleById);
+                return vehicleMapper;
+            }
+            catch (Exception ex) 
+            {
+                throw new Exception(ex.Message);
+            }
+        }
     }
 }
 

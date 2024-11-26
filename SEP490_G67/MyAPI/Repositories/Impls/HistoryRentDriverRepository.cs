@@ -10,6 +10,7 @@ using MyAPI.DTOs.RequestDTOs;
 using MyAPI.Helper;
 using DocumentFormat.OpenXml.Wordprocessing;
 using MyAPI.DTOs.PaymentRentDriver;
+using Microsoft.EntityFrameworkCore.Internal;
 
 namespace MyAPI.Repositories.Impls
 {
@@ -34,12 +35,13 @@ namespace MyAPI.Repositories.Impls
             _requestDetailRepository = requestDetailRepository;
         }
 
-        public async Task<bool> AcceptOrDenyRentDriver(int requestId, bool choose)
+        public async Task<bool> AcceptOrDenyRentDriver(int requestId, bool choose, int? driverId)
         {
             try
             {
                 var checkRequest = await _context.Requests.FirstOrDefaultAsync(s => s.Id == requestId);
 
+               
                 var token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
                 int userId = _tokenHelper.GetIdInHeader(token);
 
@@ -48,93 +50,116 @@ namespace MyAPI.Repositories.Impls
                     throw new Exception("Invalid user ID from token.");
                 }
 
-                var requestDetail = await _context.Requests.Include(s => s.RequestDetails)
-                                                           .SelectMany(s => s.RequestDetails)
-                                                           .Where(s => s.RequestId == requestId)
-                                                           .Select(rd => new
-                                                           {
-                                                               rd.CreatedBy,
-                                                               rd.VehicleId,
-                                                               rd.DriverId,
-                                                               rd.StartTime,
-                                                               rd.EndTime,
-                                                               rd.CreatedAt,
-                                                               rd.Price
-                                                           }).FirstOrDefaultAsync();
+                var requestDetail = await (from r in _context.Requests
+                                          join rd in _context.RequestDetails
+                                          on r.Id equals rd.RequestId
+                                          where r.Id == requestId
+                                          select rd).FirstOrDefaultAsync();
 
                 if (requestDetail == null)
                 {
                     throw new Exception("Fail requestDetail in AcceptOrDenyRentDriver.");
                 }
-
-                var driver = await _context.Drivers
-                                           .Where(d => d.Id == requestDetail.DriverId)
-                                           .FirstOrDefaultAsync();
-
-                if (driver == null)
-                {
-                    throw new Exception("Fail driver in AcceptOrDenyRentDriver.");
-                }
-
-                var updateRequest = await _context.Requests.FirstOrDefaultAsync(s => s.Id == requestId);
-                if (updateRequest == null)
-                {
-                    throw new Exception("Request not found in AcceptOrDenyRentDriver.");
-                }
-
-                updateRequest.Note = choose ? "Đã xác nhận" : "Từ chối xác nhận";
-                updateRequest.Status = choose;
-
-                var updateRequestRentDriver = await _requestRepository.UpdateRequestVehicleAsync(requestId, updateRequest);
-
-                var updateRequestDetail = new RequestDetailDTO
-                {
-                    UpdatedBy = userId,
-                    UpdatedAt = DateTime.Now,
-                };
-
-                var updateRequestDetailRentDriver = await _requestDetailRepository.CreateRequestDetailAsync(updateRequestDetail);
-
                 if (!choose)
                 {
+                    var updateRequest = await _context.Requests.FirstOrDefaultAsync(s => s.Id == requestId);
+                    if (updateRequest == null)
+                    {
+                        throw new Exception("Request not found in AcceptOrDenyRentDriver.");
+                    }
+
+                    updateRequest.Note = choose ? "Đã xác nhận" : "Từ chối xác nhận";
+                    updateRequest.Status = choose;
+                    var updateRequestRentDriver = await _requestRepository.UpdateRequestVehicleAsync(requestId, updateRequest);
                     return true;
                 }
 
-                var addHistoryDriver = new HistoryRentDriver
+
+                if (await checkDriverNotVechile(driverId))
                 {
-                    DriverId = requestDetail.DriverId,
-                    VehicleId = requestDetail.VehicleId,
-                    TimeStart = requestDetail.StartTime,
-                    EndStart = requestDetail.EndTime,
-                    CreatedBy = requestDetail.CreatedBy,
-                    CreatedAt = requestDetail.CreatedAt,
-                    UpdateAt = DateTime.Now,
-                    UpdateBy = requestDetail.CreatedBy,
-                };
+                    var updateRequest = await _context.Requests.FirstOrDefaultAsync(s => s.Id == requestId);
+                    if (updateRequest == null)
+                    {
+                        throw new Exception("Request not found in AcceptOrDenyRentDriver.");
+                    }
 
-                await _context.HistoryRentDrivers.AddAsync(addHistoryDriver);
-                await _context.SaveChangesAsync();
-                var addPaymentDriver = new PaymentRentDriver
+                    updateRequest.Note = choose ? "Đã xác nhận" : "Từ chối xác nhận";
+                    updateRequest.Status = choose;
+                    var updateRequestRentDriver = await _requestRepository.UpdateRequestVehicleAsync(requestId, updateRequest);
+                    
+                    var vechileAssgin = await _context.Vehicles.FirstOrDefaultAsync(x => x.Id == requestDetail.VehicleId);
+                    vechileAssgin.DriverId = driverId;
+                    _context.Vehicles.Update(vechileAssgin);
+                    await _context.SaveChangesAsync();
+                    
+                    requestDetail.DriverId = driverId;
+                    requestDetail.UpdateBy = userId;
+                    requestDetail.UpdateAt = DateTime.Now;
+                    _context.RequestDetails.Update(requestDetail);
+                    await _context.SaveChangesAsync();
+
+                    var addHistoryDriver = new HistoryRentDriver
+                    {
+                        DriverId = requestDetail.DriverId,
+                        VehicleId = requestDetail.VehicleId,
+                        TimeStart = requestDetail.StartTime,
+                        EndStart = requestDetail.EndTime,
+                        CreatedBy = requestDetail.CreatedBy,
+                        CreatedAt = requestDetail.CreatedAt,
+                        UpdateAt = DateTime.Now,
+                        UpdateBy = requestDetail.CreatedBy,
+                    };
+                    await _context.HistoryRentDrivers.AddAsync(addHistoryDriver);
+                    await _context.SaveChangesAsync();
+                    var addPaymentDriver = new PaymentRentDriver
+                    {
+                        DriverId = requestDetail.DriverId,
+                        Price = requestDetail.Price,
+                        VehicleId = requestDetail.VehicleId,
+                        Description = _context.Requests.SingleOrDefault(x => x.Id == requestId).Description,
+                        HistoryRentDriverId = addHistoryDriver.HistoryId,
+                        CreatedBy = requestDetail.CreatedBy,
+                        CreatedAt = requestDetail.CreatedAt,
+                        UpdateAt = DateTime.Now,
+                        UpdateBy = requestDetail.CreatedBy,
+                    };
+
+                    await _context.PaymentRentDrivers.AddAsync(addPaymentDriver);
+                    await _context.SaveChangesAsync();
+
+                    return true;
+                }
+                else
                 {
-                    DriverId = requestDetail.DriverId,
-                    Price = requestDetail.Price,
-                    VehicleId = requestDetail.VehicleId,
-                    Description = _context.Requests.SingleOrDefault(x => x.Id == requestId).Description,
-                    HistoryRentDriverId = addHistoryDriver.HistoryId,
-                    CreatedBy = requestDetail.CreatedBy,
-                    CreatedAt = requestDetail.CreatedAt,
-                    UpdateAt = DateTime.Now,
-                    UpdateBy = requestDetail.CreatedBy,
-                };
-
-                await _context.PaymentRentDrivers.AddAsync(addPaymentDriver);
-                await _context.SaveChangesAsync();
-
-                return true;
+                    throw new Exception("Not found driver avaliable");
+                }
             }
             catch (Exception ex)
             {
                 throw new Exception($"Error in AcceptOrDenyRentDriver: {ex.Message}");
+            }
+        }
+        private async Task<bool> checkDriverNotVechile(int? driverId)
+        {
+            try
+            {
+                var listDriver = await (from d in _context.Drivers
+                                        join v in _context.Vehicles on d.Id equals v.DriverId into vehicleGroup
+                                        from v in vehicleGroup.DefaultIfEmpty()
+                                        where v == null
+                                        select d).ToListAsync();
+                foreach (var driver in listDriver)
+                {
+                    if(driver.Id == driverId)
+                    {
+                        return true;
+                    }
+                }
+                return false;
+            }
+            catch (Exception ex) 
+            {
+                throw new Exception(ex.Message);
             }
         }
 
@@ -244,6 +269,7 @@ namespace MyAPI.Repositories.Impls
                     .OrderBy(d => d.RentCount)
                     .ThenBy(d => d.Driver.Id)
                     .ToListAsync();
+
 
                 var result = driversWithRentCount
                     .Select(d => new HistoryRentDriverListDTOs

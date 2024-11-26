@@ -53,13 +53,11 @@ namespace MyAPI.Controllers
             var UpdateRequestDto = _mapper.Map<RequestDTO>(requests);
             return Ok(UpdateRequestDto);
         }
-
         [HttpPost("/CreateTicketForRentFullCar")]
         public async Task<IActionResult> CreateRequestForRentCar(RequestDTOForRentCar requestforrentcar)
         {
             try
             {
-
                 var isAdded = await _requestRepository.CreateRequestRentCarAsync(requestforrentcar);
                 return Ok(new { Message = "Car rent added successfully.",CarRent = requestforrentcar });
 
@@ -172,14 +170,13 @@ namespace MyAPI.Controllers
                 return BadRequest(ex.Message);
             }
         }
-
-
+        //driver thuê xe trong hệ thống
+        [Authorize(Roles = "Driver")]
         [HttpPost("CreateRentVehicleForDriverRequest")]
         public async Task<IActionResult> AddVehicle(RentVehicleAddDTO rentVehicleAddDTO)
         {
             try
             {
-
                 var isAdded = await _requestRepository.CreateRequestRentVehicleAsync(rentVehicleAddDTO);
                 return Ok(new { Message = "Vehicle rent added successfully.", VehicleRent = rentVehicleAddDTO });
 
