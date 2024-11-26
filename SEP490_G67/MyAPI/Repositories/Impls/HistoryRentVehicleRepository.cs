@@ -198,20 +198,44 @@ namespace MyAPI.Repositories.Impls
             {
                 int limit = 5;
 
-                var result = new List<HistoryRentVehicleListDTO>();
-                int takeCount = 0;
-                int currentMinRentCount = 0;
+               
+                var vehiclesWithoutDriver = await _context.Vehicles
+                    .Where(v => v.DriverId == null) 
+                    .Select(v => new
+                    {
+                        Vehicle = v,
+                        RentCount = _context.HistoryRentVehicles.Count(hrv => hrv.VehicleId == v.Id)
+                    })
+                    .OrderBy(v => v.RentCount)
+                    .Take(limit)
+                    .Select(v => new HistoryRentVehicleListDTO
+                    {
+                        Id = v.Vehicle.Id,
+                        NumberSeat = v.Vehicle.NumberSeat,
+                        VehicleTypeId = v.Vehicle.VehicleTypeId,
+                        Status = v.Vehicle.Status,
+                        Image = v.Vehicle.Image,
+                        DriverId = v.Vehicle.DriverId,
+                        VehicleOwner = v.Vehicle.VehicleOwner,
+                        Description = v.Vehicle.Description,
+                        LicensePlate = v.Vehicle.LicensePlate,
+                    })
+                    .ToListAsync();
 
-                while (takeCount < limit)
+                
+                if (vehiclesWithoutDriver.Count < limit)
                 {
-                    var vehicleWithCurrentRentCount = await _context.Vehicles
+                    int remainingLimit = limit - vehiclesWithoutDriver.Count;
+
+                    var additionalVehicles = await _context.Vehicles
+                        .Where(v => v.DriverId != null) 
                         .Select(v => new
                         {
                             Vehicle = v,
                             RentCount = _context.HistoryRentVehicles.Count(hrv => hrv.VehicleId == v.Id)
                         })
-                        .Where(v => v.RentCount == currentMinRentCount)
-                        .Take(limit - takeCount)
+                        .OrderBy(v => v.RentCount) 
+                        .Take(remainingLimit)
                         .Select(v => new HistoryRentVehicleListDTO
                         {
                             Id = v.Vehicle.Id,
@@ -226,23 +250,18 @@ namespace MyAPI.Repositories.Impls
                         })
                         .ToListAsync();
 
-                    result.AddRange(vehicleWithCurrentRentCount);
-                    takeCount += vehicleWithCurrentRentCount.Count;
-
-                    if (takeCount >= limit)
-                    {
-                        break;
-                    }
-
-                    currentMinRentCount++;
+                    vehiclesWithoutDriver.AddRange(additionalVehicles); 
                 }
 
-                return result.Take(limit).ToList();
-            }catch (Exception ex)
+                return vehiclesWithoutDriver.Take(limit).ToList();
+            }
+            catch (Exception ex)
             {
-                throw new Exception($"historyRentVehicleListDTOs { ex.Message}");
+                throw new Exception($"Error in historyRentVehicleListDTOs: {ex.Message}");
             }
         }
+
+
 
         public async Task<bool> sendMailRequestRentVehicle(string description)
         {
