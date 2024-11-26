@@ -27,5 +27,7 @@ namespace MyAPI.Infrastructure.Interfaces
         Task<int> GetNumberSeatAvaiable(int tripId, DateTime dateTime);
 
         Task<VehicleAddDTO> GetVehicleById(int vehicleId);
+
+        Task<List<VehicleLicenscePlateDTOs>> getLicensecePlate();
     }
 }

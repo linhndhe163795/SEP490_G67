@@ -202,6 +202,8 @@ namespace MyAPI.Repositories.Impls
                 int takeCount = 0;
                 int currentMinRentCount = 0;
 
+
+
                 while (takeCount < limit)
                 {
                     var vehicleWithCurrentRentCount = await _context.Vehicles
@@ -233,10 +235,8 @@ namespace MyAPI.Repositories.Impls
                     {
                         break;
                     }
-
                     currentMinRentCount++;
                 }
-
                 return result.Take(limit).ToList();
             }catch (Exception ex)
             {

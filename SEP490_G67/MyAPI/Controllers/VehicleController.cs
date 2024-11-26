@@ -346,6 +346,20 @@ namespace MyAPI.Controllers
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
-        //[HttpGet("listFiveVehicle")]
+        [HttpGet("getLicenscePlate")]
+        public async Task<IActionResult> getLicensePlateById()
+        {
+            try
+            {
+                var result = await _vehicleRepository.getLicensecePlate();
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
+        }
+
     }
 }
