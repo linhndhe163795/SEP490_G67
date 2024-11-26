@@ -261,8 +261,6 @@ namespace MyAPI.Repositories.Impls
             }
         }
 
-
-
         public async Task<bool> sendMailRequestRentVehicle(string description)
         {
             var users = await _context.Users.ToListAsync();
