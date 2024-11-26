@@ -130,7 +130,7 @@ namespace MyAPI.Repositories.Impls
         }
 
 
-        public async Task AcceptOrDenyRequestRentCar(int requestId, bool choose)
+        public async Task AcceptOrDenyRequestRentCar(int requestId, bool choose, int vehicleId, decimal price)
         {
             try
             {
@@ -158,8 +158,8 @@ namespace MyAPI.Repositories.Impls
 
                 var ticket = new Ticket
                 {
-                    VehicleId = requestDetail.VehicleId,
-                    Price = requestDetail.Price,
+                    VehicleId = vehicleId,
+                    Price = price,
                     NumberTicket = requestDetail.Seats,
                     PointStart = requestDetail.StartLocation,
                     PointEnd = requestDetail.EndLocation,
