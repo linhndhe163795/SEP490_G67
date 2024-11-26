@@ -59,7 +59,7 @@ namespace MyAPI.Controllers
             try
             {
                 var isAdded = await _requestRepository.CreateRequestRentCarAsync(requestforrentcar);
-                return Ok(new { Message = "Car rent added successfully.",CarRent = requestforrentcar });
+                return Ok(new { Message = "Car rent added successfully.", CarRent = requestforrentcar });
 
             }
             catch (Exception ex)
@@ -101,7 +101,7 @@ namespace MyAPI.Controllers
             if (requests == null)
             {
                 return NotFound("request not found");
-            } 
+            }
             await _requestRepository.Delete(requests);
 
             return NoContent();
@@ -202,7 +202,7 @@ namespace MyAPI.Controllers
                 return BadRequest(new { Message = "AddDriver rent Add failed", Details = ex.Message });
             }
         }
-
+        [Authorize]
         [HttpPost("ConvenientTripCreateForUser")]
         public async Task<IActionResult> CreateRequestConvenientTrip(ConvenientTripDTO convenientTripDTO)
         {
@@ -252,6 +252,7 @@ namespace MyAPI.Controllers
             }
         }
 
+        [Authorize(Roles = "Staff")]
         [HttpPost("ConvenientTripUpdateForStaff")]
         public async Task<IActionResult> UpdateRequestConvenientTrip(int requestId, bool choose)
         {
@@ -270,5 +271,43 @@ namespace MyAPI.Controllers
             }
         }
 
+        [Authorize]
+        [HttpGet("getListRequestForUser")]
+        public async Task<IActionResult> getListRequestForVehicleOwner()
+        {
+            try
+            {
+                string token = Request.Headers["Authorization"];
+                if (token.StartsWith("Bearer"))
+                {
+                    token = token.Substring("Bearer ".Length).Trim();
+                }
+                if (string.IsNullOrEmpty(token))
+                {
+                    return BadRequest("Token is required.");
+                }
+                var userId = _token.GetIdInHeader(token);
+                var result = await _requestRepository.getListRequestForUser(userId);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [Authorize]
+        [HttpPost("updateRequestForUser/{requestID}")]
+        public async Task<IActionResult> updateRequestDetails(int requestID, RequestDetailDTO requestDetailDTO)
+        {
+            try
+            {
+                await _requestRepository.updateRequest(requestID, requestDetailDTO);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }

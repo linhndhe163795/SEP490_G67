@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualBasic;
 using MyAPI.DTOs;
 using MyAPI.DTOs.HistoryRentVehicle;
@@ -20,22 +21,25 @@ namespace MyAPI.Repositories.Impls
         private readonly IRequestDetailRepository _requestDetailRepository;
         private readonly IPromotionUserRepository _promotionUserRepository;
         private readonly IPaymentRepository _paymentRepository;
+        private readonly IMapper _mapper;
 
         public RequestRepository(SEP490_G67Context _context, IHttpContextAccessor httpContextAccessor
             , GetInforFromToken tokenHelper, IRequestDetailRepository requestDetailRepository
-            , IPromotionUserRepository promotionUserRepository, IPaymentRepository paymentRepository) : base(_context)
+            , IPromotionUserRepository promotionUserRepository, IPaymentRepository paymentRepository,
+            IMapper mapper) : base(_context)
         {
             _httpContextAccessor = httpContextAccessor;
             _tokenHelper = tokenHelper;
             _requestDetailRepository = requestDetailRepository;
             _promotionUserRepository = promotionUserRepository;
             _paymentRepository = paymentRepository;
+            _mapper = mapper;
         }
 
         public async Task<RequestDetailDTO> GetRequestDetailByIdAsync(int requestId)
         {
             var requestDetail = await _context.RequestDetails
-                .Where(rd => rd.RequestId == requestId) 
+                .Where(rd => rd.RequestId == requestId)
                 .Select(rd => new RequestDetailDTO
                 {
                     RequestId = rd.RequestId,
@@ -145,12 +149,12 @@ namespace MyAPI.Repositories.Impls
                     throw new Exception("Invalid user ID from token.");
                 }
 
-               
+
                 var addRentVehicle = new Request
                 {
                     UserId = userId,
-                    TypeId = 2, 
-                    Status = false, 
+                    TypeId = 2,
+                    Status = false,
                     Description = "Yêu cầu thuê xe du lịch",
                     CreatedAt = DateTime.Now,
                     Note = "Chờ xác nhận",
@@ -159,16 +163,16 @@ namespace MyAPI.Repositories.Impls
                     UpdateBy = userId,
                 };
 
-                
+
                 await _context.Requests.AddAsync(addRentVehicle);
                 await _context.SaveChangesAsync();
 
-               
+
                 var addRentVehicleRequestDetails = new RequestDetail
                 {
-                    RequestId = addRentVehicle.Id, 
+                    RequestId = addRentVehicle.Id,
                     VehicleId = null,
-                    TicketId = null, 
+                    TicketId = null,
                     StartLocation = rentVehicleAddDTO?.StartLocation,
                     EndLocation = rentVehicleAddDTO?.EndLocation,
                     StartTime = rentVehicleAddDTO?.StartTime,
@@ -239,7 +243,7 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception(ex.Message);
             }
         }
-          
+
         public async Task<bool> UpdateRequestVehicleAsync(int requestId, Request request)
         {
             var update = await _context.Requests.SingleOrDefaultAsync(s => s.Id == requestId);
@@ -255,7 +259,7 @@ namespace MyAPI.Repositories.Impls
             return false;
         }
 
-       
+
 
         public async Task createRequestCancleTicket(RequestCancleTicketDTOs requestCancleTicketDTOs, int userId)
         {
@@ -336,16 +340,17 @@ namespace MyAPI.Repositories.Impls
                 requestCancleTicket.Status = true;
                 requestCancleTicket.Note = "Đã xác nhận";
                 var getTicketCancle = await (from r in _context.Requests
-                                               join rd in _context.RequestDetails
-                                               on r.Id equals rd.RequestId
-                                               where r.Id == requestId
-                                               select rd
+                                             join rd in _context.RequestDetails
+                                             on r.Id equals rd.RequestId
+                                             where r.Id == requestId
+                                             select rd
                                                ).FirstOrDefaultAsync();
                 if (getTicketCancle == null)
                 {
                     throw new NullReferenceException();
                 }
-                var inforTicketCancle = await (from t in _context.Tickets join p in _context.Payments
+                var inforTicketCancle = await (from t in _context.Tickets
+                                               join p in _context.Payments
                                                on t.Id equals p.TicketId
                                                join rd in _context.RequestDetails on t.Id equals rd.TicketId
                                                join r in _context.Requests on rd.RequestId equals r.Id
@@ -357,7 +362,7 @@ namespace MyAPI.Repositories.Impls
                 {
                     throw new Exception("Không có vé để hủy");
                 }
-                var pointOfPayment = (int) inforTicketCancle.t.Price * Helper.Constant.TICH_DIEM;
+                var pointOfPayment = (int)inforTicketCancle.t.Price * Helper.Constant.TICH_DIEM;
 
                 var updatePointUserCancle = await (from pu in _context.PointUsers
                                                    where pu.Id == (from innerPu in _context.PointUsers
@@ -366,18 +371,18 @@ namespace MyAPI.Repositories.Impls
                                                    && pu.UserId == inforTicketCancle.t.UserId
                                                    select pu
                                   ).FirstOrDefaultAsync();
-                if(updatePointUserCancle == null)
+                if (updatePointUserCancle == null)
                 {
                     throw new Exception();
                 }
-                if(updatePointUserCancle.Points <= pointOfPayment)
+                if (updatePointUserCancle.Points <= pointOfPayment)
                 {
                     var PointUserMinus = new PointUser
                     {
                         PaymentId = inforTicketCancle.p.PaymentId,
                         UserId = inforTicketCancle.t.UserId,
                         Points = 0,
-                        PointsMinus = (int) pointOfPayment,
+                        PointsMinus = (int)pointOfPayment,
                         Date = DateTime.Now,
                         CreatedAt = DateTime.Now,
                         CreatedBy = inforTicketCancle.t.UserId,
@@ -392,7 +397,7 @@ namespace MyAPI.Repositories.Impls
                     {
                         PaymentId = inforTicketCancle.p.PaymentId,
                         UserId = inforTicketCancle.t.UserId,
-                        Points = (int) (updatePointUserCancle.Points - pointOfPayment),
+                        Points = (int)(updatePointUserCancle.Points - pointOfPayment),
                         PointsMinus = (int)pointOfPayment,
                         Date = DateTime.Now,
                         CreatedAt = DateTime.Now,
@@ -487,7 +492,7 @@ namespace MyAPI.Repositories.Impls
             catch (Exception ex)
             {
                 await transaction.RollbackAsync();
-                throw; 
+                throw;
             }
         }
 
@@ -567,7 +572,7 @@ namespace MyAPI.Repositories.Impls
                                             select v).ToListAsync();
                 foreach (var vehicle in vehicleOfOwner)
                 {
-                    if(vehicle.Id == vehicleId)
+                    if (vehicle.Id == vehicleId)
                     {
                         return true;
                     }
@@ -735,10 +740,10 @@ namespace MyAPI.Repositories.Impls
                 price = price / (1 - (discount / 100m));
             }
 
-            if(checkRequestDetail.VehicleId == 0 || checkRequestDetail.VehicleId == null)
+            if (checkRequestDetail.VehicleId == 0 || checkRequestDetail.VehicleId == null)
             {
                 throw new Exception("Vehicle Id null please update VehicleId before accpet!!");
-            } 
+            }
 
             var addTicket = new Ticket
             {
@@ -791,6 +796,40 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception("Add Payment Fails!!");
             }
             return true;
+        }
+
+        public async Task<List<RequestDTO>> getListRequestForUser(int userId)
+        {
+            try
+            {
+                var request = await _context.Requests.Where(x => x.UserId == userId && x.TypeId != 7).ToListAsync();
+                var requestMapper = _mapper.Map<List<RequestDTO>>(request);
+                return requestMapper;
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+        public async Task updateRequest(int requestID, RequestDetailDTO requestDetailDTO)
+        {
+            try
+            {
+                var requestDetails = await _context.RequestDetails.FirstOrDefaultAsync(x => x.RequestId == requestID);
+                requestDetails.StartLocation = requestDetailDTO.StartLocation;
+                requestDetails.EndLocation = requestDetailDTO.EndLocation;
+                requestDetails.Price = requestDetailDTO.Price;
+                requestDetails.VehicleId = requestDetails.VehicleId;
+                requestDetails.EndTime = requestDetailDTO.EndTime;
+                requestDetails.StartTime = requestDetailDTO.StartTime;
+                _context.RequestDetails.Update(requestDetails);
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
         }
     }
 }
