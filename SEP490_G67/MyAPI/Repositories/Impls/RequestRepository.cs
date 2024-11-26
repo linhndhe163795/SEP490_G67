@@ -63,9 +63,6 @@ namespace MyAPI.Repositories.Impls
             return requestDetail;
         }
 
-
-
-
         public async Task<bool> UpdateRequestRentCarAsync(int requestId, RequestDTOForRentCar rentVehicleAddDTO)
         {
             using var transaction = await _context.Database.BeginTransactionAsync();
@@ -135,9 +132,6 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception($"Error in UpdateRequestRentCarAsync: {ex.Message}");
             }
         }
-
-
-
 
         public async Task<bool> CreateRequestRentCarAsync(RequestDTOForRentCar rentVehicleAddDTO)
         {

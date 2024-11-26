@@ -39,11 +39,11 @@ namespace MyAPI.Controllers
         }
 
         [HttpPost("AddHistoryDriver")]
-        public async Task<IActionResult> AddHistoryDriverUseRent(int requestId, bool choose)
+        public async Task<IActionResult> AddHistoryDriverUseRent(int requestId, bool choose, int? driverId)
         {
             try
             {
-                var requests = await _historyRentDriverRepository.AcceptOrDenyRentDriver(requestId, choose);
+                var requests = await _historyRentDriverRepository.AcceptOrDenyRentDriver(requestId, choose, driverId);
                 if (requests)
                 {
                     return Ok(requests);
