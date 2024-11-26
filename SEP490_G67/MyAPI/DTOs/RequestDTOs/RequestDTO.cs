@@ -2,6 +2,7 @@
     {
         public class RequestDTO
         {
+            public string Id { get; set; }
             public int UserId { get; set; }
             public int? TypeId { get; set; }
             public bool Status { get; set; }
