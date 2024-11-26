@@ -507,51 +507,59 @@ namespace MyAPI.Repositories.Impls
             try
             {
                 var token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
-                int userId = _tokenHelper.GetIdInHeader(token);
+                int vehicleOwnerId = _tokenHelper.GetIdInHeader(token);
 
-                if (userId == -1)
+                if (vehicleOwnerId == -1)
                 {
                     throw new Exception("Invalid user ID from token.");
                 }
-
-                var addRentDriver = new Request
+                if (await checkVehicleOwner(vehicleOwnerId, rentDriverAddDTO.VehicleId))
                 {
-                    UserId = userId,
-                    TypeId = 5,
-                    Status = false,
-                    Description = "Yêu cầu thuê tài xế",
-                    CreatedAt = DateTime.Now,
-                    Note = "Chờ xác nhận",
-                    CreatedBy = userId,
-                    UpdateAt = DateTime.Now,
-                    UpdateBy = userId,
-                };
 
-                await _context.Requests.AddAsync(addRentDriver);
-                await _context.SaveChangesAsync();
+                    var addRentDriver = new Request
+                    {
+                        UserId = vehicleOwnerId,
+                        TypeId = 5,
+                        Status = false,
+                        Description = "Yêu cầu thuê tài xế",
+                        CreatedAt = DateTime.Now,
+                        Note = "Chờ xác nhận",
+                        CreatedBy = vehicleOwnerId,
+                        UpdateAt = DateTime.Now,
+                        UpdateBy = vehicleOwnerId,
+                    };
 
-                var addRentDriverRequestDetails = new RequestDetail
+                    await _context.Requests.AddAsync(addRentDriver);
+                    await _context.SaveChangesAsync();
+
+                    var addRentDriverRequestDetails = new RequestDetail
+                    {
+                        RequestId = addRentDriver.Id,
+                        VehicleId = rentDriverAddDTO.VehicleId,
+                        TicketId = null,
+                        StartLocation = rentDriverAddDTO?.StartLocation,
+                        EndLocation = rentDriverAddDTO?.EndLocation,
+                        StartTime = rentDriverAddDTO?.StartTime,
+                        EndTime = rentDriverAddDTO?.EndTime,
+                        Seats = rentDriverAddDTO?.Seats,
+                        Price = rentDriverAddDTO?.Price,
+                        CreatedAt = DateTime.Now,
+                        CreatedBy = vehicleOwnerId,
+                        UpdateAt = DateTime.Now,
+                        UpdateBy = vehicleOwnerId,
+                    };
+
+                    await _context.RequestDetails.AddAsync(addRentDriverRequestDetails);
+                    await _context.SaveChangesAsync();
+
+                    await transaction.CommitAsync();
+                    return true;
+
+                }
+                else
                 {
-                    RequestId = addRentDriver.Id,
-                    VehicleId = rentDriverAddDTO.VehicleId,
-                    TicketId = null,
-                    StartLocation = rentDriverAddDTO?.StartLocation,
-                    EndLocation = rentDriverAddDTO?.EndLocation,
-                    StartTime = rentDriverAddDTO?.StartTime,
-                    EndTime = rentDriverAddDTO?.EndTime,
-                    Seats = rentDriverAddDTO?.Seats,
-                    Price = rentDriverAddDTO?.Price,
-                    CreatedAt = DateTime.Now,
-                    CreatedBy = userId,
-                    UpdateAt = DateTime.Now,
-                    UpdateBy = userId,
-                };
-
-                await _context.RequestDetails.AddAsync(addRentDriverRequestDetails);
-                await _context.SaveChangesAsync();
-
-                await transaction.CommitAsync();
-                return true;
+                    throw new Exception("Not found vehicle or vehicle have driver");
+                }
             }
             catch (Exception ex)
             {
@@ -559,8 +567,28 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception($"Error in CreateRequestRentDriverAsync: {ex.Message}");
             }
         }
-
-
+        private async Task<bool> checkVehicleOwner(int vehicleOwnerId, int? vehicleId)
+        {
+            try
+            {
+                var vehicleOfOwner = await (from v in _context.Vehicles
+                                            where v.VehicleOwner == vehicleOwnerId
+                                            && v.DriverId == null
+                                            select v).ToListAsync();
+                foreach (var vehicle in vehicleOfOwner)
+                {
+                    if(vehicle.Id == vehicleId)
+                    {
+                        return true;
+                    }
+                }
+                return false;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
         public async Task<bool> CreateRequestCovenient(ConvenientTripDTO convenientTripDTO)
         {
             // Lấy User ID từ token
