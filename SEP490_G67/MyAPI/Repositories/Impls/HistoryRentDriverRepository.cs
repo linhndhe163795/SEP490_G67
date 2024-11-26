@@ -50,21 +50,11 @@ namespace MyAPI.Repositories.Impls
                     throw new Exception("Invalid user ID from token.");
                 }
 
-                
-
-                var requestDetail = await _context.Requests.Include(s => s.RequestDetails)
-                                                           .SelectMany(s => s.RequestDetails)
-                                                           .Where(s => s.RequestId == requestId)
-                                                           .Select(rd => new
-                                                           {
-                                                               rd.CreatedBy,
-                                                               rd.VehicleId,
-                                                               rd.DriverId,
-                                                               rd.StartTime,
-                                                               rd.EndTime,
-                                                               rd.CreatedAt,
-                                                               rd.Price
-                                                           }).FirstOrDefaultAsync();
+                var requestDetail = await (from r in _context.Requests
+                                          join rd in _context.RequestDetails
+                                          on r.Id equals rd.RequestId
+                                          where r.Id == requestId
+                                          select rd).FirstOrDefaultAsync();
 
                 if (requestDetail == null)
                 {
@@ -101,14 +91,12 @@ namespace MyAPI.Repositories.Impls
                     vechileAssgin.DriverId = driverId;
                     _context.Vehicles.Update(vechileAssgin);
                     await _context.SaveChangesAsync();
-                    var updateRequestDetail = new RequestDetail
-                    {
-                        UpdateBy = userId,
-                        UpdateAt = DateTime.Now,
-                        DriverId = driverId,
-                    };
-                    _context.RequestDetails.Update(updateRequestDetail);
                     
+                    requestDetail.DriverId = driverId;
+                    requestDetail.UpdateBy = userId;
+                    requestDetail.UpdateAt = DateTime.Now;
+                    _context.RequestDetails.Update(requestDetail);
+                    await _context.SaveChangesAsync();
 
                     var addHistoryDriver = new HistoryRentDriver
                     {

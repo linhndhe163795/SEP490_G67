@@ -452,9 +452,9 @@ namespace MyAPI.Repositories.Impls
                 var addRentVehicle = new Request
                 {
                     UserId = userId,
-                    TypeId = 4,
+                    TypeId = 7,
                     Status = false,
-                    Description = "Yêu cầu thuê xe tiện chuyến",
+                    Description = "Tài xế muốn thuê xe của hệ thống",
                     CreatedAt = DateTime.Now,
                     Note = "Chờ xác nhận",
                     CreatedBy = userId,
@@ -468,20 +468,18 @@ namespace MyAPI.Repositories.Impls
                 var addRentVehicelRequestDetails = new RequestDetail
                 {
                     RequestId = addRentVehicle.Id,
-                    VehicleId = null,
-                    TicketId = null,
                     StartLocation = rentVehicleAddDTO?.StartLocation,
                     EndLocation = rentVehicleAddDTO?.EndLocation,
                     StartTime = rentVehicleAddDTO?.StartTime,
                     EndTime = rentVehicleAddDTO?.EndTime,
                     Seats = rentVehicleAddDTO?.Seats,
                     Price = rentVehicleAddDTO?.Price,
+                    DriverId = userId,
                     CreatedAt = DateTime.Now,
                     CreatedBy = userId,
                     UpdateAt = DateTime.Now,
                     UpdateBy = userId,
                 };
-
                 await _context.RequestDetails.AddAsync(addRentVehicelRequestDetails);
                 await _context.SaveChangesAsync();
 
