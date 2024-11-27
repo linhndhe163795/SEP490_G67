@@ -68,7 +68,7 @@ namespace MyAPI.Controllers
             }
         }
         [Authorize(Roles = "Staff")]
-        [HttpPut("/UpdateRequestForRentFullCar/{id}")]
+        [HttpPost("/UpdateRequestForRentFullCar/{id}")]
         public async Task<IActionResult> UpdateRequestForRentCar(int id, RequestDTOForRentCar requestDto)
         {
             var isupdated = await _requestRepository.UpdateRequestRentCarAsync(id, requestDto);
@@ -108,7 +108,7 @@ namespace MyAPI.Controllers
         }
 
         [Authorize(Roles = "Staff")]
-        [HttpPut("acceptCancleTicket/{id}")]
+        [HttpPost("acceptCancleTicket/{id}")]
         public async Task<IActionResult> AcceptCancleTicketRequest(int id)
         {
             try
@@ -170,7 +170,7 @@ namespace MyAPI.Controllers
                 return BadRequest(ex.Message);
             }
         }
-        //driver thuê xe trong hệ thống
+        
         [Authorize(Roles = "Driver")]
         [HttpPost("CreateRentVehicleForDriverRequest")]
         public async Task<IActionResult> AddVehicle(RentVehicleAddDTO rentVehicleAddDTO)

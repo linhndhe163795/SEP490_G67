@@ -181,7 +181,7 @@ namespace MyAPI.Controllers
             }
         }
         [Authorize(Roles = "Staff")]
-        [HttpPut("updateStatusticketNotPaid/id")]
+        [HttpPost("updateStatusticketNotPaid/id")]
         public async Task<IActionResult> updateStatusTicketNotPaid(int id)
         {
             try
