@@ -202,6 +202,7 @@ namespace MyAPI.Controllers
                 return BadRequest(new { Message = "AddDriver rent Add failed", Details = ex.Message });
             }
         }
+
         [Authorize]
         [HttpPost("ConvenientTripCreateForUser")]
         public async Task<IActionResult> CreateRequestConvenientTrip(ConvenientTripDTO convenientTripDTO)
@@ -270,7 +271,7 @@ namespace MyAPI.Controllers
                 return BadRequest(new { success = false, message = ex.Message });
             }
         }
-
+        //screen request for user
         [Authorize]
         [HttpGet("getListRequestForUser")]
         public async Task<IActionResult> getListRequestForVehicleOwner()
@@ -295,6 +296,7 @@ namespace MyAPI.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        //update request for user
         [Authorize]
         [HttpPost("updateRequestForUser/{requestID}")]
         public async Task<IActionResult> updateRequestDetails(int requestID, RequestDetailDTO requestDetailDTO)

@@ -167,7 +167,7 @@ namespace MyAPI.Controllers
                 return BadRequest(new { Message = "DeleteVehicle Delete failed", Details = ex.Message });
             }
         }
-        [Authorize]
+        [Authorize(Roles = "Driver,Staff")]
         [HttpGet("getStartPointTripFromVehicle/{vehicleId}")]
         public async Task<IActionResult> getStartPointTripFromVehicle(int vehicleId)
         {
@@ -185,6 +185,7 @@ namespace MyAPI.Controllers
                 return BadRequest(new { ex.Message });
             }
         }
+        [Authorize(Roles = "Driver,Staff")]
         [Authorize]
         [HttpGet("getEndPointTripFromVehicle/{vehicleId}")]
         public async Task<IActionResult> getEndPointTripFromVehicle(int vehicleId)
@@ -316,9 +317,9 @@ namespace MyAPI.Controllers
                     var trip = await _tripRepository.GetTripById(tripId);
                     if (trip != null)
                     {
-                        if (trip.StartTime.HasValue) // Kiểm tra nếu StartTime không null
+                        if (trip.StartTime.HasValue) 
                         {
-                            var dateTime = parsedDate.Date.Add(trip.StartTime.Value); // Lấy giá trị của TimeSpan
+                            var dateTime = parsedDate.Date.Add(trip.StartTime.Value); 
                             Console.WriteLine($"DateTime: {dateTime}");
 
                             var count = await _vehicleRepository.GetNumberSeatAvaiable(tripId, dateTime);
