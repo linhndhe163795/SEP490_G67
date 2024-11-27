@@ -172,7 +172,7 @@ namespace MyAPI.Controllers
                 var role = _getInforFromToken.GetRoleFromToken(token);
                 if (role == "Driver" && await _vehicleRepository.checkDriver(vehicleId,userId) == false)
                 {
-                   return NotFound("Not Authenticate");
+                   return NotFound("Not Authentication");
                 }
                 var listTicket = await _ticketRepository.GetListTicketNotPaid(vehicleId);
                 if (listTicket == null) return NotFound();
