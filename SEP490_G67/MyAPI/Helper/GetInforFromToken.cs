@@ -37,5 +37,29 @@ namespace MyAPI.Helper
                 return -1;
             }
         }
+        public string GetRoleFromToken(string token)
+        {
+            var handler = new JwtSecurityTokenHandler();
+            try
+            {
+                var jwtToken = handler.ReadJwtToken(token);
+
+                // Lấy claim "role" từ token
+                var roleClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == "role");
+                if (roleClaim == null)
+                {
+                    Console.WriteLine("Invalid token: role claim is missing.");
+                    return string.Empty;
+                }
+
+                return roleClaim.Value;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Exception while reading token: {ex.Message}");
+                return string.Empty;
+            }
+        }
+
     }
 }

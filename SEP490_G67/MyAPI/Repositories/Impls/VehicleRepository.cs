@@ -541,10 +541,10 @@ namespace MyAPI.Repositories.Impls
             {
                 var vehicleByDriverID = _context.Vehicles.Where(x => x.DriverId == driverId).Select(x => new VehicleLicenscePlateDTOs
                 {
-                    Id= x.Id,
+                    Id = x.Id,
                     LicensePlate = x.LicensePlate
                 }).ToListAsync();
-                if(vehicleByDriverID == null)
+                if (vehicleByDriverID == null)
                 {
                     throw new Exception("Driver not have vehicle");
                 }
@@ -552,7 +552,24 @@ namespace MyAPI.Repositories.Impls
             }
             catch (Exception ex)
             {
-                throw new Exception(ex.Message); 
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<bool> checkDriver(int vehicleId,int driverId)
+        {
+            try
+            {
+                var vehicle = await _context.Vehicles.FirstOrDefaultAsync(x => x.Id == vehicleId);
+                if (vehicle.DriverId == driverId) 
+                {
+                    return true;
+                }
+                return false;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
             }
         }
     }

@@ -7,5 +7,6 @@
         public string FullName { get; set; }
         public decimal Price { get; set; }
         public string TypeOfPayment { get; set; }
+        public decimal total {  get; set; }
     }
 }

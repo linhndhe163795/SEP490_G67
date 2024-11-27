@@ -159,6 +159,21 @@ namespace MyAPI.Controllers
         {
             try
             {
+                string token = Request.Headers["Authorization"];
+                if (token.StartsWith("Bearer"))
+                {
+                    token = token.Substring("Bearer ".Length).Trim();
+                }
+                if (string.IsNullOrEmpty(token))
+                {
+                    return BadRequest("Token is required.");
+                }
+                var userId = _getInforFromToken.GetIdInHeader(token);
+                var role = _getInforFromToken.GetRoleFromToken(token);
+                if (role == "Driver" && await _vehicleRepository.checkDriver(vehicleId,userId) == false)
+                {
+                   return NotFound("Not Authenticate");
+                }
                 var listTicket = await _ticketRepository.GetListTicketNotPaid(vehicleId);
                 if (listTicket == null) return NotFound();
                 return Ok(listTicket);
