@@ -41,11 +41,11 @@ namespace MyAPI.Controllers
         }
         [Authorize(Roles = "Staff")]
         [HttpPost("AddHistoryVehicle")]
-        public async Task<IActionResult> AddHistoryVehicleUseRent(int requestId, bool choose, int? vehicleId)
+        public async Task<IActionResult> AddHistoryVehicleUseRent(int requestId, bool choose, int? vehicleId, decimal price)
         {
             try
             {
-                var requests = await _historyRentVehicleRepository.AccpetOrDeninedRentVehicle(requestId, choose, vehicleId);
+                var requests = await _historyRentVehicleRepository.AccpetOrDeninedRentVehicle(requestId, choose, vehicleId, price);
                 if (requests)
                 {
                     return Ok(requests);

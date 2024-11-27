@@ -35,7 +35,7 @@ namespace MyAPI.Repositories.Impls
             _requestDetailRepository = requestDetailRepository;
         }
 
-        public async Task<bool> AcceptOrDenyRentDriver(int requestId, bool choose, int? driverId)
+        public async Task<bool> AcceptOrDenyRentDriver(int requestId, bool choose, int? driverId, decimal price)
         {
             try
             {
@@ -114,7 +114,7 @@ namespace MyAPI.Repositories.Impls
                     var addPaymentDriver = new PaymentRentDriver
                     {
                         DriverId = requestDetail.DriverId,
-                        Price = requestDetail.Price,
+                        Price = price,
                         VehicleId = requestDetail.VehicleId,
                         Description = _context.Requests.SingleOrDefault(x => x.Id == requestId).Description,
                         HistoryRentDriverId = addHistoryDriver.HistoryId,
