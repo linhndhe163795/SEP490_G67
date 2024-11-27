@@ -11,5 +11,6 @@ namespace MyAPI.Infrastructure.Interfaces
         Task<TotalPayementRentDriver> GetRentDetailsWithTotalForOwner(DateTime startDate, DateTime endDate, int? vehicleId, int? vehicleOwnerId);
         Task<bool> UpdateDriverInRequestAsync(int driverId, int requestId);
 
+        Task<List<DriverHistoryDTO>> GetDriverHistoryByUserIdAsync();
     }
 }

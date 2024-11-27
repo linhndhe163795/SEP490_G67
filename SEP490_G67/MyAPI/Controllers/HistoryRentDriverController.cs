@@ -99,6 +99,25 @@ namespace MyAPI.Controllers
             }
         }
 
+        [HttpGet("driver-history")]
+        public async Task<IActionResult> GetDriverHistory()
+        {
+            try
+            {
+                var history = await _historyRentDriverRepository.GetDriverHistoryByUserIdAsync();
+
+                if (history == null || !history.Any())
+                {
+                    return NotFound($"No history found for driver with ID");
+                }
+
+                return Ok(history);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Failed to fetch driver history.", error = ex.Message });
+            }
+        }
 
 
 

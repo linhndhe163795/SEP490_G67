@@ -324,6 +324,42 @@ namespace MyAPI.Repositories.Impls
             }
         }
 
+        public async Task<List<DriverHistoryDTO>> GetDriverHistoryByUserIdAsync()
+        {
+            try
+            {
+                var token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+                int userId = _tokenHelper.GetIdInHeader(token);
+
+                if (userId == -1)
+                {
+                    throw new Exception("Invalid user ID from token.");
+                }
+                var historyList = await _context.HistoryRentDrivers
+                    .Where(hrd => hrd.DriverId == userId)
+                    .Select(hrd => new DriverHistoryDTO
+                    {
+                        HistoryId = hrd.HistoryId,
+                        DriverId = hrd.DriverId,
+                        VehicleId = hrd.VehicleId,
+                        TimeStart = hrd.TimeStart,
+                        EndStart = hrd.EndStart,
+                        CreatedAt = hrd.CreatedAt,
+                        CreatedBy = hrd.CreatedBy,
+                        UpdatedAt = hrd.UpdateAt,
+                        UpdatedBy = hrd.UpdateBy
+                    })
+                    .ToListAsync();
+
+                return historyList;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error fetching driver history: {ex.Message}");
+            }
+        }
+
+
 
     }
 }
