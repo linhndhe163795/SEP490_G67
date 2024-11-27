@@ -35,7 +35,7 @@ namespace MyAPI.Repositories.Impls
             _requestDetailRepository = requestDetailRepository;
         }
 
-        public async Task<bool> AcceptOrDenyRentDriver(int requestId, bool choose, int? driverId)
+        public async Task<bool> AcceptOrDenyRentDriver(int requestId, bool choose, int? driverId, decimal price)
         {
             try
             {
@@ -114,7 +114,7 @@ namespace MyAPI.Repositories.Impls
                     var addPaymentDriver = new PaymentRentDriver
                     {
                         DriverId = requestDetail.DriverId,
-                        Price = requestDetail.Price,
+                        Price = price,
                         VehicleId = requestDetail.VehicleId,
                         Description = _context.Requests.SingleOrDefault(x => x.Id == requestId).Description,
                         HistoryRentDriverId = addHistoryDriver.HistoryId,
@@ -323,6 +323,42 @@ namespace MyAPI.Repositories.Impls
                 return false; 
             }
         }
+
+        public async Task<List<DriverHistoryDTO>> GetDriverHistoryByUserIdAsync()
+        {
+            try
+            {
+                var token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+                int userId = _tokenHelper.GetIdInHeader(token);
+
+                        if (userId == -1)
+                {
+                    throw new Exception("Invalid user ID from token.");
+                }
+                var historyList = await _context.HistoryRentDrivers
+                    .Where(hrd => hrd.DriverId == userId)
+                    .Select(hrd => new DriverHistoryDTO
+                    {
+                        HistoryId = hrd.HistoryId,
+                        DriverId = hrd.DriverId,
+                        VehicleId = hrd.VehicleId,
+                        TimeStart = hrd.TimeStart,
+                        EndStart = hrd.EndStart,
+                        CreatedAt = hrd.CreatedAt,
+                        CreatedBy = hrd.CreatedBy,
+                        UpdatedAt = hrd.UpdateAt,
+                        UpdatedBy = hrd.UpdateBy
+                    })
+                    .ToListAsync();
+
+                return historyList;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error fetching driver history: {ex.Message}");
+            }
+        }
+
 
 
     }

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using DocumentFormat.OpenXml.Spreadsheet;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualBasic;
 using MyAPI.DTOs;
@@ -810,6 +811,22 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception(ex.Message);
             }
         }
+
+        public async Task<List<RequestDTO>> GetListRequestForDriver(int userId)
+        {
+            try
+            {
+                var request = await _context.Requests.Where(x => x.UserId == userId && x.TypeId == 7).ToListAsync();
+                var requestMapper = _mapper.Map<List<RequestDTO>>(request);
+                return requestMapper;
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
 
         public async Task updateRequest(int requestID, RequestDetailDTO requestDetailDTO)
         {

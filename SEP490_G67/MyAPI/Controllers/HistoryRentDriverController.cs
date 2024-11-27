@@ -39,11 +39,11 @@ namespace MyAPI.Controllers
         }
         [Authorize(Roles = "Staff")]
         [HttpPost("AddHistoryDriver")]
-        public async Task<IActionResult> AddHistoryDriverUseRent(int requestId, bool choose, int? driverId)
+        public async Task<IActionResult> AddHistoryDriverUseRent(int requestId, bool choose, int? driverId, decimal price)
         {
             try
             {
-                var requests = await _historyRentDriverRepository.AcceptOrDenyRentDriver(requestId, choose, driverId);
+                var requests = await _historyRentDriverRepository.AcceptOrDenyRentDriver(requestId, choose, driverId , price);
                 if (requests)
                 {
                     return Ok(requests);
@@ -99,6 +99,25 @@ namespace MyAPI.Controllers
             }
         }
 
+        [HttpGet("driver-history")]
+        public async Task<IActionResult> GetDriverHistory()
+        {
+            try
+            {
+                var history = await _historyRentDriverRepository.GetDriverHistoryByUserIdAsync();
+
+                if (history == null || !history.Any())
+                {
+                    return NotFound($"No history found for driver with ID");
+                }
+
+                return Ok(history);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Failed to fetch driver history.", error = ex.Message });
+            }
+        }
 
 
 
