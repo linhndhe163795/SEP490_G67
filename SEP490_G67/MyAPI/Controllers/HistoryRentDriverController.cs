@@ -37,7 +37,7 @@ namespace MyAPI.Controllers
                 return BadRequest(new { Message = "Get List Driver Rent failed", Details = ex.Message });
             }
         }
-
+        [Authorize(Roles = "Staff")]
         [HttpPost("AddHistoryDriver")]
         public async Task<IActionResult> AddHistoryDriverUseRent(int requestId, bool choose, int? driverId)
         {
