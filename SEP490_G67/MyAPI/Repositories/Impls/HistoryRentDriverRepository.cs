@@ -331,7 +331,7 @@ namespace MyAPI.Repositories.Impls
                 var token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
                 int userId = _tokenHelper.GetIdInHeader(token);
 
-                if (userId == -1)
+                        if (userId == -1)
                 {
                     throw new Exception("Invalid user ID from token.");
                 }
