@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MyAPI.Infrastructure.Interfaces;
 using MyAPI.Repositories.Impls;
@@ -15,7 +16,7 @@ namespace MyAPI.Controllers
         {
             _historyRentVehicleRepository = historyRentVehicleRepository;
         }
-
+        //thiếu role
         [HttpGet("ListVehicleRent")]
         public async Task<IActionResult> GetVehicleUseRent()
         {
@@ -38,13 +39,13 @@ namespace MyAPI.Controllers
             }
 
         }
-
+        [Authorize(Roles = "Staff")]
         [HttpPost("AddHistoryVehicle")]
-        public async Task<IActionResult> AddHistoryVehicleUseRent(int requestId, bool choose)
+        public async Task<IActionResult> AddHistoryVehicleUseRent(int requestId, bool choose, int? vehicleId)
         {
             try
             {
-                var requests = await _historyRentVehicleRepository.AccpetOrDeninedRentVehicle(requestId, choose);
+                var requests = await _historyRentVehicleRepository.AccpetOrDeninedRentVehicle(requestId, choose, vehicleId);
                 if (requests)
                 {
                     return Ok(requests);

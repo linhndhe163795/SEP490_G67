@@ -50,8 +50,8 @@ namespace MyAPI.Controllers
         }
 
         [Authorize(Roles = "Staff")]
-        [HttpPost("createTicketFromDriver/{vehicleId}")]
-        public async Task<IActionResult> creatTicketFromDriver([FromBody] TicketFromDriverDTOs ticketFromDriver, [FromForm] int vehicleId, int numberTicket)
+        [HttpPost("createTicketFromDriver/{vehicleId}/{numberTicket}")]
+        public async Task<IActionResult> creatTicketFromDriver([FromBody] TicketFromDriverDTOs ticketFromDriver, int vehicleId, int numberTicket)
         {
             try
             {
@@ -75,13 +75,13 @@ namespace MyAPI.Controllers
                 return BadRequest(ex.Message);
             }
         }
-
+        [Authorize]
         [HttpPost("createTicketForRentCar")]
-        public async Task<IActionResult> CreateTicketForRentCar(int requestId, bool choose)
+        public async Task<IActionResult> CreateTicketForRentCar(int requestId, bool choose, int vehicleId, decimal price)
         {
             try
             {
-                await _ticketRepository.AcceptOrDenyRequestRentCar(requestId, choose);
+                await _ticketRepository.AcceptOrDenyRequestRentCar(requestId, choose, vehicleId, price);
 
                 return Ok("Ticket created successfully.");
             }
@@ -90,6 +90,51 @@ namespace MyAPI.Controllers
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
+
+        [HttpGet("GetTravelCarByRequest/{requestId}")]
+        public async Task<IActionResult> GetVehiclesByRequestId(int requestId)
+        {
+            try
+            {
+                // Sử dụng repository để lấy danh sách phương tiện, giới hạn tối đa 5 xe
+                var vehicles = await _ticketRepository.GetVehiclesByRequestIdAsync(requestId);
+
+                if (vehicles == null || !vehicles.Any())
+                {
+                    return NotFound(new { Message = "No vehicles found with the specified criteria." });
+                }
+
+                return Ok(vehicles);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Message = "Failed to retrieve vehicles.", Details = ex.Message });
+            }
+        }
+
+        [HttpPut("AssignTravelCarForRent")]
+        public async Task<IActionResult> UpdateVehicleInRequest(int vehicleId, int requestId)
+        {
+            try
+            {
+                
+                var result = await _ticketRepository.UpdateVehicleInRequestAsync(vehicleId, requestId);
+
+                if (result)
+                {
+                    return Ok(new { Message = "Vehicle updated successfully for the request." });
+                }
+                else
+                {
+                    return NotFound(new { Message = "Request not found or update failed." });
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Message = "Failed to update vehicle for the request.", Details = ex.Message });
+            }
+        }
+
 
         [HttpGet]
         public async Task<IActionResult> getListTicket()
@@ -106,8 +151,8 @@ namespace MyAPI.Controllers
                 return BadRequest("getListTicket: " + ex.Message);
             }
         }
-        [Authorize(Roles = "Staff")]
-        [HttpGet("tickeNotPaid")]
+        [Authorize(Roles = "Staff,Driver")]
+        [HttpGet("tickeNotPaid/{vehicleId}")]
         public async Task<IActionResult> getListTicketNotPaid(int vehicleId)
         {
             try
@@ -135,8 +180,8 @@ namespace MyAPI.Controllers
                 return BadRequest(ex.Message);
             }
         }
-        [Authorize(Roles = "Staff")]
-        [HttpPut("updateStatusticketNotPaid/id")]
+        [Authorize(Roles = "Staff, Driver")]
+        [HttpPost("updateStatusticketNotPaid/id")]
         public async Task<IActionResult> updateStatusTicketNotPaid(int id)
         {
             try
@@ -206,5 +251,6 @@ namespace MyAPI.Controllers
                 return BadRequest(new { Message = "deleteTicketByTicketId failed", Details = ex.Message });
             }
         }
+        
     }
 }

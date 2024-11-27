@@ -143,7 +143,7 @@ namespace MyAPI.Repositories.Impls
             {
                 throw new Exception("AddVehicleAsync: " + ex.Message);
             }
-           
+
         }
         public async Task<bool> AddVehicleByStaffcheckAsync(int requestId, bool isApprove)
         {
@@ -248,7 +248,7 @@ namespace MyAPI.Repositories.Impls
             {
                 throw new Exception("DeleteVehicleAsync: " + ex.Message);
             }
-            
+
         }
 
         public async Task<List<EndPointDTO>> GetListEndPointByVehicleId(int vehicleId)
@@ -267,7 +267,7 @@ namespace MyAPI.Repositories.Impls
                 List<EndPointDTO> listEndPointDTOs = new List<EndPointDTO>();
                 foreach (var v in listStartPoint)
                 {
-                    listEndPointDTOs.Add(new EndPointDTO{ id = i++, name = v });
+                    listEndPointDTOs.Add(new EndPointDTO { id = i++, name = v });
                 }
 
                 if (listEndPointDTOs == null)
@@ -299,7 +299,7 @@ namespace MyAPI.Repositories.Impls
             {
                 throw new Exception("GetVehicleTypeDTOsAsync: " + ex.Message);
             }
-            
+
         }
 
         public async Task<bool> UpdateVehicleAsync(int id, string driverName)
@@ -335,7 +335,8 @@ namespace MyAPI.Repositories.Impls
                 {
                     throw new Exception("Not found user name in system");
                 }
-            }catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 throw new Exception("UpdateVehicleAsync: " + ex.Message);
             }
@@ -384,7 +385,8 @@ namespace MyAPI.Repositories.Impls
                 var vehicleListDTOs = _mapper.Map<List<VehicleListDTO>>(listVehicle);
 
                 return vehicleListDTOs;
-            }catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 throw new Exception("GetVehicleDTOsAsync: " + ex.Message);
             }
@@ -415,7 +417,8 @@ namespace MyAPI.Repositories.Impls
                 {
                     throw new Exception("Not found user name in system");
                 }
-            }catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 throw new Exception("UpdateVehicleAsync: " + ex.Message);
             }
@@ -447,7 +450,8 @@ namespace MyAPI.Repositories.Impls
                 {
                     throw new Exception("Not found vehicle in system");
                 }
-            }catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 throw new Exception("UpdateVehicleByStaff: " + ex.Message);
             }
@@ -476,6 +480,37 @@ namespace MyAPI.Repositories.Impls
                 var seatAvaiable = vehicle.NumberSeat - ticketCount;
                 return seatAvaiable.Value;
 
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<VehicleAddDTO> GetVehicleById(int vehicleId)
+        {
+            try
+            {
+                var vehicleById = await _context.Vehicles.FirstOrDefaultAsync(x => x.Id == vehicleId);
+                var vehicleMapper = _mapper.Map<VehicleAddDTO>(vehicleById);
+                return vehicleMapper;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public Task<List<VehicleLicenscePlateDTOs>> getLicensecePlate()
+        {
+            try
+            {
+                var list = _context.Vehicles.Select(x => new VehicleLicenscePlateDTOs
+                {
+                    Id = x.Id,
+                    LicensePlate = x.LicensePlate
+                }).ToListAsync();
+                return list;
             }
             catch (Exception ex)
             {

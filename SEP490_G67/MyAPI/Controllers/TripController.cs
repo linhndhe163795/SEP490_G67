@@ -315,6 +315,45 @@ namespace MyAPI.Controllers
                 return BadRequest(new { Message = "GetListconvenient failed", Details = ex.Message });
             }
         }
-
+        [HttpGet("getListStartPoint")]
+        public async Task<IActionResult> getListStartPoint()
+        {
+            try
+            {
+                var listStart = await _tripRepository.getListStartPoint();
+                if(listStart == null)
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    return Ok(listStart);
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [HttpGet("getListEndPoint")]
+        public async Task<IActionResult> getListEndPoint()
+        {
+            try
+            {
+                var listEnd = await _tripRepository.getListEndPoint();
+                if (listEnd == null)
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    return Ok(listEnd);
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }

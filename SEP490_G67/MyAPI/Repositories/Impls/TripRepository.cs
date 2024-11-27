@@ -47,8 +47,8 @@ namespace MyAPI.Repositories.Impls
                                         join v in _context.Vehicles
                                         on tv.VehicleId equals v.Id
                                         join u in _context.Users on v.VehicleOwner equals u.Id
-                                        where t.PointStart.Contains(startPoint) &&
-                                            t.PointEnd.Contains(endPoint) &&
+                                        where t.PointStart.Contains(startPoint.Trim()) &&
+                                            t.PointEnd.Contains(endPoint.Trim()) &&
                                             t.StartTime >= timeSpan &&
                                             t.TypeOfTrip == Constant.CHUYEN_DI_LIEN_TINH &&
                                             t.Status == true &&
@@ -76,7 +76,6 @@ namespace MyAPI.Repositories.Impls
                                                 NumberSeat = g.v.NumberSeat,
                                                 VehicleTypeId = g.v.VehicleTypeId,
                                                 Price = g.t.Price,
-
                                             }).OrderByDescending(v => v.LicensePlate).ToList()
                                         }).ToListAsync();
                 var searchTripMapper = _mapper.Map<List<TripVehicleDTO>>(searchTrip);
@@ -252,7 +251,7 @@ namespace MyAPI.Repositories.Impls
 
                 }
                 await _context.VehicleTrips.AddRangeAsync(vt);
-                //await _context.TripDetails.AddRangeAsync(td);
+                await _context.TripDetails.AddRangeAsync(td);
                 await _context.SaveChangesAsync();
             }
             catch (Exception ex)
@@ -460,7 +459,35 @@ namespace MyAPI.Repositories.Impls
                 var tripMapper = _mapper.Map<TripDTO>(trip);
                 return tripMapper;
             }
-            catch (Exception ex) 
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<List<StartPointDTO>> getListStartPoint()
+        {
+            try
+            {
+                var listStartPoint = await _context.Trips.Select(x => x.PointStart).ToListAsync();
+                var mapper = _mapper.Map<List<StartPointDTO>>(listStartPoint);
+                return mapper;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<List<EndPointDTO>> getListEndPoint()
+        {
+            try
+            {
+                var listPointEnd = await _context.Trips.Select(x => x.PointEnd).ToListAsync();
+                var mapper = _mapper.Map<List<EndPointDTO>>(listPointEnd);
+                return mapper;
+            }
+            catch (Exception ex)
             {
                 throw new Exception(ex.Message);
             }

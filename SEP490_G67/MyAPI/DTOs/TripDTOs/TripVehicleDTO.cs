@@ -10,6 +10,7 @@ namespace MyAPI.DTOs.TripDTOs
         public string? Description { get; set; }
         public string? PointStart { get; set; }
         public string? PointEnd { get; set; }
+        public int countSeatAvaliable { get; set; }
         public List<VehicleDTO> listVehicle { get; set; } = new List<VehicleDTO>();
     }
 }

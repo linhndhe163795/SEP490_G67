@@ -75,6 +75,19 @@ namespace MyAPI.Controllers
             }
         }
 
+        [HttpGet("getInforVehicle/{id}")]
+        public async Task<IActionResult> getVehicleDetailsById(int id)
+        {
+            try
+            {
+                var vehicleDetail = await _vehicleRepository.GetVehicleById(id);
+                return Ok(vehicleDetail);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
         //[Authorize(Roles = "Staff, VehicleOwner")]
         [HttpPost("addVehicle")]
         public async Task<IActionResult> AddVehicle(VehicleAddDTO vehicleAddDTO, string? driverName)
@@ -154,7 +167,7 @@ namespace MyAPI.Controllers
                 return BadRequest(new { Message = "DeleteVehicle Delete failed", Details = ex.Message });
             }
         }
-        [Authorize]
+        [Authorize(Roles = "Driver,Staff")]
         [HttpGet("getStartPointTripFromVehicle/{vehicleId}")]
         public async Task<IActionResult> getStartPointTripFromVehicle(int vehicleId)
         {
@@ -172,6 +185,7 @@ namespace MyAPI.Controllers
                 return BadRequest(new { ex.Message });
             }
         }
+        [Authorize(Roles = "Driver,Staff")]
         [Authorize]
         [HttpGet("getEndPointTripFromVehicle/{vehicleId}")]
         public async Task<IActionResult> getEndPointTripFromVehicle(int vehicleId)
@@ -264,8 +278,6 @@ namespace MyAPI.Controllers
                 return BadRequest(ex.Message);
             }
         }
-
-
         [Authorize]
         [HttpPost("import_vehicle")]
         public async Task<IActionResult> importVehicel(IFormFile fileExcleVehicel)
@@ -305,9 +317,9 @@ namespace MyAPI.Controllers
                     var trip = await _tripRepository.GetTripById(tripId);
                     if (trip != null)
                     {
-                        if (trip.StartTime.HasValue) // Kiểm tra nếu StartTime không null
+                        if (trip.StartTime.HasValue) 
                         {
-                            var dateTime = parsedDate.Date.Add(trip.StartTime.Value); // Lấy giá trị của TimeSpan
+                            var dateTime = parsedDate.Date.Add(trip.StartTime.Value); 
                             Console.WriteLine($"DateTime: {dateTime}");
 
                             var count = await _vehicleRepository.GetNumberSeatAvaiable(tripId, dateTime);
@@ -334,6 +346,20 @@ namespace MyAPI.Controllers
                 Console.WriteLine($"Error: {ex.Message}");
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
+        }
+        [HttpGet("getLicenscePlate")]
+        public async Task<IActionResult> getLicensePlateById()
+        {
+            try
+            {
+                var result = await _vehicleRepository.getLicensecePlate();
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
         }
 
     }

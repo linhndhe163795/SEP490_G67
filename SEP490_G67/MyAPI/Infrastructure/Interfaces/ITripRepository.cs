@@ -19,5 +19,7 @@ namespace MyAPI.Infrastructure.Interfaces
         Task<int> GetTicketCount(int tripId, DateTime dateTime);
         Task<List<ListCovenientStartEndDTO>> getListStartAndEndPoint();
         Task<TripDTO> GetTripById(int id);
+        Task<List<StartPointDTO>> getListStartPoint();
+        Task<List<EndPointDTO>> getListEndPoint();
     }
 }

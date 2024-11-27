@@ -37,13 +37,13 @@ namespace MyAPI.Controllers
                 return BadRequest(new { Message = "Get List Driver Rent failed", Details = ex.Message });
             }
         }
-
+        [Authorize(Roles = "Staff")]
         [HttpPost("AddHistoryDriver")]
-        public async Task<IActionResult> AddHistoryDriverUseRent(int requestId, bool choose)
+        public async Task<IActionResult> AddHistoryDriverUseRent(int requestId, bool choose, int? driverId)
         {
             try
             {
-                var requests = await _historyRentDriverRepository.AcceptOrDenyRentDriver(requestId, choose);
+                var requests = await _historyRentDriverRepository.AcceptOrDenyRentDriver(requestId, choose, driverId);
                 if (requests)
                 {
                     return Ok(requests);
@@ -73,6 +73,49 @@ namespace MyAPI.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, new { message = "Failed to fetch rent details for the owner.", error = ex.Message });
+            }
+        }
+
+        [HttpPut("/AssignDriverForRent")]
+        public async Task<IActionResult> UpdateDriverInRequest(int driverId, int requestId)
+        {
+            try
+            {
+                // Gọi hàm repository để cập nhật driverId cho requestId
+                var result = await _historyRentDriverRepository.UpdateDriverInRequestAsync(driverId, requestId);
+
+                if (result)
+                {
+                    return Ok(new { Message = "Driver updated successfully for the request." });
+                }
+                else
+                {
+                    return NotFound(new { Message = "Request not found or update failed." });
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Message = "Failed to update driver for the request.", Details = ex.Message });
+            }
+        }
+
+        [HttpGet("driver-history")]
+        public async Task<IActionResult> GetDriverHistory()
+        {
+            try
+            {
+                var history = await _historyRentDriverRepository.GetDriverHistoryByUserIdAsync();
+
+                if (history == null || !history.Any())
+                {
+                    return NotFound($"No history found for driver with ID");
+                }
+
+                return Ok(history);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Failed to fetch driver history.", error = ex.Message });
             }
         }
 
