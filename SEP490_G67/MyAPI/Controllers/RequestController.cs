@@ -309,5 +309,30 @@ namespace MyAPI.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        [Authorize]
+        [HttpGet("getListRequestForDriver")]
+        public async Task<IActionResult> getListRequestForDriver()
+        {
+            try
+            {
+                string token = Request.Headers["Authorization"];
+                if (token.StartsWith("Bearer"))
+                {
+                    token = token.Substring("Bearer ".Length).Trim();
+                }
+                if (string.IsNullOrEmpty(token))
+                {
+                    return BadRequest("Token is required.");
+                }
+                var driverid = _token.GetIdInHeader(token);
+                var result = await _requestRepository.GetListRequestForDriver(driverid);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }
