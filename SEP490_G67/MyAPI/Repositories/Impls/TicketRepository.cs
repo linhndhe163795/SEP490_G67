@@ -286,7 +286,7 @@ namespace MyAPI.Repositories.Impls
             }
         }
 
-        public async Task<List<TicketNotPaid>> GetListTicketNotPaid(int vehicleId)
+        public async Task<List<TicketNotPaid>> GetListTicketNotPaid(int vehicleId, DateTime dateTime)
         {
             try
             {
@@ -299,12 +299,15 @@ namespace MyAPI.Repositories.Impls
                                         on t.Id equals tk.TripId
                                         join u in _context.Users on tk.UserId equals u.Id
                                         join typeP in _context.TypeOfPayments on tk.TypeOfPayment equals typeP.Id
-                                        where typeP.Id == Constant.TIEN_MAT && v.Id == vehicleId
-                                        select new { u.FullName, tk.PricePromotion, typeP.TypeOfPayment1 }
+                                        where typeP.Id == Constant.TIEN_MAT && 
+                                        v.Id == vehicleId && 
+                                        tk.Status == "Thanh toán bằng tiền mặt" && 
+                                        tk.TimeFrom <= DateTime.Now
+                                        select new { tk.UserId ,u.FullName, tk.PricePromotion, typeP.TypeOfPayment1, tk.Id }
                                        ).ToListAsync();
                 var totalPricePromotion = listTicket
-                    .GroupBy(t => t.FullName)
-                    .Select(g => new TicketNotPaid { FullName = g.Key, Price = g.Sum(x => x.PricePromotion.Value), TypeOfPayment = g.FirstOrDefault()?.TypeOfPayment1 })
+                    .GroupBy(t => new { t.UserId, t.Id })
+                    .Select(g => new TicketNotPaid { ticketId = g.Key.Id ,userId = g.Key.UserId, FullName = g.FirstOrDefault()?.FullName ,Price = g.Sum(x => x.PricePromotion.Value), TypeOfPayment = g.FirstOrDefault()?.TypeOfPayment1 })
                     .ToList();
 
 
