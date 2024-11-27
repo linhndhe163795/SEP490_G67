@@ -199,7 +199,6 @@ namespace MyAPI.Repositories.Impls
             }
         }
 
-
         public async Task DeleteRequestDetailAsync(int requestId, int detailId)
         {
             var detail = await _context.RequestDetails
@@ -258,8 +257,6 @@ namespace MyAPI.Repositories.Impls
             }
             return false;
         }
-
-
 
         public async Task createRequestCancleTicket(RequestCancleTicketDTOs requestCancleTicketDTOs, int userId)
         {
@@ -562,6 +559,7 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception($"Error in CreateRequestRentDriverAsync: {ex.Message}");
             }
         }
+
         private async Task<bool> checkVehicleOwner(int vehicleOwnerId, int? vehicleId)
         {
             try
@@ -584,6 +582,7 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception(ex.Message);
             }
         }
+
         public async Task<bool> CreateRequestCovenient(ConvenientTripDTO convenientTripDTO)
         {
             // Lấy User ID từ token
@@ -670,7 +669,6 @@ namespace MyAPI.Repositories.Impls
 
             return true;
         }
-
 
         public async Task<bool> UpdateStatusRequestConvenient(int requestId, bool choose)
         {
@@ -812,6 +810,7 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception(ex.Message);
             }
         }
+
         public async Task updateRequest(int requestID, RequestDetailDTO requestDetailDTO)
         {
             try

@@ -21,13 +21,15 @@ namespace MyAPI.Controllers
         private readonly GetInforFromToken _inforFromToken;
         private readonly ServiceImport _serviceImport;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        public VehicleController(IVehicleRepository vehicleRepository, GetInforFromToken inforFromToken, ServiceImport serviceImport, IHttpContextAccessor httpContextAccessor,ITripRepository tripRepository) 
+        private readonly GetInforFromToken _getInforFromToken;
+        public VehicleController(GetInforFromToken getInforFromToken, IVehicleRepository vehicleRepository, GetInforFromToken inforFromToken, ServiceImport serviceImport, IHttpContextAccessor httpContextAccessor, ITripRepository tripRepository)
         {
             _vehicleRepository = vehicleRepository;
             _inforFromToken = inforFromToken;
             _serviceImport = serviceImport;
             _httpContextAccessor = httpContextAccessor;
             _tripRepository = tripRepository;
+            _getInforFromToken = getInforFromToken;
         }
         [Authorize(Roles = "Staff")]
         [HttpGet("listVehicleType")]
@@ -317,9 +319,9 @@ namespace MyAPI.Controllers
                     var trip = await _tripRepository.GetTripById(tripId);
                     if (trip != null)
                     {
-                        if (trip.StartTime.HasValue) 
+                        if (trip.StartTime.HasValue)
                         {
-                            var dateTime = parsedDate.Date.Add(trip.StartTime.Value); 
+                            var dateTime = parsedDate.Date.Add(trip.StartTime.Value);
                             Console.WriteLine($"DateTime: {dateTime}");
 
                             var count = await _vehicleRepository.GetNumberSeatAvaiable(tripId, dateTime);
@@ -359,8 +361,29 @@ namespace MyAPI.Controllers
             {
                 return BadRequest(ex.Message);
             }
-
         }
-
+        [HttpGet("getVehicleByDriverId")]
+        public async Task<IActionResult> getListVehicleByDriverId()
+        {
+            try
+            {
+                string token = Request.Headers["Authorization"];
+                if (token.StartsWith("Bearer"))
+                {
+                    token = token.Substring("Bearer ".Length).Trim();
+                }
+                if (string.IsNullOrEmpty(token))
+                {
+                    return BadRequest("Token is required.");
+                }
+                var driverId = _getInforFromToken.GetIdInHeader(token);
+                var listVehicle = await _vehicleRepository.getVehicleByDriverId(driverId);
+                return Ok(listVehicle);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }
