@@ -286,7 +286,7 @@ namespace MyAPI.Repositories.Impls
             }
         }
 
-        public async Task<List<TicketNotPaid>> GetListTicketNotPaid(int vehicleId)
+        public async Task<TicketNotPaidSummary> GetListTicketNotPaid(int vehicleId)
         {
             try
             {
@@ -302,16 +302,21 @@ namespace MyAPI.Repositories.Impls
                                         where typeP.Id == Constant.TIEN_MAT && 
                                         v.Id == vehicleId && 
                                         tk.Status == "Thanh toán bằng tiền mặt" && 
-                                        tk.TimeFrom <= DateTime.Now
+                                        tk.TimeFrom <= DateTime.Now  
                                         select new { tk.UserId ,u.FullName, tk.PricePromotion, typeP.TypeOfPayment1, tk.Id }
                                        ).ToListAsync();
                 var totalPricePromotion = listTicket
                     .GroupBy(t => new { t.UserId, t.Id })
                     .Select(g => new TicketNotPaid { ticketId = g.Key.Id ,userId = g.Key.UserId, FullName = g.FirstOrDefault()?.FullName ,Price = g.Sum(x => x.PricePromotion.Value), TypeOfPayment = g.FirstOrDefault()?.TypeOfPayment1 })
                     .ToList();
-
-
-                return totalPricePromotion;
+                decimal total = totalPricePromotion.Sum(t => t.Price);
+                var result = new TicketNotPaidSummary
+                {
+                    Tickets = totalPricePromotion,
+                    Total = total
+                    
+                };
+                return result;
             }
             catch (Exception ex)
             {

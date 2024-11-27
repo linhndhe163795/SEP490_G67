@@ -17,11 +17,13 @@ namespace MyAPI.Controllers
         private readonly ITicketRepository _ticketRepository;
         private readonly GetInforFromToken _getInforFromToken;
         private readonly IMapper _mapper;
-        public TicketController(ITicketRepository ticketRepository, GetInforFromToken getInforFromToken, IMapper mapper)
+        private readonly IVehicleRepository _vehicleRepository;
+        public TicketController(ITicketRepository ticketRepository, GetInforFromToken getInforFromToken, IMapper mapper, IVehicleRepository vehicleRepository)
         {
             _ticketRepository = ticketRepository;
             _mapper = mapper;
             _getInforFromToken = getInforFromToken;
+            _vehicleRepository = vehicleRepository;
         }
         [Authorize]
         [HttpPost("bookTicket/{tripDetailsId}")]
@@ -157,6 +159,21 @@ namespace MyAPI.Controllers
         {
             try
             {
+                string token = Request.Headers["Authorization"];
+                if (token.StartsWith("Bearer"))
+                {
+                    token = token.Substring("Bearer ".Length).Trim();
+                }
+                if (string.IsNullOrEmpty(token))
+                {
+                    return BadRequest("Token is required.");
+                }
+                var userId = _getInforFromToken.GetIdInHeader(token);
+                var role = _getInforFromToken.GetRoleFromToken(token);
+                if (role == "Driver" && await _vehicleRepository.checkDriver(vehicleId,userId) == false)
+                {
+                   return NotFound("Not Authentication");
+                }
                 var listTicket = await _ticketRepository.GetListTicketNotPaid(vehicleId);
                 if (listTicket == null) return NotFound();
                 return Ok(listTicket);
@@ -180,7 +197,7 @@ namespace MyAPI.Controllers
                 return BadRequest(ex.Message);
             }
         }
-        [Authorize(Roles = "Staff, Driver")]
+        [Authorize(Roles = "Driver")]
         [HttpPost("updateStatusticketNotPaid/id")]
         public async Task<IActionResult> updateStatusTicketNotPaid(int id)
         {

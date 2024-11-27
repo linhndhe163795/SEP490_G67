@@ -29,5 +29,8 @@ namespace MyAPI.Infrastructure.Interfaces
         Task<VehicleAddDTO> GetVehicleById(int vehicleId);
 
         Task<List<VehicleLicenscePlateDTOs>> getLicensecePlate();
+
+        Task<List<VehicleLicenscePlateDTOs>> getVehicleByDriverId(int driverId);
+        Task<bool> checkDriver(int vehicleId,int driverId);
     }
 }

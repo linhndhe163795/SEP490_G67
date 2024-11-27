@@ -517,6 +517,61 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception(ex.Message);
             }
         }
+
+        public async Task<int> VehicleByDriverId(int driverId)
+        {
+            try
+            {
+                var vehicleId = await _context.Vehicles.FirstOrDefaultAsync(x => x.DriverId == driverId);
+                if (vehicleId == null)
+                {
+                    throw new Exception("Driver not have vehicle");
+                }
+                return vehicleId.Id;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public Task<List<VehicleLicenscePlateDTOs>> getVehicleByDriverId(int driverId)
+        {
+            try
+            {
+                var vehicleByDriverID = _context.Vehicles.Where(x => x.DriverId == driverId).Select(x => new VehicleLicenscePlateDTOs
+                {
+                    Id = x.Id,
+                    LicensePlate = x.LicensePlate
+                }).ToListAsync();
+                if (vehicleByDriverID == null)
+                {
+                    throw new Exception("Driver not have vehicle");
+                }
+                return vehicleByDriverID;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<bool> checkDriver(int vehicleId,int driverId)
+        {
+            try
+            {
+                var vehicle = await _context.Vehicles.FirstOrDefaultAsync(x => x.Id == vehicleId);
+                if (vehicle.DriverId == driverId) 
+                {
+                    return true;
+                }
+                return false;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
     }
 }
 

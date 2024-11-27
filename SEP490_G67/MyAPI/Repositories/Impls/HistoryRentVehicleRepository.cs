@@ -30,7 +30,7 @@ namespace MyAPI.Repositories.Impls
             _requestDetailRepository = requestDetailRepository; 
         }
         //dành cho driver thuê xe 
-        public async Task<bool> AccpetOrDeninedRentVehicle(int requestId, bool choose, int? vehicleId)
+        public async Task<bool> AccpetOrDeninedRentVehicle(int requestId, bool choose, int? vehicleId, decimal price)
         {
             var checkRequest = await _context.Requests.FirstOrDefaultAsync(s => s.Id == requestId);
 
@@ -114,7 +114,7 @@ namespace MyAPI.Repositories.Impls
                         DriverId = requestDetail.CreatedBy,
                         VehicleId = requestDetail.VehicleId,
                         CarOwnerId = vehicleOwner,
-                        Price = requestDetail.Price,
+                        Price = price,
                         HistoryRentVehicleId = addHistoryVehicle.HistoryId,
                         CreatedBy = requestDetail.CreatedBy,
                         CreatedAt = requestDetail.CreatedAt,
