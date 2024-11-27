@@ -286,7 +286,7 @@ namespace MyAPI.Repositories.Impls
             }
         }
 
-        public async Task<List<TicketNotPaid>> GetListTicketNotPaid(int vehicleId, DateTime dateTime)
+        public async Task<List<TicketNotPaid>> GetListTicketNotPaid(int vehicleId)
         {
             try
             {
