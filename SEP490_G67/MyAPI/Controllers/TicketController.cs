@@ -114,7 +114,7 @@ namespace MyAPI.Controllers
             }
         }
 
-        [HttpPut("AssignTravelCarForRent")]
+        [HttpPost("AssignTravelCarForRent")]
         public async Task<IActionResult> UpdateVehicleInRequest(int vehicleId, int requestId)
         {
             try

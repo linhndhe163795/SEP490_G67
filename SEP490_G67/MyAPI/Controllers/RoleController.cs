@@ -54,8 +54,8 @@ namespace MyAPI.Controllers
 
         }
 
-
-        [HttpPut("updateRole/{id}")]
+            
+        [HttpPost("updateRole/{id}")]
         public async Task<IActionResult> UpdateRole(int id,RoleAddDTO roleAddDTO)
         {
 

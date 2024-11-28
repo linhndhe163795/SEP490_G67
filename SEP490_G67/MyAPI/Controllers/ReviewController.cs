@@ -58,7 +58,7 @@ namespace MyAPI.Controllers
             return CreatedAtAction(nameof(GetReviewById), new { id = review.Id }, review);
         }
         [Authorize]
-        [HttpPut("{id}")]
+        [HttpPost("{id}")]
         public async Task<IActionResult> UpdateReview(int id, [FromBody] ReviewDTO reviewDto)
         {
             if (!ModelState.IsValid)
