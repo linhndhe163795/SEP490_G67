@@ -53,12 +53,9 @@ namespace MyAPI.Controllers
             }
 
         }
-
-            
         [HttpPost("updateRole/{id}")]
         public async Task<IActionResult> UpdateRole(int id,RoleAddDTO roleAddDTO)
         {
-
             try
             {
                 var addRole = await _roleRepository.UpdateRole(id,roleAddDTO);

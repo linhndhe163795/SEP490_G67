@@ -27,7 +27,7 @@ namespace MyAPI.Controllers
         }
         [Authorize]
         [HttpPost("bookTicket/{tripDetailsId}")]
-        public async Task<IActionResult> createTicket(BookTicketDTOs ticketDTOs, int tripDetailsId, string? promotionCode, int numberTicket)
+        public async Task<IActionResult> createTicket([FromBody] BookTicketDTOs ticketDTOs, int tripDetailsId, string? promotionCode, int numberTicket)
         {
             try
             {

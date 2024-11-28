@@ -87,7 +87,7 @@ namespace MyAPI.Controllers
 
        
         [Authorize(Roles = "Staff")]
-        [HttpPut("updatePromotion/id")]
+        [HttpPost("updatePromotion/id")]
         public async Task<IActionResult> UpdatePromotion(int id, [FromForm] PromotionDTO promotionDTO, IFormFile? imageFile)
         {
             try

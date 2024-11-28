@@ -93,7 +93,7 @@ namespace MyAPI.Repositories.Impls
             }
             catch (Exception ex)
             {
-                throw new Exception("CreateTicketByUser: " + ex.Message);
+                throw new Exception("CreateTicketByUser: " + ex.StackTrace);
             }
         }
 
