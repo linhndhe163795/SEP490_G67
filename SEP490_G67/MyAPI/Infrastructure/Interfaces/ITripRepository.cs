@@ -10,7 +10,7 @@ namespace MyAPI.Infrastructure.Interfaces
         Task<List<TripDTO>> GetListTrip();
         Task<List<TripVehicleDTO>> SreachTrip(string startPoint, string endPoint, string time);
         Task AddTrip(TripDTO trip, int? vehicleId, int userId);  
-        Task UpdateTripById(int tripId, TripDTO trip, int userId);
+        Task UpdateTripById(int tripId, UpdateTrip trip, int userId);
         Task updateStatusTrip(int id, int userId);
         Task confirmAddValidEntryImport(List<TripImportDTO> validEntry);
         Task<List<TripDTO>> getListTripNotVehicle();

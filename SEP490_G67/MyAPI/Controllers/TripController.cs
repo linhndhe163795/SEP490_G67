@@ -147,8 +147,8 @@ namespace MyAPI.Controllers
         }
 
         [Authorize(Roles = "Staff")]
-        [HttpPut("updateTrip/{id}")]
-        public async Task<IActionResult> updateTrip(int id, TripDTO tripDTO)
+        [HttpPost("updateTrip/{id}")]
+        public async Task<IActionResult> updateTrip(int id, UpdateTrip tripDTO)
         {
             try
             {

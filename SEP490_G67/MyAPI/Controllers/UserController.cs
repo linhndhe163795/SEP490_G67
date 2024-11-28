@@ -40,7 +40,7 @@ namespace MyAPI.Controllers
         }
 
         [Authorize]
-        [HttpPut("EditProfile")]
+        [HttpPost("EditProfile")]
         public async Task<IActionResult> EditProfile(EditProfileDTO editProfileDTO)
         {
             try
