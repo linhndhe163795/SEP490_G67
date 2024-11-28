@@ -166,7 +166,7 @@ namespace MyAPI.Controllers
             return Ok(new { Message = "Vehicle updated successfully." });
         }
         [Authorize(Roles = "Staff")]
-        [HttpDelete("deleteVehicleByStatus/{id}")]
+        [HttpPost("deleteVehicleByStatus/{id}")]
         public async Task<IActionResult> UpdateVehicle(int id)
         {
             try

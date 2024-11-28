@@ -93,7 +93,7 @@ namespace MyAPI.Controllers
 
 
         [Authorize(Roles = "Staff")]
-        [HttpDelete("{id}")]
+        [HttpPost("Delete/{id}")]
         public async Task<IActionResult> DeleteRequest(int id)
         {
 

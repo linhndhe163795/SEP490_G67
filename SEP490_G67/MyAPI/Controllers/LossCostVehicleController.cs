@@ -84,7 +84,7 @@ namespace MyAPI.Controllers
             }
         }
         [Authorize(Roles = "Staff")]
-        [HttpDelete("deleteLossCost/id")]
+        [HttpPost("deleteLossCost/id")]
         public async Task<IActionResult> deleteCostById(int id)
         {
             try

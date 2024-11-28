@@ -125,7 +125,7 @@ namespace MyAPI.Controllers
             }
         }
         [Authorize(Roles = "Staff")]
-        [HttpDelete("deletePromotion/id")]
+        [HttpPost("deletePromotion/id")]
         public async Task<IActionResult> DeletePromotion(int id)
         {
             try
@@ -182,7 +182,7 @@ namespace MyAPI.Controllers
                 return BadRequest("GivePromotionAllUser: " + ex.Message);
             }
         }
-        [HttpDelete("deletePromotionAfterPayment/{userId}/{promotionId}")]
+        [HttpPost("deletePromotionAfterPayment/{userId}/{promotionId}")]
         public async Task<IActionResult> deletePromotionAfterPayment(int userId, int promotionId)
         {
             try

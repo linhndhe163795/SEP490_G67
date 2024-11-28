@@ -67,7 +67,7 @@ namespace MyAPI.Controllers
             }
         }
 
-        [HttpDelete("deleteRole/{id}")]
+        [HttpPost("deleteRole/{id}")]
         public async Task<IActionResult> DeleteRole(int id)
         {
             try

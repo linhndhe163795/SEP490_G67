@@ -49,7 +49,7 @@ namespace MyAPI.Controllers
             }
         }
         [Authorize(Roles = "Staff,Admin")]
-        [HttpDelete("{id}")]
+        [HttpPost("Delete/{id}")]
         public async Task<IActionResult> DeleteTypeOfDriver(int id)
         {
             var typeOfDriver = await _typeOfDriverRepository.Get(id);
