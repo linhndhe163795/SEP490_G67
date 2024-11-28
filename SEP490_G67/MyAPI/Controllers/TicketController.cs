@@ -27,7 +27,7 @@ namespace MyAPI.Controllers
         }
         [Authorize]
         [HttpPost("bookTicket/{tripDetailsId}")]
-        public async Task<IActionResult> createTicket(BookTicketDTOs ticketDTOs, int tripDetailsId, string? promotionCode, int numberTicket)
+        public async Task<IActionResult> createTicket([FromBody] BookTicketDTOs ticketDTOs, int tripDetailsId, string? promotionCode, int numberTicket)
         {
             try
             {
@@ -114,7 +114,7 @@ namespace MyAPI.Controllers
             }
         }
 
-        [HttpPut("AssignTravelCarForRent")]
+        [HttpPost("AssignTravelCarForRent")]
         public async Task<IActionResult> UpdateVehicleInRequest(int vehicleId, int requestId)
         {
             try
@@ -266,6 +266,29 @@ namespace MyAPI.Controllers
             catch (Exception ex)
             {
                 return BadRequest(new { Message = "deleteTicketByTicketId failed", Details = ex.Message });
+            }
+        }
+        [HttpGet("listTicketByUserId")]
+        public async Task<IActionResult> getListTicketByUserId()
+        {
+            try
+            {
+                string token = Request.Headers["Authorization"];
+                if (token.StartsWith("Bearer"))
+                {
+                    token = token.Substring("Bearer ".Length).Trim();
+                }
+                if (string.IsNullOrEmpty(token))
+                {
+                    return BadRequest("Token is required.");
+                }
+                var userId = _getInforFromToken.GetIdInHeader(token);
+                var list = await _ticketRepository.GetTicketByUserId(userId);
+                return Ok(list);
+
+            }catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
             }
         }
         

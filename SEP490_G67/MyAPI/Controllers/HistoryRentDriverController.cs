@@ -77,7 +77,7 @@ namespace MyAPI.Controllers
             }
         }
 
-        [HttpPut("/AssignDriverForRent")]
+        [HttpPost("/AssignDriverForRent")]
         public async Task<IActionResult> UpdateDriverInRequest(int driverId, int requestId)
         {
             try

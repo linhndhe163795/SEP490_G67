@@ -757,7 +757,7 @@ namespace MyAPI.Repositories.Impls
                 UserId = checkRequest.UserId,
                 VehicleId = checkRequestDetail.VehicleId,
                 TripId = tripId,
-                TypeOfTicket = typeOfTrip,
+                TypeOfTicket = Constant.VE_XE_TIEN_CHUYEN,
                 TypeOfPayment = 2,
                 Status = "Thanh toán bằng tiền mặt",
                 CreatedAt = DateTime.Now,

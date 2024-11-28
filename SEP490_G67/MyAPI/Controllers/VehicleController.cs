@@ -130,8 +130,8 @@ namespace MyAPI.Controllers
 
         }
         [Authorize(Roles = "Staff, VehicleOwner")]
-        [HttpPut("updateVehicle/{id}/{driverName}")]
-        public async Task<IActionResult> UpdateVehicle(int id, string driverName)
+        [HttpPost("updateVehicle/{id}/{driverName}")]
+        public async Task<IActionResult> UpdateVehicle(int id, string driverName)   
         {
             try
             {
@@ -148,7 +148,7 @@ namespace MyAPI.Controllers
         }
 
         [Authorize(Roles = "Staff, VehicleOwner")]
-        [HttpPut("updateVehicleInformation/{id}")]
+        [HttpPost("updateVehicleInformation/{id}")]
         public async Task<IActionResult> UpdateVehicle(int id, [FromBody] VehicleUpdateDTO updateDTO)
         {
             if (!ModelState.IsValid)
@@ -227,7 +227,7 @@ namespace MyAPI.Controllers
         }
 
         [Authorize(Roles = "Staff")]
-        [HttpPut("assignDriverForVehicle/{vehicleId}/{driverId}")]
+        [HttpPost("assignDriverForVehicle/{vehicleId}/{driverId}")]
         public async Task<IActionResult> AssignDriverForVehicle(int vehicleId, int driverId)
         {
             try

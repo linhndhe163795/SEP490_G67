@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using DocumentFormat.OpenXml.VariantTypes;
 using Microsoft.EntityFrameworkCore;
 using MyAPI.DTOs.TripDTOs;
 using MyAPI.DTOs.VehicleDTOs;
@@ -149,11 +150,12 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception("addTrips: " + ex.Message, ex);
             }
         }
-        public async Task UpdateTripById(int tripId, TripDTO trip, int userId)
+        public async Task UpdateTripById(int tripId, UpdateTrip trip, int userId)
         {
             try
             {
                 var tripById = await _context.Trips.FirstOrDefaultAsync(x => x.Id == tripId);
+                var tripDetailById = await _context.TripDetails.Where(x => x.TripId == tripId).ToListAsync();
                 if (tripById != null)
                 {
                     tripById.Name = trip.Name;

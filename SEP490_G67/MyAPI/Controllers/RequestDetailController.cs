@@ -41,7 +41,7 @@ namespace MyAPI.Controllers
             return CreatedAtAction(nameof(GetRequestDetailById), new { id = createdRequestDetail.RequestId }, createdRequestDetail);
         }
 
-        [HttpPut("{id}")]
+        [HttpPost("{id}")]
         public async Task<IActionResult> UpdateRequestDetail(int id, RequestDetailDTO requestDetailDto)
         {
             if (id != requestDetailDto.RequestId)

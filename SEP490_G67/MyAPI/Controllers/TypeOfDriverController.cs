@@ -30,7 +30,7 @@ namespace MyAPI.Controllers
             return CreatedAtAction(nameof(GetTypeOfDriverById), new { id = typeOfDriver.Id }, typeOfDriver);
         }
         [Authorize(Roles = "Admin")]
-        [HttpPut("{id}")]
+        [HttpPost("{id}")]
         public async Task<IActionResult> UpdateTypeOfDriver(int id, [FromBody] UpdateTypeOfDriverDTO updateTypeOfDriverDto)
         {
             if (updateTypeOfDriverDto == null)

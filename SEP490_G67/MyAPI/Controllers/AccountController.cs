@@ -85,7 +85,7 @@ namespace MyAPI.Controllers
         }
 
         [Authorize(Roles = "Admin")]
-        [HttpPut("updateAccount/{id}/{newIdUpdate}")]
+        [HttpPost("updateAccount/{id}/{newIdUpdate}")]
         public async Task<IActionResult> UpdateAccountById(int id, int newIdUpdate)
         {
             try
