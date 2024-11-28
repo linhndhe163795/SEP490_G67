@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MyAPI.DTOs.HistoryRentVehicleDTOs;
 using MyAPI.Infrastructure.Interfaces;
 using MyAPI.Repositories.Impls;
 
@@ -41,11 +42,11 @@ namespace MyAPI.Controllers
         }
         [Authorize(Roles = "Staff")]
         [HttpPost("AddHistoryVehicle")]
-        public async Task<IActionResult> AddHistoryVehicleUseRent(int requestId, bool choose, int? vehicleId, decimal price)
+        public async Task<IActionResult> AddHistoryVehicleUseRent(AddHistoryVehicleUseRent add)
         {
             try
             {
-                var requests = await _historyRentVehicleRepository.AccpetOrDeninedRentVehicle(requestId, choose, vehicleId, price);
+                var requests = await _historyRentVehicleRepository.AccpetOrDeninedRentVehicle(add);
                 if (requests)
                 {
                     return Ok(requests);

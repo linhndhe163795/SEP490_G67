@@ -34,9 +34,12 @@ namespace MyAPI.Repositories.Impls
             _requestRepository = requestRepository;
             _requestDetailRepository = requestDetailRepository;
         }
-
-        public async Task<bool> AcceptOrDenyRentDriver(int requestId, bool choose, int? driverId, decimal price)
+        public async Task<bool> AcceptOrDenyRentDriver(AddHistoryRentDriver add)
         {
+            int requestId = add.requestId;
+            bool choose = add.choose;
+            int? driverId = add.driverId;
+            decimal price = add.price;
             try
             {
                 var checkRequest = await _context.Requests.FirstOrDefaultAsync(s => s.Id == requestId);

@@ -30,8 +30,13 @@ namespace MyAPI.Repositories.Impls
             _requestDetailRepository = requestDetailRepository; 
         }
         //dành cho driver thuê xe 
-        public async Task<bool> AccpetOrDeninedRentVehicle(int requestId, bool choose, int? vehicleId, decimal price)
+        public async Task<bool> AccpetOrDeninedRentVehicle(AddHistoryVehicleUseRent add)
         {
+            int requestId = add.requestId;
+            bool choose = add.choose;
+            int? vehicleId = add.vehicleId;
+            decimal price = add.price;
+
             var checkRequest = await _context.Requests.FirstOrDefaultAsync(s => s.Id == requestId);
 
             var token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
