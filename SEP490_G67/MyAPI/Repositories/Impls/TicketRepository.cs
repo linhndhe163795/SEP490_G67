@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using AutoMapper.Configuration.Conventions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using MyAPI.DTOs;
 using MyAPI.DTOs.TicketDTOs;
@@ -210,7 +211,7 @@ namespace MyAPI.Repositories.Impls
         {
             try
             {
-                
+
                 var requestDetail = await _context.RequestDetails.FirstOrDefaultAsync(rd => rd.RequestId == requestId);
 
                 if (requestDetail == null)
@@ -218,18 +219,18 @@ namespace MyAPI.Repositories.Impls
                     return false;
                 }
 
-                
+
                 requestDetail.VehicleId = vehicleId;
 
-                
+
                 _context.RequestDetails.Update(requestDetail);
                 await _context.SaveChangesAsync();
 
-                return true; 
+                return true;
             }
             catch
             {
-                return false; 
+                return false;
             }
         }
 
@@ -299,22 +300,22 @@ namespace MyAPI.Repositories.Impls
                                         on t.Id equals tk.TripId
                                         join u in _context.Users on tk.UserId equals u.Id
                                         join typeP in _context.TypeOfPayments on tk.TypeOfPayment equals typeP.Id
-                                        where typeP.Id == Constant.TIEN_MAT && 
-                                        v.Id == vehicleId && 
-                                        tk.Status == "Thanh toán bằng tiền mặt" && 
-                                        tk.TimeFrom <= DateTime.Now  
-                                        select new { tk.UserId ,u.FullName, tk.PricePromotion, typeP.TypeOfPayment1, tk.Id }
+                                        where typeP.Id == Constant.TIEN_MAT &&
+                                        v.Id == vehicleId &&
+                                        tk.Status == "Thanh toán bằng tiền mặt" &&
+                                        tk.TimeFrom <= DateTime.Now
+                                        select new { tk.UserId, u.FullName, tk.PricePromotion, typeP.TypeOfPayment1, tk.Id }
                                        ).ToListAsync();
                 var totalPricePromotion = listTicket
                     .GroupBy(t => new { t.UserId, t.Id })
-                    .Select(g => new TicketNotPaid { ticketId = g.Key.Id ,userId = g.Key.UserId, FullName = g.FirstOrDefault()?.FullName ,Price = g.Sum(x => x.PricePromotion.Value), TypeOfPayment = g.FirstOrDefault()?.TypeOfPayment1 })
+                    .Select(g => new TicketNotPaid { ticketId = g.Key.Id, userId = g.Key.UserId, FullName = g.FirstOrDefault()?.FullName, Price = g.Sum(x => x.PricePromotion.Value), TypeOfPayment = g.FirstOrDefault()?.TypeOfPayment1 })
                     .ToList();
                 decimal total = totalPricePromotion.Sum(t => t.Price);
                 var result = new TicketNotPaidSummary
                 {
                     Tickets = totalPricePromotion,
                     Total = total
-                    
+
                 };
                 return result;
             }
@@ -522,6 +523,20 @@ namespace MyAPI.Repositories.Impls
             _context.Tickets.Remove(checkTicket);
             await _context.SaveChangesAsync();
             return true;
+        }
+        [Authorize]
+        public async Task<List<ListTicketDTOs>> GetTicketByUserId(int userId)
+        {
+            try
+            {
+                var listTicket = await _context.Tickets.Where(x => x.UserId == userId).ToListAsync();
+                var mapper = _mapper.Map<List<ListTicketDTOs>>(listTicket);
+                return mapper;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
         }
     }
 }

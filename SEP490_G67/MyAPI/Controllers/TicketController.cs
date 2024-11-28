@@ -268,6 +268,29 @@ namespace MyAPI.Controllers
                 return BadRequest(new { Message = "deleteTicketByTicketId failed", Details = ex.Message });
             }
         }
+        [HttpGet("listTicketByUserId")]
+        public async Task<IActionResult> getListTicketByUserId()
+        {
+            try
+            {
+                string token = Request.Headers["Authorization"];
+                if (token.StartsWith("Bearer"))
+                {
+                    token = token.Substring("Bearer ".Length).Trim();
+                }
+                if (string.IsNullOrEmpty(token))
+                {
+                    return BadRequest("Token is required.");
+                }
+                var userId = _getInforFromToken.GetIdInHeader(token);
+                var list = await _ticketRepository.GetTicketByUserId(userId);
+                return Ok(list);
+
+            }catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
         
     }
 }
