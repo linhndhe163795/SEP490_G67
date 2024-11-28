@@ -32,5 +32,6 @@ namespace MyAPI.Infrastructure.Interfaces
 
         Task<List<VehicleLicenscePlateDTOs>> getVehicleByDriverId(int driverId);
         Task<bool> checkDriver(int vehicleId,int driverId);
+        Task<bool> UpdateVehicleAsync(int id, VehicleUpdateDTO updateDTO);
     }
 }

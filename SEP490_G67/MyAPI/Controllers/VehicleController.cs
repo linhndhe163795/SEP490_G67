@@ -146,6 +146,25 @@ namespace MyAPI.Controllers
             }
 
         }
+
+        [Authorize(Roles = "Staff, VehicleOwner")]
+        [HttpPut("updateVehicleInformation/{id}")]
+        public async Task<IActionResult> UpdateVehicle(int id, [FromBody] VehicleUpdateDTO updateDTO)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var result = await _vehicleRepository.UpdateVehicleAsync(id, updateDTO);
+
+            if (!result)
+            {
+                return NotFound(new { Message = "Vehicle not found." });
+            }
+
+            return Ok(new { Message = "Vehicle updated successfully." });
+        }
         [Authorize(Roles = "Staff")]
         [HttpDelete("deleteVehicleByStatus/{id}")]
         public async Task<IActionResult> UpdateVehicle(int id)
