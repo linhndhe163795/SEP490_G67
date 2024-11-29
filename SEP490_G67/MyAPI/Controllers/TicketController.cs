@@ -51,7 +51,7 @@ namespace MyAPI.Controllers
             }
         }
 
-        [Authorize(Roles = "Staff")]
+        [Authorize(Roles = "Driver, Staff")]
         [HttpPost("createTicketFromDriver/{vehicleId}/{numberTicket}")]
         public async Task<IActionResult> creatTicketFromDriver([FromBody] TicketFromDriverDTOs ticketFromDriver, int vehicleId, int numberTicket)
         {
@@ -153,7 +153,7 @@ namespace MyAPI.Controllers
                 return BadRequest("getListTicket: " + ex.Message);
             }
         }
-        [Authorize(Roles = "Staff,Driver")]
+        [Authorize(Roles = "Staff, Driver")]
         [HttpGet("tickeNotPaid/{vehicleId}")]
         public async Task<IActionResult> getListTicketNotPaid(int vehicleId)
         {

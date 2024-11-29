@@ -381,6 +381,7 @@ namespace MyAPI.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        [Authorize(Roles = "Staff")]
         [HttpGet("getVehicleByDriverId")]
         public async Task<IActionResult> getListVehicleByDriverId()
         {
@@ -402,6 +403,31 @@ namespace MyAPI.Controllers
             catch (Exception ex)
             {
                 return BadRequest(ex.Message);
+            }
+        }
+        [Authorize(Roles = "Staff, VehicleOwner")]
+        [HttpGet("getVehicleByVehicleOwnerId")]
+        public async Task<IActionResult> getListVehicleOfVehicleOwner()
+        {
+            try
+            {
+                string token = Request.Headers["Authorization"];
+                if (token.StartsWith("Bearer"))
+                {
+                    token = token.Substring("Bearer ".Length).Trim();
+                }
+                if (string.IsNullOrEmpty(token))
+                {
+                    return BadRequest("Token is required.");
+                }
+                var vehicleOwner = _getInforFromToken.GetIdInHeader(token);
+                var listVehicle = await _vehicleRepository.getVehicleByVehicleOwner(vehicleOwner);
+                return Ok(listVehicle);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+
             }
         }
     }

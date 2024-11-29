@@ -556,12 +556,12 @@ namespace MyAPI.Repositories.Impls
             }
         }
 
-        public async Task<bool> checkDriver(int vehicleId,int driverId)
+        public async Task<bool> checkDriver(int vehicleId, int driverId)
         {
             try
             {
                 var vehicle = await _context.Vehicles.FirstOrDefaultAsync(x => x.Id == vehicleId);
-                if (vehicle.DriverId == driverId) 
+                if (vehicle.DriverId == driverId)
                 {
                     return true;
                 }
@@ -577,11 +577,11 @@ namespace MyAPI.Repositories.Impls
         {
             try
             {
-                
+
                 var vehicle = await _context.Vehicles.FindAsync(id);
                 if (vehicle == null) return false;
 
-                
+
                 var token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
                 int userId = _tokenHelper.GetIdInHeader(token);
 
@@ -590,7 +590,7 @@ namespace MyAPI.Repositories.Impls
                     throw new Exception("Invalid user ID from token.");
                 }
 
-                
+
                 if (updateDTO.NumberSeat.HasValue) vehicle.NumberSeat = updateDTO.NumberSeat.Value;
                 if (updateDTO.VehicleTypeId.HasValue) vehicle.VehicleTypeId = updateDTO.VehicleTypeId.Value;
                 if (updateDTO.Status.HasValue) vehicle.Status = updateDTO.Status.Value;
@@ -603,28 +603,48 @@ namespace MyAPI.Repositories.Impls
                 vehicle.UpdateAt = DateTime.UtcNow;
                 vehicle.UpdateBy = userId;
 
-                
+
                 _context.Vehicles.Update(vehicle);
                 await _context.SaveChangesAsync();
                 return true;
             }
             catch (ArgumentException ex)
             {
-                
+
                 throw new Exception($"Validation error: {ex.Message}");
             }
             catch (DbUpdateException ex)
             {
-                
+
                 throw new Exception("Database update error. See inner exception for details.", ex);
             }
             catch (Exception ex)
             {
-                
+
                 throw new Exception("An unexpected error occurred while updating the vehicle.", ex);
             }
         }
 
+        public async Task<List<VehicleLicenscePlateDTOs>> getVehicleByVehicleOwner(int vehicleOwner)
+        {
+            try
+            {
+                var listVehicle = await _context.Vehicles.Where(x => x.VehicleOwner == vehicleOwner).Select(x => new VehicleLicenscePlateDTOs
+                {
+                    Id = x.Id,
+                    LicensePlate = x.LicensePlate
+                }).ToListAsync();
+                if(listVehicle.Count <= 0)
+                {
+                    throw new Exception("Not found vehicleId");
+                }
+                return listVehicle;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
     }
 }
 
