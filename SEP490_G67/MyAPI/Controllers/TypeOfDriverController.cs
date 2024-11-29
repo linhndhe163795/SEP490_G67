@@ -1,9 +1,12 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using DocumentFormat.OpenXml.Office2010.Excel;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MyAPI.DTOs.DriverDTOs;
+using MyAPI.DTOs.TypeOfDTOs;
 using MyAPI.Infrastructure.Interfaces;
 using MyAPI.Models;
 using System.Threading.Tasks;
+using TypeOfDriverDTO = MyAPI.DTOs.TypeOfDTOs.TypeOfDriverDTO;
 
 namespace MyAPI.Controllers
 {
@@ -78,7 +81,13 @@ namespace MyAPI.Controllers
         public async Task<IActionResult> GetAllTypeOfDrivers()
         {
             var typesOfDrivers = await _typeOfDriverRepository.GetAll();
-            return Ok(typesOfDrivers);
+            var typeOfDriverDtos = typesOfDrivers.Select(t => new TypeOfDriverDTO
+            {
+                Description = t.Description,
+                Id = t.Id    
+            }).ToList();
+
+            return Ok(typeOfDriverDtos);
         }
     }
 }
