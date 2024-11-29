@@ -52,7 +52,7 @@ namespace MyAPI.Controllers
         }
 
 
-        [HttpDelete("{id}")]
+        [HttpPost("Delete/{id}")]
         public async Task<IActionResult> DeleteRequestDetail(int id)
         {
             var requestDetail = await _requestDetailRepository.Get(id);

@@ -248,7 +248,7 @@ namespace MyAPI.Controllers
             }
         }
 
-        [HttpDelete("deleteTicketTimeOut/{ticketId}")]
+        [HttpPost("deleteTicketTimeOut/{ticketId}")]
         public async Task<IActionResult> deleteTicketByTicketId(int ticketId)
         {
             try
