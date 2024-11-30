@@ -41,7 +41,25 @@ namespace MyAPI.Repositories.Impls
 
             var token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
             int userId = _tokenHelper.GetIdInHeader(token);
+            if (add == null)
+            {
+                throw new Exception("Input data is required.");
+            }
 
+            if (add.requestId < 0)
+            {
+                throw new Exception("Invalid request ID.");
+            }
+
+            if (add.vehicleId.HasValue && add.vehicleId < 0)
+            {
+                throw new Exception("Invalid vehicle ID.");
+            }
+
+            if (add.price <= 0)
+            {
+                throw new Exception("Price must be greater than 0.");
+            }
 
             if (userId == -1)
             {

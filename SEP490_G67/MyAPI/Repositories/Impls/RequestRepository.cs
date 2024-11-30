@@ -112,7 +112,30 @@ namespace MyAPI.Repositories.Impls
                     throw new Exception("Request detail not found.");
                 }
 
-
+                if (string.IsNullOrWhiteSpace(rentVehicleAddDTO.StartLocation))
+                {
+                    throw new Exception("Start location is required.");
+                }
+                if (rentVehicleAddDTO.StartLocation.Length > 255)
+                {
+                    throw new Exception("Start location cannot exceed 255 characters.");
+                }
+                if (rentVehicleAddDTO.StartTime == DateTime.MinValue || rentVehicleAddDTO.EndTime == DateTime.MinValue)
+                {
+                    throw new Exception("Start time and end time are required.");
+                }
+                if (rentVehicleAddDTO.StartTime >= rentVehicleAddDTO.EndTime)
+                {
+                    throw new Exception("Start time must be earlier than end time.");
+                }
+                if (rentVehicleAddDTO.Seats <= 0)
+                {
+                    throw new Exception("Number of seats must be greater than 0.");
+                }
+                if (rentVehicleAddDTO.Seats > 45)
+                {
+                    throw new Exception("Number of seats cannot exceed 45.");
+                }
                 existingRequestDetail.StartLocation = rentVehicleAddDTO?.StartLocation;
                 existingRequestDetail.EndLocation = rentVehicleAddDTO?.EndLocation;
                 existingRequestDetail.StartTime = rentVehicleAddDTO?.StartTime;
@@ -168,7 +191,25 @@ namespace MyAPI.Repositories.Impls
                 await _context.Requests.AddAsync(addRentVehicle);
                 await _context.SaveChangesAsync();
 
+                if (string.IsNullOrWhiteSpace(rentVehicleAddDTO.StartLocation))
+                {
+                    throw new Exception("Start location is required.");
+                }
 
+                if (string.IsNullOrWhiteSpace(rentVehicleAddDTO.EndLocation))
+                {
+                    throw new Exception("End location is required.");
+                }
+
+                if (rentVehicleAddDTO.StartTime >= rentVehicleAddDTO.EndTime)
+                {
+                    throw new Exception("Start time must be earlier than end time.");
+                }
+
+                if (rentVehicleAddDTO.Seats <= 0)
+                {
+                    throw new Exception("Number of seats must be greater than 0.");
+                }
                 var addRentVehicleRequestDetails = new RequestDetail
                 {
                     RequestId = addRentVehicle.Id,
@@ -218,7 +259,20 @@ namespace MyAPI.Repositories.Impls
             {
                 var token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
                 int userId = _tokenHelper.GetIdInHeader(token);
+                if (requestDTO == null)
+                {
+                    throw new Exception("Request data is required.");
+                }
 
+                if (string.IsNullOrWhiteSpace(requestDTO.Description))
+                {
+                    throw new Exception("Description is required.");
+                }
+
+                if (requestDTO.TypeId < 0)
+                {
+                    throw new Exception("Invalid Type ID.");
+                }
                 if (userId == -1)
                 {
                     throw new Exception("Invalid user ID from token.");
@@ -246,33 +300,63 @@ namespace MyAPI.Repositories.Impls
 
         public async Task<bool> UpdateRequestVehicleAsync(int requestId, Request request)
         {
-            var update = await _context.Requests.SingleOrDefaultAsync(s => s.Id == requestId);
-            if (update != null)
+           
+            try
             {
-                update.Status = request.Status;
-                update.Note = request.Note;
-                update.UpdateAt = DateTime.Now;
+                // Kiểm tra đầu vào
+                if (request == null)
+                {
+                    throw new Exception("Request data is required.");
+                }
 
+                if (requestId <= 0)
+                {
+                    throw new Exception("Invalid request ID.");
+                }
+
+                var existingRequest = await _context.Requests.SingleOrDefaultAsync(s => s.Id == requestId);
+                if (existingRequest == null)
+                {
+                    return false;
+                    throw new Exception($"Request with ID {requestId} not found.");
+                }
+
+                existingRequest.Status = request.Status;
+                existingRequest.Note = request.Note;
+                existingRequest.UpdateAt = DateTime.UtcNow; 
+             
                 await _context.SaveChangesAsync();
                 return true;
             }
-            return false;
+            catch (Exception ex)
+            {
+                throw new Exception("An error occurred while updating the request: " + ex.Message);
+            }
         }
 
         public async Task createRequestCancleTicket(RequestCancleTicketDTOs requestCancleTicketDTOs, int userId)
         {
             try
             {
+                if (requestCancleTicketDTOs == null)
+                {
+                    throw new Exception("Request data is required.");
+                }
+                if (userId < 0)
+                {
+                    throw new Exception("Invalid user ID.");
+                }
+
                 DateTime dateTimeCancle = DateTime.Now.AddHours(-2);
                 var listTicketId = await _context.Tickets.Where(x => x.UserId == userId && x.TimeFrom <= dateTimeCancle).ToListAsync();
                 if (!listTicketId.Any())
                 {
-                    throw new NullReferenceException("Không có vé của nào của user");
+                    throw new Exception("Không có vé của nào của user");
                 }
                 var ticketToCancel = listTicketId.FirstOrDefault(ticket => ticket.Id == requestCancleTicketDTOs.TicketId);
                 if (ticketToCancel == null)
                 {
-                    throw new NullReferenceException("Không có vé hợp lệ để hủy");
+                    throw new Exception("Không có vé hợp lệ để hủy");
                 }
                 var RequestCancleTicket = new Request
                 {
@@ -316,7 +400,7 @@ namespace MyAPI.Repositories.Impls
                                                      }).ToListAsync();
                 if (listRequestCancleTicket == null)
                 {
-                    throw new NullReferenceException();
+                    throw new Exception();
                 }
                 return listRequestCancleTicket;
             }
@@ -333,7 +417,7 @@ namespace MyAPI.Repositories.Impls
                 var requestCancleTicket = await _context.Requests.FirstOrDefaultAsync(x => x.Id == requestId);
                 if (requestCancleTicket == null)
                 {
-                    throw new NullReferenceException();
+                    throw new Exception();
                 }
                 requestCancleTicket.Status = true;
                 requestCancleTicket.Note = "Đã xác nhận";
@@ -449,6 +533,35 @@ namespace MyAPI.Repositories.Impls
                 {
                     throw new Exception("Invalid user ID from token.");
                 }
+                if (rentVehicleAddDTO == null)
+                {
+                    throw new Exception("Request data is required.");
+                }
+
+                if (string.IsNullOrWhiteSpace(rentVehicleAddDTO.StartLocation))
+                {
+                    throw new Exception("Start location is required.");
+                }
+
+                if (string.IsNullOrWhiteSpace(rentVehicleAddDTO.EndLocation))
+                {
+                    throw new Exception("End location is required.");
+                }
+
+                if (rentVehicleAddDTO.StartTime >= rentVehicleAddDTO.EndTime)
+                {
+                    throw new Exception("Start time must be earlier than end time.");
+                }
+
+                if (rentVehicleAddDTO.Seats <= 0)
+                {
+                    throw new Exception("Number of seats must be greater than 0.");
+                }
+
+                if (rentVehicleAddDTO.Price <= 0)
+                {
+                    throw new Exception("Price must be greater than 0.");
+                }
 
                 var addRentVehicle = new Request
                 {
@@ -524,6 +637,35 @@ namespace MyAPI.Repositories.Impls
 
                     await _context.Requests.AddAsync(addRentDriver);
                     await _context.SaveChangesAsync();
+                    if (rentDriverAddDTO == null)
+                    {
+                        throw new Exception("Request data is required.");
+                    }
+
+                    if (string.IsNullOrWhiteSpace(rentDriverAddDTO.StartLocation))
+                    {
+                        throw new Exception("Start location is required.");
+                    }
+
+                    if (string.IsNullOrWhiteSpace(rentDriverAddDTO.EndLocation))
+                    {
+                        throw new Exception("End location is required.");
+                    }
+
+                    if (rentDriverAddDTO.StartTime >= rentDriverAddDTO.EndTime)
+                    {
+                        throw new Exception("Start time must be earlier than end time.");
+                    }
+
+                    if (rentDriverAddDTO.Seats <= 0)
+                    {
+                        throw new Exception("Number of seats must be greater than 0.");
+                    }
+
+                    if (rentDriverAddDTO.Price <= 0)
+                    {
+                        throw new Exception("Price must be greater than 0.");
+                    }
 
                     var addRentDriverRequestDetails = new RequestDetail
                     {
@@ -801,6 +943,10 @@ namespace MyAPI.Repositories.Impls
         {
             try
             {
+                if (userId <= 0)
+                {
+                    throw new Exception("Invalid user ID.");
+                }
                 var request = await _context.Requests.Where(x => x.UserId == userId && x.TypeId != 7).ToListAsync();
                 var requestMapper = _mapper.Map<List<RequestDTO>>(request);
                 return requestMapper;
@@ -816,6 +962,10 @@ namespace MyAPI.Repositories.Impls
         {
             try
             {
+                if (userId <= 0)
+                {
+                    throw new Exception("Invalid user ID.");
+                }
                 var request = await _context.Requests.Where(x => x.UserId == userId && x.TypeId == 7).ToListAsync();
                 var requestMapper = _mapper.Map<List<RequestDTO>>(request);
                 return requestMapper;
@@ -832,7 +982,30 @@ namespace MyAPI.Repositories.Impls
         {
             try
             {
-                var requestDetails = await _context.RequestDetails.FirstOrDefaultAsync(x => x.RequestId == requestID);
+                var requestDetails = await _context.RequestDetails.FirstOrDefaultAsync(x => x.RequestId == requestID); 
+                if (requestDetails == null)
+                {
+                    throw new Exception($"RequestDetail with Request ID {requestID} not found.");
+                }
+                if (string.IsNullOrWhiteSpace(requestDetailDTO.StartLocation))
+                {
+                    throw new Exception("Start location is required.");
+                }
+
+                if (string.IsNullOrWhiteSpace(requestDetailDTO.EndLocation))
+                {
+                    throw new Exception("End location is required.");
+                }
+
+                if (requestDetailDTO.StartTime >= requestDetailDTO.EndTime)
+                {
+                    throw new Exception("Start time must be earlier than end time.");
+                }
+
+                if (requestDetailDTO.Price <= 0)
+                {
+                    throw new Exception("Price must be greater than 0.");
+                }
                 requestDetails.StartLocation = requestDetailDTO.StartLocation;
                 requestDetails.EndLocation = requestDetailDTO.EndLocation;
                 requestDetails.Price = requestDetailDTO.Price;

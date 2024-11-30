@@ -19,9 +19,14 @@ namespace MyAPI.Repositories.Impls
         {
             try
             {
+                if (promotionId <= 0)
+                {
+                    throw new Exception("Invalid promotion ID.");
+                }
+
                 var listUser = _context.Users.ToList();
                 List<PromotionUserDTO> listPromotionUser = new List<PromotionUserDTO>();
-                foreach (var user in listUser) 
+                foreach (var user in listUser)
                 {
                     listPromotionUser.Add(new PromotionUserDTO
                     {
@@ -34,31 +39,52 @@ namespace MyAPI.Repositories.Impls
                 await _context.AddRangeAsync(listPromotionUserMapper);
                 await _context.SaveChangesAsync();
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
-                throw new Exception("AddPromotionAllUser: " + ex.Message);
+                throw new Exception(ex.Message);
             }
         }
 
         public async Task<bool> DeletePromotionAfterPayment(int userId, int promotion_id)
         {
-            var checkExits = await _context.PromotionUsers.FirstOrDefaultAsync(s => s.UserId == userId && s.PromotionId == promotion_id);
-
-            if (checkExits != null)
+            if (userId <= 0)
             {
-                _context.PromotionUsers.Remove(checkExits);
-                await _context.SaveChangesAsync(); 
-                return true;
-            }else
-            {
-                throw new Exception("Faild to deletePromotion");
+                throw new Exception("Invalid user ID.");
             }
+            if (promotion_id <= 0)
+            {
+                throw new Exception("Invalid promotion ID.");
+            }
+            try
+            {
+                var checkExits = await _context.PromotionUsers.FirstOrDefaultAsync(s => s.UserId == userId && s.PromotionId == promotion_id);
+
+                if (checkExits != null)
+                {
+                    _context.PromotionUsers.Remove(checkExits);
+                    await _context.SaveChangesAsync();
+                    return true;
+                }
+                else
+                {
+                    throw new Exception("Faild to deletePromotion");
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+
         }
 
         public async Task DeletePromotionUser(int id)
         {
             try
             {
+                if (id <= 0)
+                {
+                    throw new Exception("Invalid promotion ID.");
+                }
                 List<PromotionUser> promotionUser = new List<PromotionUser>();
                 var listPromotionUser = _context.PromotionUsers.Where(x => x.PromotionId == id).ToList();
                 foreach (var item in listPromotionUser)
@@ -72,7 +98,7 @@ namespace MyAPI.Repositories.Impls
             {
                 throw new Exception("DeletePromotionUser " + ex.Message);
             }
- 
+
         }
     }
 }

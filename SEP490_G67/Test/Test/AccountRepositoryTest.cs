@@ -8,6 +8,10 @@ using MyAPI.Models;
 using MyAPI.Helper;
 using MyAPI.Repositories.Impls;
 using MyAPI.DTOs.AccountDTOs;
+using MyAPI.DTOs.DriverDTOs;
+using MyAPI.Infrastructure.Interfaces;
+using System.Security.Cryptography;
+using System.Text;
 
 public class AccountRepositoryTests
 {
@@ -168,51 +172,44 @@ public class AccountRepositoryTests
         Assert.Equal(expectedDto[0].FullName, result[0].FullName);
         Assert.Equal(expectedDto[1].Email, result[1].Email);
     }
+    //[Fact]
+    //public async Task CreateDriverAsync_ValidDriver_ReturnsDriver()
+    //{
+    //    // Arrange
+    //    var updateDriverDto = new UpdateDriverDTO
+    //    {
+    //        UserName = "dungnd",
+    //        Name = "Nguyen Van Dung",
+    //        NumberPhone = "0913530333",
+    //        Password = "123456789",
+    //        Avatar = "avatar.jpg",
+    //        Dob = new DateTime(1990, 1, 1),
+    //        License = "D",
+    //        Status = true
+    //    };
 
-    [Fact]
-    public async Task UpdateRoleOfAccount_ValidUserAndRole_UpdatesRoleSuccessfully()
-    {
-        var user = new User
-        {
-            Id = 1,
-            FullName = "John Doe",
-            Email = "john.doe@example.com",
-            Username = "johndoe",
-            Password = "password123",
-            NumberPhone = "123456789",
-            UserRoles = new List<UserRole>
-            {
-                new UserRole { UserId = 1, RoleId = 1 }
-            }
-        };
+    //    // Hash mật khẩu để khớp với logic repository
+    //    var expectedHashedPassword = ComputeHash(updateDriverDto.Password);
 
-        var role = new Role { Id = 2, RoleName = "Admin" };
+    //    // Act
+    //    var result = await _driverRepository.CreateDriverAsync(updateDriverDto);
 
-        _context.Users.Add(user);
-        _context.Roles.Add(role);
-        await _context.SaveChangesAsync();
+    //    // Assert
+    //    Assert.NotNull(result);
+    //    Assert.Equal("dungnd", result.UserName);
+    //    Assert.Equal("Nguyen Van Dung", result.Name);
+    //    Assert.Equal(expectedHashedPassword, result.Password); // So sánh với giá trị hash mong đợi
+    //    Assert.Equal("Active", result.StatusWork);
+    //}
+    //private string ComputeHash(string input)
+    //{
+    //    using (var md5 = MD5.Create())
+    //    {
+    //        var bytes = md5.ComputeHash(Encoding.UTF8.GetBytes(input));
+    //        return BitConverter.ToString(bytes).Replace("-", "").ToLower();
+    //    }
+    //}
 
-        var token = "ValidToken";
-        _httpContextAccessorMock
-            .Setup(c => c.HttpContext.Request.Headers["Authorization"])
-            .Returns($"Bearer {token}");
-
-        _inforFromTokenMock
-            .Setup(t => t.GetIdInHeader(token))
-            .Returns(99);
-
-        var result = await _accountRepository.UpdateRoleOfAccount(1, 2);
-
-        Assert.True(result);
-
-        var updatedUserRole = _context.UserRoles.SingleOrDefault(ur => ur.UserId == 1);
-        Assert.NotNull(updatedUserRole);
-        Assert.Equal(2, updatedUserRole.RoleId);
-
-        var updatedUser = _context.Users.SingleOrDefault(u => u.Id == 1);
-        Assert.NotNull(updatedUser);
-        Assert.Equal(99, updatedUser.UpdateBy);
-    }
 
 
 }

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using AutoMapper.Configuration.Conventions;
+using DocumentFormat.OpenXml.Office2010.Excel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using MyAPI.DTOs;
@@ -34,7 +35,15 @@ namespace MyAPI.Repositories.Impls
                 var user = await _context.Users.FirstOrDefaultAsync(x => x.Id == userId);
                 if (user == null)
                 {
-                    throw new NullReferenceException();
+                    throw new Exception("User not found.");
+                }
+                if (tripDetailsId <= 0)
+                {
+                    throw new Exception("Invalid trip details ID.");
+                }
+                if (numberTicket <= 0)
+                {
+                    throw new Exception("Number of tickets must be greater than 0.");
                 }
                 var promotionUser = await (from u in _context.Users
                                            join pu in _context.PromotionUsers on u.Id equals pu.UserId
@@ -60,13 +69,20 @@ namespace MyAPI.Repositories.Impls
                                              VehicleTrip = vt,
                                              Vehicle = v
                                          }).FirstOrDefaultAsync();
-
+                if (tripDetails == null)
+                {
+                    throw new Exception("Trip details not found.");
+                }
                 var tripbyTripDetailsId = await _context.TripDetails
                                         .Include(x => x.Trip)
                                         .Where(x => x.Id == tripDetailsId)
                                         .FirstOrDefaultAsync();
                 var trip = await _context.Trips.FirstOrDefaultAsync(x => x.Id == tripbyTripDetailsId.TripId);
 
+                if (ticketDTOs.TypeOfPayment != Constant.CHUYEN_KHOAN && ticketDTOs.TypeOfPayment != Constant.TIEN_MAT)
+                {
+                    throw new Exception("Invalid type of payment.");
+                }
                 var createTicket = new TicketDTOs
                 {
                     TripId = tripDetails.Trip.Id,
@@ -111,6 +127,37 @@ namespace MyAPI.Repositories.Impls
         {
             try
             {
+                if (vehicleId <= 0)
+                {
+                    throw new Exception("Invalid vehicle ID.");
+                }
+
+                if (driverId <= 0)
+                {
+                    throw new Exception("Invalid driver ID.");
+                }
+                if (numberTicket <= 0)
+                {
+                    throw new Exception("Number of tickets must be greater than 0.");
+                }
+                if (ticket == null)
+                {
+                    throw new Exception("Ticket information is required.");
+                }
+                if (string.IsNullOrWhiteSpace(ticket.PointStart))
+                {
+                    throw new Exception("PointStart is required.");
+                }
+
+                if (string.IsNullOrWhiteSpace(ticket.PointEnd))
+                {
+                    throw new Exception("PointEnd is required.");
+                }
+
+                if (ticket.TypeOfPayment != Constant.CHUYEN_KHOAN && ticket.TypeOfPayment != Constant.TIEN_MAT)
+                {
+                    throw new Exception("Invalid type of payment.");
+                }
                 if (ticket.PointStart != null && ticket.PointEnd != null)
 
                 {
@@ -140,7 +187,7 @@ namespace MyAPI.Repositories.Impls
             }
         }
 
-
+        //note
         public async Task AcceptOrDenyRequestRentCar(int requestId, bool choose, int vehicleId, decimal price)
         {
             try
@@ -221,7 +268,10 @@ namespace MyAPI.Repositories.Impls
         {
             try
             {
-
+                if (vehicleId <= 0)
+                {
+                    throw new Exception("Invalid vehicle ID.");
+                }
                 var requestDetail = await _context.RequestDetails.FirstOrDefaultAsync(rd => rd.RequestId == requestId);
 
                 if (requestDetail == null)
@@ -238,12 +288,13 @@ namespace MyAPI.Repositories.Impls
 
                 return true;
             }
-            catch
+            catch(Exception ex)
             {
                 return false;
+                throw new Exception(ex.Message);
             }
         }
-
+        //note
         public async Task<IEnumerable<VehicleBasicDto>> GetVehiclesByRequestIdAsync(int requestId)
         {
             try
@@ -281,8 +332,6 @@ namespace MyAPI.Repositories.Impls
         }
 
 
-
-
         public async Task<List<ListTicketDTOs>> getAllTicket()
         {
             try
@@ -301,6 +350,10 @@ namespace MyAPI.Repositories.Impls
         {
             try
             {
+                if (vehicleId <= 0)
+                {
+                    throw new Exception("Invalid vehicle ID.");
+                }
                 var listTicket = await (from v in _context.Vehicles
                                         join vt in _context.VehicleTrips
                                         on v.Id equals vt.VehicleId
@@ -339,6 +392,24 @@ namespace MyAPI.Repositories.Impls
         {
             try
             {
+                if (ticket == null)
+                {
+                    throw new Exception("Ticket data is required.");
+                }
+                if (vehicleId <= 0)
+                {
+                    throw new Exception("Invalid vehicle ID.");
+                }
+                if (string.IsNullOrWhiteSpace(ticket.PointStart))
+                {
+                    throw new Exception("PointStart is required.");
+                }
+
+                if (string.IsNullOrWhiteSpace(ticket.PointEnd))
+                {
+                    throw new Exception("PointEnd is required.");
+                }
+
                 var priceFromPoint = await (from v in _context.Vehicles
                                             join vt in _context.VehicleTrips
                                             on v.Id equals vt.VehicleId
@@ -363,6 +434,15 @@ namespace MyAPI.Repositories.Impls
         {
             try
             {
+                if (id <= 0)
+                {
+                    throw new Exception("Invalid ticket ID.");
+                }
+
+                if (driverId <= 0)
+                {
+                    throw new Exception("Invalid driver ID.");
+                }
                 var ticketNotPaid = await _context.Tickets.FirstOrDefaultAsync(x => x.Id == id && x.TypeOfPayment == Constant.TIEN_MAT);
 
                 var pointTicket = ticketNotPaid.PricePromotion * 10 / 100;
@@ -413,6 +493,10 @@ namespace MyAPI.Repositories.Impls
         {
             try
             {
+                if (ticketId <= 0)
+                {
+                    throw new Exception("Invalid ticket ID.");
+                }
                 var ticketById = await _context.Tickets.FirstOrDefaultAsync(x => x.Id == ticketId);
                 var mapperTicketById = _mapper.Map<TicketByIdDTOs>(ticketById);
                 return mapperTicketById;
@@ -427,6 +511,7 @@ namespace MyAPI.Repositories.Impls
         {
             try
             {
+
                 var checkTicket = await _context.Tickets.FirstOrDefaultAsync(s => s.Id == id);
                 if (checkTicket != null)
                 {
@@ -437,7 +522,7 @@ namespace MyAPI.Repositories.Impls
                 }
                 else
                 {
-                    throw new Exception("Update for payment");
+                    throw new Exception("Not found ticket");
                 }
             }
             catch (Exception ex)
@@ -450,6 +535,19 @@ namespace MyAPI.Repositories.Impls
         {
             try
             {
+                if (startTime > endTime)
+                {
+                    throw new Exception("Start time must be earlier than or equal to end time.");
+                }
+
+                if (userId <= 0)
+                {
+                    throw new Exception("Invalid user ID.");
+                }
+                if (startTime == default || endTime == default)
+                {
+                    throw new Exception("Start time and end time must be valid DateTime values.");
+                }
                 var getInforUser = _context.Users.Include(x => x.UserRoles).ThenInclude(x => x.Role).Where(x => x.Id == userId).FirstOrDefault();
                 if (getInforUser == null)
                 {
@@ -539,6 +637,11 @@ namespace MyAPI.Repositories.Impls
         {
             try
             {
+              
+                if (userId <= 0)
+                {
+                    throw new Exception("Invalid user.");
+                }
                 var listTicket = await _context.Tickets.Where(x => x.UserId == userId).ToListAsync();
                 var mapper = _mapper.Map<List<ListTicketDTOs>>(listTicket);
                 return mapper;

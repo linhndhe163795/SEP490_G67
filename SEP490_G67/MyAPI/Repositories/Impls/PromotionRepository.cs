@@ -36,6 +36,11 @@ namespace MyAPI.Repositories.Impls
         {
             try
             {
+                if (promotionDTO == null)
+                {
+                    throw new ArgumentNullException(nameof(promotionDTO), "Promotion data is required.");
+                }
+
                 var promotion = _mapper.Map<Promotion>(promotionDTO);
                 promotion.CreatedAt = DateTime.UtcNow;
                 promotion.CreatedBy = promotionDTO.CreatedBy;
@@ -60,7 +65,19 @@ namespace MyAPI.Repositories.Impls
                 {
                     throw new Exception("Promotion not found");
                 }
+                if (promotionDTO.StartDate >= promotionDTO.EndDate)
+                {
+                    throw new Exception("Start date must be earlier than end date.");
+                }
 
+                if (promotionDTO.Discount <= 0 || promotionDTO.Discount > 100)
+                {
+                    throw new Exception("Discount must be between 1 and 100.");
+                }
+                if (promotionDTO.Discount <= 0 || promotionDTO.Discount > 100)
+        {
+            throw new Exception("Discount must be between 1 and 100.");
+        }
                 promotion.CodePromotion = promotionDTO.CodePromotion;
                 promotion.ImagePromotion = promotionDTO.ImagePromotion;
                 promotion.Description = promotionDTO.Description;
@@ -78,7 +95,7 @@ namespace MyAPI.Repositories.Impls
             }
             catch (Exception ex)
             {
-                throw new Exception("UpdatePromotion: " + ex.Message);
+                throw new Exception(ex.Message, ex);
             }
         }
 
@@ -88,7 +105,10 @@ namespace MyAPI.Repositories.Impls
             {
                 var pointUserId = await _context.PointUsers.OrderByDescending(x => x.Id).FirstOrDefaultAsync(x => x.UserId == userId);
                 var promotion = await _context.Promotions.FirstOrDefaultAsync(x => x.Id == promotionId);
-
+                if (promotion == null)
+                {
+                    throw new Exception("Promotion not found.");
+                }
                 bool checkPromotion = await checkPromtionUserCanChange(promotionId, userId);
                 if (!checkPromotion) 
                 {
