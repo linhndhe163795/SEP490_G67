@@ -87,7 +87,7 @@ namespace MyAPI.Test
         public async Task GetDetailsAccountById_ReturnsOk_WithValidId()
         {
             // Arrange
-            var mockAccount = new AccountListDTO { FullName = "John Doe", NumberPhone = "123456789" };
+            var mockAccount = new AccountListDTO { FullName = "Nguyen Van A", NumberPhone = "123456789" };
             int accountId = 1;
             serviceMock.Setup(repo => repo.GetDetailsUser(accountId)).ReturnsAsync(mockAccount);
 
