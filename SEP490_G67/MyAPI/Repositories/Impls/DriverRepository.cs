@@ -51,6 +51,18 @@ namespace MyAPI.Repositories.Impls
                 {
                     throw new Exception("User Name is exsit in system");
                 }
+                if (updateDriverDto.NumberPhone == null)
+                {
+                    throw new ArgumentNullException(nameof(updateDriverDto.NumberPhone), "NumberPhone cannot be null");
+                }
+                if (updateDriverDto.Password == null)
+                {
+                    throw new ArgumentNullException(nameof(updateDriverDto.Password), "Password cannot be null");
+                }
+                if (updateDriverDto.UserName == null)
+                {
+                    throw new ArgumentNullException(nameof(updateDriverDto.UserName), "UserName cannot be null");
+                }
                 var hashPassword = _hashPassword.HashMD5Password(updateDriverDto.Password);
                 var driver = new Driver
                 {
@@ -70,7 +82,7 @@ namespace MyAPI.Repositories.Impls
             }
             catch (Exception ex) 
             {
-                throw new Exception(ex.Message);
+                throw;
             }
         }
 

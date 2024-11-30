@@ -332,6 +332,9 @@ namespace MyAPI.Controllers
         {
             try
             {
+                var cookies = HttpContext.Request.Headers["Cookie"].ToString();
+                Console.WriteLine($"Cookies: {cookies}");
+
                 var date = _httpContextAccessor?.HttpContext.Session.GetString("date");
                 if (!string.IsNullOrEmpty(date) && DateTime.TryParse(date, out var parsedDate))
                 {
