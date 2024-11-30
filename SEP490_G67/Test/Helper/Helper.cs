@@ -21,9 +21,9 @@ namespace Test.Helper
                 Subject = new ClaimsIdentity(new[]
                 {
                 new Claim(ClaimTypes.NameIdentifier, userId.ToString()),
-                new Claim(ClaimTypes.Role, "User") // Thêm các claim nếu cần
+                new Claim(ClaimTypes.Role, "User") 
             }),
-                Expires = DateTime.UtcNow.AddMinutes(10), // Thời gian hết hạn của token
+                Expires = DateTime.UtcNow.AddMinutes(10), 
                 Issuer = issuer,
                 Audience = audience,
                 SigningCredentials = new SigningCredentials(
