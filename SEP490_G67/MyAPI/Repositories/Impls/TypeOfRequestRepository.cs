@@ -32,8 +32,23 @@ namespace MyAPI.Repositories.Impls
 
         public async Task<IEnumerable<TypeOfRequest>> GetAll()
         {
-            return await _context.TypeOfRequests.ToListAsync();
+            try
+            {
+                var typeOfRequests = await _context.TypeOfRequests.ToListAsync();
+
+                if (typeOfRequests == null || !typeOfRequests.Any())
+                {
+                    throw new KeyNotFoundException("No types of requests found.");
+                }
+
+                return typeOfRequests;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error while retrieving types of requests: " + ex.Message);
+            }
         }
+
 
 
     }

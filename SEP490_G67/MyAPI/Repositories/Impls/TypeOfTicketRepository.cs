@@ -32,8 +32,23 @@ namespace MyAPI.Repositories.Impls
 
         public async Task<IEnumerable<TypeOfTicket>> GetAll()
         {
-            return await _context.TypeOfTickets.ToListAsync();
+            try
+            {
+                var typeOfTickets = await _context.TypeOfTickets.ToListAsync();
+
+                if (typeOfTickets == null || !typeOfTickets.Any())
+                {
+                    throw new KeyNotFoundException("No types of tickets found.");
+                }
+
+                return typeOfTickets;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error while retrieving types of tickets: " + ex.Message);
+            }
         }
+
 
 
     }

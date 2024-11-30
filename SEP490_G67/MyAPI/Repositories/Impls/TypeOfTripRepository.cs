@@ -32,8 +32,23 @@ namespace MyAPI.Repositories.Impls
 
         public async Task<IEnumerable<TypeOfTrip>> GetAll()
         {
-            return await _context.TypeOfTrips.ToListAsync();
+            try
+            {
+                var typeOfTrips = await _context.TypeOfTrips.ToListAsync();
+
+                if (typeOfTrips == null || !typeOfTrips.Any())
+                {
+                    throw new KeyNotFoundException("No types of trips found.");
+                }
+
+                return typeOfTrips;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error while retrieving types of trips: " + ex.Message);
+            }
         }
+
 
 
     }

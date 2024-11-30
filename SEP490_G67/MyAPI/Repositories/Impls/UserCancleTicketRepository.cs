@@ -18,6 +18,25 @@ namespace MyAPI.Repositories.Impls
 
         public async Task AddUserCancleTicket(AddUserCancleTicketDTOs addUserCancleTicketDTOs, int userId)
         {
+            if (addUserCancleTicketDTOs == null)
+            {
+                throw new ArgumentNullException(nameof(addUserCancleTicketDTOs), "Cancel ticket data cannot be null.");
+            }
+
+            if (addUserCancleTicketDTOs.TicketId <= 0)
+            {
+                throw new ArgumentException("Ticket ID must be greater than 0.");
+            }
+
+            if (string.IsNullOrWhiteSpace(addUserCancleTicketDTOs.ReasonCancle))
+            {
+                throw new ArgumentException("Reason for cancellation cannot be null or empty.");
+            }
+
+            if (userId <= 0)
+            {
+                throw new ArgumentException("User ID must be greater than 0.");
+            }
             try
             {
                 DateTime dateTimeCancle = DateTime.Now.AddHours(-2);

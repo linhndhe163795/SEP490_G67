@@ -138,16 +138,36 @@ namespace MyAPI.Repositories.Impls
 
             }
         }
-       
+
 
         public async Task<bool> checkLogin(UserLoginDTO userLoginDTO)
         {
+            if (userLoginDTO == null)
+            {
+                throw new ArgumentNullException(nameof(userLoginDTO), "Login data cannot be null.");
+            }
+
+            if (string.IsNullOrWhiteSpace(userLoginDTO.Username))
+            {
+                throw new ArgumentException("Username cannot be null or empty.");
+            }
+
+            if (string.IsNullOrWhiteSpace(userLoginDTO.Password))
+            {
+                throw new ArgumentException("Password cannot be null or empty.");
+            }
+
             var hashedPassword = _hassPassword.HashMD5Password(userLoginDTO.Password);
+
             var user = await _context.Users
                 .FirstOrDefaultAsync(x =>
-                (x.Username == userLoginDTO.Username || x.Email == userLoginDTO.Email) && x.Password == hashedPassword && x.Status == true);
+                    x.Username == userLoginDTO.Username &&
+                    x.Password == hashedPassword &&
+                    x.Status == true);
+
             return user != null;
         }
+
         public async Task ForgotPassword(ForgotPasswordDTO entity)
         {
             if (entity == null)
