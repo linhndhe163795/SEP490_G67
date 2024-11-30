@@ -47,6 +47,31 @@ namespace MyAPI.Repositories.Impls
         {
             try
             {
+                if (vehicleAddDTO == null)
+                {
+                    throw new ArgumentNullException(nameof(vehicleAddDTO), "VehicleAddDTO cannot be null.");
+                }
+
+                if (string.IsNullOrWhiteSpace(driverName))
+                {
+                    throw new ArgumentException("Driver name cannot be null or empty.");
+                }
+
+                if (vehicleAddDTO.NumberSeat == null || vehicleAddDTO.NumberSeat <= 0)
+                {
+                    throw new ArgumentException("NumberSeat must be greater than 0.");
+                }
+
+                if (string.IsNullOrWhiteSpace(vehicleAddDTO.LicensePlate))
+                {
+                    throw new ArgumentException("License plate cannot be null or empty.");
+                }
+
+                if (vehicleAddDTO.CreatedAt == null || vehicleAddDTO.CreatedAt > DateTime.Now)
+                {
+                    throw new ArgumentException("CreatedAt must be a valid date and cannot be in the future.");
+                }
+
                 var checkUserNameDrive = await _context.Drivers.SingleOrDefaultAsync(s => s.UserName.Equals(driverName));
 
                 var token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
@@ -63,11 +88,6 @@ namespace MyAPI.Repositories.Impls
                     throw new Exception("User does not exist.");
                 }
 
-                //if (checkUserNameDrive == null)
-                //{
-                //    throw new Exception("Driver not found in the system.");
-                //}
-
                 var checkLicensePlate = await _context.Vehicles.FirstOrDefaultAsync(s => s.LicensePlate.Equals(vehicleAddDTO.LicensePlate));
                 if (checkLicensePlate != null)
                 {
@@ -78,8 +98,8 @@ namespace MyAPI.Repositories.Impls
 
                 Vehicle vehicle = new Vehicle
                 {
-                    NumberSeat = vehicleAddDTO.NumberSeat,
-                    VehicleTypeId = 1,
+                    NumberSeat = vehicleAddDTO.NumberSeat.Value,
+                    VehicleTypeId = vehicleAddDTO.VehicleTypeId ?? 1,
                     Image = vehicleAddDTO.Image,
                     Status = isStaff,
                     DriverId = checkUserNameDrive != null ? checkUserNameDrive.Id : 0,
@@ -87,21 +107,20 @@ namespace MyAPI.Repositories.Impls
                     LicensePlate = vehicleAddDTO.LicensePlate,
                     Description = vehicleAddDTO.Description,
                     CreatedBy = userId,
-                    CreatedAt = vehicleAddDTO.CreatedAt,
-                    UpdateAt = vehicleAddDTO.UpdateAt,
-                    UpdateBy = vehicleAddDTO.UpdateBy,
+                    CreatedAt = vehicleAddDTO.CreatedAt.Value,
+                    UpdateAt = vehicleAddDTO.UpdateAt ?? DateTime.Now,
+                    UpdateBy = vehicleAddDTO.UpdateBy ?? userId,
                 };
 
                 _context.Vehicles.Add(vehicle);
-
 
                 if (!isStaff)
                 {
                     var requestDTO = new RequestDTO
                     {
                         TypeId = 1,
-                        Description = "Yêu cầu thêm xe",
-                        Note = "Đang chờ xác nhận",
+                        Description = "Request to add vehicle",
+                        Note = "Pending approval",
                     };
 
                     var createdRequest = await _requestRepository.CreateRequestVehicleAsync(requestDTO);
@@ -124,14 +143,14 @@ namespace MyAPI.Repositories.Impls
                         FromEmail = "nhaxenhanam@gmail.com",
                         Password = "vzgq unyk xtpt xyjp",
                         ToEmail = user.Email,
-                        Subject = "Thông báo về việc đăng ký xe vào hệ thống",
-                        Body = "Thông tin của bạn đã được chúng tôi tiếp nhận xin vui lòng chờ đợi kiểm duyệt"
+                        Subject = "Notification about vehicle registration in the system",
+                        Body = "Your information has been received. Please wait for approval."
                     };
 
                     var checkMail = await _sendMail.SendEmail(mail);
                     if (!checkMail)
                     {
-                        throw new Exception("Send mail fail!!");
+                        throw new Exception("Failed to send email.");
                     }
                 }
 
@@ -143,12 +162,17 @@ namespace MyAPI.Repositories.Impls
             {
                 throw new Exception("AddVehicleAsync: " + ex.Message);
             }
-
         }
+
         public async Task<bool> AddVehicleByStaffcheckAsync(int requestId, bool isApprove)
         {
             try
             {
+                if (requestId <= 0)
+                {
+                    throw new ArgumentException("Request ID must be greater than 0.");
+                }
+
                 var checkRequestExits = await _context.Requests.FirstOrDefaultAsync(s => s.Id == requestId);
 
                 var token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
@@ -167,7 +191,7 @@ namespace MyAPI.Repositories.Impls
 
                 if (checkRequestExits == null)
                 {
-                    return false;
+                    throw new Exception("Request does not exist.");
                 }
 
                 checkRequestExits.Note = isApprove ? "Đã xác nhận" : "Từ chối xác nhận";
@@ -179,11 +203,10 @@ namespace MyAPI.Repositories.Impls
                     throw new Exception("Failed to update request.");
                 }
 
-
                 var emailOfUser = await _context.Users
-                                              .Where(rq => rq.Id == checkRequestExits.UserId)
-                                              .Select(rq => rq.Email)
-                                              .FirstOrDefaultAsync();
+                                                .Where(rq => rq.Id == checkRequestExits.UserId)
+                                                .Select(rq => rq.Email)
+                                                .FirstOrDefaultAsync();
 
                 if (string.IsNullOrEmpty(emailOfUser))
                 {
@@ -228,33 +251,54 @@ namespace MyAPI.Repositories.Impls
         }
 
 
+
         public async Task<bool> DeleteVehicleAsync(int id)
         {
             try
             {
+                if (id == null)
+                {
+                    throw new ArgumentNullException(nameof(id), "Vehicle ID cannot be null.");
+                }
+
+                if (id <= 0)
+                {
+                    throw new ArgumentException("Vehicle ID must be greater than 0.");
+                }
+
                 var checkVehicle = await _context.Vehicles.SingleOrDefaultAsync(s => s.Id == id);
-                if (checkVehicle != null)
+
+                if (checkVehicle == null)
                 {
-                    checkVehicle.Status = false;
-                    await _context.SaveChangesAsync();
-                    return true;
+                    throw new Exception("Vehicle not found.");
                 }
-                else
-                {
-                    return false;
-                }
+
+                checkVehicle.Status = false;
+                await _context.SaveChangesAsync();
+
+                return true;
             }
             catch (Exception ex)
             {
                 throw new Exception("DeleteVehicleAsync: " + ex.Message);
             }
-
         }
+
 
         public async Task<List<EndPointDTO>> GetListEndPointByVehicleId(int vehicleId)
         {
             try
             {
+                if (vehicleId == null)
+                {
+                    throw new ArgumentNullException(nameof(vehicleId), "Vehicle ID cannot be null.");
+                }
+
+                if (vehicleId <= 0)
+                {
+                    throw new ArgumentException("Vehicle ID must be greater than 0.");
+                }
+
                 var i = 1;
                 var listStartPoint = await (from v in _context.Vehicles
                                             join vt in _context.VehicleTrips
@@ -264,26 +308,26 @@ namespace MyAPI.Repositories.Impls
                                             where v.Id == vehicleId
                                             select t.PointEnd).Distinct()
                                          .ToListAsync();
+
+                if (listStartPoint == null || !listStartPoint.Any())
+                {
+                    throw new Exception("No endpoints found for the given Vehicle ID.");
+                }
+
                 List<EndPointDTO> listEndPointDTOs = new List<EndPointDTO>();
                 foreach (var v in listStartPoint)
                 {
                     listEndPointDTOs.Add(new EndPointDTO { id = i++, name = v });
                 }
 
-                if (listEndPointDTOs == null)
-                {
-                    throw new ArgumentNullException(nameof(listEndPointDTOs));
-                }
-                else
-                {
-                    return listEndPointDTOs;
-                }
+                return listEndPointDTOs;
             }
             catch (Exception ex)
             {
                 throw new Exception("GetListEndPointByVehicleId: " + ex.Message);
             }
         }
+
 
         public async Task<List<VehicleTypeDTO>> GetVehicleTypeDTOsAsync()
         {
