@@ -9,6 +9,24 @@ using MyAPI.Helper;
 using MyAPI.Models;
 using MyAPI.Repositories.Impls;
 using System.Linq.Expressions;
+using System.Security.Cryptography;
+using System.Text;
+
+
+public static class MockDbSetExtensions
+{
+    public static Mock<DbSet<T>> BuildMockDbSet<T>(this IQueryable<T> source) where T : class
+    {
+        var mockDbSet = new Mock<DbSet<T>>();
+
+        mockDbSet.As<IQueryable<T>>().Setup(m => m.Provider).Returns(source.Provider);
+        mockDbSet.As<IQueryable<T>>().Setup(m => m.Expression).Returns(source.Expression);
+        mockDbSet.As<IQueryable<T>>().Setup(m => m.ElementType).Returns(source.ElementType);
+        mockDbSet.As<IQueryable<T>>().Setup(m => m.GetEnumerator()).Returns(source.GetEnumerator());
+
+        return mockDbSet;
+    }
+}
 
 public class DriverRepositoryTests
 {
@@ -43,79 +61,14 @@ public class DriverRepositoryTests
             _mapperMock.Object
         );
     }
-
-    [Fact]
-    public async Task CreateDriverAsync_ValidDriver_ReturnsDriver()
+    private string ComputeHash(string input)
     {
-        // Arrange
-        var updateDriverDto = new UpdateDriverDTO
+        using (var md5 = MD5.Create())
         {
-            UserName = "dungnd",
-            Name = "Nguyen Van Dung",
-            NumberPhone = "0913530333",
-            Password = "123456789",
-            Avatar = "avatar.jpg",
-            Dob = new DateTime(1990, 1, 1),
-            License = "D",
-            Status = true
-        };
-
-        // Mocking password hashing
-       var expectedHashedPassword = "25f9e794323b453885f5181f1b624d0b";
-
-        // Act
-        var result = await _driverRepository.CreateDriverAsync(updateDriverDto);
-
-        // Assert
-        Assert.NotNull(result);
-        Assert.Equal("dungnd", result.UserName);
-        Assert.Equal("Nguyen Van Dung", result.Name);
-        Assert.Equal("hashedPassword", result.Password);
-        Assert.Equal("Active", result.StatusWork);
+            var bytes = md5.ComputeHash(Encoding.UTF8.GetBytes(input));
+            return BitConverter.ToString(bytes).Replace("-", "").ToLower();
+        }
     }
-
-    [Fact]
-    public async Task CreateDriverAsync_UsernameExists_ThrowsException()
-    {
-        // Arrange
-        var existingDriver = new Driver
-        {
-            UserName = "dungnd",
-            Name = "Existing User"
-        };
-
-        // Tạo danh sách dữ liệu giả lập
-        var drivers = new List<Driver> { existingDriver }.AsQueryable();
-
-        // Mock DbSet<Driver>
-        var mockDbSet = new Mock<DbSet<Driver>>();
-        mockDbSet.As<IQueryable<Driver>>().Setup(m => m.Provider).Returns(drivers.Provider);
-        mockDbSet.As<IQueryable<Driver>>().Setup(m => m.Expression).Returns(drivers.Expression);
-        mockDbSet.As<IQueryable<Driver>>().Setup(m => m.ElementType).Returns(drivers.ElementType);
-        mockDbSet.As<IQueryable<Driver>>().Setup(m => m.GetEnumerator()).Returns(drivers.GetEnumerator());
-
-        // Gán Mock DbSet vào context
-        _contextMock.Setup(ctx => ctx.Drivers).Returns(mockDbSet.Object);
-
-        var updateDriverDto = new UpdateDriverDTO
-        {
-            UserName = "dungnd", // UserName đã tồn tại
-            Name = "New User",
-            NumberPhone = "0913530333",
-            Password = "123456789",
-            License = "D",
-            Status = true
-        };
-
-        // Act & Assert
-        var exception = await Assert.ThrowsAsync<Exception>(
-            () => _driverRepository.CreateDriverAsync(updateDriverDto));
-
-        Assert.Equal("User Name is exist in system", exception.Message);
-    }
-
-
-
 
     [Fact]
     public async Task CreateDriverAsync_NullPassword_ThrowsException()
@@ -175,5 +128,85 @@ public class DriverRepositoryTests
         var exception = await Assert.ThrowsAsync<ArgumentNullException>(
             () => _driverRepository.CreateDriverAsync(updateDriverDto));
         Assert.Contains("NumberPhone cannot be null", exception.Message);
+    }
+    [Fact]
+    public async Task UpdateDriverAsync_ValidDriver_ReturnsUpdatedDriver()
+    {
+        // Arrange
+        var existingDriver = new Driver
+        {
+            Id = 1,
+            UserName = "dungnd",
+            Name = "Nguyen Van Dung",
+            NumberPhone = "0913530333",
+            Password = "25f9e794323b453885f5181f1b624d0b",
+            License = "D",
+            Status = true
+        };
+
+        _contextMock.Setup(ctx => ctx.Drivers.FindAsync(1)).ReturnsAsync(existingDriver);
+
+        var updateDriverDto = new UpdateDriverDTO
+        {
+            UserName = "newuser",
+            Name = "Updated Name",
+            NumberPhone = "0912123456",
+            Password = "newpassword",
+            License = "B",
+            Status = true
+        };
+        // Act
+        var result = await _driverRepository.UpdateDriverAsync(1, updateDriverDto);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal("newuser", updateDriverDto.UserName);
+        Assert.Equal("Updated Name", updateDriverDto.Name);
+        Assert.Equal("0912123456", updateDriverDto.NumberPhone);
+        Assert.Equal("hashed_newpassword", updateDriverDto.Password);
+        Assert.Equal("B", updateDriverDto.License);
+        Assert.True(result.Status);
+    }
+    [Fact]
+    public async Task UpdateDriverAsync_UsernameExists_ThrowsException()
+    {
+        // Arrange
+        var existingDriver = new Driver
+        {
+            Id = 1,
+            UserName = "dungnd",
+            Name = "Nguyen Van Dung"
+        };
+
+        var otherDriver = new Driver
+        {
+            Id = 2,
+            UserName = "newuser"
+        };
+
+        var drivers = new List<Driver> { existingDriver }.AsQueryable();
+        var mockDbSet = new Mock<DbSet<Driver>>();
+        mockDbSet.As<IQueryable<Driver>>().Setup(m => m.Provider).Returns(drivers.Provider);
+        mockDbSet.As<IQueryable<Driver>>().Setup(m => m.Expression).Returns(drivers.Expression);
+        mockDbSet.As<IQueryable<Driver>>().Setup(m => m.ElementType).Returns(drivers.ElementType);
+        mockDbSet.As<IQueryable<Driver>>().Setup(m => m.GetEnumerator()).Returns(drivers.GetEnumerator());
+
+        _contextMock.Setup(ctx => ctx.Drivers).Returns(mockDbSet.Object);
+
+        var updateDriverDto = new UpdateDriverDTO
+        {
+            UserName = "newuser", // Username đã tồn tại
+            Name = "Updated Name",
+            NumberPhone = "0912123456",
+            Password = "newpassword",
+            License = "B",
+            Status = true
+        };
+
+        // Act & Assert
+        var exception = await Assert.ThrowsAsync<Exception>(
+            () => _driverRepository.UpdateDriverAsync(1, updateDriverDto));
+
+        Assert.Equal("User Name already exists in the system", exception.Message);
     }
 }

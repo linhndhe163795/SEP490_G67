@@ -22,6 +22,10 @@ namespace MyAPI.Repositories.Impls
 
         public async Task<LossCostType> CreateLossCostType(LossCostTypeAddDTO lossCostTypeAddDTO)
         {
+            if(lossCostTypeAddDTO.Description == null)
+            {
+                throw new Exception("Description not null");
+            }
             var token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
 
             int userId = _tokenHelper.GetIdInHeader(token);

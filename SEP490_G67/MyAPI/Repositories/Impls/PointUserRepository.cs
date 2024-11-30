@@ -18,6 +18,10 @@ namespace MyAPI.Repositories.Impls
         {
             try
             {
+                if (userId <= 0)
+                {
+                    throw new Exception("Invalid User ID.");
+                }
                 var addNewPointUser = new PointUser
                 {
                     UserId = userId,
@@ -38,8 +42,23 @@ namespace MyAPI.Repositories.Impls
 
         public async Task<bool> addPointUser(PointUserAddDTO pointUserAddDTO)
         {
+
             try
             {
+                if (pointUserAddDTO == null)
+                {
+                    throw new ArgumentNullException(nameof(pointUserAddDTO), "PointUserAddDTO is required.");
+                }
+
+                if (pointUserAddDTO.UserId < 0)
+                {
+                    throw new Exception("Invalid User ID.");
+                }
+
+                if (pointUserAddDTO.PaymentId < 0)
+                {
+                    throw new Exception("Invalid Payment ID.");
+                }
                 var addPoint = new PointUser
                 {
                     CreatedAt = DateTime.Now,

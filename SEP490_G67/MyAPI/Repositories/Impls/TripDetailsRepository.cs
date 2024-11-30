@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using DocumentFormat.OpenXml.Office2010.Excel;
 using Microsoft.EntityFrameworkCore;
 using MyAPI.DTOs.TripDetailsDTOs;
 using MyAPI.Infrastructure.Interfaces;
@@ -150,13 +151,41 @@ namespace MyAPI.Repositories.Impls
             }
             try
             {
+                if (tripId <= 0)
+                {
+                    throw new Exception("Invalid trip ID.");
+                }
+
+                if (tripDetailsId <= 0)
+                {
+                    throw new Exception("Invalid trip details ID.");
+                }
+
+                if (updateTripDetails == null)
+                {
+                    throw new Exception("Update data is required.");
+                }
+
+                if (string.IsNullOrWhiteSpace(updateTripDetails.PointStartDetails))
+                {
+                    throw new Exception("PointStartDetails is required.");
+                }
+
+                if (string.IsNullOrWhiteSpace(updateTripDetails.PointEndDetails))
+                {
+                    throw new Exception("PointEndDetails is required.");
+                }
+
+                if (updateTripDetails.TimeStartDetils >= updateTripDetails.TimeEndDetails)
+                {
+                    throw new Exception("TimeStartDetils must be earlier than TimeEndDetails.");
+                }
                 var tripDetail = await _context.TripDetails
                     .FirstOrDefaultAsync(x => x.TripId == tripId && x.Id == tripDetailsId);
                 if (tripDetail == null)
                 {
                     throw new Exception("Not Found trip Details");
                 }
-
                 tripDetail.PointStartDetails = updateTripDetails.PointStartDetails;
                 tripDetail.TimeStartDetils = updateTripDetails.TimeStartDetils;
                 tripDetail.PointEndDetails = updateTripDetails.PointEndDetails;

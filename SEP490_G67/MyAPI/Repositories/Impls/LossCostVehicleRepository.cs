@@ -152,6 +152,22 @@ namespace MyAPI.Repositories.Impls
         }
         private async Task<TotalLossCost> GetLossCosstForStaff(DateTime startDate, DateTime endDate, int? vehicleOwner, int? vehicleId ,int userId)
         {
+
+            if (startDate > endDate)
+            {
+                throw new Exception("Start date must be earlier than or equal to end date.");
+            }
+
+            if (vehicleId.HasValue && vehicleId <= 0)
+            {
+                throw new Exception("Invalid vehicle ID.");
+            }
+
+            if (vehicleOwner.HasValue && vehicleOwner <= 0)
+            {
+                throw new Exception("Invalid vehicle owner ID.");
+            }
+
             var query = _context.LossCosts.Include(x => x.Vehicle)
                                           .ThenInclude(x => x.VehicleOwnerNavigation)
                                           .Include(x => x.LossCostType)
@@ -177,10 +193,7 @@ namespace MyAPI.Repositories.Impls
                                                 LossCostType = ls.LossCostType.Description,
                                                 VehicleOwner = _context.Users.Include(uv => uv.Vehicles).Where(u => u.Id == ls.Vehicle.VehicleOwner).Select(u => u.FullName).FirstOrDefault()
                                             }).ToListAsync();
-            //if (!lossCostVehicleByDate.Any())
-            //{
-            //    throw new Exception("No loss cost data found for the specified criteria.");
-            //}
+            
             var combineResult = new TotalLossCost
             {
                 listLossCostVehicle = lossCostVehicleByDate,
@@ -192,10 +205,24 @@ namespace MyAPI.Repositories.Impls
         {
             try
             {
+                if (id <= 0)
+                {
+                    throw new Exception("Invalid ID provided.");
+                }
+
+                if (userId <= 0)
+                {
+                    throw new Exception("Invalid user ID provided.");
+                }
+                ValidateLossCostUpdateDTO(lossCostupdateDTOs);
                 var lossCostId = await _context.LossCosts.FirstOrDefaultAsync(x => x.Id == id);
                 if (lossCostId == null)
                 {
                     throw new NullReferenceException(nameof(id));
+                }
+                if (lossCostupdateDTOs.DateIncurred.HasValue)
+                {
+                    lossCostId.DateIncurred = lossCostupdateDTOs.DateIncurred.Value;
                 }
                 lossCostId.DateIncurred = lossCostupdateDTOs.DateIncurred;
                 lossCostId.Price = lossCostupdateDTOs.Price;
@@ -209,8 +236,36 @@ namespace MyAPI.Repositories.Impls
             }
             catch (Exception ex)
             {
-                throw new Exception("UpdateLossCostById: " + ex.Message);
+                throw new Exception(ex.Message);
             }
         }
+        private void ValidateLossCostUpdateDTO(LossCostUpdateDTO dto)
+        {
+            if (!dto.VehicleId.HasValue || dto.VehicleId <= 0)
+            {
+                throw new Exception("VehicleId is required and must be greater than 0.");
+            }
+
+            if (!dto.LossCostTypeId.HasValue || dto.LossCostTypeId <= 0)
+            {
+                throw new Exception("LossCostTypeId is required and must be greater than 0.");
+            }
+
+            if (!dto.Price.HasValue || dto.Price <= 0)
+            {
+                throw new Exception("Price is required and must be greater than 0.");
+            }
+
+            if (string.IsNullOrWhiteSpace(dto.Description))
+            {
+                throw new Exception("Description is required and cannot be empty.");
+            }
+
+            if (!dto.DateIncurred.HasValue)
+            {
+                throw new Exception("DateIncurred is required.");
+            }
+        }
+
     }
 }
