@@ -334,8 +334,8 @@ namespace MyAPI.Controllers
             {
                 var cookies = HttpContext.Request.Headers["Cookie"].ToString();
                 Console.WriteLine($"Cookies: {cookies}");
-
-                var date = _httpContextAccessor?.HttpContext.Session.GetString("date");
+                var date = HttpContext.Request.Cookies["date"];
+                //var date = _httpContextAccessor?.HttpContext.Session.GetString("date");
                 if (!string.IsNullOrEmpty(date) && DateTime.TryParse(date, out var parsedDate))
                 {
                     var trip = await _tripRepository.GetTripById(tripId);

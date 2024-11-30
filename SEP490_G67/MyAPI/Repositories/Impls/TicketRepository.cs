@@ -44,7 +44,9 @@ namespace MyAPI.Repositories.Impls
 
                 var promotionUserUsed = await _context.PromotionUsers.Include(x => x.Promotion)
                                         .FirstOrDefaultAsync(x => x.Promotion.CodePromotion == promotionCode && x.UserId == userId);
-                var dateString = _httpContextAccessor?.HttpContext?.Session.GetString("date") ?? DateTime.Now.ToString("MM/dd/yyyy"); ;
+                //var dateString = _httpContextAccessor?.HttpContext?.Session.GetString("date") ?? DateTime.Now.ToString("MM/dd/yyyy");
+                var dateString = _httpContextAccessor?.HttpContext?.Request.Cookies["date"]
+                 ?? DateTime.Now.ToString("MM/dd/yyyy");
 
                 var tripDetails = await (from td in _context.TripDetails
                                          join t in _context.Trips on td.TripId equals t.Id
@@ -59,6 +61,12 @@ namespace MyAPI.Repositories.Impls
                                              Vehicle = v
                                          }).FirstOrDefaultAsync();
 
+                var tripbyTripDetailsId = await _context.TripDetails
+                                        .Include(x => x.Trip)
+                                        .Where(x => x.Id == tripDetailsId)
+                                        .FirstOrDefaultAsync();
+                var trip = await _context.Trips.FirstOrDefaultAsync(x => x.Id == tripbyTripDetailsId.TripId);
+
                 var createTicket = new TicketDTOs
                 {
                     TripId = tripDetails.Trip.Id,
@@ -66,7 +74,7 @@ namespace MyAPI.Repositories.Impls
                     Description = tripDetails.Trip.Description,
                     PointStart = tripDetails.TripDetails.PointStartDetails,
                     PointEnd = tripDetails.TripDetails.PointEndDetails,
-                    TimeFrom = _parseToDateTime.ParseToDateTime(dateString, tripDetails.TripDetails.TimeStartDetils),
+                    TimeFrom = _parseToDateTime.ParseToDateTime(dateString, trip.StartTime),
                     TimeTo = _parseToDateTime.ParseToDateTime(dateString, tripDetails.TripDetails.TimeEndDetails),
                     Price = tripDetails.Trip.Price * numberTicket,
                     PricePromotion = (tripDetails.Trip.Price * numberTicket) - (tripDetails.Trip.Price * numberTicket * (promotionUser?.Discount ?? 0) / 100),
@@ -75,7 +83,9 @@ namespace MyAPI.Repositories.Impls
                     Status = (ticketDTOs.TypeOfPayment == Constant.CHUYEN_KHOAN) ? "Chờ thanh toán" : "Thanh toán bằng tiền mặt",
                     VehicleId = tripDetails.Vehicle.Id,
                     TypeOfTicket = (tripDetails.Vehicle.NumberSeat >= Constant.SO_GHE_XE_TIEN_CHUYEN) ? Constant.VE_XE_LIEN_TINH : Constant.VE_XE_TIEN_CHUYEN,
-                    Note = ticketDTOs.Note,
+                    Note = ticketDTOs.Note + "\n" +
+                        " Xe sẽ đến điểm " + tripDetails.TripDetails.PointStartDetails +
+                        " vào lúc: " + tripDetails.TripDetails.PointStartDetails,
                     UserId = userId,
                     CreatedAt = DateTime.Now,
                     CreatedBy = userId,
