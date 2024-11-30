@@ -2,7 +2,7 @@
 {
     public class PromotionDTO
     {
-        //public int Id { get; set; }
+        public int Id { get; set; }
         public string CodePromotion { get; set; } = null!;
         public string? ImagePromotion { get; set; }
         public string Description { get; set; } = null!;

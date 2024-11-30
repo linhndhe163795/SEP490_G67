@@ -19,7 +19,7 @@ namespace MyAPI.Controllers
         private readonly GetInforFromToken _getInforFromToken;
         private readonly IUserRepository _userRepository;
         private readonly IMapper _mapper;
-        public PromotionController(IPromotionRepository promotionRepository, GetInforFromToken getInforFromToken,IMapper mapper, IPromotionUserRepository promotionUserRepository, IUserRepository userRepository)
+        public PromotionController(IPromotionRepository promotionRepository, GetInforFromToken getInforFromToken, IMapper mapper, IPromotionUserRepository promotionUserRepository, IUserRepository userRepository)
         {
             _promotionRepository = promotionRepository;
             _mapper = mapper;
@@ -29,7 +29,7 @@ namespace MyAPI.Controllers
         }
         [Authorize(Roles = "Staff")]
         [HttpGet]
-        public async Task<IActionResult> GetAllPromotion() 
+        public async Task<IActionResult> GetAllPromotion()
         {
             try
             {
@@ -37,7 +37,7 @@ namespace MyAPI.Controllers
                 var listPromotionMapper = _mapper.Map<List<PromotionDTO>>(listPromotion);
                 return Ok(listPromotionMapper);
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }
@@ -84,10 +84,8 @@ namespace MyAPI.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
-
-       
         [Authorize(Roles = "Staff")]
-        [HttpPut("updatePromotion/id")]
+        [HttpPost("updatePromotion/id")]
         public async Task<IActionResult> UpdatePromotion(int id, [FromForm] PromotionDTO promotionDTO, IFormFile? imageFile)
         {
             try
@@ -127,7 +125,7 @@ namespace MyAPI.Controllers
             }
         }
         [Authorize(Roles = "Staff")]
-        [HttpDelete("deletePromotion/id")]
+        [HttpPost("deletePromotion/id")]
         public async Task<IActionResult> DeletePromotion(int id)
         {
             try
@@ -174,19 +172,17 @@ namespace MyAPI.Controllers
             try
             {
                 var promotionMapper = _mapper.Map<Promotion>(promotionDTO);
-                await _promotionRepository.Add(promotionMapper); 
+                await _promotionRepository.Add(promotionMapper);
                 await _promotionUserRepository.AddPromotionAllUser(promotionMapper.Id);
 
                 return Ok(promotionDTO);
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 return BadRequest("GivePromotionAllUser: " + ex.Message);
             }
         }
-
-
-        [HttpDelete("deletePromotionAfterPayment/{userId}/{promotionId}")]
+        [HttpPost("deletePromotionAfterPayment/{userId}/{promotionId}")]
         public async Task<IActionResult> deletePromotionAfterPayment(int userId, int promotionId)
         {
             try
@@ -205,6 +201,57 @@ namespace MyAPI.Controllers
             {
                 return BadRequest(new { Message = "deletePromotionAfterPayment failed", Details = ex.Message });
             }
+        }
+        [Authorize]
+        [HttpPost("exchangePromtion/{promotionId}")]
+        public async Task<IActionResult> getPromotionExchange(int promotionId)
+        {
+            try
+            {
+
+                string token = Request.Headers["Authorization"];
+                if (token.StartsWith("Bearer"))
+                {
+                    token = token.Substring("Bearer ".Length).Trim();
+                }
+                if (string.IsNullOrEmpty(token))
+                {
+                    return BadRequest("Token is required.");
+                }
+                var userId = _getInforFromToken.GetIdInHeader(token);
+                await _promotionRepository.exchangePromotion(userId, promotionId);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [Authorize]
+        [HttpGet("listPromtionCanChange")]
+        public async Task<IActionResult> getListPromotionUserCanChange()
+        {
+            try
+            {
+                string token = Request.Headers["Authorization"];
+                if (token.StartsWith("Bearer"))
+                {
+                    token = token.Substring("Bearer ".Length).Trim();
+                }
+                if (string.IsNullOrEmpty(token))
+                {
+                    return BadRequest("Token is required.");
+                }
+                var userId = _getInforFromToken.GetIdInHeader(token);
+                var listPromotionUserCanChange = await _promotionRepository.listPromotionCanChange(userId);
+                return Ok(listPromotionUserCanChange);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message); 
+            }
+
+
         }
     }
 }

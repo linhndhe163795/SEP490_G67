@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MyAPI.DTOs.HistoryRentDriverDTOs;
 using MyAPI.Infrastructure.Interfaces;
 using MyAPI.Repositories.Impls;
 
@@ -39,11 +40,11 @@ namespace MyAPI.Controllers
         }
         [Authorize(Roles = "Staff")]
         [HttpPost("AddHistoryDriver")]
-        public async Task<IActionResult> AddHistoryDriverUseRent(int requestId, bool choose, int? driverId, decimal price)
+        public async Task<IActionResult> AddHistoryDriverUseRent(AddHistoryRentDriver add)
         {
             try
             {
-                var requests = await _historyRentDriverRepository.AcceptOrDenyRentDriver(requestId, choose, driverId , price);
+                var requests = await _historyRentDriverRepository.AcceptOrDenyRentDriver(add);
                 if (requests)
                 {
                     return Ok(requests);
@@ -76,7 +77,7 @@ namespace MyAPI.Controllers
             }
         }
 
-        [HttpPut("/AssignDriverForRent")]
+        [HttpPost("/AssignDriverForRent")]
         public async Task<IActionResult> UpdateDriverInRequest(int driverId, int requestId)
         {
             try

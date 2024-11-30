@@ -9,6 +9,6 @@ namespace MyAPI.Infrastructure.Interfaces
 
         Task<List<StartPointTripDetails>> StartPointTripDetailsById (int TripId);
         Task<List<EndPointTripDetails>> EndPointTripDetailsById (int TripId);
-
+        Task UpdateTripDetailsById(int tripId, int tripDetailsId, UpdateTripDetails updateTripDetails);
     }
 }

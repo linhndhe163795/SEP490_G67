@@ -130,8 +130,8 @@ namespace MyAPI.Controllers
 
         }
         [Authorize(Roles = "Staff, VehicleOwner")]
-        [HttpPut("updateVehicle/{id}/{driverName}")]
-        public async Task<IActionResult> UpdateVehicle(int id, string driverName)
+        [HttpPost("updateVehicle/{id}/{driverName}")]
+        public async Task<IActionResult> UpdateVehicle(int id, string driverName)   
         {
             try
             {
@@ -146,8 +146,27 @@ namespace MyAPI.Controllers
             }
 
         }
+
+        [Authorize(Roles = "Staff, VehicleOwner")]
+        [HttpPost("updateVehicleInformation/{id}")]
+        public async Task<IActionResult> UpdateVehicle(int id, [FromBody] VehicleUpdateDTO updateDTO)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var result = await _vehicleRepository.UpdateVehicleAsync(id, updateDTO);
+
+            if (!result)
+            {
+                return NotFound(new { Message = "Vehicle not found." });
+            }
+
+            return Ok(new { Message = "Vehicle updated successfully." });
+        }
         [Authorize(Roles = "Staff")]
-        [HttpDelete("deleteVehicleByStatus/{id}")]
+        [HttpPost("deleteVehicleByStatus/{id}")]
         public async Task<IActionResult> UpdateVehicle(int id)
         {
             try
@@ -208,7 +227,7 @@ namespace MyAPI.Controllers
         }
 
         [Authorize(Roles = "Staff")]
-        [HttpPut("assignDriverForVehicle/{vehicleId}/{driverId}")]
+        [HttpPost("assignDriverForVehicle/{vehicleId}/{driverId}")]
         public async Task<IActionResult> AssignDriverForVehicle(int vehicleId, int driverId)
         {
             try
@@ -313,6 +332,9 @@ namespace MyAPI.Controllers
         {
             try
             {
+                var cookies = HttpContext.Request.Headers["Cookie"].ToString();
+                Console.WriteLine($"Cookies: {cookies}");
+
                 var date = _httpContextAccessor?.HttpContext.Session.GetString("date");
                 if (!string.IsNullOrEmpty(date) && DateTime.TryParse(date, out var parsedDate))
                 {
@@ -362,6 +384,7 @@ namespace MyAPI.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        [Authorize(Roles = "Staff")]
         [HttpGet("getVehicleByDriverId")]
         public async Task<IActionResult> getListVehicleByDriverId()
         {
@@ -383,6 +406,31 @@ namespace MyAPI.Controllers
             catch (Exception ex)
             {
                 return BadRequest(ex.Message);
+            }
+        }
+        [Authorize(Roles = "Staff, VehicleOwner")]
+        [HttpGet("getVehicleByVehicleOwnerId")]
+        public async Task<IActionResult> getListVehicleOfVehicleOwner()
+        {
+            try
+            {
+                string token = Request.Headers["Authorization"];
+                if (token.StartsWith("Bearer"))
+                {
+                    token = token.Substring("Bearer ".Length).Trim();
+                }
+                if (string.IsNullOrEmpty(token))
+                {
+                    return BadRequest("Token is required.");
+                }
+                var vehicleOwner = _getInforFromToken.GetIdInHeader(token);
+                var listVehicle = await _vehicleRepository.getVehicleByVehicleOwner(vehicleOwner);
+                return Ok(listVehicle);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+
             }
         }
     }

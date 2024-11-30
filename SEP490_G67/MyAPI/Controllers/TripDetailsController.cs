@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using MyAPI.DTOs.TripDetailsDTOs;
+using MyAPI.DTOs.TripDTOs;
 using MyAPI.Infrastructure.Interfaces;
 
 namespace MyAPI.Controllers
@@ -59,5 +61,18 @@ namespace MyAPI.Controllers
                 return BadRequest("getListTripDetailsbyTripId API: " + ex.Message);
             }
         }
-    }
+        [HttpPost("updateTripDetails/{tripId}/{tripDetailsId}")]
+        public async Task<IActionResult> updateTripDetailsById(int tripId, int tripDetailsId, UpdateTripDetails updateTripDetails)
+        {
+            try
+            {
+                await _tripDetailsRepository.UpdateTripDetailsById(tripId, tripDetailsId, updateTripDetails);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+    }   
 }

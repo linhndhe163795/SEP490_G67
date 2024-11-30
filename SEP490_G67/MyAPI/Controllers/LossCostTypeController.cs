@@ -58,7 +58,7 @@ namespace MyAPI.Controllers
             }
         }
 
-        [HttpPut("updateLossCostType/{id}")]
+        [HttpPost("updateLossCostType/{id}")]
         public async Task<IActionResult> UpdateLossCostType(int id, LossCostTypeAddDTO lossCostTypeAddDTO)
         {
             try
@@ -74,9 +74,9 @@ namespace MyAPI.Controllers
             }
 
         }
-
-        [HttpDelete("deleteLossCostType/{id}")]
-        public async Task<IActionResult> UpdateLossCostType(int id)
+        //tạm thời chưa dùng
+        [HttpPost("updateStatusLossCostType/{id}")]
+        public async Task<IActionResult> UpdateStatusLossCostType(int id)
         {
             try
             {

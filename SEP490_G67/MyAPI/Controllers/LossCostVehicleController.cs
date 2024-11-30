@@ -36,7 +36,7 @@ namespace MyAPI.Controllers
             }
         }
         [Authorize(Roles = "Staff")]
-        [HttpPut("updateLossCost/id")]
+        [HttpPost("updateLossCost/id")]
         public async Task<IActionResult> updateLossCostById(int id, LossCostUpdateDTO lossCostupdateDTOs)
         {
             try
@@ -84,7 +84,7 @@ namespace MyAPI.Controllers
             }
         }
         [Authorize(Roles = "Staff")]
-        [HttpDelete("deleteLossCost/id")]
+        [HttpPost("deleteLossCost/id")]
         public async Task<IActionResult> deleteCostById(int id)
         {
             try
