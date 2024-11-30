@@ -11,7 +11,7 @@ namespace MyAPI.Repositories.Impls
 
         public Task addVehiceleToTrip(IFormFile tripData)
         {
-          throw new NotImplementedException();
+            throw new NotImplementedException();
         }
 
         public async Task assginVehicleToTrip(int staffId, List<int> vehicleId, int tripId)

@@ -18,6 +18,25 @@ namespace MyAPI.Repositories.Impls
 
         public async Task AddUserCancleTicket(AddUserCancleTicketDTOs addUserCancleTicketDTOs, int userId)
         {
+            if (addUserCancleTicketDTOs == null)
+            {
+                throw new ArgumentNullException(nameof(addUserCancleTicketDTOs), "Cancel ticket data cannot be null.");
+            }
+
+            if (addUserCancleTicketDTOs.TicketId <= 0)
+            {
+                throw new ArgumentException("Ticket ID must be greater than 0.");
+            }
+
+            if (string.IsNullOrWhiteSpace(addUserCancleTicketDTOs.ReasonCancle))
+            {
+                throw new ArgumentException("Reason for cancellation cannot be null or empty.");
+            }
+
+            if (userId <= 0)
+            {
+                throw new ArgumentException("User ID must be greater than 0.");
+            }
             try
             {
                 DateTime dateTimeCancle = DateTime.Now.AddHours(-2);
@@ -35,17 +54,18 @@ namespace MyAPI.Repositories.Impls
                 {
                     ticketToCancel.Status = "Hủy chuyến";
                 }
-                var inforTicketCancle = await (from t in _context.Tickets join p in _context.Payments
+                var inforTicketCancle = await (from t in _context.Tickets
+                                               join p in _context.Payments
                                                  on t.Id equals p.TicketId
-                                                 where t.Id == addUserCancleTicketDTOs.TicketId
-                                                 select p).FirstOrDefaultAsync();
-                if (inforTicketCancle == null) 
+                                               where t.Id == addUserCancleTicketDTOs.TicketId
+                                               select p).FirstOrDefaultAsync();
+                if (inforTicketCancle == null)
                 {
                     throw new NullReferenceException("Không tìm thấy ticket!");
                 }
                 else
                 {
-                    if(inforTicketCancle.TypeOfPayment == Constant.TIEN_MAT)
+                    if (inforTicketCancle.TypeOfPayment == Constant.TIEN_MAT)
                     {
                         var addCancleTicket = new UserCancleTicket
                         {
@@ -56,7 +76,7 @@ namespace MyAPI.Repositories.Impls
                             CreatedAt = DateTime.Now,
                             CreatedBy = userId,
                         };
-                        var pointUserMinus = (int) inforTicketCancle.Price * Constant.TICH_DIEM;
+                        var pointUserMinus = (int)inforTicketCancle.Price * Constant.TICH_DIEM;
 
                         var pointUserById = _context.PointUsers.FirstOrDefault(x => x.UserId == userId);
                         if (pointUserById == null)
@@ -65,7 +85,7 @@ namespace MyAPI.Repositories.Impls
                         }
                         else
                         {
-                            pointUserById.Points -= (int) pointUserMinus;
+                            pointUserById.Points -= (int)pointUserMinus;
                             if (pointUserById.Points < 0) { pointUserById.Points = 0; }
                         }
                         var ticketPaymet = await (from t in _context.Tickets
@@ -74,7 +94,7 @@ namespace MyAPI.Repositories.Impls
                                                   where t.Id == addUserCancleTicketDTOs.TicketId
                                                   select p
                                                   ).FirstOrDefaultAsync();
-                        if(ticketPaymet == null)
+                        if (ticketPaymet == null)
                         {
                             throw new NullReferenceException();
                         }
@@ -109,9 +129,9 @@ namespace MyAPI.Repositories.Impls
                         };
                         await _requestRepository.createRequestCancleTicket(RequestCancleTicket, userId);
                     }
-                 
+
                 }
-               
+
             }
             catch (Exception ex)
             {

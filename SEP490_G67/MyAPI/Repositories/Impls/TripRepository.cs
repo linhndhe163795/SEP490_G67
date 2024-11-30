@@ -29,16 +29,37 @@ namespace MyAPI.Repositories.Impls
             try
             {
                 var tripList = await _context.Trips.ToListAsync();
+
+                if (tripList == null || !tripList.Any())
+                {
+                    throw new KeyNotFoundException("No trips found.");
+                }
+
                 var mapperTrip = _mapper.Map<List<TripDTO>>(tripList);
                 return mapperTrip;
             }
             catch (Exception ex)
             {
-                throw new Exception("GetListTrip: " + ex.Message);
+                throw new Exception("Error while retrieving trip list: " + ex.Message);
             }
         }
+
         public async Task<List<TripVehicleDTO>> SreachTrip(string startPoint, string endPoint, string? time)
         {
+            if (string.IsNullOrWhiteSpace(startPoint))
+            {
+                throw new ArgumentException("Start point cannot be null or empty.");
+            }
+
+            if (string.IsNullOrWhiteSpace(endPoint))
+            {
+                throw new ArgumentException("End point cannot be null or empty.");
+            }
+
+            if (string.IsNullOrWhiteSpace(time))
+            {
+                throw new ArgumentException("Time cannot be null or empty.");
+            }
             try
             {
                 var timeSpan = TimeSpan.Parse(time);
@@ -89,6 +110,45 @@ namespace MyAPI.Repositories.Impls
         }
         public async Task AddTrip(TripDTO trip, int? vehicleId, int userId)
         {
+            if (trip == null)
+            {
+                throw new ArgumentNullException(nameof(trip), "Trip data cannot be null.");
+            }
+
+            if (string.IsNullOrWhiteSpace(trip.Name))
+            {
+                throw new ArgumentException("Trip name cannot be null or empty.");
+            }
+
+            if (string.IsNullOrWhiteSpace(trip.PointStart))
+            {
+                throw new ArgumentException("Start point cannot be null or empty.");
+            }
+
+            if (string.IsNullOrWhiteSpace(trip.PointEnd))
+            {
+                throw new ArgumentException("End point cannot be null or empty.");
+            }
+
+            if (trip.StartTime == null)
+            {
+                throw new ArgumentException("Start time cannot be null.");
+            }
+
+            if (trip.Price <= 0)
+            {
+                throw new ArgumentException("Price must be greater than 0.");
+            }
+
+            if (userId <= 0)
+            {
+                throw new ArgumentException("User ID must be greater than 0.");
+            }
+            if (trip.TypeOfTrip == null || trip.TypeOfTrip <= 0)
+            {
+                throw new ArgumentException("Type of trip must be greater than 0.");
+            }
+
             try
             {
                 Trip addTrip = new Trip
@@ -152,6 +212,55 @@ namespace MyAPI.Repositories.Impls
         }
         public async Task UpdateTripById(int tripId, UpdateTrip trip, int userId)
         {
+            if (tripId <= 0)
+            {
+                throw new ArgumentException("Trip ID must be greater than 0.");
+            }
+
+            if (trip == null)
+            {
+                throw new ArgumentNullException(nameof(trip), "Trip data cannot be null.");
+            }
+
+            if (string.IsNullOrWhiteSpace(trip.Name))
+            {
+                throw new ArgumentException("Trip name cannot be null or empty.");
+            }
+
+            if (string.IsNullOrWhiteSpace(trip.Description))
+            {
+                throw new ArgumentException("Description cannot be null or empty.");
+            }
+
+            if (trip.Price == null || trip.Price <= 0)
+            {
+                throw new ArgumentException("Price must be greater than 0.");
+            }
+
+            if (string.IsNullOrWhiteSpace(trip.PointStart))
+            {
+                throw new ArgumentException("Start point cannot be null or empty.");
+            }
+
+            if (string.IsNullOrWhiteSpace(trip.PointEnd))
+            {
+                throw new ArgumentException("End point cannot be null or empty.");
+            }
+
+            if (trip.StartTime == null)
+            {
+                throw new ArgumentException("Start time cannot be null.");
+            }
+
+            if (trip.Status == null)
+            {
+                throw new ArgumentException("Status cannot be null.");
+            }
+
+            if (userId <= 0)
+            {
+                throw new ArgumentException("User ID must be greater than 0.");
+            }
             try
             {
                 var tripById = await _context.Trips.FirstOrDefaultAsync(x => x.Id == tripId);
@@ -182,6 +291,16 @@ namespace MyAPI.Repositories.Impls
         }
         public async Task updateStatusTrip(int id, int userId)
         {
+            if (id == null || id <= 0)
+            {
+                throw new ArgumentException("Trip ID must be a valid positive number.");
+            }
+
+            if (userId == null || userId <= 0)
+            {
+                throw new ArgumentException("User ID must be a valid positive number.");
+            }
+
             try
             {
                 var tripById = await _context.Trips.FirstOrDefaultAsync(x => x.Id == id);
@@ -273,34 +392,62 @@ namespace MyAPI.Repositories.Impls
                                     from v in vehicleGroup.DefaultIfEmpty()
                                     where vt == null
                                     select t
-                             ).ToListAsync();
+                                ).ToListAsync();
+
+                if (result == null || !result.Any())
+                {
+                    throw new KeyNotFoundException("No trips without vehicles found.");
+                }
 
                 var listTripNoVehicleMapper = _mapper.Map<List<TripDTO>>(result);
                 return listTripNoVehicleMapper;
             }
             catch (Exception ex)
             {
-                throw new Exception(ex.Message);
+                throw new Exception("getListTripNotVehicle: " + ex.Message);
             }
         }
+
         public async Task<int> GetTicketCount(int tripId, DateTime dateTime)
         {
+            if (tripId <= 0)
+            {
+                throw new ArgumentException("Trip ID must be greater than 0.");
+            }
+
+            if (dateTime == default)
+            {
+                throw new ArgumentException("DateTime cannot be the default value.");
+            }
+
             try
             {
-                var vehicelID = await _context.VehicleTrips.FirstOrDefaultAsync(x => x.TripId == tripId);
+                var vehicleTrip = await _context.VehicleTrips.FirstOrDefaultAsync(x => x.TripId == tripId);
 
-                var listTicketByVehicelID = await (from t in _context.Tickets
-                                                   where t.VehicleId == vehicelID.VehicleId && t.TimeFrom == dateTime
+                if (vehicleTrip == null)
+                {
+                    throw new KeyNotFoundException("No vehicle trip found for the specified trip ID.");
+                }
+
+                var listTicketByVehicleID = await (from t in _context.Tickets
+                                                   where t.VehicleId == vehicleTrip.VehicleId && t.TimeFrom == dateTime
                                                    select t.NumberTicket
-                                         ).ToListAsync();
-                var sum = listTicketByVehicelID.Sum();
+                                                  ).ToListAsync();
+
+                if (listTicketByVehicleID == null || !listTicketByVehicleID.Any())
+                {
+                    return 0;
+                }
+
+                var sum = listTicketByVehicleID.Sum();
                 return sum ?? 0;
             }
             catch (Exception ex)
             {
-                throw new Exception(ex.Message);
+                throw new Exception("GetTicketCount: " + ex.Message);
             }
         }
+
 
 
 
@@ -415,6 +562,10 @@ namespace MyAPI.Repositories.Impls
 
         public async Task<decimal> SearchVehicleConvenient(string startPoint, string endPoint, int typeOfTrip, string? promotion)
         {
+            if (typeOfTrip <= 0)
+            {
+                throw new ArgumentException("Type of trip must be a valid positive integer.");
+            }
             if (string.IsNullOrEmpty(startPoint) || string.IsNullOrEmpty(endPoint))
                 throw new ArgumentException("Start point and end point must not be empty.");
 
@@ -444,55 +595,99 @@ namespace MyAPI.Repositories.Impls
 
         public async Task<List<ListCovenientStartEndDTO>> getListStartAndEndPoint()
         {
-            var listTripConvenient = await _context.Trips
-                .Where(trip => trip.TypeOfTrip == 1)
-                .ToListAsync();
+            try
+            {
+                var listTripConvenient = await _context.Trips
+                    .Where(trip => trip.TypeOfTrip == 1)
+                    .ToListAsync();
 
-            var tripCovenientListDTOs = _mapper.Map<List<ListCovenientStartEndDTO>>(listTripConvenient);
+                if (listTripConvenient == null || !listTripConvenient.Any())
+                {
+                    throw new KeyNotFoundException("No trips found with the specified type.");
+                }
 
-            return tripCovenientListDTOs;
+                var tripCovenientListDTOs = _mapper.Map<List<ListCovenientStartEndDTO>>(listTripConvenient);
+                return tripCovenientListDTOs;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("getListStartAndEndPoint: " + ex.Message);
+            }
         }
+
 
         public async Task<TripDTO> GetTripById(int id)
         {
+            if (id <= 0)
+            {
+                throw new ArgumentException("Trip ID must be a valid positive integer.");
+            }
+
             try
             {
                 var trip = await _context.Trips.FirstOrDefaultAsync(x => x.Id == id);
+
+                if (trip == null)
+                {
+                    throw new KeyNotFoundException("Trip not found with the specified ID.");
+                }
+
                 var tripMapper = _mapper.Map<TripDTO>(trip);
                 return tripMapper;
             }
             catch (Exception ex)
             {
-                throw new Exception(ex.Message);
+                throw new Exception("GetTripById: " + ex.Message);
             }
         }
+
 
         public async Task<List<StartPointDTO>> getListStartPoint()
         {
             try
             {
-                var listStartPoint = await _context.Trips.Select(x => x.PointStart).ToListAsync();
+                var listStartPoint = await _context.Trips
+                    .Where(x => !string.IsNullOrEmpty(x.PointStart))
+                    .Select(x => x.PointStart)
+                    .Distinct()
+                    .ToListAsync();
+
+                if (listStartPoint == null || !listStartPoint.Any())
+                {
+                    throw new KeyNotFoundException("No start points found.");
+                }
+
                 var mapper = _mapper.Map<List<StartPointDTO>>(listStartPoint);
                 return mapper;
             }
             catch (Exception ex)
             {
-                throw new Exception(ex.Message);
+                throw new Exception("getListStartPoint: " + ex.Message);
             }
         }
-
         public async Task<List<EndPointDTO>> getListEndPoint()
         {
             try
             {
-                var listPointEnd = await _context.Trips.Select(x => x.PointEnd).ToListAsync();
+                var listPointEnd = await _context.Trips
+                    .Where(x => !string.IsNullOrEmpty(x.PointEnd))
+                    .Select(x => x.PointEnd)
+                    .Distinct()
+                    .ToListAsync();
+
+                if (listPointEnd == null || !listPointEnd.Any())
+                {
+                    throw new KeyNotFoundException("No end points found.");
+                }
+
                 var mapper = _mapper.Map<List<EndPointDTO>>(listPointEnd);
                 return mapper;
             }
             catch (Exception ex)
             {
-                throw new Exception(ex.Message);
+                throw new Exception("getListEndPoint: " + ex.Message);
             }
         }
+
     }
 }
