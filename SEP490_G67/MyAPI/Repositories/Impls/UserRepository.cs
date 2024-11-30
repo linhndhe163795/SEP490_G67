@@ -30,9 +30,37 @@ namespace MyAPI.Repositories.Impls
 
         public async Task<User> Register(UserRegisterDTO entity)
         {
+            if (entity == null)
+            {
+                throw new ArgumentNullException(nameof(entity), "User registration data cannot be null.");
+            }
 
+            if (string.IsNullOrWhiteSpace(entity.Username))
+            {
+                throw new ArgumentException("Username cannot be null or empty.");
+            }
+
+            if (string.IsNullOrWhiteSpace(entity.Password))
+            {
+                throw new ArgumentException("Password cannot be null or empty.");
+            }
+
+            if (string.IsNullOrWhiteSpace(entity.Email))
+            {
+                throw new ArgumentException("Email cannot be null or empty.");
+            }
+
+            if (string.IsNullOrWhiteSpace(entity.NumberPhone))
+            {
+                throw new ArgumentException("NumberPhone cannot be null or empty.");
+            }
+
+            if (entity.Dob == null)
+            {
+                throw new ArgumentException("Date of Birth cannot be null.");
+            }
             var verifyCode = _sendMail.GenerateVerificationCode(4);
-            SendMailDTO sendMailDTO = new()
+            var sendMailDTO = new SendMailDTO
             {
                 FromEmail = "duclinh5122002@gmail.com",
                 Password = "jetj haze ijdw euci",
@@ -40,39 +68,50 @@ namespace MyAPI.Repositories.Impls
                 Subject = "Verify Code",
                 Body = verifyCode,
             };
+
             if (await _sendMail.SendEmail(sendMailDTO))
             {
-                UserRegisterDTO userRegisterDTO = new UserRegisterDTO
-                {
-                    Username = entity.Username,
-                    Password = _hassPassword.HashMD5Password(entity.Password),
-                    NumberPhone = entity.NumberPhone,
-                    Dob = entity.Dob,
-                    Email = entity.Email,
-                    ActiveCode = verifyCode,
-                    CreatedAt = DateTime.Now,
-                    UpdateAt = DateTime.Now,
-                    Status = false,
-                };
+                entity.Password = _hassPassword.HashMD5Password(entity.Password);
+                entity.ActiveCode = verifyCode;
+                entity.CreatedAt = DateTime.Now;
+                entity.UpdateAt = DateTime.Now;
+                entity.Status = false;
 
-                var userMapper = _mapper.Map<User>(userRegisterDTO);
+                var userMapper = _mapper.Map<User>(entity);
                 await _context.AddAsync(userMapper);
                 await base.SaveChange();
-                int userId = userMapper.Id;
-                await _pointUserRepository.addNewPointUser(userId);
+                await _pointUserRepository.addNewPointUser(userMapper.Id);
+
                 return userMapper;
             }
             else
             {
-                throw new Exception("Failed to send mail");
+                throw new Exception("Failed to send verification email.");
             }
         }
 
+
         public async Task<bool> checkAccountExsit(User user)
         {
+            if (user == null)
+            {
+                throw new ArgumentNullException(nameof(user), "User data cannot be null.");
+            }
+
+            if (string.IsNullOrWhiteSpace(user.Username))
+            {
+                throw new ArgumentException("Username cannot be null or empty.");
+            }
+
+            if (string.IsNullOrWhiteSpace(user.Email))
+            {
+                throw new ArgumentException("Email cannot be null or empty.");
+            }
+
             var userExit = await _context.Users.FirstOrDefaultAsync(x => x.Username == user.Username || x.Email == user.Email);
             return userExit != null;
         }
+
 
         public async Task<int> lastIdUser()
         {
@@ -111,11 +150,21 @@ namespace MyAPI.Repositories.Impls
         }
         public async Task ForgotPassword(ForgotPasswordDTO entity)
         {
+            if (entity == null)
+            {
+                throw new ArgumentNullException(nameof(entity), "Forgot password data cannot be null.");
+            }
+
+            if (string.IsNullOrWhiteSpace(entity.Email))
+            {
+                throw new ArgumentException("Email cannot be null or empty.");
+            }
+
             var acc = await _context.Users.FirstOrDefaultAsync(x => x.Email == entity.Email);
             if (acc != null)
             {
                 var verifyCode = _sendMail.GenerateVerificationCode(6);
-                SendMailDTO sendMailDTO = new()
+                var sendMailDTO = new SendMailDTO
                 {
                     FromEmail = "duclinh5122002@gmail.com",
                     Password = "jetj haze ijdw euci",
@@ -123,6 +172,7 @@ namespace MyAPI.Repositories.Impls
                     Subject = "Verify Code",
                     Body = verifyCode,
                 };
+
                 if (await _sendMail.SendEmail(sendMailDTO))
                 {
                     acc.ActiveCode = verifyCode;
@@ -131,34 +181,62 @@ namespace MyAPI.Repositories.Impls
                 }
                 else
                 {
-                    return;
+                    throw new Exception("Failed to send verification email.");
                 }
+            }
+            else
+            {
+                throw new Exception("Account not found with the provided email.");
             }
         }
 
+
         public async Task ResetPassword(ResetPasswordDTO resetPasswordDTO)
         {
-            var acc = await _context.Users.FirstOrDefaultAsync(x => x.Email == resetPasswordDTO.Email && x.ActiveCode == resetPasswordDTO.Code);
+            if (resetPasswordDTO == null)
+            {
+                throw new ArgumentNullException(nameof(resetPasswordDTO), "Reset password data cannot be null.");
+            }
 
+            if (string.IsNullOrWhiteSpace(resetPasswordDTO.Email))
+            {
+                throw new ArgumentException("Email cannot be null or empty.");
+            }
+
+            if (string.IsNullOrWhiteSpace(resetPasswordDTO.Code))
+            {
+                throw new ArgumentException("Verification code cannot be null or empty.");
+            }
+
+            if (string.IsNullOrWhiteSpace(resetPasswordDTO.Password))
+            {
+                throw new ArgumentException("Password cannot be null or empty.");
+            }
+
+            if (string.IsNullOrWhiteSpace(resetPasswordDTO.ConfirmPassword))
+            {
+                throw new ArgumentException("Confirm password cannot be null or empty.");
+            }
+
+            if (resetPasswordDTO.Password != resetPasswordDTO.ConfirmPassword)
+            {
+                throw new Exception("Passwords do not match.");
+            }
+
+            var acc = await _context.Users.FirstOrDefaultAsync(x => x.Email == resetPasswordDTO.Email && x.ActiveCode == resetPasswordDTO.Code);
             if (acc != null)
             {
-                if (!string.IsNullOrEmpty(resetPasswordDTO.Password) && resetPasswordDTO.Password == resetPasswordDTO.ConfirmPassword)
-                {
-                    acc.Password = _hassPassword.HashMD5Password(resetPasswordDTO.Password);
-                    acc.ActiveCode = null;
-                    acc.UpdateBy = acc.Id;
-                    await base.Update(acc);
-                }
-                else
-                {
-                    throw new Exception("Passwords do not match or are empty.");
-                }
+                acc.Password = _hassPassword.HashMD5Password(resetPasswordDTO.Password);
+                acc.ActiveCode = null;
+                acc.UpdateBy = acc.Id;
+                await base.Update(acc);
             }
             else
             {
                 throw new Exception("Invalid email or reset code.");
             }
         }
+
 
         public async Task ChangePassword(ChangePasswordDTO changeEmailDTO)
         {
@@ -211,62 +289,88 @@ namespace MyAPI.Repositories.Impls
 
         public async Task<User> EditProfile(EditProfileDTO editProfileDTO)
         {
-            try
+            if (editProfileDTO == null)
             {
-                // Lấy token từ header Authorization
-                var token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
-
-                // Lấy userId từ token
-                int userId = _tokenHelper.GetIdInHeader(token);
-
-                if (userId == -1)
-                {
-                    throw new Exception("Invalid user ID from token.");
-                }
-
-                var user = await _context.Users.FindAsync(userId);
-                if (user == null)
-                {
-                    throw new Exception("User does not exist.");
-                }
-                if (!editProfileDTO.Password.Equals(editProfileDTO.ConfirmPassword))
-                {
-                    throw new Exception("Password not match");
-                }
-                var hashedPassword = _hassPassword.HashMD5Password(editProfileDTO.Password);
-                // Cập nhật thông tin người dùng
-                user.Email = editProfileDTO.Email;
-                user.NumberPhone = editProfileDTO.NumberPhone;
-                user.Avatar = editProfileDTO.Avatar;
-                user.Password = hashedPassword;
-                user.FullName = editProfileDTO.FullName;
-                user.Address = editProfileDTO.Address;
-                user.Dob = editProfileDTO.Dob;
-                user.UpdateAt = DateTime.UtcNow;
-                user.UpdateBy = userId;
-
-                await _context.SaveChangesAsync();
-
-                return user;
+                throw new ArgumentNullException(nameof(editProfileDTO), "Edit profile data cannot be null.");
             }
-            catch (Exception ex)
+
+            if (string.IsNullOrWhiteSpace(editProfileDTO.Email))
             {
-                throw new Exception("Something went wrong when updating user information: " + ex.Message);
+                throw new ArgumentException("Email cannot be null or empty.");
             }
+
+            if (string.IsNullOrWhiteSpace(editProfileDTO.Password))
+            {
+                throw new ArgumentException("Password cannot be null or empty.");
+            }
+
+            if (string.IsNullOrWhiteSpace(editProfileDTO.ConfirmPassword))
+            {
+                throw new ArgumentException("Confirm password cannot be null or empty.");
+            }
+
+            if (!editProfileDTO.Password.Equals(editProfileDTO.ConfirmPassword))
+            {
+                throw new Exception("Passwords do not match.");
+            }
+
+            var token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+            int userId = _tokenHelper.GetIdInHeader(token);
+
+            if (userId == -1)
+            {
+                throw new Exception("Invalid user ID from token.");
+            }
+
+            var user = await _context.Users.FindAsync(userId);
+            if (user == null)
+            {
+                throw new Exception("User not found.");
+            }
+
+            user.Email = editProfileDTO.Email;
+            user.NumberPhone = editProfileDTO.NumberPhone;
+            user.Avatar = editProfileDTO.Avatar;
+            user.Password = _hassPassword.HashMD5Password(editProfileDTO.Password);
+            user.FullName = editProfileDTO.FullName;
+            user.Address = editProfileDTO.Address;
+            user.Dob = editProfileDTO.Dob;
+            user.UpdateAt = DateTime.UtcNow;
+            user.UpdateBy = userId;
+
+            await _context.SaveChangesAsync();
+            return user;
         }
+
 
         public async Task<UserLoginDTO> GetUserLogin(UserLoginDTO userLogin)
         {
+            if (userLogin == null)
+            {
+                throw new ArgumentNullException(nameof(userLogin), "Login data cannot be null.");
+            }
+
+            if (string.IsNullOrWhiteSpace(userLogin.Username) && string.IsNullOrWhiteSpace(userLogin.Email))
+            {
+                throw new ArgumentException("Either Username or Email must be provided.");
+            }
+
+            if (string.IsNullOrWhiteSpace(userLogin.Password))
+            {
+                throw new ArgumentException("Password cannot be null or empty.");
+            }
+
             try
             {
                 var hashedPassword = _hassPassword.HashMD5Password(userLogin.Password);
+
                 var user = await _context.Users
                     .Include(x => x.UserRoles)
                     .ThenInclude(ur => ur.Role)
                     .Where(x =>
-                    (x.Username == userLogin.Username || x.Email == userLogin.Email) &&
-                    x.Password == hashedPassword &&
-                    x.Status == true)
+                        (x.Username == userLogin.Username || x.Email == userLogin.Email) &&
+                        x.Password == hashedPassword &&
+                        x.Status == true)
                     .Select(x => new UserLoginDTO
                     {
                         Email = x.Email,
@@ -276,7 +380,13 @@ namespace MyAPI.Repositories.Impls
                         RoleName = string.Join(", ", x.UserRoles.Select(ur => ur.Role.RoleName)),
                     })
                     .FirstOrDefaultAsync();
-                return user != null ? user : throw new Exception();
+
+                if (user == null)
+                {
+                    throw new Exception("Invalid username, email, or password.");
+                }
+
+                return user;
             }
             catch (Exception ex)
             {
@@ -284,8 +394,14 @@ namespace MyAPI.Repositories.Impls
             }
         }
 
+
         public async Task<UserPostLoginDTO> getUserById(int id)
         {
+            if (id <= 0)
+            {
+                throw new ArgumentException("User ID must be greater than 0.");
+            }
+
             try
             {
                 var user = await _context.Users
@@ -295,7 +411,7 @@ namespace MyAPI.Repositories.Impls
 
                 if (user == null)
                 {
-                    throw new NullReferenceException("User not found.");
+                    throw new Exception("User not found.");
                 }
 
                 var userMapper = _mapper.Map<UserPostLoginDTO>(user);
@@ -308,6 +424,7 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception("getUserById: " + ex.Message);
             }
         }
+
 
 
     }
