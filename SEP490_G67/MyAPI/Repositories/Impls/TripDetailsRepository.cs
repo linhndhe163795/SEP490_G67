@@ -20,8 +20,8 @@ namespace MyAPI.Repositories.Impls
             {
                 var listEndPointTripDetails = await _context.TripDetails.Where(x => x.TripId == TripId && x.Status == true).ToListAsync();
                 var listEndPointTripDetailsMapper = _mapper.Map<List<EndPointTripDetails>>(listEndPointTripDetails)
-                                                    .GroupBy(x => new { x.PointEndDetails, x.TimeEndDetails })  
-                                                    .Select(g => g.First())  
+                                                    .GroupBy(x => new { x.PointEndDetails, x.TimeEndDetails })
+                                                    .Select(g => g.First())
                                                     .ToList();
                 return listEndPointTripDetailsMapper;
             }
@@ -56,6 +56,30 @@ namespace MyAPI.Repositories.Impls
             catch (Exception ex)
             {
                 throw new Exception("TripDetailsByTripId: " + ex.Message);
+            }
+        }
+
+        public async Task UpdateTripDetailsById(int tripId, int tripDetailsId, UpdateTripDetails updateTripDetails)
+        {
+            try
+            {
+                var tripDetail = await _context.TripDetails
+                    .FirstOrDefaultAsync(x => x.TripId == tripId && x.Id == tripDetailsId);
+                if(tripDetail == null)
+                {
+                    throw new Exception("Not Found trip Details");
+                }
+
+                tripDetail.PointStartDetails = updateTripDetails.PointStartDetails;
+                tripDetail.TimeStartDetils = updateTripDetails.TimeStartDetils;
+                tripDetail.PointEndDetails = updateTripDetails.PointEndDetails;
+                tripDetail.TimeEndDetails = updateTripDetails.TimeEndDetails;
+                _context.TripDetails.Update(tripDetail);
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
             }
         }
     }

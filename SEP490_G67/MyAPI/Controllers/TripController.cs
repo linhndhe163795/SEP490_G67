@@ -147,8 +147,8 @@ namespace MyAPI.Controllers
         }
 
         [Authorize(Roles = "Staff")]
-        [HttpPut("updateTrip/{id}")]
-        public async Task<IActionResult> updateTrip(int id, TripDTO tripDTO)
+        [HttpPost("updateTrip/{id}")]
+        public async Task<IActionResult> updateTrip(int id, UpdateTrip tripDTO)
         {
             try
             {
@@ -173,7 +173,7 @@ namespace MyAPI.Controllers
             }
         }
         [Authorize(Roles = "Staff")]
-        [HttpPut("updateStatusTrip/{id}")]
+        [HttpPost("updateStatusTrip/{id}")]
         public async Task<IActionResult> updateStatusTrip(int id)
         {
             try
@@ -228,12 +228,10 @@ namespace MyAPI.Controllers
                 worksheet.Cells[1, 5].Value = "PointStart";
                 worksheet.Cells[1, 6].Value = "PointEnd";
                 worksheet.Cells[1, 7].Value = "Status";
-                worksheet.Cells[1, 8].Value = "TypeOfTrip";
-
                 var sampleData = new List<object[]>
             {
-                new object[] { "Trip A", "10:00", "Trip to ha noi", 50.0m, "Ha Noi", "Bac Giang", true, 1 },
-                new object[] { "Trip B", "12:00", "Trip to Bac Giang", 80.0m, "Bac Giang", "Ha Noi", false, 2 }
+                new object[] { "Trip A", "10:00", "Trip to ha noi", 50.0m, "Ha Noi", "Bac Giang", true },
+                new object[] { "Trip B", "12:00", "Trip to Bac Giang", 80.0m, "Bac Giang", "Ha Noi", false }
             };
 
                 for (int i = 0; i < sampleData.Count; i++)
@@ -317,6 +315,45 @@ namespace MyAPI.Controllers
                 return BadRequest(new { Message = "GetListconvenient failed", Details = ex.Message });
             }
         }
-
+        [HttpGet("getListStartPoint")]
+        public async Task<IActionResult> getListStartPoint()
+        {
+            try
+            {
+                var listStart = await _tripRepository.getListStartPoint();
+                if(listStart == null)
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    return Ok(listStart);
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [HttpGet("getListEndPoint")]
+        public async Task<IActionResult> getListEndPoint()
+        {
+            try
+            {
+                var listEnd = await _tripRepository.getListEndPoint();
+                if (listEnd == null)
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    return Ok(listEnd);
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }

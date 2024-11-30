@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using DocumentFormat.OpenXml.VariantTypes;
 using Microsoft.EntityFrameworkCore;
 using MyAPI.DTOs.PromotionDTOs;
 using MyAPI.Infrastructure.Interfaces;
@@ -80,5 +81,87 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception("UpdatePromotion: " + ex.Message);
             }
         }
+
+        public async Task exchangePromotion(int userId, int promotionId)
+        {
+            try
+            {
+                var pointUserId = await _context.PointUsers.OrderByDescending(x => x.Id).FirstOrDefaultAsync(x => x.UserId == userId);
+                var promotion = await _context.Promotions.FirstOrDefaultAsync(x => x.Id == promotionId);
+
+                bool checkPromotion = await checkPromtionUserCanChange(promotionId, userId);
+                if (!checkPromotion) 
+                {
+                    throw new Exception("You have promotion !");
+                }
+                if (pointUserId.Points >= promotion.ExchangePoint)
+                {
+                    var promotionUser = new PromotionUser
+                    {
+                        DateReceived = DateTime.UtcNow,
+                        PromotionId = promotionId,
+                        UserId = userId
+                    };
+                    _context.PromotionUsers.Add(promotionUser);
+                    var pointUserAfterExchange = new PointUser
+                    {
+                        Points = pointUserId.Points - promotion.ExchangePoint,
+                        PointsMinus = promotion.ExchangePoint,
+                        PaymentId = null,
+                        CreatedAt = DateTime.UtcNow,
+                        CreatedBy = userId,
+                        UpdateAt = DateTime.UtcNow,
+                        UpdateBy = userId,
+                    };
+                    _context.PointUsers.Add(pointUserAfterExchange);
+                    await _context.SaveChangesAsync();
+                }
+                else
+                {
+                    throw new Exception("Not enough point to exchange");
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+        private async Task<bool> checkPromtionUserCanChange(int promotionId, int userId)
+        {
+            var listPromtion = await listPromotionCanChange(userId);
+            if (listPromtion == null)
+            {
+                throw new Exception("Not found promotion you can change");
+            }
+            foreach (var promotion in listPromtion)
+            {
+                if(promotion.Id == promotionId)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+    
+    public async Task<List<PromotionDTO>> listPromotionCanChange(int userId)
+    {
+        try
+        {
+            var userPromotionIds = await _context.PromotionUsers
+                                    .Where(pu => pu.UserId == userId)
+                                    .Select(pu => pu.PromotionId)
+                                    .ToListAsync();
+            var listPromotionCanChange = await _context.Promotions
+                                    .Where(p => !userPromotionIds.Contains(p.Id)) // Loại bỏ Promotion user đã có
+                                    .ToListAsync();
+
+            var mapper = _mapper.Map<List<PromotionDTO>>(listPromotionCanChange);
+            return mapper;
+        }
+        catch (Exception ex)
+        {
+            throw new Exception(ex.Message);
+        }
     }
+}
 }

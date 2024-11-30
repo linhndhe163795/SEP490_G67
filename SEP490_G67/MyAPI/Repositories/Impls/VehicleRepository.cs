@@ -143,7 +143,7 @@ namespace MyAPI.Repositories.Impls
             {
                 throw new Exception("AddVehicleAsync: " + ex.Message);
             }
-           
+
         }
         public async Task<bool> AddVehicleByStaffcheckAsync(int requestId, bool isApprove)
         {
@@ -248,7 +248,7 @@ namespace MyAPI.Repositories.Impls
             {
                 throw new Exception("DeleteVehicleAsync: " + ex.Message);
             }
-            
+
         }
 
         public async Task<List<EndPointDTO>> GetListEndPointByVehicleId(int vehicleId)
@@ -267,7 +267,7 @@ namespace MyAPI.Repositories.Impls
                 List<EndPointDTO> listEndPointDTOs = new List<EndPointDTO>();
                 foreach (var v in listStartPoint)
                 {
-                    listEndPointDTOs.Add(new EndPointDTO{ id = i++, name = v });
+                    listEndPointDTOs.Add(new EndPointDTO { id = i++, name = v });
                 }
 
                 if (listEndPointDTOs == null)
@@ -299,7 +299,7 @@ namespace MyAPI.Repositories.Impls
             {
                 throw new Exception("GetVehicleTypeDTOsAsync: " + ex.Message);
             }
-            
+
         }
 
         public async Task<bool> UpdateVehicleAsync(int id, string driverName)
@@ -335,7 +335,8 @@ namespace MyAPI.Repositories.Impls
                 {
                     throw new Exception("Not found user name in system");
                 }
-            }catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 throw new Exception("UpdateVehicleAsync: " + ex.Message);
             }
@@ -384,7 +385,8 @@ namespace MyAPI.Repositories.Impls
                 var vehicleListDTOs = _mapper.Map<List<VehicleListDTO>>(listVehicle);
 
                 return vehicleListDTOs;
-            }catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 throw new Exception("GetVehicleDTOsAsync: " + ex.Message);
             }
@@ -415,7 +417,8 @@ namespace MyAPI.Repositories.Impls
                 {
                     throw new Exception("Not found user name in system");
                 }
-            }catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 throw new Exception("UpdateVehicleAsync: " + ex.Message);
             }
@@ -447,7 +450,8 @@ namespace MyAPI.Repositories.Impls
                 {
                     throw new Exception("Not found vehicle in system");
                 }
-            }catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 throw new Exception("UpdateVehicleByStaff: " + ex.Message);
             }
@@ -466,15 +470,175 @@ namespace MyAPI.Repositories.Impls
 
             return await _context.SaveChangesAsync() > 0;
         }
-        public async Task<int> GetNumberSeatAvaiable(int vehicleId)
+        public async Task<int> GetNumberSeatAvaiable(int tripId, DateTime dateTime)
         {
             try
             {
-                var ticketCount = await _tripRepository.GetTicketCount(vehicleId);
-                var vehicel = await _context.Vehicles.FirstOrDefaultAsync(x => x.Id == vehicleId);
-                var seatAvaiable = vehicel.NumberSeat - ticketCount;
+                var ticketCount = await _tripRepository.GetTicketCount(tripId, dateTime);
+                var vehicleTrip = await _context.VehicleTrips.FirstOrDefaultAsync(x => x.TripId == tripId);
+                var vehicle = await _context.Vehicles.FirstOrDefaultAsync(x => x.Id == vehicleTrip.VehicleId);
+                var seatAvaiable = vehicle.NumberSeat - ticketCount;
                 return seatAvaiable.Value;
 
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<VehicleAddDTO> GetVehicleById(int vehicleId)
+        {
+            try
+            {
+                var vehicleById = await _context.Vehicles.FirstOrDefaultAsync(x => x.Id == vehicleId);
+                var vehicleMapper = _mapper.Map<VehicleAddDTO>(vehicleById);
+                return vehicleMapper;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public Task<List<VehicleLicenscePlateDTOs>> getLicensecePlate()
+        {
+            try
+            {
+                var list = _context.Vehicles.Select(x => new VehicleLicenscePlateDTOs
+                {
+                    Id = x.Id,
+                    LicensePlate = x.LicensePlate
+                }).ToListAsync();
+                return list;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<int> VehicleByDriverId(int driverId)
+        {
+            try
+            {
+                var vehicleId = await _context.Vehicles.FirstOrDefaultAsync(x => x.DriverId == driverId);
+                if (vehicleId == null)
+                {
+                    throw new Exception("Driver not have vehicle");
+                }
+                return vehicleId.Id;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public Task<List<VehicleLicenscePlateDTOs>> getVehicleByDriverId(int driverId)
+        {
+            try
+            {
+                var vehicleByDriverID = _context.Vehicles.Where(x => x.DriverId == driverId).Select(x => new VehicleLicenscePlateDTOs
+                {
+                    Id = x.Id,
+                    LicensePlate = x.LicensePlate
+                }).ToListAsync();
+                if (vehicleByDriverID == null)
+                {
+                    throw new Exception("Driver not have vehicle");
+                }
+                return vehicleByDriverID;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<bool> checkDriver(int vehicleId, int driverId)
+        {
+            try
+            {
+                var vehicle = await _context.Vehicles.FirstOrDefaultAsync(x => x.Id == vehicleId);
+                if (vehicle.DriverId == driverId)
+                {
+                    return true;
+                }
+                return false;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<bool> UpdateVehicleAsync(int id, VehicleUpdateDTO updateDTO)
+        {
+            try
+            {
+
+                var vehicle = await _context.Vehicles.FindAsync(id);
+                if (vehicle == null) return false;
+
+
+                var token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+                int userId = _tokenHelper.GetIdInHeader(token);
+
+                if (userId == -1)
+                {
+                    throw new Exception("Invalid user ID from token.");
+                }
+
+
+                if (updateDTO.NumberSeat.HasValue) vehicle.NumberSeat = updateDTO.NumberSeat.Value;
+                if (updateDTO.VehicleTypeId.HasValue) vehicle.VehicleTypeId = updateDTO.VehicleTypeId.Value;
+                if (updateDTO.Status.HasValue) vehicle.Status = updateDTO.Status.Value;
+                if (!string.IsNullOrEmpty(updateDTO.Image)) vehicle.Image = updateDTO.Image;
+                if (updateDTO.DriverId.HasValue) vehicle.DriverId = updateDTO.DriverId.Value;
+                if (updateDTO.VehicleOwner.HasValue) vehicle.VehicleOwner = updateDTO.VehicleOwner.Value;
+                if (!string.IsNullOrEmpty(updateDTO.LicensePlate)) vehicle.LicensePlate = updateDTO.LicensePlate;
+                if (!string.IsNullOrEmpty(updateDTO.Description)) vehicle.Description = updateDTO.Description;
+
+                vehicle.UpdateAt = DateTime.UtcNow;
+                vehicle.UpdateBy = userId;
+
+
+                _context.Vehicles.Update(vehicle);
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch (ArgumentException ex)
+            {
+
+                throw new Exception($"Validation error: {ex.Message}");
+            }
+            catch (DbUpdateException ex)
+            {
+
+                throw new Exception("Database update error. See inner exception for details.", ex);
+            }
+            catch (Exception ex)
+            {
+
+                throw new Exception("An unexpected error occurred while updating the vehicle.", ex);
+            }
+        }
+
+        public async Task<List<VehicleLicenscePlateDTOs>> getVehicleByVehicleOwner(int vehicleOwner)
+        {
+            try
+            {
+                var listVehicle = await _context.Vehicles.Where(x => x.VehicleOwner == vehicleOwner).Select(x => new VehicleLicenscePlateDTOs
+                {
+                    Id = x.Id,
+                    LicensePlate = x.LicensePlate
+                }).ToListAsync();
+                if(listVehicle.Count <= 0)
+                {
+                    throw new Exception("Not found vehicleId");
+                }
+                return listVehicle;
             }
             catch (Exception ex)
             {

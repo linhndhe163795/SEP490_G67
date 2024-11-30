@@ -54,11 +54,11 @@ namespace MyAPI.Controllers
             
             
 
-            var review = await _reviewRepository.CreateReviewAsync(reviewDto, userId);
+            var review = await _reviewRepository.CreateReviewAsync(reviewDto);
             return CreatedAtAction(nameof(GetReviewById), new { id = review.Id }, review);
         }
         [Authorize]
-        [HttpPut("{id}")]
+        [HttpPost("UpdateReview/{id}")]
         public async Task<IActionResult> UpdateReview(int id, [FromBody] ReviewDTO reviewDto)
         {
             if (!ModelState.IsValid)
@@ -73,7 +73,7 @@ namespace MyAPI.Controllers
             
             
 
-            var review = await _reviewRepository.UpdateReviewAsync(id, reviewDto, userId);
+            var review = await _reviewRepository.UpdateReviewAsync(id, reviewDto);
             if (review == null)
             {
                 return NotFound();
@@ -83,7 +83,7 @@ namespace MyAPI.Controllers
         }
 
         [Authorize]
-        [HttpDelete("{id}")]
+        [HttpPost("DeleteReview/{id}")]
         public async Task<IActionResult> DeleteReview(int id)
         {
             var review = await _reviewRepository.Get(id);

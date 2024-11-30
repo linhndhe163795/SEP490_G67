@@ -53,15 +53,13 @@ namespace MyAPI.Controllers
             var UpdateRequestDto = _mapper.Map<RequestDTO>(requests);
             return Ok(UpdateRequestDto);
         }
-
         [HttpPost("/CreateTicketForRentFullCar")]
         public async Task<IActionResult> CreateRequestForRentCar(RequestDTOForRentCar requestforrentcar)
         {
             try
             {
-
                 var isAdded = await _requestRepository.CreateRequestRentCarAsync(requestforrentcar);
-                return Ok(new { Message = "Car rent added successfully.",CarRent = requestforrentcar });
+                return Ok(new { Message = "Car rent added successfully.", CarRent = requestforrentcar });
 
             }
             catch (Exception ex)
@@ -70,7 +68,7 @@ namespace MyAPI.Controllers
             }
         }
         [Authorize(Roles = "Staff")]
-        [HttpPut("/UpdateRequestForRentFullCar/{id}")]
+        [HttpPost("/UpdateRequestForRentFullCar/{id}")]
         public async Task<IActionResult> UpdateRequestForRentCar(int id, RequestDTOForRentCar requestDto)
         {
             var isupdated = await _requestRepository.UpdateRequestRentCarAsync(id, requestDto);
@@ -95,7 +93,7 @@ namespace MyAPI.Controllers
 
 
         [Authorize(Roles = "Staff")]
-        [HttpDelete("{id}")]
+        [HttpPost("Delete/{id}")]
         public async Task<IActionResult> DeleteRequest(int id)
         {
 
@@ -103,14 +101,14 @@ namespace MyAPI.Controllers
             if (requests == null)
             {
                 return NotFound("request not found");
-            } 
+            }
             await _requestRepository.Delete(requests);
 
             return NoContent();
         }
 
         [Authorize(Roles = "Staff")]
-        [HttpPut("acceptCancleTicket/{id}")]
+        [HttpPost("acceptCancleTicket/{id}")]
         public async Task<IActionResult> AcceptCancleTicketRequest(int id)
         {
             try
@@ -147,8 +145,6 @@ namespace MyAPI.Controllers
                 return BadRequest(ex.Message);
             }
         }
-
-
         // create request from user
         [Authorize]
         [HttpPost("createRequestCancleTicket")]
@@ -174,14 +170,13 @@ namespace MyAPI.Controllers
                 return BadRequest(ex.Message);
             }
         }
-
-
+        
+        [Authorize(Roles = "Driver")]
         [HttpPost("CreateRentVehicleForDriverRequest")]
         public async Task<IActionResult> AddVehicle(RentVehicleAddDTO rentVehicleAddDTO)
         {
             try
             {
-
                 var isAdded = await _requestRepository.CreateRequestRentVehicleAsync(rentVehicleAddDTO);
                 return Ok(new { Message = "Vehicle rent added successfully.", VehicleRent = rentVehicleAddDTO });
 
@@ -191,7 +186,7 @@ namespace MyAPI.Controllers
                 return BadRequest(new { Message = "AddVehicle rent Add failed", Details = ex.Message });
             }
         }
-
+        [Authorize(Roles = "VehicleOwner")]
         [HttpPost("CreateRentDriverForOwnerRequest")]
         public async Task<IActionResult> RentDriver(RequestDetailForRentDriver rentDriverAddDTO)
         {
@@ -208,6 +203,7 @@ namespace MyAPI.Controllers
             }
         }
 
+        [Authorize]
         [HttpPost("ConvenientTripCreateForUser")]
         public async Task<IActionResult> CreateRequestConvenientTrip(ConvenientTripDTO convenientTripDTO)
         {
@@ -257,6 +253,7 @@ namespace MyAPI.Controllers
             }
         }
 
+        [Authorize(Roles = "Staff")]
         [HttpPost("ConvenientTripUpdateForStaff")]
         public async Task<IActionResult> UpdateRequestConvenientTrip(int requestId, bool choose)
         {
@@ -274,6 +271,70 @@ namespace MyAPI.Controllers
                 return BadRequest(new { success = false, message = ex.Message });
             }
         }
+        //screen request for user
+        [Authorize]
+        [HttpGet("getListRequestForUser")]
+        public async Task<IActionResult> getListRequestForVehicleOwner()
+        {
+            try
+            {
+                string token = Request.Headers["Authorization"];
+                if (token.StartsWith("Bearer"))
+                {
+                    token = token.Substring("Bearer ".Length).Trim();
+                }
+                if (string.IsNullOrEmpty(token))
+                {
+                    return BadRequest("Token is required.");
+                }
+                var userId = _token.GetIdInHeader(token);
+                var result = await _requestRepository.getListRequestForUser(userId);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        //update request for user
+        [Authorize]
+        [HttpPost("updateRequestForUser/{requestID}")]
+        public async Task<IActionResult> updateRequestDetails(int requestID, RequestDetailDTO requestDetailDTO)
+        {
+            try
+            {
+                await _requestRepository.updateRequest(requestID, requestDetailDTO);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
 
+        [Authorize]
+        [HttpGet("getListRequestForDriver")]
+        public async Task<IActionResult> getListRequestForDriver()
+        {
+            try
+            {
+                string token = Request.Headers["Authorization"];
+                if (token.StartsWith("Bearer"))
+                {
+                    token = token.Substring("Bearer ".Length).Trim();
+                }
+                if (string.IsNullOrEmpty(token))
+                {
+                    return BadRequest("Token is required.");
+                }
+                var driverid = _token.GetIdInHeader(token);
+                var result = await _requestRepository.GetListRequestForDriver(driverid);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }

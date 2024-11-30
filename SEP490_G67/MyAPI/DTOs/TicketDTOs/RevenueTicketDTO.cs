@@ -10,9 +10,9 @@
     public class TicketRevenue
     {
         public decimal? PricePromotion { get; set; }
-        public int? VehicleId { get; set; }
-        public int? TypeOfTicket { get; set; }
-        public int? TypeOfPayment { get; set; }
+        public string LiscenseVehicle { get; set; }
+        public string TypeOfTicket { get; set; }
+        public string TypeOfPayment { get; set; }
         public DateTime? CreatedAt { get; set; }
     }
 }

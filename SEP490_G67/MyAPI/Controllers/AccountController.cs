@@ -14,7 +14,7 @@ namespace MyAPI.Controllers
     public class AccountController : ControllerBase
     {
         private readonly IAccountRepository _accountRepository;
-        public AccountController(IAccountRepository accountRepository,  IMapper mapper)
+        public AccountController(IAccountRepository accountRepository, IMapper mapper)
         {
             _accountRepository = accountRepository;
         }
@@ -25,10 +25,11 @@ namespace MyAPI.Controllers
             try
             {
                 var listAccount = await _accountRepository.GetListAccount();
-                if(listAccount != null)
+                if (listAccount != null)
                 {
                     return Ok(listAccount);
-                }else
+                }
+                else
                 {
                     return NotFound("Not found list Account");
                 }
@@ -37,7 +38,6 @@ namespace MyAPI.Controllers
             {
                 return BadRequest(new { Message = "Account get list failed", Details = ex.Message });
             }
-
         }
         [Authorize(Roles = "Admin")]
         [HttpGet("detailsAccount/{id}")]
@@ -59,11 +59,10 @@ namespace MyAPI.Controllers
             {
                 return BadRequest(new { Message = "Account details failed", Details = ex.Message });
             }
-
         }
 
         [Authorize(Roles = "Admin")]
-        [HttpDelete("deleteAccount/{id}")]
+        [HttpPost("deleteAccount/{id}")]
         public async Task<IActionResult> DelteAccountById(int id)
         {
             try
@@ -85,9 +84,8 @@ namespace MyAPI.Controllers
 
         }
 
-
         [Authorize(Roles = "Admin")]
-        [HttpPut("updateAccount/{id}/{newIdUpdate}")]
+        [HttpPost("updateAccount/{id}/{newIdUpdate}")]
         public async Task<IActionResult> UpdateAccountById(int id, int newIdUpdate)
         {
             try
@@ -101,7 +99,7 @@ namespace MyAPI.Controllers
             {
                 return BadRequest(new { Message = "Account update failed", Details = ex.Message });
             }
-        
+
         }
         [Authorize(Roles = "Admin")]
         [HttpGet("listRole")]
@@ -125,5 +123,6 @@ namespace MyAPI.Controllers
             }
 
         }
+       
     }
 }

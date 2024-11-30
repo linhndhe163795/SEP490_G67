@@ -43,27 +43,47 @@ namespace MyAPI.Repositories.Impls
 
         public async Task<Driver> CreateDriverAsync(UpdateDriverDTO updateDriverDto)
         {
-            var driver = new Driver
+            try
             {
-                UserName = updateDriverDto.UserName,
-                Name = updateDriverDto.Name,
-                NumberPhone = updateDriverDto.NumberPhone,
-                Avatar = updateDriverDto.Avatar,
-                Dob = updateDriverDto.Dob,
-                StatusWork = updateDriverDto.StatusWork,
-                Status = updateDriverDto.Status,
-            };
+                var checkUserName = await _context.Drivers.FirstOrDefaultAsync(x => x.UserName == updateDriverDto.UserName);
 
-            var typeOfDriver = await _typeOfDriverRepository.Get(updateDriverDto.TypeOfDriver);
-            if (typeOfDriver == null)
-            {
-                throw new ArgumentException("Invalid TypeOfDriver ID");
+                if (checkUserName != null)
+                {
+                    throw new Exception("User Name is exsit in system");
+                }
+                if (updateDriverDto.NumberPhone == null)
+                {
+                    throw new ArgumentNullException(nameof(updateDriverDto.NumberPhone), "NumberPhone cannot be null");
+                }
+                if (updateDriverDto.Password == null)
+                {
+                    throw new ArgumentNullException(nameof(updateDriverDto.Password), "Password cannot be null");
+                }
+                if (updateDriverDto.UserName == null)
+                {
+                    throw new ArgumentNullException(nameof(updateDriverDto.UserName), "UserName cannot be null");
+                }
+                var hashPassword = _hashPassword.HashMD5Password(updateDriverDto.Password);
+                var driver = new Driver
+                {
+                    UserName = updateDriverDto.UserName,
+                    Name = updateDriverDto.Name,
+                    NumberPhone = updateDriverDto.NumberPhone,
+                    Avatar = updateDriverDto.Avatar,
+                    Dob = updateDriverDto.Dob,
+                    License = updateDriverDto.License,
+                    Password = hashPassword,
+                    StatusWork = "Active",
+                    Status = updateDriverDto.Status,
+                    TypeOfDriver = 1
+                };
+                await Add(driver);
+                return driver;
             }
-
-            driver.TypeOfDriver = typeOfDriver.Id;
-
-            await Add(driver);
-            return driver;
+            catch (Exception ex) 
+            {
+                throw;
+            }
         }
 
         public async Task<Driver> UpdateDriverAsync(int id, UpdateDriverDTO updateDriverDto)
@@ -73,14 +93,11 @@ namespace MyAPI.Repositories.Impls
             {
                 throw new KeyNotFoundException("Driver not found");
             }
-
-            existingDriver.UserName = updateDriverDto.UserName;
             existingDriver.Name = updateDriverDto.Name;
             existingDriver.NumberPhone = updateDriverDto.NumberPhone;
             existingDriver.Avatar = updateDriverDto.Avatar;
             existingDriver.Dob = updateDriverDto.Dob;
-            existingDriver.StatusWork = updateDriverDto.StatusWork;
-            existingDriver.TypeOfDriver = updateDriverDto.TypeOfDriver;
+            existingDriver.License = updateDriverDto.License;
             existingDriver.Status = updateDriverDto.Status;
             existingDriver.UpdateAt = DateTime.UtcNow;
 

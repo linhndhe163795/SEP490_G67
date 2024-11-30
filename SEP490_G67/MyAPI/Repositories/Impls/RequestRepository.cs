@@ -1,7 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AutoMapper;
+using DocumentFormat.OpenXml.Spreadsheet;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualBasic;
 using MyAPI.DTOs;
 using MyAPI.DTOs.HistoryRentVehicle;
+using MyAPI.DTOs.PaymentDTOs;
 using MyAPI.DTOs.RequestDTOs;
 using MyAPI.DTOs.TripDTOs;
 using MyAPI.Helper;
@@ -18,20 +21,26 @@ namespace MyAPI.Repositories.Impls
         private readonly GetInforFromToken _tokenHelper;
         private readonly IRequestDetailRepository _requestDetailRepository;
         private readonly IPromotionUserRepository _promotionUserRepository;
+        private readonly IPaymentRepository _paymentRepository;
+        private readonly IMapper _mapper;
 
         public RequestRepository(SEP490_G67Context _context, IHttpContextAccessor httpContextAccessor
-            , GetInforFromToken tokenHelper, IRequestDetailRepository requestDetailRepository, IPromotionUserRepository promotionUserRepository) : base(_context)
+            , GetInforFromToken tokenHelper, IRequestDetailRepository requestDetailRepository
+            , IPromotionUserRepository promotionUserRepository, IPaymentRepository paymentRepository,
+            IMapper mapper) : base(_context)
         {
             _httpContextAccessor = httpContextAccessor;
             _tokenHelper = tokenHelper;
             _requestDetailRepository = requestDetailRepository;
             _promotionUserRepository = promotionUserRepository;
+            _paymentRepository = paymentRepository;
+            _mapper = mapper;
         }
 
         public async Task<RequestDetailDTO> GetRequestDetailByIdAsync(int requestId)
         {
             var requestDetail = await _context.RequestDetails
-                .Where(rd => rd.RequestId == requestId) 
+                .Where(rd => rd.RequestId == requestId)
                 .Select(rd => new RequestDetailDTO
                 {
                     RequestId = rd.RequestId,
@@ -59,9 +68,6 @@ namespace MyAPI.Repositories.Impls
             return requestDetail;
         }
 
-
-
-
         public async Task<bool> UpdateRequestRentCarAsync(int requestId, RequestDTOForRentCar rentVehicleAddDTO)
         {
             using var transaction = await _context.Database.BeginTransactionAsync();
@@ -75,29 +81,29 @@ namespace MyAPI.Repositories.Impls
                     throw new Exception("Invalid user ID from token.");
                 }
 
-                
+
                 var existingRequest = await _context.Requests.FindAsync(requestId);
                 if (existingRequest == null)
                 {
                     throw new Exception("Request not found.");
                 }
 
-                
+
                 if (existingRequest.UserId != userId)
                 {
                     throw new Exception("You do not have permission to update this request.");
                 }
 
-                
-                existingRequest.Status = false; 
-                existingRequest.Description = "Yêu cầu thuê xe du lịch "; 
-                existingRequest.Note = "Chờ xác nhận "; 
+
+                existingRequest.Status = false;
+                existingRequest.Description = "Yêu cầu thuê xe du lịch ";
+                existingRequest.Note = "Chờ xác nhận ";
                 existingRequest.UpdateAt = DateTime.Now;
                 existingRequest.UpdateBy = userId;
 
                 _context.Requests.Update(existingRequest);
 
-                
+
                 var existingRequestDetail = await _context.RequestDetails
                     .FirstOrDefaultAsync(rd => rd.RequestId == requestId);
 
@@ -106,22 +112,21 @@ namespace MyAPI.Repositories.Impls
                     throw new Exception("Request detail not found.");
                 }
 
-               
+
                 existingRequestDetail.StartLocation = rentVehicleAddDTO?.StartLocation;
                 existingRequestDetail.EndLocation = rentVehicleAddDTO?.EndLocation;
                 existingRequestDetail.StartTime = rentVehicleAddDTO?.StartTime;
                 existingRequestDetail.EndTime = rentVehicleAddDTO?.EndTime;
                 existingRequestDetail.Seats = rentVehicleAddDTO?.Seats;
-                existingRequestDetail.Price = rentVehicleAddDTO?.Price;
                 existingRequestDetail.UpdateAt = DateTime.Now;
                 existingRequestDetail.UpdateBy = userId;
 
                 _context.RequestDetails.Update(existingRequestDetail);
 
-                
+
                 await _context.SaveChangesAsync();
 
-                
+
                 await transaction.CommitAsync();
                 return true;
             }
@@ -131,9 +136,6 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception($"Error in UpdateRequestRentCarAsync: {ex.Message}");
             }
         }
-
-
-
 
         public async Task<bool> CreateRequestRentCarAsync(RequestDTOForRentCar rentVehicleAddDTO)
         {
@@ -148,12 +150,12 @@ namespace MyAPI.Repositories.Impls
                     throw new Exception("Invalid user ID from token.");
                 }
 
-               
+
                 var addRentVehicle = new Request
                 {
                     UserId = userId,
-                    TypeId = 2, 
-                    Status = false, 
+                    TypeId = 2,
+                    Status = false,
                     Description = "Yêu cầu thuê xe du lịch",
                     CreatedAt = DateTime.Now,
                     Note = "Chờ xác nhận",
@@ -162,33 +164,32 @@ namespace MyAPI.Repositories.Impls
                     UpdateBy = userId,
                 };
 
-                
+
                 await _context.Requests.AddAsync(addRentVehicle);
                 await _context.SaveChangesAsync();
 
-               
+
                 var addRentVehicleRequestDetails = new RequestDetail
                 {
-                    RequestId = addRentVehicle.Id, 
+                    RequestId = addRentVehicle.Id,
                     VehicleId = null,
-                    TicketId = null, 
+                    TicketId = null,
                     StartLocation = rentVehicleAddDTO?.StartLocation,
                     EndLocation = rentVehicleAddDTO?.EndLocation,
                     StartTime = rentVehicleAddDTO?.StartTime,
                     EndTime = rentVehicleAddDTO?.EndTime,
                     Seats = rentVehicleAddDTO?.Seats,
-                    Price = rentVehicleAddDTO?.Price,
                     CreatedAt = DateTime.Now,
                     CreatedBy = userId,
                     UpdateAt = DateTime.Now,
                     UpdateBy = userId,
                 };
 
-                
+                // Lưu RequestDetail vào cơ sở dữ liệu
                 await _context.RequestDetails.AddAsync(addRentVehicleRequestDetails);
                 await _context.SaveChangesAsync();
 
-                
+                // Cam kết giao dịch
                 await transaction.CommitAsync();
                 return true;
             }
@@ -198,6 +199,7 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception($"Error in CreateRequestRentVehicleAsync: {ex.Message}");
             }
         }
+
         public async Task DeleteRequestDetailAsync(int requestId, int detailId)
         {
             var detail = await _context.RequestDetails
@@ -241,7 +243,7 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception(ex.Message);
             }
         }
-          
+
         public async Task<bool> UpdateRequestVehicleAsync(int requestId, Request request)
         {
             var update = await _context.Requests.SingleOrDefaultAsync(s => s.Id == requestId);
@@ -256,8 +258,6 @@ namespace MyAPI.Repositories.Impls
             }
             return false;
         }
-
-       
 
         public async Task createRequestCancleTicket(RequestCancleTicketDTOs requestCancleTicketDTOs, int userId)
         {
@@ -338,16 +338,17 @@ namespace MyAPI.Repositories.Impls
                 requestCancleTicket.Status = true;
                 requestCancleTicket.Note = "Đã xác nhận";
                 var getTicketCancle = await (from r in _context.Requests
-                                               join rd in _context.RequestDetails
-                                               on r.Id equals rd.RequestId
-                                               where r.Id == requestId
-                                               select rd
+                                             join rd in _context.RequestDetails
+                                             on r.Id equals rd.RequestId
+                                             where r.Id == requestId
+                                             select rd
                                                ).FirstOrDefaultAsync();
                 if (getTicketCancle == null)
                 {
                     throw new NullReferenceException();
                 }
-                var inforTicketCancle = await (from t in _context.Tickets join p in _context.Payments
+                var inforTicketCancle = await (from t in _context.Tickets
+                                               join p in _context.Payments
                                                on t.Id equals p.TicketId
                                                join rd in _context.RequestDetails on t.Id equals rd.TicketId
                                                join r in _context.Requests on rd.RequestId equals r.Id
@@ -359,7 +360,7 @@ namespace MyAPI.Repositories.Impls
                 {
                     throw new Exception("Không có vé để hủy");
                 }
-                var pointOfPayment = (int) inforTicketCancle.t.Price * Helper.Constant.TICH_DIEM;
+                var pointOfPayment = (int)inforTicketCancle.t.Price * Helper.Constant.TICH_DIEM;
 
                 var updatePointUserCancle = await (from pu in _context.PointUsers
                                                    where pu.Id == (from innerPu in _context.PointUsers
@@ -368,18 +369,18 @@ namespace MyAPI.Repositories.Impls
                                                    && pu.UserId == inforTicketCancle.t.UserId
                                                    select pu
                                   ).FirstOrDefaultAsync();
-                if(updatePointUserCancle == null)
+                if (updatePointUserCancle == null)
                 {
                     throw new Exception();
                 }
-                if(updatePointUserCancle.Points <= pointOfPayment)
+                if (updatePointUserCancle.Points <= pointOfPayment)
                 {
                     var PointUserMinus = new PointUser
                     {
                         PaymentId = inforTicketCancle.p.PaymentId,
                         UserId = inforTicketCancle.t.UserId,
                         Points = 0,
-                        PointsMinus = (int) pointOfPayment,
+                        PointsMinus = (int)pointOfPayment,
                         Date = DateTime.Now,
                         CreatedAt = DateTime.Now,
                         CreatedBy = inforTicketCancle.t.UserId,
@@ -394,7 +395,7 @@ namespace MyAPI.Repositories.Impls
                     {
                         PaymentId = inforTicketCancle.p.PaymentId,
                         UserId = inforTicketCancle.t.UserId,
-                        Points = (int) (updatePointUserCancle.Points - pointOfPayment),
+                        Points = (int)(updatePointUserCancle.Points - pointOfPayment),
                         PointsMinus = (int)pointOfPayment,
                         Date = DateTime.Now,
                         CreatedAt = DateTime.Now,
@@ -452,9 +453,9 @@ namespace MyAPI.Repositories.Impls
                 var addRentVehicle = new Request
                 {
                     UserId = userId,
-                    TypeId = 4,
+                    TypeId = 7,
                     Status = false,
-                    Description = "Yêu cầu thuê xe tiện chuyến",
+                    Description = "Tài xế muốn thuê xe của hệ thống",
                     CreatedAt = DateTime.Now,
                     Note = "Chờ xác nhận",
                     CreatedBy = userId,
@@ -468,20 +469,18 @@ namespace MyAPI.Repositories.Impls
                 var addRentVehicelRequestDetails = new RequestDetail
                 {
                     RequestId = addRentVehicle.Id,
-                    VehicleId = null,
-                    TicketId = null,
                     StartLocation = rentVehicleAddDTO?.StartLocation,
                     EndLocation = rentVehicleAddDTO?.EndLocation,
                     StartTime = rentVehicleAddDTO?.StartTime,
                     EndTime = rentVehicleAddDTO?.EndTime,
                     Seats = rentVehicleAddDTO?.Seats,
                     Price = rentVehicleAddDTO?.Price,
+                    DriverId = userId,
                     CreatedAt = DateTime.Now,
                     CreatedBy = userId,
                     UpdateAt = DateTime.Now,
                     UpdateBy = userId,
                 };
-
                 await _context.RequestDetails.AddAsync(addRentVehicelRequestDetails);
                 await _context.SaveChangesAsync();
 
@@ -491,7 +490,7 @@ namespace MyAPI.Repositories.Impls
             catch (Exception ex)
             {
                 await transaction.RollbackAsync();
-                throw; 
+                throw;
             }
         }
 
@@ -501,51 +500,59 @@ namespace MyAPI.Repositories.Impls
             try
             {
                 var token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
-                int userId = _tokenHelper.GetIdInHeader(token);
+                int vehicleOwnerId = _tokenHelper.GetIdInHeader(token);
 
-                if (userId == -1)
+                if (vehicleOwnerId == -1)
                 {
                     throw new Exception("Invalid user ID from token.");
                 }
-
-                var addRentDriver = new Request
+                if (await checkVehicleOwner(vehicleOwnerId, rentDriverAddDTO.VehicleId))
                 {
-                    UserId = userId,
-                    TypeId = 5,
-                    Status = false,
-                    Description = "Yêu cầu thuê tài xế",
-                    CreatedAt = DateTime.Now,
-                    Note = "Chờ xác nhận",
-                    CreatedBy = userId,
-                    UpdateAt = DateTime.Now,
-                    UpdateBy = userId,
-                };
 
-                await _context.Requests.AddAsync(addRentDriver);
-                await _context.SaveChangesAsync();
+                    var addRentDriver = new Request
+                    {
+                        UserId = vehicleOwnerId,
+                        TypeId = 5,
+                        Status = false,
+                        Description = "Yêu cầu thuê tài xế",
+                        CreatedAt = DateTime.Now,
+                        Note = "Chờ xác nhận",
+                        CreatedBy = vehicleOwnerId,
+                        UpdateAt = DateTime.Now,
+                        UpdateBy = vehicleOwnerId,
+                    };
 
-                var addRentDriverRequestDetails = new RequestDetail
+                    await _context.Requests.AddAsync(addRentDriver);
+                    await _context.SaveChangesAsync();
+
+                    var addRentDriverRequestDetails = new RequestDetail
+                    {
+                        RequestId = addRentDriver.Id,
+                        VehicleId = rentDriverAddDTO.VehicleId,
+                        TicketId = null,
+                        StartLocation = rentDriverAddDTO?.StartLocation,
+                        EndLocation = rentDriverAddDTO?.EndLocation,
+                        StartTime = rentDriverAddDTO?.StartTime,
+                        EndTime = rentDriverAddDTO?.EndTime,
+                        Seats = rentDriverAddDTO?.Seats,
+                        Price = rentDriverAddDTO?.Price,
+                        CreatedAt = DateTime.Now,
+                        CreatedBy = vehicleOwnerId,
+                        UpdateAt = DateTime.Now,
+                        UpdateBy = vehicleOwnerId,
+                    };
+
+                    await _context.RequestDetails.AddAsync(addRentDriverRequestDetails);
+                    await _context.SaveChangesAsync();
+
+                    await transaction.CommitAsync();
+                    return true;
+
+                }
+                else
                 {
-                    RequestId = addRentDriver.Id,
-                    VehicleId = rentDriverAddDTO.VehicleId,
-                    TicketId = null,
-                    StartLocation = rentDriverAddDTO?.StartLocation,
-                    EndLocation = rentDriverAddDTO?.EndLocation,
-                    StartTime = rentDriverAddDTO?.StartTime,
-                    EndTime = rentDriverAddDTO?.EndTime,
-                    Seats = rentDriverAddDTO?.Seats,
-                    Price = rentDriverAddDTO?.Price,
-                    CreatedAt = DateTime.Now,
-                    CreatedBy = userId,
-                    UpdateAt = DateTime.Now,
-                    UpdateBy = userId,
-                };
-
-                await _context.RequestDetails.AddAsync(addRentDriverRequestDetails);
-                await _context.SaveChangesAsync();
-
-                await transaction.CommitAsync();
-                return true;
+                    throw new Exception("Not found vehicle or vehicle have driver");
+                }
             }
             catch (Exception ex)
             {
@@ -554,6 +561,28 @@ namespace MyAPI.Repositories.Impls
             }
         }
 
+        private async Task<bool> checkVehicleOwner(int vehicleOwnerId, int? vehicleId)
+        {
+            try
+            {
+                var vehicleOfOwner = await (from v in _context.Vehicles
+                                            where v.VehicleOwner == vehicleOwnerId
+                                            && v.DriverId == null
+                                            select v).ToListAsync();
+                foreach (var vehicle in vehicleOfOwner)
+                {
+                    if (vehicle.Id == vehicleId)
+                    {
+                        return true;
+                    }
+                }
+                return false;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
 
         public async Task<bool> CreateRequestCovenient(ConvenientTripDTO convenientTripDTO)
         {
@@ -642,7 +671,6 @@ namespace MyAPI.Repositories.Impls
             return true;
         }
 
-
         public async Task<bool> UpdateStatusRequestConvenient(int requestId, bool choose)
         {
             var checkRequest = await _context.Requests.FirstOrDefaultAsync(s => s.Id == requestId);
@@ -711,10 +739,10 @@ namespace MyAPI.Repositories.Impls
                 price = price / (1 - (discount / 100m));
             }
 
-            if(checkRequestDetail.VehicleId == 0 || checkRequestDetail.VehicleId == null)
+            if (checkRequestDetail.VehicleId == 0 || checkRequestDetail.VehicleId == null)
             {
                 throw new Exception("Vehicle Id null please update VehicleId before accpet!!");
-            } 
+            }
 
             var addTicket = new Ticket
             {
@@ -729,7 +757,7 @@ namespace MyAPI.Repositories.Impls
                 UserId = checkRequest.UserId,
                 VehicleId = checkRequestDetail.VehicleId,
                 TripId = tripId,
-                TypeOfTicket = typeOfTrip,
+                TypeOfTicket = Constant.VE_XE_TIEN_CHUYEN,
                 TypeOfPayment = 2,
                 Status = "Thanh toán bằng tiền mặt",
                 CreatedAt = DateTime.Now,
@@ -749,9 +777,75 @@ namespace MyAPI.Repositories.Impls
 
                 await _promotionUserRepository.DeletePromotionAfterPayment(checkRequest.UserId, promotionUserId);
             }
-
             await _context.SaveChangesAsync();
+
+            var paymentDTO = new PaymentAddDTO
+            {
+                UserId = addTicket.UserId,
+                Code = addTicket.CodePromotion,
+                Description = "",
+                Price = addTicket.PricePromotion,
+                TicketId = addTicket.Id,
+                TypeOfPayment = 2,
+                Time = DateTime.Now,
+            };
+            var paymentResult = await _paymentRepository.addPayment(paymentDTO);
+            if (paymentResult == null)
+            {
+                throw new Exception("Add Payment Fails!!");
+            }
             return true;
+        }
+
+        public async Task<List<RequestDTO>> getListRequestForUser(int userId)
+        {
+            try
+            {
+                var request = await _context.Requests.Where(x => x.UserId == userId && x.TypeId != 7).ToListAsync();
+                var requestMapper = _mapper.Map<List<RequestDTO>>(request);
+                return requestMapper;
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<List<RequestDTO>> GetListRequestForDriver(int userId)
+        {
+            try
+            {
+                var request = await _context.Requests.Where(x => x.UserId == userId && x.TypeId == 7).ToListAsync();
+                var requestMapper = _mapper.Map<List<RequestDTO>>(request);
+                return requestMapper;
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+
+        public async Task updateRequest(int requestID, RequestDetailDTO requestDetailDTO)
+        {
+            try
+            {
+                var requestDetails = await _context.RequestDetails.FirstOrDefaultAsync(x => x.RequestId == requestID);
+                requestDetails.StartLocation = requestDetailDTO.StartLocation;
+                requestDetails.EndLocation = requestDetailDTO.EndLocation;
+                requestDetails.Price = requestDetailDTO.Price;
+                requestDetails.VehicleId = requestDetails.VehicleId;
+                requestDetails.EndTime = requestDetailDTO.EndTime;
+                requestDetails.StartTime = requestDetailDTO.StartTime;
+                _context.RequestDetails.Update(requestDetails);
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
         }
     }
 }

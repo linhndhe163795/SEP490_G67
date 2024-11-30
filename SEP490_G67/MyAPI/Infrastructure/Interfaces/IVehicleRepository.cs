@@ -24,6 +24,15 @@ namespace MyAPI.Infrastructure.Interfaces
         Task<List<StartPointDTO>> GetListStartPointByVehicleId(int vehicleId);
 
         Task<bool> AssignDriverToVehicleAsync(int vehicleId, int driverId);
-        Task<int> GetNumberSeatAvaiable(int vehicleId);
+        Task<int> GetNumberSeatAvaiable(int tripId, DateTime dateTime);
+
+        Task<VehicleAddDTO> GetVehicleById(int vehicleId);
+
+        Task<List<VehicleLicenscePlateDTOs>> getLicensecePlate();
+
+        Task<List<VehicleLicenscePlateDTOs>> getVehicleByDriverId(int driverId);
+        Task<bool> checkDriver(int vehicleId,int driverId);
+        Task<bool> UpdateVehicleAsync(int id, VehicleUpdateDTO updateDTO);
+        Task<List<VehicleLicenscePlateDTOs>> getVehicleByVehicleOwner(int vehicleOwner);
     }
 }

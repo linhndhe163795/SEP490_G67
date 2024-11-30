@@ -94,13 +94,13 @@ namespace MyAPI.Controllers
                 var createdDriverDto = _mapper.Map<UpdateDriverDTO>(driver);
                 return CreatedAtAction(nameof(GetDriverById), new { id = driver.Id }, createdDriverDto);
             }
-            catch (ArgumentException ex)
+            catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }
         }
         [Authorize(Roles = "Staff")]
-        [HttpPut("{id}")]
+        [HttpPost("{id}")]
         public async Task<IActionResult> UpdateDriver(int id, [FromBody] UpdateDriverDTO updateDriverDto)
         {
             if (updateDriverDto == null)
@@ -113,13 +113,13 @@ namespace MyAPI.Controllers
                 var existingDriver = await _driverRepository.UpdateDriverAsync(id, updateDriverDto);
                 return Ok(existingDriver);
             }
-            catch (KeyNotFoundException ex)
+            catch (Exception ex)
             {
                 return NotFound(ex.Message);
             }
         }
         [Authorize(Roles = "Staff")]
-        [HttpDelete("{id}")]
+        [HttpPost("Delete/{id}")]
         public async Task<IActionResult> DeleteDriver(int id)
         {
             var driver = await _driverRepository.Get(id);
@@ -132,7 +132,7 @@ namespace MyAPI.Controllers
             return Ok("Driver deleted successfully");
         }
         [Authorize(Roles = "Staff")]
-        [HttpGet("drivers-without-vehicle-for-rent")]
+        [HttpGet("driversWithoutVehicle")]
         public async Task<IActionResult> GetDriversWithoutVehicle()
         {
             var drivers = await _driverRepository.GetDriversWithoutVehicleAsync();

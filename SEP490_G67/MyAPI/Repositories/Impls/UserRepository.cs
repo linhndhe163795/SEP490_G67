@@ -229,12 +229,16 @@ namespace MyAPI.Repositories.Impls
                 {
                     throw new Exception("User does not exist.");
                 }
-
+                if (!editProfileDTO.Password.Equals(editProfileDTO.ConfirmPassword))
+                {
+                    throw new Exception("Password not match");
+                }
+                var hashedPassword = _hassPassword.HashMD5Password(editProfileDTO.Password);
                 // Cập nhật thông tin người dùng
-                user.Username = editProfileDTO.Username;
                 user.Email = editProfileDTO.Email;
                 user.NumberPhone = editProfileDTO.NumberPhone;
                 user.Avatar = editProfileDTO.Avatar;
+                user.Password = hashedPassword;
                 user.FullName = editProfileDTO.FullName;
                 user.Address = editProfileDTO.Address;
                 user.Dob = editProfileDTO.Dob;

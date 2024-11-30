@@ -40,12 +40,12 @@ namespace MyAPI.Controllers
         }
 
         [Authorize]
-        [HttpPut("EditProfile/{userId}")]
-        public async Task<IActionResult> EditProfile(int userId, EditProfileDTO editProfileDTO)
+        [HttpPost("EditProfile")]
+        public async Task<IActionResult> EditProfile(EditProfileDTO editProfileDTO)
         {
             try
             {
-                var updatedUser = await _userRepository.EditProfile( editProfileDTO);
+                var updatedUser = await _userRepository.EditProfile(editProfileDTO);
                 return Ok();
             }
             catch (Exception ex)

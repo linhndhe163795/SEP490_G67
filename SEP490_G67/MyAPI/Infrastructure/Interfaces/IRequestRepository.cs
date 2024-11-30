@@ -24,5 +24,8 @@ namespace MyAPI.Infrastructure.Interfaces
         Task<bool> CreateRequestCovenient(ConvenientTripDTO convenientTripDTO);
 
         Task<bool> UpdateStatusRequestConvenient(int requestId, bool choose);
+        Task<List<RequestDTO>> getListRequestForUser(int userId);
+        Task updateRequest(int requestID, RequestDetailDTO requestDetailDTO);
+        Task<List<RequestDTO>> GetListRequestForDriver(int driverId);
     }
 }

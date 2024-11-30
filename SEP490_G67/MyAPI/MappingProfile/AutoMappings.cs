@@ -36,6 +36,7 @@ namespace MyAPI.MappingProfile
             CreateMap<Trip,TripVehicleDTO>().ReverseMap();
             CreateMap<Trip, DriverTripDTO>();
             CreateMap<Vehicle,VehicleDTO>().ReverseMap();
+            CreateMap<Vehicle,VehicleAddDTO>().ReverseMap();
             CreateMap<Driver,DriverTripDTO>().ReverseMap();
             CreateMap<Driver, UpdateDriverDTO>().ReverseMap();
             CreateMap<Driver, DriverDTO>().ReverseMap();
@@ -55,8 +56,8 @@ namespace MyAPI.MappingProfile
             CreateMap<Vehicle, VehicleListDTO>().ReverseMap();
             CreateMap<Review, ReviewDTO>().ReverseMap();
             CreateMap<VehicleTrip, VehicleTripDTO>().ReverseMap();
-            CreateMap<Trip,EndPointDTO>().ReverseMap();
-            CreateMap<Trip,StartPointDTO>().ReverseMap();
+            CreateMap<Trip, EndPointDTO>().ReverseMap();
+            CreateMap<Trip, StartPointDTO>().ReverseMap();
             CreateMap<Trip,TripImportDTO>().ReverseMap();
             CreateMap<TripImportDTO, Trip>().ReverseMap();
             CreateMap<LossCostType, LossCostTypeListDTO>().ReverseMap();
@@ -67,6 +68,9 @@ namespace MyAPI.MappingProfile
             CreateMap<Ticket, TicketByIdDTOs>().ReverseMap();
             CreateMap<Trip, ListCovenientStartEndDTO>().ReverseMap();
             CreateMap<Driver, ListDriverDTO>().ReverseMap();
+            CreateMap<Request, RequestDetailDTO>().ReverseMap();
+            CreateMap<RequestDetail, RequestDetailDTO>().ReverseMap();
+
 
         }
     }

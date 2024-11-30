@@ -17,13 +17,19 @@ namespace MyAPI.Controllers
     {
 
         private readonly IVehicleRepository _vehicleRepository;
+        private readonly ITripRepository _tripRepository;
         private readonly GetInforFromToken _inforFromToken;
         private readonly ServiceImport _serviceImport;
-        public VehicleController(IVehicleRepository vehicleRepository, GetInforFromToken inforFromToken, ServiceImport serviceImport)
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly GetInforFromToken _getInforFromToken;
+        public VehicleController(GetInforFromToken getInforFromToken, IVehicleRepository vehicleRepository, GetInforFromToken inforFromToken, ServiceImport serviceImport, IHttpContextAccessor httpContextAccessor, ITripRepository tripRepository)
         {
             _vehicleRepository = vehicleRepository;
             _inforFromToken = inforFromToken;
             _serviceImport = serviceImport;
+            _httpContextAccessor = httpContextAccessor;
+            _tripRepository = tripRepository;
+            _getInforFromToken = getInforFromToken;
         }
         [Authorize(Roles = "Staff")]
         [HttpGet("listVehicleType")]
@@ -71,6 +77,19 @@ namespace MyAPI.Controllers
             }
         }
 
+        [HttpGet("getInforVehicle/{id}")]
+        public async Task<IActionResult> getVehicleDetailsById(int id)
+        {
+            try
+            {
+                var vehicleDetail = await _vehicleRepository.GetVehicleById(id);
+                return Ok(vehicleDetail);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
         //[Authorize(Roles = "Staff, VehicleOwner")]
         [HttpPost("addVehicle")]
         public async Task<IActionResult> AddVehicle(VehicleAddDTO vehicleAddDTO, string? driverName)
@@ -111,8 +130,8 @@ namespace MyAPI.Controllers
 
         }
         [Authorize(Roles = "Staff, VehicleOwner")]
-        [HttpPut("updateVehicle/{id}/{driverName}")]
-        public async Task<IActionResult> UpdateVehicle(int id, string driverName)
+        [HttpPost("updateVehicle/{id}/{driverName}")]
+        public async Task<IActionResult> UpdateVehicle(int id, string driverName)   
         {
             try
             {
@@ -127,8 +146,27 @@ namespace MyAPI.Controllers
             }
 
         }
+
+        [Authorize(Roles = "Staff, VehicleOwner")]
+        [HttpPost("updateVehicleInformation/{id}")]
+        public async Task<IActionResult> UpdateVehicle(int id, [FromBody] VehicleUpdateDTO updateDTO)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var result = await _vehicleRepository.UpdateVehicleAsync(id, updateDTO);
+
+            if (!result)
+            {
+                return NotFound(new { Message = "Vehicle not found." });
+            }
+
+            return Ok(new { Message = "Vehicle updated successfully." });
+        }
         [Authorize(Roles = "Staff")]
-        [HttpDelete("deleteVehicleByStatus/{id}")]
+        [HttpPost("deleteVehicleByStatus/{id}")]
         public async Task<IActionResult> UpdateVehicle(int id)
         {
             try
@@ -150,7 +188,7 @@ namespace MyAPI.Controllers
                 return BadRequest(new { Message = "DeleteVehicle Delete failed", Details = ex.Message });
             }
         }
-        [Authorize]
+        [Authorize(Roles = "Driver,Staff")]
         [HttpGet("getStartPointTripFromVehicle/{vehicleId}")]
         public async Task<IActionResult> getStartPointTripFromVehicle(int vehicleId)
         {
@@ -168,6 +206,7 @@ namespace MyAPI.Controllers
                 return BadRequest(new { ex.Message });
             }
         }
+        [Authorize(Roles = "Driver,Staff")]
         [Authorize]
         [HttpGet("getEndPointTripFromVehicle/{vehicleId}")]
         public async Task<IActionResult> getEndPointTripFromVehicle(int vehicleId)
@@ -188,7 +227,7 @@ namespace MyAPI.Controllers
         }
 
         [Authorize(Roles = "Staff")]
-        [HttpPut("assignDriverForVehicle/{vehicleId}/{driverId}")]
+        [HttpPost("assignDriverForVehicle/{vehicleId}/{driverId}")]
         public async Task<IActionResult> AssignDriverForVehicle(int vehicleId, int driverId)
         {
             try
@@ -260,8 +299,6 @@ namespace MyAPI.Controllers
                 return BadRequest(ex.Message);
             }
         }
-
-
         [Authorize]
         [HttpPost("import_vehicle")]
         public async Task<IActionResult> importVehicel(IFormFile fileExcleVehicel)
@@ -290,17 +327,110 @@ namespace MyAPI.Controllers
                 return BadRequest(e.Message);
             }
         }
-        [HttpGet("getNumberSeatAvaiable")]
-        public async Task<IActionResult> getNumberSeatAvaiable(int vehicelId)
+        [HttpGet("getNumberSeatAvaiable/{tripId}")]
+        public async Task<IActionResult> GetNumberSeatAvailable(int tripId)
         {
             try
             {
-                var count = await _vehicleRepository.GetNumberSeatAvaiable(vehicelId);
-                return Ok(count);
+                var cookies = HttpContext.Request.Headers["Cookie"].ToString();
+                Console.WriteLine($"Cookies: {cookies}");
+
+                var date = _httpContextAccessor?.HttpContext.Session.GetString("date");
+                if (!string.IsNullOrEmpty(date) && DateTime.TryParse(date, out var parsedDate))
+                {
+                    var trip = await _tripRepository.GetTripById(tripId);
+                    if (trip != null)
+                    {
+                        if (trip.StartTime.HasValue)
+                        {
+                            var dateTime = parsedDate.Date.Add(trip.StartTime.Value);
+                            Console.WriteLine($"DateTime: {dateTime}");
+
+                            var count = await _vehicleRepository.GetNumberSeatAvaiable(tripId, dateTime);
+                            return Ok(count);
+                        }
+                        else
+                        {
+                            return BadRequest("Trip StartTime is not available.");
+                        }
+                    }
+                    else
+                    {
+                        return NotFound($"Trip with ID {tripId} was not found.");
+                    }
+                }
+                else
+                {
+                    return BadRequest("Invalid or missing date in session.");
+                }
+            }
+            catch (Exception ex)
+            {
+                // Ghi log lỗi nếu cần
+                Console.WriteLine($"Error: {ex.Message}");
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+        [HttpGet("getLicenscePlate")]
+        public async Task<IActionResult> getLicensePlateById()
+        {
+            try
+            {
+                var result = await _vehicleRepository.getLicensecePlate();
+                return Ok(result);
             }
             catch (Exception ex)
             {
                 return BadRequest(ex.Message);
+            }
+        }
+        [Authorize(Roles = "Staff")]
+        [HttpGet("getVehicleByDriverId")]
+        public async Task<IActionResult> getListVehicleByDriverId()
+        {
+            try
+            {
+                string token = Request.Headers["Authorization"];
+                if (token.StartsWith("Bearer"))
+                {
+                    token = token.Substring("Bearer ".Length).Trim();
+                }
+                if (string.IsNullOrEmpty(token))
+                {
+                    return BadRequest("Token is required.");
+                }
+                var driverId = _getInforFromToken.GetIdInHeader(token);
+                var listVehicle = await _vehicleRepository.getVehicleByDriverId(driverId);
+                return Ok(listVehicle);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [Authorize(Roles = "Staff, VehicleOwner")]
+        [HttpGet("getVehicleByVehicleOwnerId")]
+        public async Task<IActionResult> getListVehicleOfVehicleOwner()
+        {
+            try
+            {
+                string token = Request.Headers["Authorization"];
+                if (token.StartsWith("Bearer"))
+                {
+                    token = token.Substring("Bearer ".Length).Trim();
+                }
+                if (string.IsNullOrEmpty(token))
+                {
+                    return BadRequest("Token is required.");
+                }
+                var vehicleOwner = _getInforFromToken.GetIdInHeader(token);
+                var listVehicle = await _vehicleRepository.getVehicleByVehicleOwner(vehicleOwner);
+                return Ok(listVehicle);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+
             }
         }
     }

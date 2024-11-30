@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
 using AutoMapper.Configuration.Conventions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using MyAPI.DTOs;
 using MyAPI.DTOs.TicketDTOs;
+using MyAPI.DTOs.VehicleDTOs;
 using MyAPI.Helper;
 using MyAPI.Infrastructure.Interfaces;
 using MyAPI.Models;
@@ -91,7 +93,7 @@ namespace MyAPI.Repositories.Impls
             }
             catch (Exception ex)
             {
-                throw new Exception("CreateTicketByUser: " + ex.Message);
+                throw new Exception("CreateTicketByUser: " + ex.StackTrace);
             }
         }
 
@@ -127,12 +129,14 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception(ex.Message);
             }
         }
-        public async Task AcceptOrDenyRequestRentCar(int requestId, bool choose)
+
+
+        public async Task AcceptOrDenyRequestRentCar(int requestId, bool choose, int vehicleId, decimal price)
         {
             try
             {
                 var request = await _context.Requests
-                    .Include(r => r.RequestDetails) 
+                    .Include(r => r.RequestDetails)
                     .FirstOrDefaultAsync(r => r.Id == requestId);
 
                 if (request == null)
@@ -147,7 +151,7 @@ namespace MyAPI.Repositories.Impls
                     return;
                 }
 
-                var requestDetail = request.RequestDetails.FirstOrDefault(); 
+                var requestDetail = request.RequestDetails.FirstOrDefault();
                 if (requestDetail == null)
                 {
                     throw new Exception("Request details not found");
@@ -155,8 +159,8 @@ namespace MyAPI.Repositories.Impls
 
                 var ticket = new Ticket
                 {
-                    VehicleId = requestDetail.VehicleId,
-                    Price = requestDetail.Price,
+                    VehicleId = vehicleId,
+                    Price = price,
                     NumberTicket = requestDetail.Seats,
                     PointStart = requestDetail.StartLocation,
                     PointEnd = requestDetail.EndLocation,
@@ -203,6 +207,71 @@ namespace MyAPI.Repositories.Impls
             }
         }
 
+        public async Task<bool> UpdateVehicleInRequestAsync(int vehicleId, int requestId)
+        {
+            try
+            {
+
+                var requestDetail = await _context.RequestDetails.FirstOrDefaultAsync(rd => rd.RequestId == requestId);
+
+                if (requestDetail == null)
+                {
+                    return false;
+                }
+
+
+                requestDetail.VehicleId = vehicleId;
+
+
+                _context.RequestDetails.Update(requestDetail);
+                await _context.SaveChangesAsync();
+
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public async Task<IEnumerable<VehicleBasicDto>> GetVehiclesByRequestIdAsync(int requestId)
+        {
+            try
+            {
+                var requestDetail = await _context.RequestDetails
+                    .FirstOrDefaultAsync(rd => rd.RequestId == requestId);
+
+                if (requestDetail == null || requestDetail.Seats == null)
+                {
+                    return Enumerable.Empty<VehicleBasicDto>();
+                }
+
+                var seatCount = requestDetail.Seats.Value;
+
+                var vehicles = await _context.Vehicles
+                    .Where(v => v.VehicleTypeId == 3 && v.NumberSeat >= seatCount)
+                    .Take(5)
+                    .Select(v => new VehicleBasicDto
+                    {
+                        Id = v.Id,
+                        NumberSeat = v.NumberSeat,
+                        VehicleTypeId = v.VehicleTypeId,
+                        Status = v.Status,
+                        LicensePlate = v.LicensePlate,
+                        Description = v.Description
+                    })
+                    .ToListAsync();
+
+                return vehicles;
+            }
+            catch (Exception)
+            {
+                return Enumerable.Empty<VehicleBasicDto>();
+            }
+        }
+
+
+
 
         public async Task<List<ListTicketDTOs>> getAllTicket()
         {
@@ -218,7 +287,7 @@ namespace MyAPI.Repositories.Impls
             }
         }
 
-        public async Task<List<TicketNotPaid>> GetListTicketNotPaid(int vehicleId)
+        public async Task<TicketNotPaidSummary> GetListTicketNotPaid(int vehicleId)
         {
             try
             {
@@ -231,16 +300,24 @@ namespace MyAPI.Repositories.Impls
                                         on t.Id equals tk.TripId
                                         join u in _context.Users on tk.UserId equals u.Id
                                         join typeP in _context.TypeOfPayments on tk.TypeOfPayment equals typeP.Id
-                                        where typeP.Id == Constant.TIEN_MAT && v.Id == vehicleId
-                                        select new { u.FullName, tk.PricePromotion, typeP.TypeOfPayment1 }
+                                        where typeP.Id == Constant.TIEN_MAT &&
+                                        v.Id == vehicleId &&
+                                        tk.Status == "Thanh toán bằng tiền mặt" &&
+                                        tk.TimeFrom <= DateTime.Now
+                                        select new { tk.UserId, u.FullName, tk.PricePromotion, typeP.TypeOfPayment1, tk.Id }
                                        ).ToListAsync();
                 var totalPricePromotion = listTicket
-                    .GroupBy(t => t.FullName)
-                    .Select(g => new TicketNotPaid { FullName = g.Key, Price = g.Sum(x => x.PricePromotion.Value), TypeOfPayment = g.FirstOrDefault()?.TypeOfPayment1 })
+                    .GroupBy(t => new { t.UserId, t.Id })
+                    .Select(g => new TicketNotPaid { ticketId = g.Key.Id, userId = g.Key.UserId, FullName = g.FirstOrDefault()?.FullName, Price = g.Sum(x => x.PricePromotion.Value), TypeOfPayment = g.FirstOrDefault()?.TypeOfPayment1 })
                     .ToList();
+                decimal total = totalPricePromotion.Sum(t => t.Price);
+                var result = new TicketNotPaidSummary
+                {
+                    Tickets = totalPricePromotion,
+                    Total = total
 
-
-                return totalPricePromotion;
+                };
+                return result;
             }
             catch (Exception ex)
             {
@@ -272,11 +349,40 @@ namespace MyAPI.Repositories.Impls
             }
         }
 
-        public async Task UpdateStatusTicketNotPaid(int id)
+        public async Task UpdateStatusTicketNotPaid(int id, int driverId)
         {
             try
             {
                 var ticketNotPaid = await _context.Tickets.FirstOrDefaultAsync(x => x.Id == id && x.TypeOfPayment == Constant.TIEN_MAT);
+
+                var pointTicket = ticketNotPaid.PricePromotion * 10 / 100;
+
+                var paymentTicket = new Payment
+                {
+                    UserId = ticketNotPaid.UserId,
+                    Code = "NULL",
+                    Description = "THANH TOÁN TIỀN MẶT",
+                    Price = ticketNotPaid.Price,
+                    Time = DateTime.Now,
+                    CreatedAt = DateTime.Now,
+                    CreatedBy = driverId,
+                    TypeOfPayment = Constant.TIEN_MAT,
+                };
+                await _context.Payments.AddAsync(paymentTicket);
+                await _context.SaveChangesAsync();
+
+                var addPointUser = new PointUser
+                {
+                    Points = (int)pointTicket,
+                    UserId = ticketNotPaid.UserId,
+                    Date = DateTime.Now,
+                    PaymentId = paymentTicket.PaymentId,
+                    CreatedBy = driverId,
+                    CreatedAt = DateTime.Now,
+                    PointsMinus = 0
+                };
+                await _context.PointUsers.AddAsync(addPointUser);
+                await _context.SaveChangesAsync();
                 if (ticketNotPaid != null)
                 {
                     ticketNotPaid.Status = "Đã thanh toán";
@@ -360,7 +466,7 @@ namespace MyAPI.Repositories.Impls
         }
         private async Task<RevenueTicketDTO> GetRevenueForVehicleOwner(DateTime startTime, DateTime endTime, int? vehicleId, int userId)
         {
-            var query = _context.Tickets.Include(x => x.Vehicle).Where(x => x.Vehicle.VehicleOwner == userId);
+            var query = _context.Tickets.Include(x => x.Vehicle).Where(x => x.Vehicle.VehicleOwner == userId && x.CreatedAt >= startTime && x.CreatedAt <= endTime);
             if (vehicleId.HasValue && vehicleId != 0)
             {
                 query = query.Where(x => x.VehicleId == vehicleId);
@@ -392,11 +498,11 @@ namespace MyAPI.Repositories.Impls
                     {
                         PricePromotion = x.PricePromotion,
                         CreatedAt = x.CreatedAt,
-                        VehicleId = x.VehicleId,
-                        TypeOfTicket = x.TypeOfTicket,
-                        TypeOfPayment = x.TypeOfPayment                        
+                        LiscenseVehicle = x.Vehicle.LicensePlate,
+                        TypeOfTicket = x.TypeOfTicketNavigation.Description,
+                        TypeOfPayment = x.TypeOfPaymentNavigation.TypeOfPayment1,
                     }).ToListAsync();
-            var sumPriceTicket = query.Sum(x => x.Price);
+            var sumPriceTicket = query.Sum(x => x.PricePromotion);
             var combineResult = new RevenueTicketDTO
             {
                 total = sumPriceTicket,
@@ -417,6 +523,20 @@ namespace MyAPI.Repositories.Impls
             _context.Tickets.Remove(checkTicket);
             await _context.SaveChangesAsync();
             return true;
+        }
+        [Authorize]
+        public async Task<List<ListTicketDTOs>> GetTicketByUserId(int userId)
+        {
+            try
+            {
+                var listTicket = await _context.Tickets.Where(x => x.UserId == userId).ToListAsync();
+                var mapper = _mapper.Map<List<ListTicketDTOs>>(listTicket);
+                return mapper;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
         }
     }
 }

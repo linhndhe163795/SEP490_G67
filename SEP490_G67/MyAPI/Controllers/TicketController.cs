@@ -17,15 +17,17 @@ namespace MyAPI.Controllers
         private readonly ITicketRepository _ticketRepository;
         private readonly GetInforFromToken _getInforFromToken;
         private readonly IMapper _mapper;
-        public TicketController(ITicketRepository ticketRepository, GetInforFromToken getInforFromToken, IMapper mapper)
+        private readonly IVehicleRepository _vehicleRepository;
+        public TicketController(ITicketRepository ticketRepository, GetInforFromToken getInforFromToken, IMapper mapper, IVehicleRepository vehicleRepository)
         {
             _ticketRepository = ticketRepository;
             _mapper = mapper;
             _getInforFromToken = getInforFromToken;
+            _vehicleRepository = vehicleRepository;
         }
         [Authorize]
         [HttpPost("bookTicket/{tripDetailsId}")]
-        public async Task<IActionResult> createTicket(BookTicketDTOs ticketDTOs, int tripDetailsId, string? promotionCode, int numberTicket)
+        public async Task<IActionResult> createTicket([FromBody] BookTicketDTOs ticketDTOs, int tripDetailsId, string? promotionCode, int numberTicket)
         {
             try
             {
@@ -49,9 +51,9 @@ namespace MyAPI.Controllers
             }
         }
 
-        [Authorize(Roles = "Staff")]
-        [HttpPost("createTicketFromDriver/{vehicleId}")]
-        public async Task<IActionResult> creatTicketFromDriver([FromBody] TicketFromDriverDTOs ticketFromDriver, [FromForm] int vehicleId, int numberTicket)
+        [Authorize(Roles = "Driver, Staff")]
+        [HttpPost("createTicketFromDriver/{vehicleId}/{numberTicket}")]
+        public async Task<IActionResult> creatTicketFromDriver([FromBody] TicketFromDriverDTOs ticketFromDriver, int vehicleId, int numberTicket)
         {
             try
             {
@@ -75,13 +77,13 @@ namespace MyAPI.Controllers
                 return BadRequest(ex.Message);
             }
         }
-
+        [Authorize]
         [HttpPost("createTicketForRentCar")]
-        public async Task<IActionResult> CreateTicketForRentCar(int requestId, bool choose)
+        public async Task<IActionResult> CreateTicketForRentCar(int requestId, bool choose, int vehicleId, decimal price)
         {
             try
             {
-                await _ticketRepository.AcceptOrDenyRequestRentCar(requestId, choose);
+                await _ticketRepository.AcceptOrDenyRequestRentCar(requestId, choose, vehicleId, price);
 
                 return Ok("Ticket created successfully.");
             }
@@ -90,6 +92,51 @@ namespace MyAPI.Controllers
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
+
+        [HttpGet("GetTravelCarByRequest/{requestId}")]
+        public async Task<IActionResult> GetVehiclesByRequestId(int requestId)
+        {
+            try
+            {
+                // Sử dụng repository để lấy danh sách phương tiện, giới hạn tối đa 5 xe
+                var vehicles = await _ticketRepository.GetVehiclesByRequestIdAsync(requestId);
+
+                if (vehicles == null || !vehicles.Any())
+                {
+                    return NotFound(new { Message = "No vehicles found with the specified criteria." });
+                }
+
+                return Ok(vehicles);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Message = "Failed to retrieve vehicles.", Details = ex.Message });
+            }
+        }
+
+        [HttpPost("AssignTravelCarForRent")]
+        public async Task<IActionResult> UpdateVehicleInRequest(int vehicleId, int requestId)
+        {
+            try
+            {
+                
+                var result = await _ticketRepository.UpdateVehicleInRequestAsync(vehicleId, requestId);
+
+                if (result)
+                {
+                    return Ok(new { Message = "Vehicle updated successfully for the request." });
+                }
+                else
+                {
+                    return NotFound(new { Message = "Request not found or update failed." });
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Message = "Failed to update vehicle for the request.", Details = ex.Message });
+            }
+        }
+
 
         [HttpGet]
         public async Task<IActionResult> getListTicket()
@@ -106,12 +153,27 @@ namespace MyAPI.Controllers
                 return BadRequest("getListTicket: " + ex.Message);
             }
         }
-        [Authorize(Roles = "Staff")]
-        [HttpGet("tickeNotPaid")]
+        [Authorize(Roles = "Staff, Driver")]
+        [HttpGet("tickeNotPaid/{vehicleId}")]
         public async Task<IActionResult> getListTicketNotPaid(int vehicleId)
         {
             try
             {
+                string token = Request.Headers["Authorization"];
+                if (token.StartsWith("Bearer"))
+                {
+                    token = token.Substring("Bearer ".Length).Trim();
+                }
+                if (string.IsNullOrEmpty(token))
+                {
+                    return BadRequest("Token is required.");
+                }
+                var userId = _getInforFromToken.GetIdInHeader(token);
+                var role = _getInforFromToken.GetRoleFromToken(token);
+                if (role == "Driver" && await _vehicleRepository.checkDriver(vehicleId,userId) == false)
+                {
+                   return NotFound("Not Authentication");
+                }
                 var listTicket = await _ticketRepository.GetListTicketNotPaid(vehicleId);
                 if (listTicket == null) return NotFound();
                 return Ok(listTicket);
@@ -135,13 +197,23 @@ namespace MyAPI.Controllers
                 return BadRequest(ex.Message);
             }
         }
-        [Authorize(Roles = "Staff")]
-        [HttpPut("updateStatusticketNotPaid/id")]
+        [Authorize(Roles = "Driver")]
+        [HttpPost("updateStatusticketNotPaid/id")]
         public async Task<IActionResult> updateStatusTicketNotPaid(int id)
         {
             try
             {
-                await _ticketRepository.UpdateStatusTicketNotPaid(id);
+                string token = Request.Headers["Authorization"];
+                if (token.StartsWith("Bearer"))
+                {
+                    token = token.Substring("Bearer ".Length).Trim();
+                }
+                if (string.IsNullOrEmpty(token))
+                {
+                    return BadRequest("Token is required.");
+                }
+                var driverId = _getInforFromToken.GetIdInHeader(token);
+                await _ticketRepository.UpdateStatusTicketNotPaid(id,driverId);
                 return Ok();
             }
             catch (Exception ex)
@@ -149,6 +221,7 @@ namespace MyAPI.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
         [Authorize(Roles = "VehicleOwner, Staff")]
         [HttpGet("RevenueTicket/{startTime}/{endTime}")]
         public async Task<IActionResult> getRevenueTicket(DateTime startTime, DateTime endTime, int? vehicle, int? vehicleOwner)
@@ -175,8 +248,7 @@ namespace MyAPI.Controllers
             }
         }
 
-
-        [HttpDelete("deleteTicketTimeOut/{ticketId}")]
+        [HttpPost("deleteTicketTimeOut/{ticketId}")]
         public async Task<IActionResult> deleteTicketByTicketId(int ticketId)
         {
             try
@@ -196,5 +268,29 @@ namespace MyAPI.Controllers
                 return BadRequest(new { Message = "deleteTicketByTicketId failed", Details = ex.Message });
             }
         }
+        [HttpGet("listTicketByUserId")]
+        public async Task<IActionResult> getListTicketByUserId()
+        {
+            try
+            {
+                string token = Request.Headers["Authorization"];
+                if (token.StartsWith("Bearer"))
+                {
+                    token = token.Substring("Bearer ".Length).Trim();
+                }
+                if (string.IsNullOrEmpty(token))
+                {
+                    return BadRequest("Token is required.");
+                }
+                var userId = _getInforFromToken.GetIdInHeader(token);
+                var list = await _ticketRepository.GetTicketByUserId(userId);
+                return Ok(list);
+
+            }catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        
     }
 }
