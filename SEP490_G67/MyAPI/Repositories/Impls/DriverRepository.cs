@@ -64,6 +64,10 @@ namespace MyAPI.Repositories.Impls
                 {
                     throw new ArgumentNullException(nameof(updateDriverDto.UserName), "UserName cannot be null");
                 }
+                if (string.IsNullOrWhiteSpace(updateDriverDto.License))
+                {
+                    throw new ArgumentNullException(nameof(updateDriverDto.License), "License cannot be null or empty");
+                }
                 var hashPassword = _hashPassword.HashMD5Password(updateDriverDto.Password);
                 var driver = new Driver
                 {
@@ -107,6 +111,10 @@ namespace MyAPI.Repositories.Impls
             {
                 throw new Exception("NumberPhone must contain only digits.");
             }
+            if (string.IsNullOrWhiteSpace(updateDriverDto.License))
+            {
+                throw new ArgumentNullException(nameof(updateDriverDto.License), "License cannot be null or empty");
+            }
             existingDriver.Name = updateDriverDto.Name;
             existingDriver.NumberPhone = updateDriverDto.NumberPhone;
             existingDriver.Avatar = updateDriverDto.Avatar;
@@ -114,6 +122,7 @@ namespace MyAPI.Repositories.Impls
             existingDriver.License = updateDriverDto.License;
             existingDriver.Status = updateDriverDto.Status;
             existingDriver.UpdateAt = DateTime.UtcNow;
+            existingDriver.UpdateBy = Constant.STAFF;
 
             await Update(existingDriver);
             return existingDriver;
