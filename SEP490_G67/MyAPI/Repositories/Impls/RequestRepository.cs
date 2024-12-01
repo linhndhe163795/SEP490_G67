@@ -956,14 +956,14 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception(ex.Message);
             }
         }
-        public async Task updateRequest(int requestID, RequestDetailDTO requestDetailDTO)
+        public async Task updateRequest(RequestDetailDTO requestDetailDTO)
         {
             try
             {
-                var requestDetails = await _context.RequestDetails.FirstOrDefaultAsync(x => x.RequestId == requestID); 
+                var requestDetails = await _context.RequestDetails.FirstOrDefaultAsync(x => x.RequestId == requestDetailDTO.RequestId); 
                 if (requestDetails == null)
                 {
-                    throw new Exception($"RequestDetail with Request ID {requestID} not found.");
+                    throw new Exception($"RequestDetail with Request ID {requestDetailDTO.RequestId} not found.");
                 }
                 if (string.IsNullOrWhiteSpace(requestDetailDTO.StartLocation))
                 {
