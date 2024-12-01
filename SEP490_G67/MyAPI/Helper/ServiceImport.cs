@@ -2,6 +2,7 @@
 using DocumentFormat.OpenXml.Spreadsheet;
 using Microsoft.EntityFrameworkCore;
 using MyAPI.DTOs.TripDTOs;
+using MyAPI.DTOs.VehicleDTOs;
 using MyAPI.Models;
 using System.Globalization;
 
@@ -41,7 +42,7 @@ namespace MyAPI.Helper
             }
             return true;
         }
-        private bool IsValidVehicel(Vehicle vehicel)
+        private bool IsValidVehicel(VehicleImportDTO vehicel)
         {
             if (vehicel.NumberSeat <= 0 ||
                 vehicel.VehicleTypeId == null ||
@@ -184,19 +185,30 @@ namespace MyAPI.Helper
         }
 
 
-        public async Task<(List<Vehicle> validEntries, List<Vehicle> invalidEntries)> ImportVehicel(IFormFile excelFile, int staffId)
+        public async Task<(List<VehicleImportDTO> validEntries, List<VehicleImportDTO> invalidEntries)> ImportVehicel(IFormFile excelFile, int staffId)
         {
+           
+            if(excelFile == null)
+            {
+                throw new Exception("File is required");
+            }
             string path = Path.GetFileName(excelFile.FileName);
             if (!checkFile(path))
             {
-                throw new Exception("File không hợp lệ");
+                throw new Exception("File is incorrect format");
             }
-            var validEntries = new List<Vehicle>();
-            var invalidEntries = new List<Vehicle>();
+            var validEntries = new List<VehicleImportDTO>();
+            var invalidEntries = new List<VehicleImportDTO>();
             var existingLicensePlates = await _context.Vehicles.Select(v => v.LicensePlate).ToListAsync();
-
+            var vehicleOwners = await _context.Users
+                            .Include(u => u.UserRoles)
+                            .ThenInclude(ur => ur.Role)
+                            .Where(u => u.UserRoles.Any(ur => ur.Role.RoleName == "VehicleOwner"))
+                            .Select(u => u.Username)
+                            .ToListAsync();
+           
             var licensePlateSet = new HashSet<string>(existingLicensePlates);
-
+            var vehicleOwnerSet = new HashSet<string>(vehicleOwners);
             using (var stream = new MemoryStream())
             {
                 await excelFile.CopyToAsync(stream);
@@ -205,31 +217,50 @@ namespace MyAPI.Helper
                     var tripSheets = workbook.Worksheet("Vehicle");
                     foreach (var row in tripSheets.RowsUsed().Skip(1))
                     {
-                        var vehicle = new Vehicle
+                        var userNameVehicleOwner = row.Cell(5).GetValue<string>();
+                        var vehicleOwnerId = await _context.Users.Where(x => x.Username == userNameVehicleOwner).Select(x => x.Id).FirstOrDefaultAsync();
+                        var driverUserName = row.Cell(6).GetValue<string>();
+                        var driverId= await _context.Drivers.Where(x => x.UserName == driverUserName).Select(x => x.Id).FirstOrDefaultAsync();
+                        
+                        var vehicle = new VehicleImportDTO
                         {
                             NumberSeat = row.Cell(1).GetValue<Int32>(),
                             VehicleTypeId = row.Cell(2).GetValue<Int32>(),
                             LicensePlate = row.Cell(3).GetValue<string>(),
                             Description = row.Cell(4).GetValue<string>(),
+                            VehicleOwner = vehicleOwnerId,
+                            DriverId = driverId,
                             Status = true,
-                            CreatedAt = DateTime.Now,
-                            CreatedBy = staffId,
-                            UpdateAt = null,
-                            UpdateBy = null,
                         };
-
+                        var errors = new List<string>();
+                        if (driverId <= 0 && !string.IsNullOrWhiteSpace(driverUserName))
+                        {
+                            errors.Add("Invalid Driver Name in row :" +row);
+                        }
                         if (licensePlateSet.Contains(vehicle.LicensePlate))
                         {
-                            invalidEntries.Add(vehicle);
+                            errors.Add("Duplicate license plate in row :" + row);
                         }
-                        else if (IsValidVehicel(vehicle) && await checkTypeVehicle(vehicle.VehicleTypeId))
+
+                        // Kiểm tra VehicleOwner
+                        if (!vehicleOwnerSet.Contains(userNameVehicleOwner))
                         {
-                            validEntries.Add(vehicle);
-                            licensePlateSet.Add(vehicle.LicensePlate); 
+                            errors.Add("Invalid VehicleOwner in row :" + row);
+                        }
+                        if (!await checkTypeVehicle(vehicle.VehicleTypeId))
+                        {
+                            errors.Add("Invalid VehicleTypeId  in row: " +row);
+                        }
+
+                        if (errors.Count > 0)
+                        {
+                            vehicle.Errors = errors;
+                            invalidEntries.Add(vehicle);
                         }
                         else
                         {
-                            invalidEntries.Add(vehicle);
+                            validEntries.Add(vehicle);
+                            licensePlateSet.Add(vehicle.LicensePlate); // Thêm vào HashSet để kiểm tra trùng lặp
                         }
                     }
                 }

@@ -67,7 +67,6 @@ namespace MyAPI.Repositories.Impls
 
             return requestDetail;
         }
-
         public async Task<bool> UpdateRequestRentCarAsync(int requestId, RequestDTOForRentCar rentVehicleAddDTO)
         {
             using var transaction = await _context.Database.BeginTransactionAsync();
@@ -159,7 +158,6 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception($"Error in UpdateRequestRentCarAsync: {ex.Message}");
             }
         }
-
         public async Task<bool> CreateRequestRentCarAsync(RequestDTOForRentCar rentVehicleAddDTO)
         {
             using var transaction = await _context.Database.BeginTransactionAsync();
@@ -240,7 +238,6 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception($"Error in CreateRequestRentVehicleAsync: {ex.Message}");
             }
         }
-
         public async Task DeleteRequestDetailAsync(int requestId, int detailId)
         {
             var detail = await _context.RequestDetails
@@ -252,17 +249,12 @@ namespace MyAPI.Repositories.Impls
                 await _context.SaveChangesAsync();
             }
         }
-
         public async Task<Request> CreateRequestVehicleAsync(RequestDTO requestDTO)
         {
             try
             {
                 var token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
                 int userId = _tokenHelper.GetIdInHeader(token);
-                if (requestDTO == null)
-                {
-                    throw new Exception("Request data is required.");
-                }
 
                 if (string.IsNullOrWhiteSpace(requestDTO.Description))
                 {
@@ -297,7 +289,6 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception(ex.Message);
             }
         }
-
         public async Task<bool> UpdateRequestVehicleAsync(int requestId, Request request)
         {
            
@@ -333,7 +324,6 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception("An error occurred while updating the request: " + ex.Message);
             }
         }
-
         public async Task createRequestCancleTicket(RequestCancleTicketDTOs requestCancleTicketDTOs, int userId)
         {
             try
@@ -384,7 +374,6 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception(ex.Message, ex);
             }
         }
-
         public async Task<List<ResponeCancleTicketDTOs>> getListRequestCancle()
         {
             try
@@ -409,7 +398,6 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception(e.Message);
             }
         }
-
         public async Task updateStatusRequestCancleTicket(int requestId, int staffId)
         {
             try
@@ -520,7 +508,6 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception(ex.Message);
             }
         }
-
         public async Task<bool> CreateRequestRentVehicleAsync(RentVehicleAddDTO rentVehicleAddDTO)
         {
             using var transaction = await _context.Database.BeginTransactionAsync();
@@ -606,7 +593,6 @@ namespace MyAPI.Repositories.Impls
                 throw;
             }
         }
-
         public async Task<bool> CreateRequestRentDriverAsync(RequestDetailForRentDriver rentDriverAddDTO)
         {
             using var transaction = await _context.Database.BeginTransactionAsync();
@@ -702,7 +688,6 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception($"Error in CreateRequestRentDriverAsync: {ex.Message}");
             }
         }
-
         private async Task<bool> checkVehicleOwner(int vehicleOwnerId, int? vehicleId)
         {
             try
@@ -725,7 +710,6 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception(ex.Message);
             }
         }
-
         public async Task<bool> CreateRequestCovenient(ConvenientTripDTO convenientTripDTO)
         {
             // Lấy User ID từ token
@@ -812,7 +796,6 @@ namespace MyAPI.Repositories.Impls
 
             return true;
         }
-
         public async Task<bool> UpdateStatusRequestConvenient(int requestId, bool choose)
         {
             var checkRequest = await _context.Requests.FirstOrDefaultAsync(s => s.Id == requestId);
@@ -938,7 +921,6 @@ namespace MyAPI.Repositories.Impls
             }
             return true;
         }
-
         public async Task<List<RequestDTO>> getListRequestForUser(int userId)
         {
             try
@@ -957,7 +939,6 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception(ex.Message);
             }
         }
-
         public async Task<List<RequestDTO>> GetListRequestForDriver(int userId)
         {
             try
@@ -976,8 +957,6 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception(ex.Message);
             }
         }
-
-
         public async Task updateRequest(int requestID, RequestDetailDTO requestDetailDTO)
         {
             try
