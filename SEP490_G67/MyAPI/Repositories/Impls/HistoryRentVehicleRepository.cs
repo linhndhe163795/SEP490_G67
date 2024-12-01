@@ -38,10 +38,37 @@ namespace MyAPI.Repositories.Impls
             decimal price = add.price;
 
             var checkRequest = await _context.Requests.FirstOrDefaultAsync(s => s.Id == requestId);
-
+            if (checkRequest == null)
+            {
+                throw new Exception("Request not found.");
+            }
+            if (checkRequest.TypeId != 7)
+            {
+                throw new Exception("Purpose of request is not rent vehicle");
+            }
+            if (checkRequest.Note == "Đã xác nhận")
+            {
+                throw new Exception("Request has been accepted before!");
+            }
             var token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
             int userId = _tokenHelper.GetIdInHeader(token);
+            if (add.requestId < 0)
+            {
+                throw new Exception("Invalid request ID.");
+            }
+            if (!add.vehicleId.HasValue)
+            {
+                throw new Exception("Vehicle ID cannot be null.");
+            }
+            if (add.vehicleId.HasValue && add.vehicleId < 0)
+            {
+                throw new Exception("Invalid vehicle ID.");
+            }
 
+            if (add.price <= 0)
+            {
+                throw new Exception("Price must be greater than 0.");
+            }
 
             if (userId == -1)
             {

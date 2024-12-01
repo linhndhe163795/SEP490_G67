@@ -41,8 +41,21 @@ namespace MyAPI.Repositories.Impls
         }
         public async Task<RevenueDTO> RevenueStatistic(DateTime startTime, DateTime endTime, int? vehicleId, int? vehicleOwner)
         {
+
             var token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
             int userId = _tokenHelper.GetIdInHeader(token);
+
+
+            if (userId <= 0)
+            {
+                throw new Exception("Invalid user ID from token.");
+            }
+
+            // Kiểm tra logic thời gian
+            if (startTime > endTime)
+            {
+                throw new Exception("Start time must be earlier than end time.");
+            }
             var listRenvenueTicket = await _ticketRepository.getRevenueTicket(startTime, endTime, vehicleId, vehicleOwner, userId);
             var listRevenueRentVehicle = await _paymentRentVehicleRepository.getPaymentRentVehicleByDate(startTime, endTime, vehicleId, vehicleOwner, userId);
             var listLossCost = await _lossCostVehicleRepository.GetLossCostVehicleByDate(vehicleId, startTime, endTime, vehicleOwner, userId);

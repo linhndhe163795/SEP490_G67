@@ -31,10 +31,25 @@ namespace MyAPI.Infrastructure.Repositories
             var token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
             int userId = _tokenHelper.GetIdInHeader(token);
 
-            if (userId == -1)
+            if (userId <= 0)
             {
                 throw new Exception("Invalid user ID from token.");
             }
+            if (reviewDto == null)
+            {
+                throw new Exception("Review data is required.");
+            }
+
+            if (string.IsNullOrWhiteSpace(reviewDto.Description))
+            {
+                throw new Exception("Review description is required.");
+            }
+
+            if (reviewDto.TripId <= 0)
+            {
+                throw new Exception("Invalid Trip ID.");
+            }
+
             var review = new Review
             {
                 Description = reviewDto.Description,

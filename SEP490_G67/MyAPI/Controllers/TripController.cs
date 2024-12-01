@@ -50,15 +50,30 @@ namespace MyAPI.Controllers
         }
         // xe liên tỉnh
         [HttpGet("searchTrip/startPoint/endPoint/time")]
-        public async Task<IActionResult> searchTrip(string startPoint, string endPoint, DateTime time)
+        public async Task<IActionResult> SearchTrip(string startPoint, string endPoint, DateTime time)
         {
             try
             {
-                var timeonly = time.ToString("HH:ss:mm");
-                var date = time.ToString();
+                var timeonly = time.ToString("HH:mm:ss");
+                var date = time.ToString("yyyy-MM-dd");
+
                 var searchTrip = await _tripRepository.SreachTrip(startPoint, endPoint, timeonly);
-                _httpContextAccessor?.HttpContext?.Session.SetString("date", date);
-                if (searchTrip == null) return NotFound("Not found trip");
+
+                if (searchTrip == null)
+                {
+                    return NotFound("Not found trip");
+                }
+
+                var cookieOptions = new CookieOptions
+                {
+                    HttpOnly = true, // Cookie chỉ hoạt động qua HTTP
+                    Secure = true,   // Chỉ gửi qua HTTPS
+                    SameSite = SameSiteMode.Strict, // Không cho phép cross-origin
+                    Expires = DateTime.UtcNow.AddMinutes(20) // Hết hạn sau 10 phút
+                };
+
+                Response.Cookies.Append("date",date, cookieOptions);
+
                 return Ok(searchTrip);
             }
             catch (Exception ex)
@@ -66,9 +81,9 @@ namespace MyAPI.Controllers
                 return BadRequest("searchTripAPI: " + ex.Message);
             }
         }
-        [Authorize(Roles = "Staff")]
+            [Authorize(Roles = "Staff")]
         [HttpPost("addTrip")]
-        public async Task<IActionResult> addTrip(TripDTO trip, int vehicleId)
+        public async Task<IActionResult> addTrip(TripDTO trip)
         {
             try
             {
@@ -82,7 +97,7 @@ namespace MyAPI.Controllers
                     return BadRequest("Token is required.");
                 }
                 var userId = _getInforFromToken.GetIdInHeader(token);
-                await _tripRepository.AddTrip(trip, vehicleId, userId);
+                await _tripRepository.AddTrip(trip, userId);
 
                 return Ok(trip);
             }
@@ -165,7 +180,6 @@ namespace MyAPI.Controllers
 
                 await _tripRepository.UpdateTripById(id, tripDTO, userId);
                 return Ok(tripDTO);
-
             }
             catch (Exception ex)
             {
@@ -354,6 +368,24 @@ namespace MyAPI.Controllers
             {
                 return BadRequest(ex.Message);
             }
+        }
+        [Authorize]
+        [HttpGet("getListTripById/{id}")]
+        public async Task<IActionResult> getTripById(int id)
+        {
+            try
+            {
+                var tripId = await _tripRepository.getTripByTripId(id);
+                if (tripId == null) 
+                {
+                    return NotFound("Not found trip");
+                }
+                return Ok(tripId);
+
+            }catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
+            } 
         }
     }
 }

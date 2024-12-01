@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using MyAPI.DTOs.VehicleDTOs;
 using MyAPI.Helper;
 using MyAPI.Infrastructure.Interfaces;
+using MyAPI.Models;
 using MyAPI.Repositories.Impls;
 
 namespace MyAPI.Controllers
@@ -90,14 +91,14 @@ namespace MyAPI.Controllers
                 return BadRequest(ex.Message);
             }
         }
-        //[Authorize(Roles = "Staff, VehicleOwner")]
+        [Authorize(Roles = "Staff, VehicleOwner")]
         [HttpPost("addVehicle")]
-        public async Task<IActionResult> AddVehicle(VehicleAddDTO vehicleAddDTO, string? driverName)
+        public async Task<IActionResult> AddVehicle(VehicleAddDTO vehicleAddDTO)
         {
             try
             {
 
-                var isAdded = await _vehicleRepository.AddVehicleAsync(vehicleAddDTO, driverName);
+                var isAdded = await _vehicleRepository.AddVehicleAsync(vehicleAddDTO);
                 return Ok(new { Message = "Vehicle added successfully.", Vehicle = vehicleAddDTO });
 
             }
@@ -129,41 +130,50 @@ namespace MyAPI.Controllers
             }
 
         }
-        [Authorize(Roles = "Staff, VehicleOwner")]
-        [HttpPost("updateVehicle/{id}/{driverName}")]
-        public async Task<IActionResult> UpdateVehicle(int id, string driverName)   
-        {
-            try
-            {
-                var checkUpdate = await _vehicleRepository.UpdateVehicleAsync(id, driverName);
+        //[Authorize(Roles = "Staff, VehicleOwner")]
+        //[HttpPost("updateVehicle/{id}/{driverName}")]
+        //public async Task<IActionResult> UpdateVehicle(int id, string driverName)   
+        //{
+        //    try
+        //    {
+        //        var checkUpdate = await _vehicleRepository.UpdateVehicleAsync(id, driverName);
 
-                return Ok(new { Message = "Vehicle Update successfully." });
+        //        return Ok(new { Message = "Vehicle Update successfully." });
 
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { Message = "UpdateVehicle Update failed", Details = ex.Message });
-            }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return BadRequest(new { Message = "UpdateVehicle Update failed", Details = ex.Message });
+        //    }
 
-        }
+        //}
 
-        [Authorize(Roles = "Staff, VehicleOwner")]
+        [Authorize(Roles = "Staff")]
         [HttpPost("updateVehicleInformation/{id}")]
         public async Task<IActionResult> UpdateVehicle(int id, [FromBody] VehicleUpdateDTO updateDTO)
         {
-            if (!ModelState.IsValid)
+            try
             {
-                return BadRequest(ModelState);
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+
+                var result = await _vehicleRepository.UpdateVehicleAsync(id, updateDTO);
+
+                if (!result)
+                {
+                    return NotFound(new { Message = "Vehicle not found." });
+                }
+
+                return Ok(new { Message = "Vehicle updated successfully." });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
             }
 
-            var result = await _vehicleRepository.UpdateVehicleAsync(id, updateDTO);
-
-            if (!result)
-            {
-                return NotFound(new { Message = "Vehicle not found." });
-            }
-
-            return Ok(new { Message = "Vehicle updated successfully." });
+           
         }
         [Authorize(Roles = "Staff")]
         [HttpPost("deleteVehicleByStatus/{id}")]
@@ -327,6 +337,17 @@ namespace MyAPI.Controllers
                 return BadRequest(e.Message);
             }
         }
+        [HttpPost("confirmImportVehicle")]
+        public async Task<IActionResult> confirmImportVehicle(List<VehicleImportDTO> validEntries)
+        {
+            var result = await _vehicleRepository.ConfirmAddValidEntryImportVehicle(validEntries);
+
+            if (!result.IsSuccess)
+            {
+                return BadRequest(result.Errors);
+            }
+            return Ok("Import confirmed successfully!");
+        }
         [HttpGet("getNumberSeatAvaiable/{tripId}")]
         public async Task<IActionResult> GetNumberSeatAvailable(int tripId)
         {
@@ -334,8 +355,8 @@ namespace MyAPI.Controllers
             {
                 var cookies = HttpContext.Request.Headers["Cookie"].ToString();
                 Console.WriteLine($"Cookies: {cookies}");
-
-                var date = _httpContextAccessor?.HttpContext.Session.GetString("date");
+                var date = HttpContext.Request.Cookies["date"];
+                //var date = _httpContextAccessor?.HttpContext.Session.GetString("date");
                 if (!string.IsNullOrEmpty(date) && DateTime.TryParse(date, out var parsedDate))
                 {
                     var trip = await _tripRepository.GetTripById(tripId);
@@ -366,8 +387,6 @@ namespace MyAPI.Controllers
             }
             catch (Exception ex)
             {
-                // Ghi log lỗi nếu cần
-                Console.WriteLine($"Error: {ex.Message}");
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }

@@ -1,8 +1,7 @@
 ﻿namespace MyAPI.DTOs.PromotionDTOs
 {
-    public class PromotionDTO
+    public class PromotionPost
     {
-        public int Id { get; set; }
         public string CodePromotion { get; set; } = null!;
         public string? ImagePromotion { get; set; }
         public string Description { get; set; } = null!;

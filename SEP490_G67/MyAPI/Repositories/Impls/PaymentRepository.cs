@@ -40,7 +40,30 @@ namespace MyAPI.Repositories.Impls
         {
             var token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
             int userId = _tokenHelper.GetIdInHeader(token);
+            if (amout < 0)
+            {
+                throw new Exception("Amount must be greater than zero.");
+            }
 
+            if (string.IsNullOrWhiteSpace(description))
+            {
+                throw new Exception("Description is required.");
+            }
+
+            if (ticketID <= 0)
+            {
+                throw new Exception("Invalid ticket ID.");
+            }
+
+            if (typePayment <= 0)
+            {
+                throw new Exception("Invalid payment type.");
+            }
+
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                throw new Exception("Email is required.");
+            }
             if (userId == -1)
             {
                 throw new Exception("Invalid user ID from token.");
@@ -169,6 +192,35 @@ namespace MyAPI.Repositories.Impls
 
         public async Task<Payment> addPayment(PaymentAddDTO paymentAddDTO)
         {
+            if (paymentAddDTO == null)
+            {
+                throw new ArgumentNullException(nameof(paymentAddDTO), "Payment data is required.");
+            }
+
+            if (paymentAddDTO.UserId <= 0)
+            {
+                throw new Exception("Invalid User ID.");
+            }
+
+            if (string.IsNullOrWhiteSpace(paymentAddDTO.Code))
+            {
+                throw new Exception("Payment code is required.");
+            }
+
+            if (paymentAddDTO.Price < 0)
+            {
+                throw new Exception("Payment price must be greater than zero.");
+            }
+
+            if (paymentAddDTO.TicketId <= 0)
+            {
+                throw new Exception("Invalid Ticket ID.");
+            }
+
+            if (paymentAddDTO.TypeOfPayment <= 0)
+            {
+                throw new Exception("Invalid Payment Type.");
+            }
             try
             {
                 var payment = new Payment

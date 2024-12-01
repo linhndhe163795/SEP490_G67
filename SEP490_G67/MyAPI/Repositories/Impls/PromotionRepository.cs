@@ -2,6 +2,7 @@
 using DocumentFormat.OpenXml.VariantTypes;
 using Microsoft.EntityFrameworkCore;
 using MyAPI.DTOs.PromotionDTOs;
+using MyAPI.Helper;
 using MyAPI.Infrastructure.Interfaces;
 using MyAPI.Models;
 
@@ -32,18 +33,42 @@ namespace MyAPI.Repositories.Impls
             }
         }
 
-        public async Task<PromotionDTO> CreatePromotion(PromotionDTO promotionDTO)
+        public async Task<PromotionPost> CreatePromotion(PromotionPost promotionDTO)
         {
             try
             {
+                if (string.IsNullOrWhiteSpace(promotionDTO.CodePromotion))
+                {
+                    throw new ArgumentException("CodePromotion is required and cannot be empty or whitespace.", nameof(promotionDTO.CodePromotion));
+                }
+
+                if (string.IsNullOrWhiteSpace(promotionDTO.Description))
+                {
+                    throw new ArgumentException("Description is required and cannot be empty or whitespace.", nameof(promotionDTO.Description));
+                }
+
+                if (promotionDTO.Discount <= 0)
+                {
+                    throw new ArgumentException("Discount must be greater than zero.", nameof(promotionDTO.Discount));
+                }
+
+                if (promotionDTO.ExchangePoint.HasValue && promotionDTO.ExchangePoint.Value <= 0)
+                {
+                    throw new ArgumentException("ExchangePoint must be greater than zero if provided.", nameof(promotionDTO.ExchangePoint));
+                }
+
+                if (promotionDTO.StartDate.HasValue && promotionDTO.EndDate.HasValue && promotionDTO.StartDate > promotionDTO.EndDate)
+                {
+                    throw new ArgumentException("StartDate must be earlier than or equal to EndDate.", nameof(promotionDTO.StartDate));
+                }
                 var promotion = _mapper.Map<Promotion>(promotionDTO);
                 promotion.CreatedAt = DateTime.UtcNow;
-                promotion.CreatedBy = promotionDTO.CreatedBy;
+                promotion.CreatedBy = Constant.STAFF;
 
                 _context.Promotions.Add(promotion);
                 await _context.SaveChangesAsync();
 
-                return _mapper.Map<PromotionDTO>(promotion);
+                return _mapper.Map<PromotionPost>(promotion);
             }
             catch (Exception ex)
             {
@@ -51,7 +76,7 @@ namespace MyAPI.Repositories.Impls
             }
         }
 
-        public async Task<PromotionDTO> UpdatePromotion(int id, PromotionDTO promotionDTO)
+        public async Task<PromotionPost> UpdatePromotion(int id, PromotionPost promotionDTO)
         {
             try
             {
@@ -60,7 +85,43 @@ namespace MyAPI.Repositories.Impls
                 {
                     throw new Exception("Promotion not found");
                 }
+                if (string.IsNullOrWhiteSpace(promotionDTO.CodePromotion))
+                {
+                    throw new ArgumentException("CodePromotion is required and cannot be empty or whitespace.", nameof(promotionDTO.CodePromotion));
+                }
 
+                if (string.IsNullOrWhiteSpace(promotionDTO.Description))
+                {
+                    throw new ArgumentException("Description is required and cannot be empty or whitespace.", nameof(promotionDTO.Description));
+                }
+
+                if (promotionDTO.Discount <= 0 || promotionDTO.Discount > 100)
+                {
+                    throw new ArgumentException("Discount must be between 1 and 100.", nameof(promotionDTO.Discount));
+                }
+
+                if (promotionDTO.ExchangePoint.HasValue && promotionDTO.ExchangePoint.Value <= 0)
+                {
+                    throw new ArgumentException("ExchangePoint must be greater than zero if provided.", nameof(promotionDTO.ExchangePoint));
+                }
+
+                if (promotionDTO.StartDate.HasValue && promotionDTO.EndDate.HasValue && promotionDTO.StartDate >= promotionDTO.EndDate)
+                {
+                    throw new ArgumentException("StartDate must be earlier than EndDate.", nameof(promotionDTO.StartDate));
+                }
+                if (promotionDTO.StartDate >= promotionDTO.EndDate)
+                {
+                    throw new Exception("Start date must be earlier than end date.");
+                }
+
+                if (promotionDTO.Discount <= 0 || promotionDTO.Discount > 100)
+                {
+                    throw new Exception("Discount must be between 1 and 100.");
+                }
+                if (promotionDTO.Discount <= 0 || promotionDTO.Discount > 100)
+        {
+            throw new Exception("Discount must be between 1 and 100.");
+        }
                 promotion.CodePromotion = promotionDTO.CodePromotion;
                 promotion.ImagePromotion = promotionDTO.ImagePromotion;
                 promotion.Description = promotionDTO.Description;
@@ -69,16 +130,16 @@ namespace MyAPI.Repositories.Impls
                 promotion.StartDate = promotionDTO.StartDate;
                 promotion.EndDate = promotionDTO.EndDate;
                 promotion.UpdateAt = DateTime.UtcNow;
-                promotion.UpdateBy = promotionDTO.UpdateBy;
+                promotion.UpdateBy = Constant.STAFF;
 
                 _context.Promotions.Update(promotion);
                 await _context.SaveChangesAsync();
 
-                return _mapper.Map<PromotionDTO>(promotion);
+                return _mapper.Map<PromotionPost>(promotion);
             }
             catch (Exception ex)
             {
-                throw new Exception("UpdatePromotion: " + ex.Message);
+                throw new Exception(ex.Message, ex);
             }
         }
 
@@ -86,9 +147,21 @@ namespace MyAPI.Repositories.Impls
         {
             try
             {
+                if (userId <= 0)
+                {
+                    throw new ArgumentException("UserId must be greater than zero.", nameof(userId));
+                }
+
+                if (promotionId <= 0)
+                {
+                    throw new ArgumentException("PromotionId must be greater than zero.", nameof(promotionId));
+                }   
                 var pointUserId = await _context.PointUsers.OrderByDescending(x => x.Id).FirstOrDefaultAsync(x => x.UserId == userId);
                 var promotion = await _context.Promotions.FirstOrDefaultAsync(x => x.Id == promotionId);
-
+                if (promotion == null)
+                {
+                    throw new Exception("Promotion not found.");
+                }
                 bool checkPromotion = await checkPromtionUserCanChange(promotionId, userId);
                 if (!checkPromotion) 
                 {

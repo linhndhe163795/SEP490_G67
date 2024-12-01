@@ -32,8 +32,23 @@ namespace MyAPI.Repositories.Impls
 
         public async Task<IEnumerable<TypeOfPayment>> GetAll()
         {
-            return await _context.TypeOfPayments.ToListAsync();
+            try
+            {
+                var typeOfPayments = await _context.TypeOfPayments.ToListAsync();
+
+                if (typeOfPayments == null || !typeOfPayments.Any())
+                {
+                    throw new KeyNotFoundException("No types of payment found.");
+                }
+
+                return typeOfPayments;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error while retrieving types of payment: " + ex.Message);
+            }
         }
+
 
 
     }

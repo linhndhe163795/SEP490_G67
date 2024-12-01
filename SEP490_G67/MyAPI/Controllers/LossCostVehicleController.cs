@@ -52,7 +52,7 @@ namespace MyAPI.Controllers
                 }
                 var userId = _getInforFromToken.GetIdInHeader(token);
                 await _lossCostVehicleRepository.UpdateLossCostById(id, lossCostupdateDTOs, userId);
-                return Ok();
+                return Ok(lossCostupdateDTOs);
             }
             catch (Exception ex)
             {

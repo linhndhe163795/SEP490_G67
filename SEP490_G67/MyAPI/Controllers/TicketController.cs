@@ -43,6 +43,10 @@ namespace MyAPI.Controllers
                 var userId = _getInforFromToken.GetIdInHeader(token);
 
                 var ticketId = await _ticketRepository.CreateTicketByUser(promotionCode, tripDetailsId, ticketDTOs, userId, numberTicket);
+                if(ticketId > 0)
+                {
+                    Response.Cookies.Delete("date");
+                }
                 return Ok(new { ticketId, ticketDetails = ticketDTOs });
             }
             catch (Exception ex)

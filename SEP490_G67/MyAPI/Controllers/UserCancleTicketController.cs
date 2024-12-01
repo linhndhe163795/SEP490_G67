@@ -34,7 +34,7 @@ namespace MyAPI.Controllers
                 }
                 var userId = _getInforFromToken.GetIdInHeader(token);
                 await _userCancleTicketRepository.AddUserCancleTicket(addUserCancleTicketDTOs, userId);
-                return Ok();
+                return Ok("Cancle ticket successfull");
             }
             catch (Exception ex)
             {

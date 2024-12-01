@@ -40,11 +40,42 @@ namespace MyAPI.Repositories.Impls
             bool choose = add.choose;
             int? driverId = add.driverId;
             decimal price = add.price;
+            if (add.requestId <= 0)
+            {
+                throw new Exception("Invalid request ID.");
+            }
+            if (!add.driverId.HasValue)
+            {
+                throw new Exception("Driver ID cannot be null.");
+            }
+            if (add.driverId.HasValue && add.driverId <= 0)
+            {
+                throw new Exception("Invalid driver ID.");
+            }
+            if (add.price == null)
+            {
+                throw new Exception("Price cannot be null.");
+            }
+            if (add.price <= 0)
+            {
+                throw new Exception("Price must be greater than 0.");
+            }
             try
             {
                 var checkRequest = await _context.Requests.FirstOrDefaultAsync(s => s.Id == requestId);
+                if (checkRequest == null)
+                {
+                    throw new Exception("Request not found.");
+                }
 
-               
+                if (checkRequest.TypeId != 4)
+                {
+                    throw new Exception("Purpose of request is not rent driver");
+                }
+                if(checkRequest.Note == "Đã xác nhận")
+                {
+                    throw new Exception("Request has been accepted!");
+                }
                 var token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
                 int userId = _tokenHelper.GetIdInHeader(token);
 
@@ -170,6 +201,18 @@ namespace MyAPI.Repositories.Impls
         {
             try
             {
+                if (startDate > endDate)
+                {
+                    throw new Exception("Start date must be earlier than or equal to end date.");
+                }
+                if (vehicleId.HasValue && vehicleId < 0)
+                {
+                    throw new Exception("Invalid vehicle ID.");
+                }
+                if (vehicleOwnerId.HasValue && vehicleOwnerId < 0)
+                {
+                    throw new Exception("Invalid vehicle owner ID.");
+                }
                 var token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
                 int userId = _tokenHelper.GetIdInHeader(token);
 
@@ -215,8 +258,19 @@ namespace MyAPI.Repositories.Impls
             };
             return combine;
         }
-        private Task<TotalPayementRentDriver> GetRentDriverTotalForOwner(DateTime startDate, DateTime endDate, int? vehicleId, int? vehicleOwner)
+        private async Task<TotalPayementRentDriver> GetRentDriverTotalForOwner(DateTime startDate, DateTime endDate, int? vehicleId, int? vehicleOwner)
         {
+            if (startDate > endDate)
+            {
+                throw new Exception("Start date must be earlier than or equal to end date.");
+            }
+
+            if (vehicleOwner < 0 || vehicleOwner == null)
+            {
+                throw new Exception("Invalid vehicle owner ID.");
+            }
+
+
             IQueryable<PaymentRentDriver> query = _context.PaymentRentDrivers.Where(x => x.CreatedAt >= startDate && x.CreatedAt <= endDate);
             if (vehicleId != 0 && vehicleId.HasValue)
             {
@@ -226,11 +280,27 @@ namespace MyAPI.Repositories.Impls
             {
                 query = query.Include(x => x.HistoryRentDriver).ThenInclude(hrd => hrd.Vehicle).Where(x => x.HistoryRentDriver.Vehicle.VehicleOwner == vehicleOwner);
             }
-            return GetRentDriver(query);
+            var result = await GetRentDriver(query);
+            if (result == null)
+            {
+                throw new Exception("No rent driver data found for the specified criteria.");
+            }
+
+            return result;
 
         }
         private Task<TotalPayementRentDriver> GetRentDriverTotalForStaff(DateTime startDate, DateTime endDate, int? vehicleId, int? vehicleOwner)
         {
+            if (startDate > endDate)
+            {
+                throw new Exception("Start date must be earlier than or equal to end date.");
+            }
+
+            if (vehicleOwner < 0 || vehicleOwner == null)
+            {
+                throw new Exception("Invalid vehicle owner ID.");
+            }
+
             IQueryable<PaymentRentDriver> query = _context.PaymentRentDrivers.Where(x => x.CreatedAt >= startDate && x.CreatedAt <= endDate);
             if (vehicleId != 0 && vehicleId.HasValue)
             {
@@ -244,6 +314,16 @@ namespace MyAPI.Repositories.Impls
         }
         private Task<TotalPayementRentDriver> GetRentDriverTotalForDriver(DateTime startDate, DateTime endDate, int driverId)
         {
+            if (startDate > endDate)
+            {
+                throw new Exception("Start date must be earlier than or equal to end date.");
+            }
+
+            if (driverId < 0 || driverId == null)
+            {
+                throw new Exception("Invalid vehicle driver ID.");
+            }
+
             IQueryable<PaymentRentDriver> query = _context.PaymentRentDrivers.Where(x => x.CreatedAt >= startDate && x.CreatedAt <= endDate);
             if(driverId != 0)
             {
@@ -304,7 +384,15 @@ namespace MyAPI.Repositories.Impls
         {
             try
             {
-                
+                if (driverId < 0)
+                {
+                    throw new Exception("Invalid driver ID.");
+                }
+
+                if (requestId < 0)
+                {
+                    throw new Exception("Invalid request ID.");
+                }
                 var requestDetail = await _context.RequestDetails.FirstOrDefaultAsync(rd => rd.RequestId == requestId);
 
                 if (requestDetail == null)

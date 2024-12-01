@@ -33,15 +33,16 @@ namespace MyAPI.Repositories.Impls
         public async Task<TypeOfDriver> CreateTypeOfDriverAsync(UpdateTypeOfDriverDTO updateTypeOfDriverDto)
         {
 
+            if (updateTypeOfDriverDto == null)
+            {
+                throw new ArgumentNullException(nameof(updateTypeOfDriverDto), "Type of Driver data cannot be null.");
+            }
 
-            // Map DTO to Entity
             var typeOfDriver = _mapper.Map<TypeOfDriver>(updateTypeOfDriverDto);
 
-            // Set thêm thông tin người tạo
             typeOfDriver.CreatedBy = 1;
             typeOfDriver.CreatedAt = DateTime.UtcNow;
 
-            // Add the new type of driver to the context
             _context.TypeOfDrivers.Add(typeOfDriver);
             await _context.SaveChangesAsync();
 
@@ -52,21 +53,26 @@ namespace MyAPI.Repositories.Impls
         {
 
 
-            // Find existing TypeOfDriver by ID
+            if (id <= 0)
+            {
+                throw new ArgumentException("ID must be greater than 0.");
+            }
+
+            if (updateTypeOfDriverDto == null)
+            {
+                throw new ArgumentNullException(nameof(updateTypeOfDriverDto), "Type of Driver data cannot be null.");
+            }
             var existingTypeOfDriver = await _context.TypeOfDrivers.FindAsync(id);
             if (existingTypeOfDriver == null)
             {
                 throw new KeyNotFoundException("Type of Driver not found");
             }
 
-            // Update the existing entity with new values
             _mapper.Map(updateTypeOfDriverDto, existingTypeOfDriver);
 
-            // Set thêm thông tin người cập nhật
             existingTypeOfDriver.UpdateBy = 1;
             existingTypeOfDriver.UpdateAt = DateTime.UtcNow;
 
-            // Save changes
             _context.TypeOfDrivers.Update(existingTypeOfDriver);
             await _context.SaveChangesAsync();
 
@@ -75,28 +81,49 @@ namespace MyAPI.Repositories.Impls
 
         public async Task Delete(TypeOfDriver typeOfDriver, string token)
         {
-            // Lấy ID từ token để kiểm tra quyền hoặc log nếu cần
+            if (typeOfDriver == null)
+            {
+                throw new ArgumentNullException(nameof(typeOfDriver), "Type of Driver data cannot be null.");
+            }
+
+            if (string.IsNullOrWhiteSpace(token))
+            {
+                throw new ArgumentException("Token cannot be null or empty.");
+            }
             int userId = _tokenHelper.GetIdInHeader(token);
             if (userId == -1)
             {
                 throw new UnauthorizedAccessException("Invalid token.");
             }
 
-            // Remove the entity from the context
             _context.TypeOfDrivers.Remove(typeOfDriver);
             await _context.SaveChangesAsync();
         }
 
         public async Task<IEnumerable<TypeOfDriver>> GetAll()
         {
-            // Return all types of drivers
-            return await _context.TypeOfDrivers.ToListAsync();
+            var typeOfDrivers = await _context.TypeOfDrivers.ToListAsync();
+            if (typeOfDrivers == null || !typeOfDrivers.Any())
+            {
+                throw new KeyNotFoundException("No types of drivers found.");
+            }
+
+            return typeOfDrivers;
         }
 
         public async Task<TypeOfDriver> Get(int id)
         {
-            // Find type of driver by ID
-            return await _context.TypeOfDrivers.FindAsync(id);
+            if (id <= 0)
+            {
+                throw new ArgumentException("ID must be greater than 0.");
+            }
+            var typeOfDriver = await _context.TypeOfDrivers.FindAsync(id);
+            if (typeOfDriver == null)
+            {
+                throw new KeyNotFoundException("Type of Driver not found.");
+            }
+
+            return typeOfDriver;
         }
 
 

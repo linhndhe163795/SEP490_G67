@@ -8,6 +8,7 @@ using MyAPI.Helper;
 using MyAPI.Infrastructure.Interfaces;
 using MyAPI.Models;
 using System.Globalization;
+using System.Text.RegularExpressions;
 
 namespace MyAPI.Repositories.Impls
 {
@@ -49,7 +50,7 @@ namespace MyAPI.Repositories.Impls
 
                 if (checkUserName != null)
                 {
-                    throw new Exception("User Name is exsit in system");
+                    throw new Exception("User Name is exist in system");
                 }
                 if (updateDriverDto.NumberPhone == null)
                 {
@@ -62,6 +63,10 @@ namespace MyAPI.Repositories.Impls
                 if (updateDriverDto.UserName == null)
                 {
                     throw new ArgumentNullException(nameof(updateDriverDto.UserName), "UserName cannot be null");
+                }
+                if (string.IsNullOrWhiteSpace(updateDriverDto.License))
+                {
+                    throw new ArgumentNullException(nameof(updateDriverDto.License), "License cannot be null or empty");
                 }
                 var hashPassword = _hashPassword.HashMD5Password(updateDriverDto.Password);
                 var driver = new Driver
@@ -88,10 +93,27 @@ namespace MyAPI.Repositories.Impls
 
         public async Task<Driver> UpdateDriverAsync(int id, UpdateDriverDTO updateDriverDto)
         {
+            if (updateDriverDto == null)
+            {
+                throw new ArgumentNullException(nameof(updateDriverDto), "Update data is required.");
+            }
+
             var existingDriver = await Get(id);
             if (existingDriver == null)
             {
-                throw new KeyNotFoundException("Driver not found");
+                throw new Exception("Driver not found");
+            }
+            if (string.IsNullOrWhiteSpace(updateDriverDto.Name))
+            {
+                throw new Exception("Name cannot be null or empty.");
+            }
+            if (!string.IsNullOrEmpty(updateDriverDto.NumberPhone) && !Regex.IsMatch(updateDriverDto.NumberPhone, @"^\d+$"))
+            {
+                throw new Exception("NumberPhone must contain only digits.");
+            }
+            if (string.IsNullOrWhiteSpace(updateDriverDto.License))
+            {
+                throw new ArgumentNullException(nameof(updateDriverDto.License), "License cannot be null or empty");
             }
             existingDriver.Name = updateDriverDto.Name;
             existingDriver.NumberPhone = updateDriverDto.NumberPhone;
@@ -100,6 +122,7 @@ namespace MyAPI.Repositories.Impls
             existingDriver.License = updateDriverDto.License;
             existingDriver.Status = updateDriverDto.Status;
             existingDriver.UpdateAt = DateTime.UtcNow;
+            existingDriver.UpdateBy = Constant.STAFF;
 
             await Update(existingDriver);
             return existingDriver;
@@ -160,6 +183,20 @@ namespace MyAPI.Repositories.Impls
 
         public async Task<bool> checkLogin(LoginDriverDTO login)
         {
+            if (login == null)
+            {
+                throw new ArgumentNullException(nameof(login), "Login data is required.");
+            }
+
+            if (string.IsNullOrWhiteSpace(login.UserName) && string.IsNullOrWhiteSpace(login.Email))
+            {
+                throw new Exception("Either UserName or Email must be provided.");
+            }
+
+            if (string.IsNullOrWhiteSpace(login.Password))
+            {
+                throw new Exception("Password is required.");
+            }
             try
             {
                 var hashPassword = _hashPassword.HashMD5Password(login.Password);

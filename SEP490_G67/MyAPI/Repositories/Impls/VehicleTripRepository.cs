@@ -11,17 +11,38 @@ namespace MyAPI.Repositories.Impls
 
         public Task addVehiceleToTrip(IFormFile tripData)
         {
-          throw new NotImplementedException();
+            throw new NotImplementedException();
         }
 
         public async Task assginVehicleToTrip(int staffId, List<int> vehicleId, int tripId)
         {
             try
             {
+                if (staffId <= 0)
+                {
+                    throw new ArgumentException("Staff ID must be greater than 0.");
+                }
+
+                if (tripId <= 0)
+                {
+                    throw new ArgumentException("Trip ID must be greater than 0.");
+                }
+
                 if (vehicleId == null)
                 {
-                    throw new NullReferenceException("Không có xe nào hợp lệ");
+                    throw new ArgumentNullException(nameof(vehicleId), "Vehicle ID list cannot be null.");
                 }
+
+                if (!vehicleId.Any())
+                {
+                    throw new ArgumentException("Vehicle ID list cannot be empty.");
+                }
+
+                if (vehicleId.Any(id => id <= 0))
+                {
+                    throw new ArgumentException("Each Vehicle ID must be greater than 0.");
+                }
+
                 List<VehicleTrip> vehicleTrip = new List<VehicleTrip>();
                 for (int i = 0; i < vehicleId.Count; i++)
                 {
@@ -34,14 +55,16 @@ namespace MyAPI.Repositories.Impls
                     };
                     vehicleTrip.Add(vht);
                 }
+
                 await _context.AddRangeAsync(vehicleTrip);
                 await _context.SaveChangesAsync();
             }
             catch (Exception ex)
             {
-                throw new Exception(ex.Message);
+                throw new Exception($"An error occurred while assigning vehicles to the trip: {ex.Message}");
             }
         }
+
 
 
     }
