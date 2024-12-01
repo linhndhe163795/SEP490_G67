@@ -115,6 +115,18 @@ namespace MyAPI.Repositories.Impls
                 var promotionUserMapper = _mapper.Map<PromotionUser>(promotionUserUsed);
                 if (promotionUser != null) _context.PromotionUsers.Remove(promotionUserMapper);
                 await _context.SaveChangesAsync();
+                var pointUser = new PointUser
+                {
+                    Points = (int?)((int?) createTicket.PricePromotion * Constant.TICH_DIEM),
+                    UserId = userId,
+                    PointsMinus = 0,
+                    CreatedAt = DateTime.Now,
+                    CreatedBy = userId,
+                    UpdateAt = DateTime.Now,
+                    UpdateBy = userId
+                };
+                _context.PointUsers.Add(pointUser);
+                await _context.SaveChangesAsync();
                 return ticketId;
             }
             catch (Exception ex)

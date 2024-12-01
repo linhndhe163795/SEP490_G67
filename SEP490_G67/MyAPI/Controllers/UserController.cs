@@ -46,7 +46,7 @@ namespace MyAPI.Controllers
             try
             {
                 var updatedUser = await _userRepository.EditProfile(editProfileDTO);
-                return Ok();
+                return Ok("Update user profile successfull");
             }
             catch (Exception ex)
             {

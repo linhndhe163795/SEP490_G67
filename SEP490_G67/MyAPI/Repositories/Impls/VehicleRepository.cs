@@ -951,7 +951,10 @@ namespace MyAPI.Repositories.Impls
                     .ToListAsync();
 
                 var vehicleOwnerSet = new HashSet<int>(vehicleOwners.Select(v => v.Id));
-
+                var existingLicensePlates = await _context.Vehicles
+                                            .Select(v => v.LicensePlate)
+                                            .ToListAsync();
+                var licensePlateSet = new HashSet<string>(existingLicensePlates);
                 int rowEntries = 1;
                 var drivers = await _context.Drivers
                             .Select(d => d.Id)
@@ -984,18 +987,30 @@ namespace MyAPI.Repositories.Impls
                             ErrorMessage = "License plate cannot be null or empty."
                         });
                     }
-                    else if (!Regex.IsMatch(entry.LicensePlate, licensePlatePattern))
+                    else
                     {
-                        errors.Add(new ValidationErrorDTO
+                        if (!Regex.IsMatch(entry.LicensePlate, licensePlatePattern))
                         {
-                            Row = rowEntries,
-                            ErrorMessage = "Invalid license plate format. Expected format: 99A-99999."
-                        });
+                            errors.Add(new ValidationErrorDTO
+                            {
+                                Row = rowEntries,
+                                ErrorMessage = "Invalid license plate format. Expected format: 99A-99999."
+                            });
+                        }
+                        // Kiểm tra trùng lặp với cơ sở dữ liệu
+                        if (licensePlateSet.Contains(entry.LicensePlate))
+                        {
+                            errors.Add(new ValidationErrorDTO
+                            {
+                                Row = rowEntries,
+                                ErrorMessage = "Duplicate LicensePlate found in database."
+                            });
+                        }
                     }
 
                     if (entry.VehicleTypeId != Constant.XE_TIEN_CHUYEN &&
-                        entry.VehicleTypeId != Constant.XE_DU_LICH &&
-                        entry.VehicleTypeId != Constant.XE_LIEN_TINH)
+                    entry.VehicleTypeId != Constant.XE_DU_LICH &&
+                    entry.VehicleTypeId != Constant.XE_LIEN_TINH)
                     {
                         errors.Add(new ValidationErrorDTO
                         {
@@ -1012,8 +1027,6 @@ namespace MyAPI.Repositories.Impls
                             ErrorMessage = "Invalid VehicleOwner. The specified user does not have the role 'VehicleOwner'."
                         });
                     }
-
-                    
                     rowEntries++;
                 }
 

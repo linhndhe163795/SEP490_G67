@@ -328,25 +328,10 @@ namespace MyAPI.Repositories.Impls
         {
             try
             {
-                if (requestCancleTicketDTOs == null)
-                {
-                    throw new Exception("Request data is required.");
-                }
+                
                 if (userId < 0)
                 {
                     throw new Exception("Invalid user ID.");
-                }
-
-                DateTime dateTimeCancle = DateTime.Now.AddHours(-2);
-                var listTicketId = await _context.Tickets.Where(x => x.UserId == userId && x.TimeFrom <= dateTimeCancle).ToListAsync();
-                if (!listTicketId.Any())
-                {
-                    throw new Exception("Không có vé của nào của user");
-                }
-                var ticketToCancel = listTicketId.FirstOrDefault(ticket => ticket.Id == requestCancleTicketDTOs.TicketId);
-                if (ticketToCancel == null)
-                {
-                    throw new Exception("Không có vé hợp lệ để hủy");
                 }
                 var RequestCancleTicket = new Request
                 {
@@ -478,6 +463,7 @@ namespace MyAPI.Repositories.Impls
                     _context.PointUsers.Add(PointUserMinus);
                 }
                 inforTicketCancle.t.Price = 0;
+                inforTicketCancle.t.PricePromotion = 0;
                 inforTicketCancle.t.Status = "Hủy vé";
                 inforTicketCancle.p.Price = 0;
                 var UserCancleTicket = new UserCancleTicket
@@ -498,9 +484,9 @@ namespace MyAPI.Repositories.Impls
                     Password = "jetj haze ijdw euci",
                     ToEmail = inforTicketCancle.u.Email,
                     Subject = "Xác nhận hủy vé",
-                    Body = "Hệ thống đã xác nhận hủy vé xe chuyến đi: " + inforTicketCancle.t.PointStart + " - " + inforTicketCancle.t.PointEnd,
+                    Body = "Hệ thống đã xác nhận hủy vé xe chuyến đi: " + inforTicketCancle.t.PointStart + " - " + inforTicketCancle.t.PointEnd
+                      + ". Hệ thống xin phép trừ " + pointOfPayment + "điểm tích lũy của bạn.",
                 };
-
                 await _context.SaveChangesAsync();
             }
             catch (Exception ex)
