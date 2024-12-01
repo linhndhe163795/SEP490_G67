@@ -49,6 +49,7 @@ namespace MyAPI.MappingProfile
             CreateMap<Ticket, TicketDTOs>().ReverseMap();
             CreateMap<Ticket, ListTicketDTOs>().ReverseMap();
             CreateMap<Promotion, PromotionDTO>().ReverseMap();
+            CreateMap<Promotion, PromotionPost>().ReverseMap();
             CreateMap<PromotionUser, PromotionUserDTO>().ReverseMap();
             CreateMap<TripDetail, StartPointTripDetails>().ReverseMap();
             CreateMap<TripDetail, EndPointTripDetails>().ReverseMap();

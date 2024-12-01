@@ -22,9 +22,15 @@ namespace MyAPI.Repositories.Impls
 
         public async Task<LossCostType> CreateLossCostType(LossCostTypeAddDTO lossCostTypeAddDTO)
         {
-            if(lossCostTypeAddDTO.Description == null)
+            if (string.IsNullOrWhiteSpace(lossCostTypeAddDTO.Description))
             {
-                throw new Exception("Description not null");
+                throw new Exception("Description cannot be null, empty, or whitespace.");
+            }
+            var existingLossCostType = await _context.LossCostTypes.FirstOrDefaultAsync(lct => lct.Description == lossCostTypeAddDTO.Description);
+
+            if (existingLossCostType != null)
+            {
+                throw new Exception("A Loss Cost Type with the same description already exists.");
             }
             var token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
 
@@ -70,6 +76,20 @@ namespace MyAPI.Repositories.Impls
 
         public async Task<bool> UpdateLossCostType(int id, LossCostTypeAddDTO lossCostTypeAddDTO)
         {
+            if (string.IsNullOrWhiteSpace(lossCostTypeAddDTO.Description))
+            {
+                throw new Exception("Description cannot be null, empty, or whitespace.");
+            }
+            var existingLossCostType = await _context.LossCostTypes.FirstOrDefaultAsync(lct => lct.Description == lossCostTypeAddDTO.Description);
+
+            if (existingLossCostType != null)
+            {
+                throw new Exception("A Loss Cost Type with the same description already exists.");
+            }
+            if (id == null)
+            {
+                throw new Exception("Id can not be null");
+            }
 
             var token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
 

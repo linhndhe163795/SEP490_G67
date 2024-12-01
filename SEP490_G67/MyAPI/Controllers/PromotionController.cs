@@ -69,7 +69,7 @@ namespace MyAPI.Controllers
         }
         [Authorize(Roles = "Staff")]
         [HttpPost("CreatePromotion")]
-        public async Task<IActionResult> CreatePromotion([FromBody] PromotionDTO promotionDTO)
+        public async Task<IActionResult> CreatePromotion([FromBody] PromotionPost promotionDTO)
         {
             try
             {
@@ -147,9 +147,19 @@ namespace MyAPI.Controllers
         {
             try
             {
+                if (PromotionId <= 0)
+                {
+                    return BadRequest("PromotionId must be greater than zero.");
+                }
+
+                if (userId <= 0)
+                {
+                    return BadRequest("UserId must be greater than zero.");
+                }
                 var getPromotionById = await _promotionRepository.Get(PromotionId);
                 if (getPromotionById == null) return NotFound("Not found promotion had id = " + PromotionId);
                 var user = await _userRepository.Get(userId);
+
                 if (user == null) return NotFound("Not found user had id = " + userId);
                 PromotionUser pu = new PromotionUser
                 {
@@ -158,7 +168,7 @@ namespace MyAPI.Controllers
                     PromotionId = PromotionId
                 };
                 await _promotionUserRepository.Add(pu);
-                return Ok();
+                return Ok("Successfully");
             }
             catch (Exception ex)
             {
@@ -167,7 +177,7 @@ namespace MyAPI.Controllers
         }
         [Authorize(Roles = "Staff")]
         [HttpPost("givePromotionAllUser")]
-        public async Task<IActionResult> GivePromotionAllUser(PromotionDTO promotionDTO)
+        public async Task<IActionResult> GivePromotionAllUser(PromotionPost promotionDTO)
         {
             try
             {

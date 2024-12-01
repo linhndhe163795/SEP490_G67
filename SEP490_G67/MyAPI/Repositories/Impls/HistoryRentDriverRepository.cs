@@ -40,21 +40,22 @@ namespace MyAPI.Repositories.Impls
             bool choose = add.choose;
             int? driverId = add.driverId;
             decimal price = add.price;
-            if (add == null)
-            {
-                throw new ArgumentNullException(nameof(add), "Input data is required.");
-            }
-
             if (add.requestId <= 0)
             {
                 throw new Exception("Invalid request ID.");
             }
-
+            if (!add.driverId.HasValue)
+            {
+                throw new Exception("Driver ID cannot be null.");
+            }
             if (add.driverId.HasValue && add.driverId <= 0)
             {
                 throw new Exception("Invalid driver ID.");
             }
-
+            if (add.price == null)
+            {
+                throw new Exception("Price cannot be null.");
+            }
             if (add.price <= 0)
             {
                 throw new Exception("Price must be greater than 0.");
@@ -63,8 +64,19 @@ namespace MyAPI.Repositories.Impls
             try
             {
                 var checkRequest = await _context.Requests.FirstOrDefaultAsync(s => s.Id == requestId);
+                if (checkRequest == null)
+                {
+                    throw new Exception("Request not found.");
+                }
 
-               
+                if (checkRequest.TypeId != 4)
+                {
+                    throw new Exception("Purpose of request is not rent driver");
+                }
+                if(checkRequest.Note == "Đã xác nhận")
+                {
+                    throw new Exception("Request has been accepted!");
+                }
                 var token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
                 int userId = _tokenHelper.GetIdInHeader(token);
 

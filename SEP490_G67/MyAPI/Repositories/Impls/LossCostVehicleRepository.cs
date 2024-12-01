@@ -22,8 +22,33 @@ namespace MyAPI.Repositories.Impls
             {
                 if (lossCostAddDTOs == null)
                 {
-                    throw new NullReferenceException();
+                    throw new ArgumentNullException(nameof(lossCostAddDTOs), "LossCostAddDTOs cannot be null.");
                 }
+                if (lossCostAddDTOs.VehicleId <= 0)
+                {
+                    throw new ArgumentException("VehicleId must be a positive number.", nameof(lossCostAddDTOs.VehicleId));
+                }
+
+                if (lossCostAddDTOs.LossCostTypeId <= 0)
+                {
+                    throw new ArgumentException("LossCostTypeId must be a positive number.", nameof(lossCostAddDTOs.LossCostTypeId));
+                }
+
+                if (lossCostAddDTOs.Price <= 0)
+                {
+                    throw new ArgumentException("Price must be greater than zero.", nameof(lossCostAddDTOs.Price));
+                }
+
+                if (string.IsNullOrWhiteSpace(lossCostAddDTOs.Description))
+                {
+                    throw new ArgumentException("Description cannot be null, empty, or whitespace.", nameof(lossCostAddDTOs.Description));
+                }
+
+                if (lossCostAddDTOs.DateIncurred == default || lossCostAddDTOs.DateIncurred > DateTime.Now)
+                {
+                    throw new ArgumentException("DateIncurred must be a valid date and not in the future.", nameof(lossCostAddDTOs.DateIncurred));
+                }
+                
                 lossCostAddDTOs.CreatedBy = userID;
                 lossCostAddDTOs.CreatedAt = DateTime.Now;
                 var lossCostAddMapper = _mapper.Map<LossCost>(lossCostAddDTOs);
@@ -209,7 +234,38 @@ namespace MyAPI.Repositories.Impls
                 {
                     throw new Exception("Invalid ID provided.");
                 }
+                if (id == null)
+                {
+                    throw new Exception("Invalid ID provided.");
+                }
+                if (lossCostupdateDTOs == null)
+                {
+                    throw new ArgumentNullException(nameof(lossCostupdateDTOs), "LossCostAddDTOs cannot be null.");
+                }
+                if (lossCostupdateDTOs.VehicleId <= 0)
+                {
+                    throw new ArgumentException("VehicleId must be a positive number.", nameof(lossCostupdateDTOs.VehicleId));
+                }
 
+                if (lossCostupdateDTOs.LossCostTypeId <= 0)
+                {
+                    throw new ArgumentException("LossCostTypeId must be a positive number.", nameof(lossCostupdateDTOs.LossCostTypeId));
+                }
+
+                if (lossCostupdateDTOs.Price <= 0)
+                {
+                    throw new ArgumentException("Price must be greater than zero.", nameof(lossCostupdateDTOs.Price));
+                }
+
+                if (string.IsNullOrWhiteSpace(lossCostupdateDTOs.Description))
+                {
+                    throw new ArgumentException("Description cannot be null, empty, or whitespace.", nameof(lossCostupdateDTOs.Description));
+                }
+
+                if (lossCostupdateDTOs.DateIncurred == default || lossCostupdateDTOs.DateIncurred > DateTime.Now)
+                {
+                    throw new ArgumentException("DateIncurred must be a valid date and not in the future.", nameof(lossCostupdateDTOs.DateIncurred));
+                }
                 if (userId <= 0)
                 {
                     throw new Exception("Invalid user ID provided.");
