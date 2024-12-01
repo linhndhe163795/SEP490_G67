@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileSystemGlobbing.Internal;
 using MyAPI.DTOs;
 using MyAPI.DTOs.AccountDTOs;
 using MyAPI.DTOs.RequestDTOs;
@@ -8,6 +9,8 @@ using MyAPI.DTOs.VehicleDTOs;
 using MyAPI.Helper;
 using MyAPI.Infrastructure.Interfaces;
 using MyAPI.Models;
+using System.Linq;
+using System.Text.RegularExpressions;
 
 
 namespace MyAPI.Repositories.Impls
@@ -43,37 +46,32 @@ namespace MyAPI.Repositories.Impls
             _tripRepository = tripRepository;
         }
 
-        public async Task<bool> AddVehicleAsync(VehicleAddDTO vehicleAddDTO, string driverName)
+        public async Task<bool> AddVehicleAsync(VehicleAddDTO vehicleAddDTO)
         {
             try
             {
-                if (vehicleAddDTO == null)
-                {
-                    throw new ArgumentNullException(nameof(vehicleAddDTO), "VehicleAddDTO cannot be null.");
-                }
-
-                if (string.IsNullOrWhiteSpace(driverName))
-                {
-                    throw new ArgumentException("Driver name cannot be null or empty.");
-                }
-
+                var licensePlatePattern = @"^\d{2}[A-Z]-\d{5}$";
                 if (vehicleAddDTO.NumberSeat == null || vehicleAddDTO.NumberSeat <= 0)
                 {
-                    throw new ArgumentException("NumberSeat must be greater than 0.");
+                    throw new Exception("NumberSeat must be greater than 0.");
                 }
-
                 if (string.IsNullOrWhiteSpace(vehicleAddDTO.LicensePlate))
                 {
-                    throw new ArgumentException("License plate cannot be null or empty.");
+                    throw new Exception("License plate cannot be null or empty.");
                 }
-
-                if (vehicleAddDTO.CreatedAt == null || vehicleAddDTO.CreatedAt > DateTime.Now)
+                if (!Regex.IsMatch(vehicleAddDTO.LicensePlate, licensePlatePattern))
                 {
-                    throw new ArgumentException("CreatedAt must be a valid date and cannot be in the future.");
+                    throw new Exception("Invalid license plate format. Expected format: 99A-99999.");
                 }
-
-                var checkUserNameDrive = await _context.Drivers.SingleOrDefaultAsync(s => s.UserName.Equals(driverName));
-
+                if (vehicleAddDTO.VehicleTypeId != Constant.XE_TIEN_CHUYEN && vehicleAddDTO.VehicleTypeId != Constant.XE_DU_LICH && vehicleAddDTO.VehicleTypeId != Constant.XE_LIEN_TINH)
+                {
+                    throw new Exception("Invalid type of vehicle");
+                }
+                var checkUserNameDrive = await _context.Drivers.SingleOrDefaultAsync(s => s.UserName.Equals(vehicleAddDTO.driverName));
+                if (checkUserNameDrive == null && vehicleAddDTO.driverName != null)
+                {
+                    throw new Exception("Not found driver");
+                }
                 var token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
                 int userId = _tokenHelper.GetIdInHeader(token);
 
@@ -94,27 +92,30 @@ namespace MyAPI.Repositories.Impls
                     throw new Exception("License plate is duplicate.");
                 }
 
-                bool isStaff = user.UserRoles.Any(s => s.Role.RoleName == "Staff");
+
+                var isRoleStaff = await _context.UserRoles
+                                .Include(x => x.Role)
+                                .AnyAsync(u => u.UserId == userId && u.Role.RoleName == "Staff");
 
                 Vehicle vehicle = new Vehicle
                 {
                     NumberSeat = vehicleAddDTO.NumberSeat.Value,
                     VehicleTypeId = vehicleAddDTO.VehicleTypeId ?? 1,
                     Image = vehicleAddDTO.Image,
-                    Status = isStaff,
-                    DriverId = checkUserNameDrive != null ? checkUserNameDrive.Id : 0,
-                    VehicleOwner = userId,
+                    Status = isRoleStaff,
+                    DriverId = checkUserNameDrive != null ? checkUserNameDrive.Id : null,
+                    VehicleOwner = (isRoleStaff == true) ? vehicleAddDTO.VehicleOwner : userId,
                     LicensePlate = vehicleAddDTO.LicensePlate,
                     Description = vehicleAddDTO.Description,
                     CreatedBy = userId,
-                    CreatedAt = vehicleAddDTO.CreatedAt.Value,
-                    UpdateAt = vehicleAddDTO.UpdateAt ?? DateTime.Now,
-                    UpdateBy = vehicleAddDTO.UpdateBy ?? userId,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdateAt = null,
+                    UpdateBy = null,
                 };
 
                 _context.Vehicles.Add(vehicle);
 
-                if (!isStaff)
+                if (!isRoleStaff)
                 {
                     var requestDTO = new RequestDTO
                     {
@@ -168,22 +169,6 @@ namespace MyAPI.Repositories.Impls
         {
             try
             {
-                if (requestId == null)
-                {
-                    throw new ArgumentNullException(nameof(requestId), "Request ID cannot be null.");
-                }
-
-                if (requestId <= 0)
-                {
-                    throw new ArgumentException("Request ID must be greater than 0.");
-                }
-
-                var checkRequestExits = await _context.Requests.FirstOrDefaultAsync(s => s.Id == requestId);
-                if (checkRequestExits == null)
-                {
-                    throw new Exception("Request does not exist.");
-                }
-
                 var token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
                 int userId = _tokenHelper.GetIdInHeader(token);
 
@@ -191,6 +176,26 @@ namespace MyAPI.Repositories.Impls
                 {
                     throw new Exception("Invalid user ID from token.");
                 }
+                if (requestId == null)
+                {
+                    throw new ArgumentNullException(nameof(requestId), "Request ID cannot be null.");
+                }
+
+                if (requestId <= 0)
+                {
+                    throw new Exception("Request ID must be greater than 0.");
+                }
+
+                var checkRequestExits = await _context.Requests.FirstOrDefaultAsync(s => s.Id == requestId);
+                if (checkRequestExits == null)
+                {
+                    throw new Exception("Request does not exist.");
+                }
+                if (checkRequestExits.TypeId != 1)
+                {
+                    throw new Exception("Request not add vehicle");
+                }
+
 
                 var user = await _context.Users.FindAsync(userId);
                 if (user == null)
@@ -255,9 +260,6 @@ namespace MyAPI.Repositories.Impls
             }
         }
 
-
-
-
         public async Task<bool> DeleteVehicleAsync(int id)
         {
             try
@@ -269,7 +271,7 @@ namespace MyAPI.Repositories.Impls
 
                 if (id <= 0)
                 {
-                    throw new ArgumentException("Vehicle ID must be greater than 0.");
+                    throw new Exception("Vehicle ID must be greater than 0.");
                 }
 
                 var checkVehicle = await _context.Vehicles.SingleOrDefaultAsync(s => s.Id == id);
@@ -290,7 +292,6 @@ namespace MyAPI.Repositories.Impls
             }
         }
 
-
         public async Task<List<EndPointDTO>> GetListEndPointByVehicleId(int vehicleId)
         {
             try
@@ -302,7 +303,7 @@ namespace MyAPI.Repositories.Impls
 
                 if (vehicleId <= 0)
                 {
-                    throw new ArgumentException("Vehicle ID must be greater than 0.");
+                    throw new Exception("Vehicle ID must be greater than 0.");
                 }
 
                 var i = 1;
@@ -334,7 +335,6 @@ namespace MyAPI.Repositories.Impls
             }
         }
 
-
         public async Task<List<VehicleTypeDTO>> GetVehicleTypeDTOsAsync()
         {
             try
@@ -363,12 +363,12 @@ namespace MyAPI.Repositories.Impls
 
                 if (id <= 0)
                 {
-                    throw new ArgumentException("Vehicle ID must be greater than 0.");
+                    throw new Exception("Vehicle ID must be greater than 0.");
                 }
 
                 if (string.IsNullOrWhiteSpace(driverName))
                 {
-                    throw new ArgumentException("Driver name cannot be null or whitespace.");
+                    throw new Exception("Driver name cannot be null or whitespace.");
                 }
 
                 var token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
@@ -405,7 +405,6 @@ namespace MyAPI.Repositories.Impls
             }
         }
 
-
         public async Task<List<StartPointDTO>> GetListStartPointByVehicleId(int vehicleId)
         {
             try
@@ -417,7 +416,7 @@ namespace MyAPI.Repositories.Impls
 
                 if (vehicleId <= 0)
                 {
-                    throw new ArgumentException("Vehicle ID must be greater than 0.");
+                    throw new Exception("Vehicle ID must be greater than 0.");
                 }
 
                 var listStartPoint = await (from v in _context.Vehicles
@@ -447,7 +446,6 @@ namespace MyAPI.Repositories.Impls
             }
         }
 
-
         public async Task<List<VehicleListDTO>> GetVehicleDTOsAsync()
         {
             try
@@ -464,61 +462,60 @@ namespace MyAPI.Repositories.Impls
             }
         }
 
-        public async Task<bool> UpdateVehicleAsync(int id, string driverName, int userIdUpdate)
-        {
-            try
-            {
-                if (id == null)
-                {
-                    throw new ArgumentNullException(nameof(id), "Vehicle ID cannot be null.");
-                }
+        //public async Task<bool> UpdateVehicleAsync(int id, string driverName, int userIdUpdate)
+        //{
+        //    try
+        //    {
+        //        if (id == null)
+        //        {
+        //            throw new ArgumentNullException(nameof(id), "Vehicle ID cannot be null.");
+        //        }
 
-                if (id <= 0)
-                {
-                    throw new ArgumentException("Vehicle ID must be greater than 0.");
-                }
+        //        if (id <= 0)
+        //        {
+        //            throw new Exception("Vehicle ID must be greater than 0.");
+        //        }
 
-                if (string.IsNullOrWhiteSpace(driverName))
-                {
-                    throw new ArgumentException("Driver name cannot be null or whitespace.");
-                }
+        //        if (string.IsNullOrWhiteSpace(driverName))
+        //        {
+        //            throw new Exception("Driver name cannot be null or whitespace.");
+        //        }
 
-                if (userIdUpdate == null)
-                {
-                    throw new ArgumentNullException(nameof(userIdUpdate), "User ID for update cannot be null.");
-                }
+        //        if (userIdUpdate == null)
+        //        {
+        //            throw new ArgumentNullException(nameof(userIdUpdate), "User ID for update cannot be null.");
+        //        }
 
-                if (userIdUpdate <= 0)
-                {
-                    throw new ArgumentException("User ID for update must be greater than 0.");
-                }
+        //        if (userIdUpdate <= 0)
+        //        {
+        //            throw new Exception("User ID for update must be greater than 0.");
+        //        }
 
-                var vehicleUpdate = await _context.Vehicles.SingleOrDefaultAsync(vehicle => vehicle.Id == id);
-                if (vehicleUpdate == null)
-                {
-                    throw new Exception("Vehicle not found.");
-                }
+        //        var vehicleUpdate = await _context.Vehicles.SingleOrDefaultAsync(vehicle => vehicle.Id == id);
+        //        if (vehicleUpdate == null)
+        //        {
+        //            throw new Exception("Vehicle not found.");
+        //        }
 
-                var checkUserNameDrive = await _context.Drivers.SingleOrDefaultAsync(s => s.Name.Equals(driverName));
-                if (checkUserNameDrive == null)
-                {
-                    throw new Exception("Driver name not found in the system.");
-                }
+        //        var checkUserNameDrive = await _context.Drivers.SingleOrDefaultAsync(s => s.Name.Equals(driverName));
+        //        if (checkUserNameDrive == null)
+        //        {
+        //            throw new Exception("Driver name not found in the system.");
+        //        }
 
-                vehicleUpdate.DriverId = userIdUpdate;
-                vehicleUpdate.UpdateBy = checkUserNameDrive.Id;
-                vehicleUpdate.UpdateAt = DateTime.Now;
+        //        vehicleUpdate.DriverId = userIdUpdate;
+        //        vehicleUpdate.UpdateBy = checkUserNameDrive.Id;
+        //        vehicleUpdate.UpdateAt = DateTime.Now;
 
-                await _context.SaveChangesAsync();
+        //        await _context.SaveChangesAsync();
 
-                return true;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("UpdateVehicleAsync: " + ex.Message);
-            }
-        }
-
+        //        return true;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        throw new Exception("UpdateVehicleAsync: " + ex.Message);
+        //    }
+        //}
 
         private bool UpdateVehicleByStaff(int? id, int? userIdUpdate, bool updateStatus)
         {
@@ -531,7 +528,7 @@ namespace MyAPI.Repositories.Impls
 
                 if (id <= 0)
                 {
-                    throw new ArgumentException("Vehicle ID must be greater than 0.");
+                    throw new Exception("Vehicle ID must be greater than 0.");
                 }
 
                 if (userIdUpdate == null)
@@ -541,7 +538,7 @@ namespace MyAPI.Repositories.Impls
 
                 if (userIdUpdate <= 0)
                 {
-                    throw new ArgumentException("User ID for update must be greater than 0.");
+                    throw new Exception("User ID for update must be greater than 0.");
                 }
 
                 var vehicleUpdate = _context.Vehicles.SingleOrDefault(vehicle => vehicle.Id == id);
@@ -566,39 +563,51 @@ namespace MyAPI.Repositories.Impls
             }
         }
 
-
         public async Task<bool> AssignDriverToVehicleAsync(int vehicleId, int driverId)
         {
-            if (vehicleId == null)
+            try
             {
-                throw new ArgumentNullException(nameof(vehicleId), "Vehicle ID cannot be null.");
+                if (vehicleId == null)
+                {
+                    throw new ArgumentNullException(nameof(vehicleId), "Vehicle ID cannot be null.");
+                }
+
+                if (vehicleId <= 0)
+                {
+                    throw new Exception("Vehicle ID must be greater than 0.");
+                }
+
+                if (driverId == null)
+                {
+                    throw new ArgumentNullException(nameof(driverId), "Driver ID cannot be null.");
+                }
+
+                if (driverId <= 0)
+                {
+                    throw new Exception("Driver ID must be greater than 0.");
+                }
+
+                var vehicle = await _context.Vehicles.FindAsync(vehicleId);
+                if (vehicle == null)
+                {
+                    throw new Exception("Vehicle not found.");
+                }
+                var driver = await _context.Drivers.FindAsync(driverId);
+
+                if (driver == null)
+                {
+                    throw new Exception("Not Found Driver");
+                }
+                vehicle.DriverId = driverId;
+                _context.Vehicles.Update(vehicle);
+
+                return await _context.SaveChangesAsync() > 0;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
             }
 
-            if (vehicleId <= 0)
-            {
-                throw new ArgumentException("Vehicle ID must be greater than 0.");
-            }
-
-            if (driverId == null)
-            {
-                throw new ArgumentNullException(nameof(driverId), "Driver ID cannot be null.");
-            }
-
-            if (driverId <= 0)
-            {
-                throw new ArgumentException("Driver ID must be greater than 0.");
-            }
-
-            var vehicle = await _context.Vehicles.FindAsync(vehicleId);
-            if (vehicle == null)
-            {
-                throw new Exception("Vehicle not found.");
-            }
-
-            vehicle.DriverId = driverId;
-            _context.Vehicles.Update(vehicle);
-
-            return await _context.SaveChangesAsync() > 0;
         }
 
         public async Task<int> GetNumberSeatAvaiable(int tripId, DateTime dateTime)
@@ -610,7 +619,7 @@ namespace MyAPI.Repositories.Impls
 
             if (tripId <= 0)
             {
-                throw new ArgumentException("Trip ID must be greater than 0.");
+                throw new Exception("Trip ID must be greater than 0.");
             }
 
             if (dateTime == null)
@@ -653,7 +662,7 @@ namespace MyAPI.Repositories.Impls
 
             if (vehicleId <= 0)
             {
-                throw new ArgumentException("Vehicle ID must be greater than 0.");
+                throw new Exception("Vehicle ID must be greater than 0.");
             }
 
             try
@@ -700,7 +709,7 @@ namespace MyAPI.Repositories.Impls
 
             if (driverId <= 0)
             {
-                throw new ArgumentException("Driver ID must be greater than 0.");
+                throw new Exception("Driver ID must be greater than 0.");
             }
 
             try
@@ -728,7 +737,7 @@ namespace MyAPI.Repositories.Impls
 
             if (driverId <= 0)
             {
-                throw new ArgumentException("Driver ID must be greater than 0.");
+                throw new Exception("Driver ID must be greater than 0.");
             }
 
             try
@@ -764,7 +773,7 @@ namespace MyAPI.Repositories.Impls
 
             if (vehicleId <= 0)
             {
-                throw new ArgumentException("Vehicle ID must be greater than 0.");
+                throw new Exception("Vehicle ID must be greater than 0.");
             }
 
             if (driverId == null)
@@ -774,7 +783,7 @@ namespace MyAPI.Repositories.Impls
 
             if (driverId <= 0)
             {
-                throw new ArgumentException("Driver ID must be greater than 0.");
+                throw new Exception("Driver ID must be greater than 0.");
             }
 
             try
@@ -798,10 +807,39 @@ namespace MyAPI.Repositories.Impls
         {
             try
             {
+                var licensePlatePattern = @"^\d{2}[A-Z]-\d{5}$";
+                if (updateDTO.NumberSeat == null || updateDTO.NumberSeat <= 0)
+                {
+                    throw new Exception("NumberSeat must be greater than 0.");
+                }
+                if (string.IsNullOrWhiteSpace(updateDTO.LicensePlate))
+                {
+                    throw new Exception("License plate cannot be null or empty.");
+                }
+                if (!Regex.IsMatch(updateDTO.LicensePlate, licensePlatePattern))
+                {
+                    throw new Exception("Invalid license plate format. Expected format: 99A-99999.");
+                }
+                if (updateDTO.VehicleTypeId != Constant.XE_TIEN_CHUYEN && updateDTO.VehicleTypeId != Constant.XE_DU_LICH && updateDTO.VehicleTypeId != Constant.XE_LIEN_TINH)
+                {
+                    throw new Exception("Invalid type of vehicle");
+                }
+                var checkUserId = await _context.Drivers.SingleOrDefaultAsync(s => s.Id.Equals(updateDTO.DriverId));
+                if (checkUserId == null && updateDTO.DriverId != null)
+                {
+                    throw new Exception("Not found driver");
+                }
+                var checkLicensePlate = await _context.Vehicles.FirstOrDefaultAsync(s => s.LicensePlate.Equals(updateDTO.LicensePlate));
+                if (checkLicensePlate != null)
+                {
+                    throw new Exception("License plate is duplicate.");
+                }
 
                 var vehicle = await _context.Vehicles.FindAsync(id);
-                if (vehicle == null) return false;
-
+                if (vehicle == null)
+                {
+                    throw new Exception("Not found vehicle");
+                }
 
                 var token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
                 int userId = _tokenHelper.GetIdInHeader(token);
@@ -810,13 +848,31 @@ namespace MyAPI.Repositories.Impls
                 {
                     throw new Exception("Invalid user ID from token.");
                 }
+                var vehicleOwners = await _context.Users
+                                    .Include(u => u.UserRoles)
+                                    .ThenInclude(ur => ur.Role)
+                                    .Where(u => u.UserRoles.Any(ur => ur.Role.RoleName == "VehicleOwner"))
+                                    .ToListAsync();
+                bool isValidVehicleOwner = false;
 
+                foreach (var user in vehicleOwners)
+                {
+                    if (user.Id == updateDTO.VehicleOwner)
+                    {
+                        isValidVehicleOwner = true;
+                        break;
+                    }
+                }
+                if (!isValidVehicleOwner)
+                {
+                    throw new Exception("The specified user does not have the role 'VehicleOwner'.");
+                }
 
                 if (updateDTO.NumberSeat.HasValue) vehicle.NumberSeat = updateDTO.NumberSeat.Value;
                 if (updateDTO.VehicleTypeId.HasValue) vehicle.VehicleTypeId = updateDTO.VehicleTypeId.Value;
                 if (updateDTO.Status.HasValue) vehicle.Status = updateDTO.Status.Value;
                 if (!string.IsNullOrEmpty(updateDTO.Image)) vehicle.Image = updateDTO.Image;
-                if (updateDTO.DriverId.HasValue) vehicle.DriverId = updateDTO.DriverId.Value;
+                vehicle.DriverId = (vehicle.Driver != null) ? updateDTO.DriverId.Value : null;
                 if (updateDTO.VehicleOwner.HasValue) vehicle.VehicleOwner = updateDTO.VehicleOwner.Value;
                 if (!string.IsNullOrEmpty(updateDTO.LicensePlate)) vehicle.LicensePlate = updateDTO.LicensePlate;
                 if (!string.IsNullOrEmpty(updateDTO.Description)) vehicle.Description = updateDTO.Description;
@@ -829,20 +885,9 @@ namespace MyAPI.Repositories.Impls
                 await _context.SaveChangesAsync();
                 return true;
             }
-            catch (ArgumentException ex)
-            {
-
-                throw new Exception($"Validation error: {ex.Message}");
-            }
-            catch (DbUpdateException ex)
-            {
-
-                throw new Exception("Database update error. See inner exception for details.", ex);
-            }
             catch (Exception ex)
             {
-
-                throw new Exception("An unexpected error occurred while updating the vehicle.", ex);
+                throw new Exception(ex.Message);
             }
         }
 
@@ -855,7 +900,7 @@ namespace MyAPI.Repositories.Impls
 
             if (vehicleOwner <= 0)
             {
-                throw new ArgumentException("Vehicle owner ID must be greater than 0.");
+                throw new Exception("Vehicle owner ID must be greater than 0.");
             }
 
             try
@@ -881,6 +926,118 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception("getVehicleByVehicleOwner: " + ex.Message);
             }
         }
+
+        public async Task<(bool IsSuccess, List<ValidationErrorDTO> Errors)> ConfirmAddValidEntryImportVehicle(List<VehicleImportDTO> validEntries)
+        {
+            var errors = new List<ValidationErrorDTO>(); // Danh sách lỗi
+
+            try
+            {
+                if (validEntries == null || validEntries.Count == 0)
+                {
+                    errors.Add(new ValidationErrorDTO
+                    {
+                        Row = 0,
+                        ErrorMessage = "Empty data to import."
+                    });
+                    return (false, errors);
+                }
+
+                var vehicleOwners = await _context.Users
+                    .Include(u => u.UserRoles)
+                    .ThenInclude(ur => ur.Role)
+                    .Where(u => u.UserRoles.Any(ur => ur.Role.RoleName == "VehicleOwner"))
+                    .Select(u => new { u.Id, u.Username })
+                    .ToListAsync();
+
+                var vehicleOwnerSet = new HashSet<int>(vehicleOwners.Select(v => v.Id));
+
+                int rowEntries = 1;
+                var drivers = await _context.Drivers
+                            .Select(d => d.Id)
+                            .ToListAsync();
+
+                var driverSet = new HashSet<int>(drivers);
+
+                foreach (var entry in validEntries)
+                {
+                    var licensePlatePattern = @"^\d{2}[A-Z]-\d{5}$";
+                    entry.Status = true;
+                    if (entry.DriverId == 0)
+                    {
+                        entry.DriverId = null;
+                    }
+                    if (entry.NumberSeat == null || entry.NumberSeat <= 0)
+                    {
+                        errors.Add(new ValidationErrorDTO
+                        {
+                            Row = rowEntries,
+                            ErrorMessage = "NumberSeat must be greater than 0."
+                        });
+                    }
+
+                    if (string.IsNullOrWhiteSpace(entry.LicensePlate))
+                    {
+                        errors.Add(new ValidationErrorDTO
+                        {
+                            Row = rowEntries,
+                            ErrorMessage = "License plate cannot be null or empty."
+                        });
+                    }
+                    else if (!Regex.IsMatch(entry.LicensePlate, licensePlatePattern))
+                    {
+                        errors.Add(new ValidationErrorDTO
+                        {
+                            Row = rowEntries,
+                            ErrorMessage = "Invalid license plate format. Expected format: 99A-99999."
+                        });
+                    }
+
+                    if (entry.VehicleTypeId != Constant.XE_TIEN_CHUYEN &&
+                        entry.VehicleTypeId != Constant.XE_DU_LICH &&
+                        entry.VehicleTypeId != Constant.XE_LIEN_TINH)
+                    {
+                        errors.Add(new ValidationErrorDTO
+                        {
+                            Row = rowEntries,
+                            ErrorMessage = "Invalid type of vehicle."
+                        });
+                    }
+
+                    if (entry.VehicleOwner == null || !vehicleOwnerSet.Contains(entry.VehicleOwner.Value))
+                    {
+                        errors.Add(new ValidationErrorDTO
+                        {
+                            Row = rowEntries,
+                            ErrorMessage = "Invalid VehicleOwner. The specified user does not have the role 'VehicleOwner'."
+                        });
+                    }
+
+                    
+                    rowEntries++;
+                }
+
+                if (errors.Count > 0)
+                {
+                    return (false, errors);
+                }
+                var listMapper = _mapper.Map<List<Vehicle>>(validEntries);
+                await _context.AddRangeAsync(listMapper);
+                await _context.SaveChangesAsync();
+
+                return (true, errors); // Không có lỗi, trả về thành công
+            }
+            catch (Exception ex)
+            {
+                errors.Add(new ValidationErrorDTO
+                {
+                    Row = 0,
+                    ErrorMessage = $"Unexpected error: {ex.Message}"
+                });
+                return (false, errors);
+            }
+        }
+
 
     }
 }
