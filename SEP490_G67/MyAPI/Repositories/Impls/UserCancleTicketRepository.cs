@@ -41,27 +41,27 @@ namespace MyAPI.Repositories.Impls
 
                 if (ticket == null)
                 {
-                    throw new UnauthorizedAccessException("Ticket does not belong to the user.");
+                    throw new Exception("Ticket does not belong to the user.");
                 }
-                if(ticket.Status == "Hủy chuyến")
+                if (ticket.Status == "Hủy chuyến")
                 {
-                    throw new UnauthorizedAccessException("Ticket had cancle!");
+                    throw new Exception("Ticket had cancle!");
                 }
-
+                if (ticket.Status == "Chờ xác nhận hủy chuyến từ hệ thống")
+                {
+                    throw new Exception("You send request to system, please wait staff accept!");
+                }
                 DateTime dateTimeCancle = DateTime.Now.AddHours(-2);
                 var listTicketId = await _context.Tickets.Where(x => x.UserId == userId && x.TimeFrom <= dateTimeCancle).ToListAsync();
                 if (ticket.TimeFrom <= dateTimeCancle)
                 {
                     throw new InvalidOperationException("The ticket cannot be canceled within 2 hours of departure.");
                 }
-
-                
                 var inforTicketCancle = await (from t in _context.Tickets
                                                join p in _context.Payments
                                                  on t.Id equals p.TicketId
                                                where t.Id == addUserCancleTicketDTOs.TicketId
                                                select p).FirstOrDefaultAsync();
-
                 if (ticket.TypeOfPayment == Constant.TIEN_MAT)
                 {
                     ticket.Status = "Hủy chuyến";
@@ -85,10 +85,10 @@ namespace MyAPI.Repositories.Impls
                         pointUserById.Points -= (int)pointUserMinus;
                         if (pointUserById.Points < 0) { pointUserById.Points = 0; }
                     }
-                    
+
                     var pointUserCancleTicket = new PointUser
                     {
-                        PointsMinus = (int) pointUserMinus,
+                        PointsMinus = (int)pointUserMinus,
                         UserId = userId,
                         Points = pointUserById.Points,
                         Date = pointUserById.Date,
@@ -104,6 +104,9 @@ namespace MyAPI.Repositories.Impls
                 }
                 else
                 {
+                    ticket.Status = "Chờ xác nhận hủy chuyến từ hệ thống";
+                    _context.Tickets.Update(ticket);
+                    await _context.SaveChangesAsync();
                     // request đến staff
                     var RequestCancleTicket = new RequestCancleTicketDTOs
                     {
