@@ -298,12 +298,12 @@ namespace MyAPI.Controllers
         }
         //update request for user
         [Authorize]
-        [HttpPost("updateRequestForUser/{requestID}")]
-        public async Task<IActionResult> updateRequestDetails(int requestID, RequestDetailDTO requestDetailDTO)
+        [HttpPost("updateRequestForUser")]
+        public async Task<IActionResult> updateRequestDetails([FromBody] RequestDetailDTO requestDetailDTO)
         {
             try
             {
-                await _requestRepository.updateRequest(requestID, requestDetailDTO);
+                await _requestRepository.updateRequest(requestDetailDTO);
                 return Ok();
             }
             catch (Exception ex)

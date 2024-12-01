@@ -16,7 +16,7 @@ namespace MyAPI.Infrastructure.Interfaces
 
         Task<bool> UpdateStatusTicketForPayment(int id);
 
-        Task AcceptOrDenyRequestRentCar(int requestId, bool choose, int vehicleId, decimal price);
+        Task AcceptOrDenyRequestRentCar(AddTicketForRentCarDTO addTicketForRentCarDTO);
         Task<TicketByIdDTOs> getTicketById(int ticketId);
         Task<RevenueTicketDTO> getRevenueTicket(DateTime startTime, DateTime endTime, int? vehicle,int? vehicleOwner, int userId);
 

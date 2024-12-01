@@ -79,11 +79,11 @@ namespace MyAPI.Controllers
         }
         [Authorize]
         [HttpPost("createTicketForRentCar")]
-        public async Task<IActionResult> CreateTicketForRentCar(int requestId, bool choose, int vehicleId, decimal price)
+        public async Task<IActionResult> CreateTicketForRentCar([FromBody] AddTicketForRentCarDTO addTicketForRentCarDTO )
         {
             try
             {
-                await _ticketRepository.AcceptOrDenyRequestRentCar(requestId, choose, vehicleId, price);
+                await _ticketRepository.AcceptOrDenyRequestRentCar(addTicketForRentCarDTO);
 
                 return Ok("Ticket created successfully.");
             }

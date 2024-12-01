@@ -131,20 +131,20 @@ namespace MyAPI.Repositories.Impls
         }
 
 
-        public async Task AcceptOrDenyRequestRentCar(int requestId, bool choose, int vehicleId, decimal price)
+        public async Task AcceptOrDenyRequestRentCar(AddTicketForRentCarDTO addTicketForRentCarDTO)
         {
             try
             {
                 var request = await _context.Requests
                     .Include(r => r.RequestDetails)
-                    .FirstOrDefaultAsync(r => r.Id == requestId);
+                    .FirstOrDefaultAsync(r => r.Id == addTicketForRentCarDTO.requestId);
 
                 if (request == null)
                 {
                     throw new Exception("Request not found");
                 }
 
-                if (!choose)
+                if (!addTicketForRentCarDTO.choose)
                 {
                     request.Status = false;
                     await _context.SaveChangesAsync();
@@ -155,12 +155,20 @@ namespace MyAPI.Repositories.Impls
                 if (requestDetail == null)
                 {
                     throw new Exception("Request details not found");
+
+                }
+
+                var type_id = await _context.Requests.Where(s=> s.Id == addTicketForRentCarDTO.requestId).Select(r => r.TypeId).FirstOrDefaultAsync();
+
+                if (type_id != 2)
+                {
+                    throw new Exception("Request for type rent car!!!");
                 }
 
                 var ticket = new Ticket
                 {
-                    VehicleId = vehicleId,
-                    Price = price,
+                    VehicleId = addTicketForRentCarDTO.vehicleId,
+                    Price = addTicketForRentCarDTO.price,
                     NumberTicket = requestDetail.Seats,
                     PointStart = requestDetail.StartLocation,
                     PointEnd = requestDetail.EndLocation,

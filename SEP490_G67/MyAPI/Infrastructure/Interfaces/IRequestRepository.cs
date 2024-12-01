@@ -25,7 +25,7 @@ namespace MyAPI.Infrastructure.Interfaces
 
         Task<bool> UpdateStatusRequestConvenient(int requestId, bool choose);
         Task<List<RequestDTO>> getListRequestForUser(int userId);
-        Task updateRequest(int requestID, RequestDetailDTO requestDetailDTO);
+        Task updateRequest(RequestDetailDTO requestDetailDTO);
         Task<List<RequestDTO>> GetListRequestForDriver(int driverId);
     }
 }

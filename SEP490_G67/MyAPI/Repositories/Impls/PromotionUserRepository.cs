@@ -44,16 +44,16 @@ namespace MyAPI.Repositories.Impls
         {
             var checkExits = await _context.PromotionUsers.FirstOrDefaultAsync(s => s.UserId == userId && s.PromotionId == promotion_id);
 
-            if (checkExits != null)
+            if (checkExits == null)
             {
-                _context.PromotionUsers.Remove(checkExits);
-                await _context.SaveChangesAsync(); 
-                return true;
-            }else
-            {
-                throw new Exception("Faild to deletePromotion");
+                return true; 
             }
+
+            _context.PromotionUsers.Remove(checkExits);
+            await _context.SaveChangesAsync();
+            return true;
         }
+
 
         public async Task DeletePromotionUser(int id)
         {

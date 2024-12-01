@@ -11,6 +11,7 @@ using MyAPI.Helper;
 using MyAPI.Infrastructure.Interfaces;
 using MyAPI.Models;
 using System.Reflection.Metadata;
+using System.Text.RegularExpressions;
 using Constant = MyAPI.Helper.Constant;
 
 namespace MyAPI.Repositories.Impls
@@ -506,6 +507,11 @@ namespace MyAPI.Repositories.Impls
                 {
                     throw new Exception("Invalid user ID from token.");
                 }
+
+                if(rentDriverAddDTO.Price <= 0)
+                {
+                    throw new Exception("Price must be > 0");
+                }
                 if (await checkVehicleOwner(vehicleOwnerId, rentDriverAddDTO.VehicleId))
                 {
 
@@ -593,6 +599,13 @@ namespace MyAPI.Repositories.Impls
             if (userId == -1)
             {
                 throw new UnauthorizedAccessException("Invalid user ID from token.");
+            }
+
+            string pattern = @"^0[0-9]{9}$";
+            var checkSdt = Regex.IsMatch(convenientTripDTO.PhoneNumber,pattern);
+            if (checkSdt == false)
+            {
+                throw new Exception("Số điện thoại không hợp lệ");
             }
 
             int type_Of_Trip;
@@ -686,6 +699,10 @@ namespace MyAPI.Repositories.Impls
                 throw new UnauthorizedAccessException("Invalid user ID from token.");
             }
 
+            if(checkRequest.TypeId != 5)
+            {
+                throw new Exception("Request musst be for rent convenient!!!");
+            }
             checkRequest.Note = choose ? "Đã xác nhận" : "Từ chối xác nhận";
             checkRequest.Status = choose;
 
@@ -828,11 +845,11 @@ namespace MyAPI.Repositories.Impls
         }
 
 
-        public async Task updateRequest(int requestID, RequestDetailDTO requestDetailDTO)
+        public async Task updateRequest(RequestDetailDTO requestDetailDTO)
         {
             try
             {
-                var requestDetails = await _context.RequestDetails.FirstOrDefaultAsync(x => x.RequestId == requestID);
+                var requestDetails = await _context.RequestDetails.FirstOrDefaultAsync(x => x.RequestId == requestDetailDTO.RequestId);
                 requestDetails.StartLocation = requestDetailDTO.StartLocation;
                 requestDetails.EndLocation = requestDetailDTO.EndLocation;
                 requestDetails.Price = requestDetailDTO.Price;

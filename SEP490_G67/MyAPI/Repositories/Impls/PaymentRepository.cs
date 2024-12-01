@@ -174,6 +174,7 @@ namespace MyAPI.Repositories.Impls
                 var payment = new Payment
                 {
                     Code = paymentAddDTO.Code,
+                    UserId= paymentAddDTO.UserId,
                     CreatedAt = DateTime.Now,
                     CreatedBy = paymentAddDTO.UserId,
                     Description = paymentAddDTO.Description,
