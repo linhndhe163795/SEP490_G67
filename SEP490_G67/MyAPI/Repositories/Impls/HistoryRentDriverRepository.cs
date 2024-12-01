@@ -40,10 +40,6 @@ namespace MyAPI.Repositories.Impls
             bool choose = add.choose;
             int? driverId = add.driverId;
             decimal price = add.price;
-            if (add == null)
-            {
-                throw new ArgumentNullException(nameof(add), "Input data is required.");
-            }
 
             if (add.requestId <= 0)
             {
@@ -59,7 +55,6 @@ namespace MyAPI.Repositories.Impls
             {
                 throw new Exception("Price must be greater than 0.");
             }
-
             try
             {
                 var checkRequest = await _context.Requests.FirstOrDefaultAsync(s => s.Id == requestId);

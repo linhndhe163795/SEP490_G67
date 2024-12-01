@@ -609,11 +609,7 @@ namespace MyAPI.Repositories.Impls
 
                     await _context.Requests.AddAsync(addRentDriver);
                     await _context.SaveChangesAsync();
-                    if (rentDriverAddDTO == null)
-                    {
-                        throw new Exception("Request data is required.");
-                    }
-
+                   
                     if (string.IsNullOrWhiteSpace(rentDriverAddDTO.StartLocation))
                     {
                         throw new Exception("Start location is required.");

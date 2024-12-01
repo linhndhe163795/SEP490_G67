@@ -61,6 +61,7 @@ namespace MyAPI.MappingProfile
             CreateMap<Trip, EndPointDTO>().ReverseMap();
             CreateMap<Trip, StartPointDTO>().ReverseMap();
             CreateMap<Trip,TripImportDTO>().ReverseMap();
+            CreateMap<Trip,TripByIdDTO>().ReverseMap();
             CreateMap<TripImportDTO, Trip>().ReverseMap();
             CreateMap<LossCostType, LossCostTypeListDTO>().ReverseMap();
             CreateMap<LossCost, AddLostCostVehicleDTOs>().ReverseMap();
