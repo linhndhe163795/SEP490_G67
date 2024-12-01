@@ -18,118 +18,103 @@ namespace MyAPI.Repositories.Impls
 
         public async Task AddUserCancleTicket(AddUserCancleTicketDTOs addUserCancleTicketDTOs, int userId)
         {
-            if (addUserCancleTicketDTOs == null)
-            {
-                throw new ArgumentNullException(nameof(addUserCancleTicketDTOs), "Cancel ticket data cannot be null.");
-            }
+
 
             if (addUserCancleTicketDTOs.TicketId <= 0)
             {
-                throw new ArgumentException("Ticket ID must be greater than 0.");
+                throw new Exception("Ticket ID must be greater than 0.");
             }
 
             if (string.IsNullOrWhiteSpace(addUserCancleTicketDTOs.ReasonCancle))
             {
-                throw new ArgumentException("Reason for cancellation cannot be null or empty.");
+                throw new Exception("Reason for cancellation cannot be null or empty.");
             }
 
             if (userId <= 0)
             {
-                throw new ArgumentException("User ID must be greater than 0.");
+                throw new Exception("User ID must be greater than 0.");
             }
             try
             {
+                var ticket = await _context.Tickets
+                                   .FirstOrDefaultAsync(t => t.Id == addUserCancleTicketDTOs.TicketId && t.UserId == userId);
+
+                if (ticket == null)
+                {
+                    throw new Exception("Ticket does not belong to the user.");
+                }
+                if (ticket.Status == "Hủy chuyến")
+                {
+                    throw new Exception("Ticket had cancle!");
+                }
+                if (ticket.Status == "Chờ xác nhận hủy chuyến từ hệ thống")
+                {
+                    throw new Exception("You send request to system, please wait staff accept!");
+                }
                 DateTime dateTimeCancle = DateTime.Now.AddHours(-2);
                 var listTicketId = await _context.Tickets.Where(x => x.UserId == userId && x.TimeFrom <= dateTimeCancle).ToListAsync();
-                if (!listTicketId.Any())
+                if (ticket.TimeFrom <= dateTimeCancle)
                 {
-                    throw new NullReferenceException("Không có vé của nào của user");
-                }
-                var ticketToCancel = listTicketId.FirstOrDefault(ticket => ticket.Id == addUserCancleTicketDTOs.TicketId);
-                if (ticketToCancel == null)
-                {
-                    throw new NullReferenceException("Không có vé hợp lệ để hủy");
-                }
-                else
-                {
-                    ticketToCancel.Status = "Hủy chuyến";
+                    throw new InvalidOperationException("The ticket cannot be canceled within 2 hours of departure.");
                 }
                 var inforTicketCancle = await (from t in _context.Tickets
                                                join p in _context.Payments
                                                  on t.Id equals p.TicketId
                                                where t.Id == addUserCancleTicketDTOs.TicketId
                                                select p).FirstOrDefaultAsync();
-                if (inforTicketCancle == null)
+                if (ticket.TypeOfPayment == Constant.TIEN_MAT)
                 {
-                    throw new NullReferenceException("Không tìm thấy ticket!");
-                }
-                else
-                {
-                    if (inforTicketCancle.TypeOfPayment == Constant.TIEN_MAT)
+                    ticket.Status = "Hủy chuyến";
+                    var addCancleTicket = new UserCancleTicket
                     {
-                        var addCancleTicket = new UserCancleTicket
-                        {
-                            TicketId = addUserCancleTicketDTOs.TicketId,
-                            PaymentId = inforTicketCancle.PaymentId,
-                            ReasonCancle = addUserCancleTicketDTOs.ReasonCancle,
-                            UserId = userId,
-                            CreatedAt = DateTime.Now,
-                            CreatedBy = userId,
-                        };
-                        var pointUserMinus = (int)inforTicketCancle.Price * Constant.TICH_DIEM;
+                        TicketId = addUserCancleTicketDTOs.TicketId,
+                        ReasonCancle = addUserCancleTicketDTOs.ReasonCancle,
+                        UserId = userId,
+                        CreatedAt = DateTime.Now,
+                        CreatedBy = userId,
+                    };
+                    var pointUserMinus = (int)ticket.Price * Constant.TICH_DIEM;
 
-                        var pointUserById = _context.PointUsers.FirstOrDefault(x => x.UserId == userId);
-                        if (pointUserById == null)
-                        {
-                            throw new NullReferenceException();
-                        }
-                        else
-                        {
-                            pointUserById.Points -= (int)pointUserMinus;
-                            if (pointUserById.Points < 0) { pointUserById.Points = 0; }
-                        }
-                        var ticketPaymet = await (from t in _context.Tickets
-                                                  join p in _context.Payments
-                                                  on t.Id equals p.TicketId
-                                                  where t.Id == addUserCancleTicketDTOs.TicketId
-                                                  select p
-                                                  ).FirstOrDefaultAsync();
-                        if (ticketPaymet == null)
-                        {
-                            throw new NullReferenceException();
-                        }
-                        else
-                        {
-                            ticketPaymet.Price = 0;
-                        }
-                        var pointUserCancleTicket = new PointUser
-                        {
-                            PaymentId = ticketPaymet.PaymentId,
-                            PointsMinus = (int)pointUserMinus,
-                            UserId = userId,
-                            Points = pointUserById.Points,
-                            Date = pointUserById.Date,
-                            CreatedAt = DateTime.UtcNow,
-                            CreatedBy = userId,
-                            UpdateAt = null,
-                            UpdateBy = null,
-                        };
-                        _context.PointUsers.Add(pointUserCancleTicket);
-                        _context.UserCancleTickets.Add(addCancleTicket);
-                        await _context.SaveChangesAsync();
+                    var pointUserById = _context.PointUsers.FirstOrDefault(x => x.UserId == userId);
+                    if (pointUserById == null)
+                    {
+                        throw new NullReferenceException();
                     }
                     else
                     {
-                        // request đến staff
-                        var RequestCancleTicket = new RequestCancleTicketDTOs
-                        {
-                            TicketId = inforTicketCancle.TicketId,
-                            Description = addUserCancleTicketDTOs.ReasonCancle,
-                            TypeId = Constant.CHUYEN_KHOAN,
-                        };
-                        await _requestRepository.createRequestCancleTicket(RequestCancleTicket, userId);
+                        pointUserById.Points -= (int)pointUserMinus;
+                        if (pointUserById.Points < 0) { pointUserById.Points = 0; }
                     }
 
+                    var pointUserCancleTicket = new PointUser
+                    {
+                        PointsMinus = (int)pointUserMinus,
+                        UserId = userId,
+                        Points = pointUserById.Points,
+                        Date = pointUserById.Date,
+                        CreatedAt = DateTime.UtcNow,
+                        CreatedBy = userId,
+                        UpdateAt = null,
+                        UpdateBy = null,
+                    };
+                    _context.Tickets.Update(ticket);
+                    _context.PointUsers.Add(pointUserCancleTicket);
+                    _context.UserCancleTickets.Add(addCancleTicket);
+                    await _context.SaveChangesAsync();
+                }
+                else
+                {
+                    ticket.Status = "Chờ xác nhận hủy chuyến từ hệ thống";
+                    _context.Tickets.Update(ticket);
+                    await _context.SaveChangesAsync();
+                    // request đến staff
+                    var RequestCancleTicket = new RequestCancleTicketDTOs
+                    {
+                        TicketId = inforTicketCancle.TicketId,
+                        Description = addUserCancleTicketDTOs.ReasonCancle,
+                        TypeId = Constant.CHUYEN_KHOAN,
+                    };
+                    await _requestRepository.createRequestCancleTicket(RequestCancleTicket, userId);
                 }
 
             }

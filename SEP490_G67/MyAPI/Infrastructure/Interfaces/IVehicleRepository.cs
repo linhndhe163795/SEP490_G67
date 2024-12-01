@@ -10,7 +10,7 @@ namespace MyAPI.Infrastructure.Interfaces
 
         Task<List<VehicleTypeDTO>> GetVehicleTypeDTOsAsync();
 
-        Task<bool> AddVehicleAsync(VehicleAddDTO vehicleAddDTO, string driverName);
+        Task<bool> AddVehicleAsync(VehicleAddDTO vehicleAddDTO);
 
         Task<bool> UpdateVehicleAsync(int id, string driverName);
 
@@ -34,5 +34,6 @@ namespace MyAPI.Infrastructure.Interfaces
         Task<bool> checkDriver(int vehicleId,int driverId);
         Task<bool> UpdateVehicleAsync(int id, VehicleUpdateDTO updateDTO);
         Task<List<VehicleLicenscePlateDTOs>> getVehicleByVehicleOwner(int vehicleOwner);
+        Task<(bool IsSuccess, List<ValidationErrorDTO> Errors)> ConfirmAddValidEntryImportVehicle(List<VehicleImportDTO> validEntries);
     }
 }

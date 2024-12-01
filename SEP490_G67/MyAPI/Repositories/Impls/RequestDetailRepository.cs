@@ -13,10 +13,11 @@ namespace MyAPI.Repositories.Impls
 
         public async Task<RequestDetail> CreateRequestDetailAsync(RequestDetailDTO requestDetailDto)
         {
-            if (requestDetailDto == null)
-            {
-                throw new Exception("Request detail data is required.");
-            }
+            var typeId = await _context.Requests
+                        .Where(x => x.Id == requestDetailDto.RequestId)
+                        .Select(r => r.TypeId)
+                        .FirstOrDefaultAsync();
+
 
             if (requestDetailDto.RequestId <= 0)
             {
@@ -28,20 +29,20 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception("Invalid Vehicle ID.");
             }
 
-            if (requestDetailDto.StartTime >= requestDetailDto.EndTime)
+            if (requestDetailDto.StartTime >= requestDetailDto.EndTime && typeId != 1)
             {
                 throw new Exception("Start time must be earlier than end time.");
             }
-            if (string.IsNullOrWhiteSpace(requestDetailDto.StartLocation))
+            if (string.IsNullOrWhiteSpace(requestDetailDto.StartLocation) && typeId != 1 )
             {
                 throw new Exception("Start location is required.");
             }
 
-            if (string.IsNullOrWhiteSpace(requestDetailDto.EndLocation))
+            if (string.IsNullOrWhiteSpace(requestDetailDto.EndLocation) && typeId != 1)
             {
                 throw new Exception("End location is required.");
             }
-            if (requestDetailDto.Seats <= 0)
+            if (requestDetailDto.Seats <= 0 && typeId != 1)
             {
                 throw new Exception("Invalid Vehicle ID.");
             }

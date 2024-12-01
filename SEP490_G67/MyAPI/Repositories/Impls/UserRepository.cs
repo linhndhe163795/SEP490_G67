@@ -7,6 +7,7 @@ using MyAPI.DTOs.UserDTOs;
 using MyAPI.Helper;
 using MyAPI.Infrastructure.Interfaces;
 using MyAPI.Models;
+using System.Text.RegularExpressions;
 
 namespace MyAPI.Repositories.Impls
 {
@@ -37,27 +38,27 @@ namespace MyAPI.Repositories.Impls
 
             if (string.IsNullOrWhiteSpace(entity.Username))
             {
-                throw new ArgumentException("Username cannot be null or empty.");
+                throw new Exception("Username cannot be null or empty.");
             }
 
             if (string.IsNullOrWhiteSpace(entity.Password))
             {
-                throw new ArgumentException("Password cannot be null or empty.");
+                throw new Exception("Password cannot be null or empty.");
             }
 
             if (string.IsNullOrWhiteSpace(entity.Email))
             {
-                throw new ArgumentException("Email cannot be null or empty.");
+                throw new Exception("Email cannot be null or empty.");
             }
 
             if (string.IsNullOrWhiteSpace(entity.NumberPhone))
             {
-                throw new ArgumentException("NumberPhone cannot be null or empty.");
+                throw new Exception("NumberPhone cannot be null or empty.");
             }
 
             if (entity.Dob == null)
             {
-                throw new ArgumentException("Date of Birth cannot be null.");
+                throw new Exception("Date of Birth cannot be null.");
             }
             var verifyCode = _sendMail.GenerateVerificationCode(4);
             var sendMailDTO = new SendMailDTO
@@ -90,6 +91,20 @@ namespace MyAPI.Repositories.Impls
             }
         }
 
+        public bool IsValidEmail(string email)
+        {
+            var emailPattern = @"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$";
+            return Regex.IsMatch(email, emailPattern);
+        }
+        public bool IsValidPhone(string phone)
+        {
+            var phonePattern = @"^(03|05|07|08|09)\d{8}$";
+            return Regex.IsMatch(phone, phonePattern);
+        }
+        public bool IsPasswordValid(string password)
+        {
+            return password.Length >= 6;
+        }
 
         public async Task<bool> checkAccountExsit(User user)
         {
@@ -100,12 +115,12 @@ namespace MyAPI.Repositories.Impls
 
             if (string.IsNullOrWhiteSpace(user.Username))
             {
-                throw new ArgumentException("Username cannot be null or empty.");
+                throw new Exception("Username cannot be null or empty.");
             }
 
             if (string.IsNullOrWhiteSpace(user.Email))
             {
-                throw new ArgumentException("Email cannot be null or empty.");
+                throw new Exception("Email cannot be null or empty.");
             }
 
             var userExit = await _context.Users.FirstOrDefaultAsync(x => x.Username == user.Username || x.Email == user.Email);
@@ -149,12 +164,12 @@ namespace MyAPI.Repositories.Impls
 
             if (string.IsNullOrWhiteSpace(userLoginDTO.Username))
             {
-                throw new ArgumentException("Username cannot be null or empty.");
+                throw new Exception("Username cannot be null or empty.");
             }
 
             if (string.IsNullOrWhiteSpace(userLoginDTO.Password))
             {
-                throw new ArgumentException("Password cannot be null or empty.");
+                throw new Exception("Password cannot be null or empty.");
             }
 
             var hashedPassword = _hassPassword.HashMD5Password(userLoginDTO.Password);
@@ -177,7 +192,7 @@ namespace MyAPI.Repositories.Impls
 
             if (string.IsNullOrWhiteSpace(entity.Email))
             {
-                throw new ArgumentException("Email cannot be null or empty.");
+                throw new Exception("Email cannot be null or empty.");
             }
 
             var acc = await _context.Users.FirstOrDefaultAsync(x => x.Email == entity.Email);
@@ -220,22 +235,22 @@ namespace MyAPI.Repositories.Impls
 
             if (string.IsNullOrWhiteSpace(resetPasswordDTO.Email))
             {
-                throw new ArgumentException("Email cannot be null or empty.");
+                throw new Exception("Email cannot be null or empty.");
             }
 
             if (string.IsNullOrWhiteSpace(resetPasswordDTO.Code))
             {
-                throw new ArgumentException("Verification code cannot be null or empty.");
+                throw new Exception("Verification code cannot be null or empty.");
             }
 
             if (string.IsNullOrWhiteSpace(resetPasswordDTO.Password))
             {
-                throw new ArgumentException("Password cannot be null or empty.");
+                throw new Exception("Password cannot be null or empty.");
             }
 
             if (string.IsNullOrWhiteSpace(resetPasswordDTO.ConfirmPassword))
             {
-                throw new ArgumentException("Confirm password cannot be null or empty.");
+                throw new Exception("Confirm password cannot be null or empty.");
             }
 
             if (resetPasswordDTO.Password != resetPasswordDTO.ConfirmPassword)
@@ -262,6 +277,16 @@ namespace MyAPI.Repositories.Impls
         {
             try
             {
+                if (string.IsNullOrEmpty(changeEmailDTO.CurrentEmail))
+                {
+                    throw new Exception("Email is not null or empty");
+                }
+                if (!IsValidEmail(changeEmailDTO.CurrentEmail))
+                {
+                    throw new Exception("Email is invalid.");
+                }
+
+
                 var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == changeEmailDTO.CurrentEmail);
                 var sendMailDTO = new SendMailDTO
                 {
@@ -282,8 +307,14 @@ namespace MyAPI.Repositories.Impls
                 {
                     throw new Exception("Not exist user!");
                 }
-
-
+                if (string.IsNullOrEmpty(changeEmailDTO.NewPassword))
+                {
+                    throw new Exception("New password not null");
+                }
+                if (!IsPasswordValid(changeEmailDTO.NewPassword))
+                {
+                    throw new Exception("Password is weak, please input password has length more than 6 charater");
+                }
                 var hashPassword = new HashPassword();
                 string hashedCurrentPassword = hashPassword.HashMD5Password(changeEmailDTO.OldPassword);
 
@@ -303,35 +334,35 @@ namespace MyAPI.Repositories.Impls
             }
             catch (Exception ex)
             {
-                throw new Exception("Something wrong when change email:" + ex.Message);
+                throw new Exception(ex.Message);
             }
         }
-
         public async Task<User> EditProfile(EditProfileDTO editProfileDTO)
         {
-            if (editProfileDTO == null)
-            {
-                throw new ArgumentNullException(nameof(editProfileDTO), "Edit profile data cannot be null.");
-            }
 
             if (string.IsNullOrWhiteSpace(editProfileDTO.Email))
             {
-                throw new ArgumentException("Email cannot be null or empty.");
+                throw new Exception("Email cannot be null or empty.");
             }
-
-            if (string.IsNullOrWhiteSpace(editProfileDTO.Password))
+            if (string.IsNullOrWhiteSpace(editProfileDTO.NumberPhone))
             {
-                throw new ArgumentException("Password cannot be null or empty.");
+                throw new Exception("NumberPhone cannot be null or empty.");
             }
-
-            if (string.IsNullOrWhiteSpace(editProfileDTO.ConfirmPassword))
+            if (string.IsNullOrWhiteSpace(editProfileDTO.Address))
             {
-                throw new ArgumentException("Confirm password cannot be null or empty.");
+                throw new Exception("Address cannot be null or empty.");
             }
-
-            if (!editProfileDTO.Password.Equals(editProfileDTO.ConfirmPassword))
+            if (string.IsNullOrWhiteSpace(editProfileDTO.FullName))
             {
-                throw new Exception("Passwords do not match.");
+                throw new Exception("FullName cannot be null or empty.");
+            }
+            if (!IsValidEmail(editProfileDTO.Email))
+            {
+                throw new Exception("Email is invalid.");
+            }
+            if (!IsValidPhone(editProfileDTO.NumberPhone))
+            {
+                throw new Exception("Phone is invalid");
             }
 
             var token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
@@ -351,7 +382,6 @@ namespace MyAPI.Repositories.Impls
             user.Email = editProfileDTO.Email;
             user.NumberPhone = editProfileDTO.NumberPhone;
             user.Avatar = editProfileDTO.Avatar;
-            user.Password = _hassPassword.HashMD5Password(editProfileDTO.Password);
             user.FullName = editProfileDTO.FullName;
             user.Address = editProfileDTO.Address;
             user.Dob = editProfileDTO.Dob;
@@ -372,12 +402,12 @@ namespace MyAPI.Repositories.Impls
 
             if (string.IsNullOrWhiteSpace(userLogin.Username) && string.IsNullOrWhiteSpace(userLogin.Email))
             {
-                throw new ArgumentException("Either Username or Email must be provided.");
+                throw new Exception("Either Username or Email must be provided.");
             }
 
             if (string.IsNullOrWhiteSpace(userLogin.Password))
             {
-                throw new ArgumentException("Password cannot be null or empty.");
+                throw new Exception("Password cannot be null or empty.");
             }
 
             try
@@ -419,7 +449,7 @@ namespace MyAPI.Repositories.Impls
         {
             if (id <= 0)
             {
-                throw new ArgumentException("User ID must be greater than 0.");
+                throw new Exception("User ID must be greater than 0.");
             }
 
             try
