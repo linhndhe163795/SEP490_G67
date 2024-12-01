@@ -349,7 +349,6 @@ namespace MyAPI.Controllers
             return Ok("Import confirmed successfully!");
         }
         [HttpGet("getNumberSeatAvaiable/{tripId}")]
-
         public async Task<IActionResult> GetNumberSeatAvailable(int tripId)
         {
             try
@@ -388,8 +387,6 @@ namespace MyAPI.Controllers
             }
             catch (Exception ex)
             {
-                // Ghi log lỗi nếu cần
-                Console.WriteLine($"Error: {ex.Message}");
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }

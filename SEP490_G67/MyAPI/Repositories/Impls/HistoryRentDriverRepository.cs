@@ -60,7 +60,6 @@ namespace MyAPI.Repositories.Impls
             {
                 throw new Exception("Price must be greater than 0.");
             }
-
             try
             {
                 var checkRequest = await _context.Requests.FirstOrDefaultAsync(s => s.Id == requestId);

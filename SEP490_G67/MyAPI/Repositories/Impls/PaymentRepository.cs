@@ -50,11 +50,6 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception("Description is required.");
             }
 
-            if (string.IsNullOrWhiteSpace(codePayment))
-            {
-                throw new Exception("CodePayment is required.");
-            }
-
             if (ticketID <= 0)
             {
                 throw new Exception("Invalid ticket ID.");
