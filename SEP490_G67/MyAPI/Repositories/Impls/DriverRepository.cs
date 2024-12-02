@@ -210,8 +210,10 @@ namespace MyAPI.Repositories.Impls
                 var driverLoginRespone = new DriverLoginRespone
                 {
                     Email = driver.Email,
+                    UserName = driver.UserName,
                     Id = driver.Id,
                     RoleName = "Driver"
+
                 };
                 return driverLoginRespone;
             }
