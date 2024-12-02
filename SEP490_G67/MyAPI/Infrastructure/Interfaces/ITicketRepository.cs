@@ -13,13 +13,10 @@ namespace MyAPI.Infrastructure.Interfaces
         Task<int> GetPriceFromPoint(TicketFromDriverDTOs ticket, int vehicleId);
         Task<TicketNotPaidSummary> GetListTicketNotPaid (int vehicleId);
         Task UpdateStatusTicketNotPaid(int id, int driverId);
-
         Task<bool> UpdateStatusTicketForPayment(int id);
-
-        Task AcceptOrDenyRequestRentCar(AddTicketForRentCarDTO addTicketForRentCarDTO);
-        Task<TicketByIdDTOs> getTicketById(int ticketId);
+        Task AcceptOrDenyRequestRentCar(int requestId, bool choose, int vehicleId, decimal price);
+        Task<TicketByIdDTOs> getTicketDetailsById(int ticketId, int userId);
         Task<RevenueTicketDTO> getRevenueTicket(DateTime startTime, DateTime endTime, int? vehicle,int? vehicleOwner, int userId);
-
         Task<bool> deleteTicketTimeOut(int ticketId);
 
         Task<bool> UpdateVehicleInRequestAsync(int vehicleId, int requestId);

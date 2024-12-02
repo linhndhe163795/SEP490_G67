@@ -21,8 +21,9 @@ namespace MyAPI.Repositories.Impls
             try
             {
                 var listPromotion = await (from pu in _context.PromotionUsers
-                                           join p in _context.Promotions on pu.UserId equals p.Id
-                                           where p.Id == id
+                                           join p in _context.Promotions on pu.PromotionId equals p.Id
+                                           join u in _context.Users on pu.UserId equals u.Id
+                                           where u.Id == id
                                            select p).ToListAsync();
                 var listPromotionMapper = _mapper.Map<List<PromotionDTO>>(listPromotion);
                 return listPromotionMapper;
