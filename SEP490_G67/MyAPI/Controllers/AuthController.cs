@@ -46,7 +46,7 @@ namespace MyAPI.Controllers
                     var lastIdUser = _userRepository.lastIdUser();
                     UserRole ur = new UserRole
                     {
-                        RoleId = 3,
+                        RoleId = 4,
                         Status = true,
                         UserId = lastIdUser.Result
                     };
@@ -120,7 +120,7 @@ namespace MyAPI.Controllers
                 if (await _userRepository.checkAccountExsit(userMapper))
                 {
                     await _userRepository.ForgotPassword(forgotPassword);
-                    return Ok();
+                    return Ok("Vertify Code has been sent to your email!");
                 }
                 else
                 {
