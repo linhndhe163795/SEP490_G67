@@ -113,16 +113,6 @@ namespace MyAPI.Repositories.Impls
                 throw new ArgumentNullException(nameof(user), "User data cannot be null.");
             }
 
-            if (string.IsNullOrWhiteSpace(user.Username))
-            {
-                throw new Exception("Username cannot be null or empty.");
-            }
-
-            if (string.IsNullOrWhiteSpace(user.Email))
-            {
-                throw new Exception("Email cannot be null or empty.");
-            }
-
             var userExit = await _context.Users.FirstOrDefaultAsync(x => x.Username == user.Username || x.Email == user.Email);
             return userExit != null;
         }
@@ -204,7 +194,7 @@ namespace MyAPI.Repositories.Impls
                     FromEmail = "duclinh5122002@gmail.com",
                     Password = "jetj haze ijdw euci",
                     ToEmail = entity.Email,
-                    Subject = "Verify Code",
+                    Subject = "Code Reset Password",
                     Body = verifyCode,
                 };
 
@@ -225,17 +215,11 @@ namespace MyAPI.Repositories.Impls
             }
         }
 
-
         public async Task ResetPassword(ResetPasswordDTO resetPasswordDTO)
         {
             if (resetPasswordDTO == null)
             {
                 throw new ArgumentNullException(nameof(resetPasswordDTO), "Reset password data cannot be null.");
-            }
-
-            if (string.IsNullOrWhiteSpace(resetPasswordDTO.Email))
-            {
-                throw new Exception("Email cannot be null or empty.");
             }
 
             if (string.IsNullOrWhiteSpace(resetPasswordDTO.Code))
@@ -271,7 +255,6 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception("Invalid email or reset code.");
             }
         }
-
 
         public async Task ChangePassword(ChangePasswordDTO changeEmailDTO)
         {
