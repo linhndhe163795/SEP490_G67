@@ -55,24 +55,12 @@ namespace MyAPI.Controllers
             try
             {
                 var timeonly = time.ToString("HH:mm:ss");
-                var date = time.ToString("yyyy-MM-dd");
-
                 var searchTrip = await _tripRepository.SreachTrip(startPoint, endPoint, timeonly);
 
                 if (searchTrip == null)
                 {
                     return NotFound("Not found trip");
                 }
-
-                var cookieOptions = new CookieOptions
-                {
-                    HttpOnly = true, // Cookie chỉ hoạt động qua HTTP
-                    Secure = true,   // Chỉ gửi qua HTTPS
-                    SameSite = SameSiteMode.Strict, // Không cho phép cross-origin
-                    Expires = DateTime.UtcNow.AddMinutes(20) // Hết hạn sau 10 phút
-                };
-
-                Response.Cookies.Append("date",date, cookieOptions);
 
                 return Ok(searchTrip);
             }
@@ -81,7 +69,7 @@ namespace MyAPI.Controllers
                 return BadRequest("searchTripAPI: " + ex.Message);
             }
         }
-            [Authorize(Roles = "Staff")]
+        [Authorize(Roles = "Staff")]
         [HttpPost("addTrip")]
         public async Task<IActionResult> addTrip(TripDTO trip)
         {
