@@ -117,7 +117,7 @@ namespace MyAPI.Repositories.Impls
                 await _context.SaveChangesAsync();
                 var pointUser = new PointUser
                 {
-                    Points = (int?)((int?) createTicket.PricePromotion * Constant.TICH_DIEM),
+                    Points = (int?)((int?)createTicket.PricePromotion * Constant.TICH_DIEM),
                     UserId = userId,
                     PointsMinus = 0,
                     CreatedAt = DateTime.Now,
@@ -300,7 +300,7 @@ namespace MyAPI.Repositories.Impls
 
                 return true;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return false;
                 throw new Exception(ex.Message);
@@ -500,22 +500,58 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception("UpdateStatusTicketNotPaid: " + ex.Message);
             }
         }
-
-        public async Task<TicketByIdDTOs> getTicketById(int ticketId)
+        public async Task<TicketByIdDTOs> getTicketDetailsById(int ticketId, int userId)
         {
             try
             {
                 if (ticketId <= 0)
                 {
-                    throw new Exception("Invalid ticket ID.");
+                    throw new ArgumentException("Invalid ticket ID.");
                 }
-                var ticketById = await _context.Tickets.FirstOrDefaultAsync(x => x.Id == ticketId);
-                var mapperTicketById = _mapper.Map<TicketByIdDTOs>(ticketById);
-                return mapperTicketById;
+
+                var getInforUser = await _context.Users
+                    .Include(x => x.UserRoles)
+                    .ThenInclude(x => x.Role)
+                    .FirstOrDefaultAsync(x => x.Id == userId);
+
+                if (getInforUser == null)
+                {
+                    throw new ArgumentException("User not found.");
+                }
+
+                if (IsUserRole(getInforUser, "Staff"))
+                {
+                    var ticketById = await _context.Tickets
+                        .FirstOrDefaultAsync(x => x.Id == ticketId);
+
+                    if (ticketById == null)
+                    {
+                        throw new ArgumentException("Ticket not found.");
+                    }
+
+                    var mapperTicketById = _mapper.Map<TicketByIdDTOs>(ticketById);
+                    return mapperTicketById;
+                }
+
+                if (IsUserRole(getInforUser, "User"))
+                {
+                    var ticketById = await _context.Tickets
+                        .FirstOrDefaultAsync(x => x.Id == ticketId && x.UserId == userId);
+
+                    if (ticketById == null)
+                    {
+                        throw new ArgumentException("Ticket not found or you do not have access to this ticket.");
+                    }
+
+                    var mapperTicketById = _mapper.Map<TicketByIdDTOs>(ticketById);
+                    return mapperTicketById;
+                }
+
+                throw new UnauthorizedAccessException("User does not have valid roles to access the ticket.");
             }
             catch (Exception ex)
             {
-                throw new Exception(ex.Message);
+                throw new Exception($"Error fetching ticket details: {ex.Message}", ex);
             }
         }
 
@@ -649,7 +685,7 @@ namespace MyAPI.Repositories.Impls
         {
             try
             {
-              
+
                 if (userId <= 0)
                 {
                     throw new Exception("Invalid user.");

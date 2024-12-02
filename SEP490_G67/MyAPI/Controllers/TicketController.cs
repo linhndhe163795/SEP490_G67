@@ -188,7 +188,17 @@ namespace MyAPI.Controllers
         {
             try
             {
-                var ticketById = await _ticketRepository.getTicketById(ticketId);
+                string token = Request.Headers["Authorization"];
+                if (token.StartsWith("Bearer"))
+                {
+                    token = token.Substring("Bearer ".Length).Trim();
+                }
+                if (string.IsNullOrEmpty(token))
+                {
+                    return BadRequest("Token is required.");
+                }
+                var userId = _getInforFromToken.GetIdInHeader(token);
+                var ticketById = await _ticketRepository.getTicketDetailsById(ticketId,userId);
                 return Ok(ticketById);
             }
             catch (Exception ex)
