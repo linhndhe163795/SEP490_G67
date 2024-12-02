@@ -761,7 +761,7 @@ namespace MyAPI.Repositories.Impls
                 EndLocation = convenientTripDTO.PointEnd,
                 StartTime = convenientTripDTO.StartTime,
                 EndTime = null,
-                Seats = null,
+                Seats = convenientTripDTO.SeatNumber,
                 Price = convenientTripDTO.Price,
                 CreatedAt = DateTime.Now,
                 CreatedBy = userId,
