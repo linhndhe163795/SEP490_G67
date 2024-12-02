@@ -9,6 +9,7 @@ namespace MyAPI.Models
         {
             HistoryRentDrivers = new HashSet<HistoryRentDriver>();
             HistoryRentVehicles = new HashSet<HistoryRentVehicle>();
+            Requests = new HashSet<Request>();
             Vehicles = new HashSet<Vehicle>();
         }
 
@@ -32,6 +33,7 @@ namespace MyAPI.Models
         public virtual TypeOfDriver? TypeOfDriverNavigation { get; set; }
         public virtual ICollection<HistoryRentDriver> HistoryRentDrivers { get; set; }
         public virtual ICollection<HistoryRentVehicle> HistoryRentVehicles { get; set; }
+        public virtual ICollection<Request> Requests { get; set; }
         public virtual ICollection<Vehicle> Vehicles { get; set; }
     }
 }

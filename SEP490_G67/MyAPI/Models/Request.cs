@@ -20,7 +20,9 @@ namespace MyAPI.Models
         public int? CreatedBy { get; set; }
         public DateTime? UpdateAt { get; set; }
         public int? UpdateBy { get; set; }
+        public int? DriverId { get; set; }
 
+        public virtual Driver? Driver { get; set; }
         public virtual TypeOfRequest? Type { get; set; }
         public virtual User User { get; set; } = null!;
         public virtual ICollection<RequestDetail> RequestDetails { get; set; }

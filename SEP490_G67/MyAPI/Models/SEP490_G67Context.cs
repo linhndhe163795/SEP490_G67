@@ -53,15 +53,17 @@ namespace MyAPI.Models
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-                optionsBuilder.UseSqlServer("server =localhost; database =SEP490_G67;uid=sa;pwd=123;TrustServerCertificate=true");
+                optionsBuilder.UseSqlServer("Server=202.92.7.204,1437;Database=SEP490_G67;User Id=SEP490_G67;Password=M77aw~0c5;MultipleActiveResultSets=True");
             }
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.HasDefaultSchema("SEP490_G67");
+
             modelBuilder.Entity<ChangeTimeTrip>(entity =>
             {
-                entity.ToTable("ChangeTimeTrip");
+                entity.ToTable("ChangeTimeTrip", "dbo");
 
                 entity.Property(e => e.Id).HasColumnName("id");
 
@@ -95,12 +97,12 @@ namespace MyAPI.Models
                 entity.HasOne(d => d.Ticked)
                     .WithMany(p => p.ChangeTimeTrips)
                     .HasForeignKey(d => d.TickedId)
-                    .HasConstraintName("FK__ChangeTim__ticke__797309D9");
+                    .HasConstraintName("FK__ChangeTim__ticke__11158940");
             });
 
             modelBuilder.Entity<Driver>(entity =>
             {
-                entity.ToTable("Driver");
+                entity.ToTable("Driver", "dbo");
 
                 entity.Property(e => e.Id).HasColumnName("id");
 
@@ -165,15 +167,15 @@ namespace MyAPI.Models
                 entity.HasOne(d => d.TypeOfDriverNavigation)
                     .WithMany(p => p.Drivers)
                     .HasForeignKey(d => d.TypeOfDriver)
-                    .HasConstraintName("FK__Driver__type_of___7A672E12");
+                    .HasConstraintName("FK__Driver__type_of___1209AD79");
             });
 
             modelBuilder.Entity<HistoryRentDriver>(entity =>
             {
                 entity.HasKey(e => e.HistoryId)
-                    .HasName("PK__HistoryR__096AA2E93A23D542");
+                    .HasName("PK__HistoryR__096AA2E965BD99D7");
 
-                entity.ToTable("HistoryRentDriver");
+                entity.ToTable("HistoryRentDriver", "dbo");
 
                 entity.Property(e => e.HistoryId).HasColumnName("history_id");
 
@@ -201,20 +203,20 @@ namespace MyAPI.Models
                 entity.HasOne(d => d.Driver)
                     .WithMany(p => p.HistoryRentDrivers)
                     .HasForeignKey(d => d.DriverId)
-                    .HasConstraintName("FK__HistoryRe__drive__7B5B524B");
+                    .HasConstraintName("FK__HistoryRe__drive__12FDD1B2");
 
                 entity.HasOne(d => d.Vehicle)
                     .WithMany(p => p.HistoryRentDrivers)
                     .HasForeignKey(d => d.VehicleId)
-                    .HasConstraintName("FK__HistoryRe__vehic__7C4F7684");
+                    .HasConstraintName("FK__HistoryRe__vehic__13F1F5EB");
             });
 
             modelBuilder.Entity<HistoryRentVehicle>(entity =>
             {
                 entity.HasKey(e => e.HistoryId)
-                    .HasName("PK__HistoryR__096AA2E973F44309");
+                    .HasName("PK__HistoryR__096AA2E93C78B7F1");
 
-                entity.ToTable("HistoryRentVehicle");
+                entity.ToTable("HistoryRentVehicle", "dbo");
 
                 entity.Property(e => e.HistoryId).HasColumnName("history_id");
 
@@ -244,17 +246,17 @@ namespace MyAPI.Models
                 entity.HasOne(d => d.Driver)
                     .WithMany(p => p.HistoryRentVehicles)
                     .HasForeignKey(d => d.DriverId)
-                    .HasConstraintName("FK__HistoryRe__drive__7D439ABD");
+                    .HasConstraintName("FK__HistoryRe__drive__14E61A24");
 
                 entity.HasOne(d => d.Vehicle)
                     .WithMany(p => p.HistoryRentVehicles)
                     .HasForeignKey(d => d.VehicleId)
-                    .HasConstraintName("FK__HistoryRe__vehic__7E37BEF6");
+                    .HasConstraintName("FK__HistoryRe__vehic__15DA3E5D");
             });
 
             modelBuilder.Entity<LossCost>(entity =>
             {
-                entity.ToTable("LossCost");
+                entity.ToTable("LossCost", "dbo");
 
                 entity.Property(e => e.Id).HasColumnName("id");
 
@@ -290,17 +292,17 @@ namespace MyAPI.Models
                 entity.HasOne(d => d.LossCostType)
                     .WithMany(p => p.LossCosts)
                     .HasForeignKey(d => d.LossCostTypeId)
-                    .HasConstraintName("FK__LossCost__loss_c__7F2BE32F");
+                    .HasConstraintName("FK__LossCost__loss_c__16CE6296");
 
                 entity.HasOne(d => d.Vehicle)
                     .WithMany(p => p.LossCosts)
                     .HasForeignKey(d => d.VehicleId)
-                    .HasConstraintName("FK__LossCost__vehicl__00200768");
+                    .HasConstraintName("FK__LossCost__vehicl__17C286CF");
             });
 
             modelBuilder.Entity<LossCostType>(entity =>
             {
-                entity.ToTable("LossCostType");
+                entity.ToTable("LossCostType", "dbo");
 
                 entity.Property(e => e.Id).HasColumnName("id");
 
@@ -324,7 +326,7 @@ namespace MyAPI.Models
 
             modelBuilder.Entity<Payment>(entity =>
             {
-                entity.ToTable("Payment");
+                entity.ToTable("Payment", "dbo");
 
                 entity.Property(e => e.PaymentId).HasColumnName("payment_id");
 
@@ -367,22 +369,22 @@ namespace MyAPI.Models
                 entity.HasOne(d => d.Ticket)
                     .WithMany(p => p.Payments)
                     .HasForeignKey(d => d.TicketId)
-                    .HasConstraintName("FK__Payment__ticket___01142BA1");
+                    .HasConstraintName("FK__Payment__ticket___18B6AB08");
 
                 entity.HasOne(d => d.TypeOfPaymentNavigation)
                     .WithMany(p => p.Payments)
                     .HasForeignKey(d => d.TypeOfPayment)
-                    .HasConstraintName("FK__Payment__type_of__02084FDA");
+                    .HasConstraintName("FK__Payment__type_of__19AACF41");
 
                 entity.HasOne(d => d.User)
                     .WithMany(p => p.Payments)
                     .HasForeignKey(d => d.UserId)
-                    .HasConstraintName("FK__Payment__user_id__02FC7413");
+                    .HasConstraintName("FK__Payment__user_id__1A9EF37A");
             });
 
             modelBuilder.Entity<PaymentRentDriver>(entity =>
             {
-                entity.ToTable("PaymentRentDriver");
+                entity.ToTable("PaymentRentDriver", "dbo");
 
                 entity.Property(e => e.Id).HasColumnName("id");
 
@@ -416,12 +418,12 @@ namespace MyAPI.Models
                 entity.HasOne(d => d.HistoryRentDriver)
                     .WithMany(p => p.PaymentRentDrivers)
                     .HasForeignKey(d => d.HistoryRentDriverId)
-                    .HasConstraintName("FK__PaymentRe__histo__03F0984C");
+                    .HasConstraintName("FK__PaymentRe__histo__1B9317B3");
             });
 
             modelBuilder.Entity<PaymentRentVehicle>(entity =>
             {
-                entity.ToTable("PaymentRentVehicle");
+                entity.ToTable("PaymentRentVehicle", "dbo");
 
                 entity.Property(e => e.Id).HasColumnName("id");
 
@@ -453,12 +455,12 @@ namespace MyAPI.Models
                 entity.HasOne(d => d.HistoryRentVehicle)
                     .WithMany(p => p.PaymentRentVehicles)
                     .HasForeignKey(d => d.HistoryRentVehicleId)
-                    .HasConstraintName("FK__PaymentRe__histo__04E4BC85");
+                    .HasConstraintName("FK__PaymentRe__histo__1C873BEC");
             });
 
             modelBuilder.Entity<PointUser>(entity =>
             {
-                entity.ToTable("PointUser");
+                entity.ToTable("PointUser", "dbo");
 
                 entity.Property(e => e.Id).HasColumnName("id");
 
@@ -490,17 +492,17 @@ namespace MyAPI.Models
                 entity.HasOne(d => d.Payment)
                     .WithMany(p => p.PointUsers)
                     .HasForeignKey(d => d.PaymentId)
-                    .HasConstraintName("FK__PointUser__payme__05D8E0BE");
+                    .HasConstraintName("FK__PointUser__payme__1D7B6025");
 
                 entity.HasOne(d => d.User)
                     .WithMany(p => p.PointUsers)
                     .HasForeignKey(d => d.UserId)
-                    .HasConstraintName("FK__PointUser__user___06CD04F7");
+                    .HasConstraintName("FK__PointUser__user___1E6F845E");
             });
 
             modelBuilder.Entity<Promotion>(entity =>
             {
-                entity.ToTable("Promotion");
+                entity.ToTable("Promotion", "dbo");
 
                 entity.Property(e => e.Id).HasColumnName("id");
 
@@ -546,9 +548,9 @@ namespace MyAPI.Models
             modelBuilder.Entity<PromotionUser>(entity =>
             {
                 entity.HasKey(e => new { e.UserId, e.PromotionId })
-                    .HasName("PK__Promotio__1B75A259416E2D75");
+                    .HasName("PK__Promotio__1B75A25968EB7AAA");
 
-                entity.ToTable("PromotionUser");
+                entity.ToTable("PromotionUser", "dbo");
 
                 entity.Property(e => e.UserId).HasColumnName("user_id");
 
@@ -562,18 +564,18 @@ namespace MyAPI.Models
                     .WithMany(p => p.PromotionUsers)
                     .HasForeignKey(d => d.PromotionId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Promotion__promo__07C12930");
+                    .HasConstraintName("FK__Promotion__promo__1F63A897");
 
                 entity.HasOne(d => d.User)
                     .WithMany(p => p.PromotionUsers)
                     .HasForeignKey(d => d.UserId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Promotion__user___08B54D69");
+                    .HasConstraintName("FK__Promotion__user___2057CCD0");
             });
 
             modelBuilder.Entity<Request>(entity =>
             {
-                entity.ToTable("Request");
+                entity.ToTable("Request", "dbo");
 
                 entity.Property(e => e.Id).HasColumnName("id");
 
@@ -587,6 +589,8 @@ namespace MyAPI.Models
                 entity.Property(e => e.Description)
                     .HasColumnType("ntext")
                     .HasColumnName("description");
+
+                entity.Property(e => e.DriverId).HasColumnName("driverId");
 
                 entity.Property(e => e.Note)
                     .HasColumnType("ntext")
@@ -604,24 +608,29 @@ namespace MyAPI.Models
 
                 entity.Property(e => e.UserId).HasColumnName("user_id");
 
+                entity.HasOne(d => d.Driver)
+                    .WithMany(p => p.Requests)
+                    .HasForeignKey(d => d.DriverId)
+                    .HasConstraintName("FK_Request_Driver");
+
                 entity.HasOne(d => d.Type)
                     .WithMany(p => p.Requests)
                     .HasForeignKey(d => d.TypeId)
-                    .HasConstraintName("FK__Request__type_id__09A971A2");
+                    .HasConstraintName("FK__Request__type_id__214BF109");
 
                 entity.HasOne(d => d.User)
                     .WithMany(p => p.Requests)
                     .HasForeignKey(d => d.UserId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Request__user_id__0A9D95DB");
+                    .HasConstraintName("FK__Request__user_id__22401542");
             });
 
             modelBuilder.Entity<RequestDetail>(entity =>
             {
                 entity.HasKey(e => e.DetailId)
-                    .HasName("PK__Request___38E9A224FD1B58EC");
+                    .HasName("PK__Request___38E9A2245DCAA6BB");
 
-                entity.ToTable("Request_Details");
+                entity.ToTable("Request_Details", "dbo");
 
                 entity.Property(e => e.DetailId).HasColumnName("detail_id");
 
@@ -685,17 +694,17 @@ namespace MyAPI.Models
                 entity.HasOne(d => d.Request)
                     .WithMany(p => p.RequestDetails)
                     .HasForeignKey(d => d.RequestId)
-                    .HasConstraintName("FK__Request_D__reque__0B91BA14");
+                    .HasConstraintName("FK__Request_D__reque__2334397B");
 
                 entity.HasOne(d => d.Vehicle)
                     .WithMany(p => p.RequestDetails)
                     .HasForeignKey(d => d.VehicleId)
-                    .HasConstraintName("FK__Request_D__vehic__0C85DE4D");
+                    .HasConstraintName("FK__Request_D__vehic__24285DB4");
             });
 
             modelBuilder.Entity<Review>(entity =>
             {
-                entity.ToTable("Review");
+                entity.ToTable("Review", "dbo");
 
                 entity.Property(e => e.Id).HasColumnName("id");
 
@@ -723,17 +732,17 @@ namespace MyAPI.Models
                 entity.HasOne(d => d.Trip)
                     .WithMany(p => p.Reviews)
                     .HasForeignKey(d => d.TripId)
-                    .HasConstraintName("FK__Review__trip_id__0D7A0286");
+                    .HasConstraintName("FK__Review__trip_id__251C81ED");
 
                 entity.HasOne(d => d.User)
                     .WithMany(p => p.Reviews)
                     .HasForeignKey(d => d.UserId)
-                    .HasConstraintName("FK__Review__user_id__0E6E26BF");
+                    .HasConstraintName("FK__Review__user_id__2610A626");
             });
 
             modelBuilder.Entity<Role>(entity =>
             {
-                entity.ToTable("Role");
+                entity.ToTable("Role", "dbo");
 
                 entity.Property(e => e.Id).HasColumnName("id");
 
@@ -759,7 +768,7 @@ namespace MyAPI.Models
 
             modelBuilder.Entity<Ticket>(entity =>
             {
-                entity.ToTable("Ticket");
+                entity.ToTable("Ticket", "dbo");
 
                 entity.Property(e => e.Id).HasColumnName("id");
 
@@ -832,32 +841,32 @@ namespace MyAPI.Models
                 entity.HasOne(d => d.Trip)
                     .WithMany(p => p.Tickets)
                     .HasForeignKey(d => d.TripId)
-                    .HasConstraintName("FK__Ticket__trip_id__0F624AF8");
+                    .HasConstraintName("FK__Ticket__trip_id__2704CA5F");
 
                 entity.HasOne(d => d.TypeOfPaymentNavigation)
                     .WithMany(p => p.Tickets)
                     .HasForeignKey(d => d.TypeOfPayment)
-                    .HasConstraintName("FK__Ticket__type_of___114A936A");
+                    .HasConstraintName("FK__Ticket__type_of___28ED12D1");
 
                 entity.HasOne(d => d.TypeOfTicketNavigation)
                     .WithMany(p => p.Tickets)
                     .HasForeignKey(d => d.TypeOfTicket)
-                    .HasConstraintName("FK__Ticket__type_of___10566F31");
+                    .HasConstraintName("FK__Ticket__type_of___27F8EE98");
 
                 entity.HasOne(d => d.User)
                     .WithMany(p => p.Tickets)
                     .HasForeignKey(d => d.UserId)
-                    .HasConstraintName("FK__Ticket__user_id__1332DBDC");
+                    .HasConstraintName("FK__Ticket__user_id__29E1370A");
 
                 entity.HasOne(d => d.Vehicle)
                     .WithMany(p => p.Tickets)
                     .HasForeignKey(d => d.VehicleId)
-                    .HasConstraintName("FK__Ticket__vehicle___123EB7A3");
+                    .HasConstraintName("FK__Ticket__vehicle___2AD55B43");
             });
 
             modelBuilder.Entity<Trip>(entity =>
             {
-                entity.ToTable("Trip");
+                entity.ToTable("Trip", "dbo");
 
                 entity.Property(e => e.Id).HasColumnName("id");
 
@@ -906,6 +915,8 @@ namespace MyAPI.Models
 
             modelBuilder.Entity<TripDetail>(entity =>
             {
+                entity.ToTable("TripDetails", "dbo");
+
                 entity.Property(e => e.Id).HasColumnName("id");
 
                 entity.Property(e => e.CreatedAt)
@@ -940,12 +951,12 @@ namespace MyAPI.Models
                 entity.HasOne(d => d.Trip)
                     .WithMany(p => p.TripDetails)
                     .HasForeignKey(d => d.TripId)
-                    .HasConstraintName("FK__TripDetai__trip___151B244E");
+                    .HasConstraintName("FK__TripDetai__trip___2CBDA3B5");
             });
 
             modelBuilder.Entity<TypeOfDriver>(entity =>
             {
-                entity.ToTable("TypeOfDriver");
+                entity.ToTable("TypeOfDriver", "dbo");
 
                 entity.Property(e => e.Id).HasColumnName("id");
 
@@ -971,7 +982,7 @@ namespace MyAPI.Models
 
             modelBuilder.Entity<TypeOfPayment>(entity =>
             {
-                entity.ToTable("TypeOfPayment");
+                entity.ToTable("TypeOfPayment", "dbo");
 
                 entity.Property(e => e.Id).HasColumnName("id");
 
@@ -995,7 +1006,7 @@ namespace MyAPI.Models
 
             modelBuilder.Entity<TypeOfRequest>(entity =>
             {
-                entity.ToTable("Type_of_Request");
+                entity.ToTable("Type_of_Request", "dbo");
 
                 entity.Property(e => e.Id).HasColumnName("id");
 
@@ -1010,7 +1021,7 @@ namespace MyAPI.Models
 
             modelBuilder.Entity<TypeOfTicket>(entity =>
             {
-                entity.ToTable("TypeOfTicket");
+                entity.ToTable("TypeOfTicket", "dbo");
 
                 entity.Property(e => e.Id).HasColumnName("id");
 
@@ -1034,7 +1045,7 @@ namespace MyAPI.Models
 
             modelBuilder.Entity<TypeOfTrip>(entity =>
             {
-                entity.ToTable("TypeOfTrip");
+                entity.ToTable("TypeOfTrip", "dbo");
 
                 entity.Property(e => e.Description).HasColumnType("text");
 
@@ -1045,12 +1056,12 @@ namespace MyAPI.Models
 
             modelBuilder.Entity<User>(entity =>
             {
-                entity.ToTable("User");
+                entity.ToTable("User", "dbo");
 
-                entity.HasIndex(e => e.Email, "UQ__User__AB6E6164D0112D69")
+                entity.HasIndex(e => e.Email, "UQ__User__AB6E6164C6F9C56C")
                     .IsUnique();
 
-                entity.HasIndex(e => e.Username, "UQ__User__F3DBC572439CD1FF")
+                entity.HasIndex(e => e.Username, "UQ__User__F3DBC572F0E7C577")
                     .IsUnique();
 
                 entity.Property(e => e.Id).HasColumnName("id");
@@ -1114,7 +1125,7 @@ namespace MyAPI.Models
 
             modelBuilder.Entity<UserCancleTicket>(entity =>
             {
-                entity.ToTable("UserCancleTicket");
+                entity.ToTable("UserCancleTicket", "dbo");
 
                 entity.Property(e => e.Id).HasColumnName("id");
 
@@ -1144,25 +1155,25 @@ namespace MyAPI.Models
                 entity.HasOne(d => d.Payment)
                     .WithMany(p => p.UserCancleTickets)
                     .HasForeignKey(d => d.PaymentId)
-                    .HasConstraintName("FK__UserCancl__payme__160F4887");
+                    .HasConstraintName("FK__UserCancl__payme__2DB1C7EE");
 
                 entity.HasOne(d => d.Ticket)
                     .WithMany(p => p.UserCancleTickets)
                     .HasForeignKey(d => d.TicketId)
-                    .HasConstraintName("FK__UserCancl__ticke__17036CC0");
+                    .HasConstraintName("FK__UserCancl__ticke__2EA5EC27");
 
                 entity.HasOne(d => d.User)
                     .WithMany(p => p.UserCancleTickets)
                     .HasForeignKey(d => d.UserId)
-                    .HasConstraintName("FK__UserCancl__user___17F790F9");
+                    .HasConstraintName("FK__UserCancl__user___2F9A1060");
             });
 
             modelBuilder.Entity<UserRole>(entity =>
             {
                 entity.HasKey(e => new { e.UserId, e.RoleId })
-                    .HasName("PK__UserRole__6EDEA153C448EDA0");
+                    .HasName("PK__UserRole__6EDEA15399B1A8A4");
 
-                entity.ToTable("UserRole");
+                entity.ToTable("UserRole", "dbo");
 
                 entity.Property(e => e.UserId).HasColumnName("user_id");
 
@@ -1174,18 +1185,18 @@ namespace MyAPI.Models
                     .WithMany(p => p.UserRoles)
                     .HasForeignKey(d => d.RoleId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__UserRole__role_i__18EBB532");
+                    .HasConstraintName("FK__UserRole__role_i__308E3499");
 
                 entity.HasOne(d => d.User)
                     .WithMany(p => p.UserRoles)
                     .HasForeignKey(d => d.UserId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__UserRole__user_i__19DFD96B");
+                    .HasConstraintName("FK__UserRole__user_i__318258D2");
             });
 
             modelBuilder.Entity<Vehicle>(entity =>
             {
-                entity.ToTable("Vehicle");
+                entity.ToTable("Vehicle", "dbo");
 
                 entity.Property(e => e.Id).HasColumnName("id");
 
@@ -1228,22 +1239,22 @@ namespace MyAPI.Models
                 entity.HasOne(d => d.Driver)
                     .WithMany(p => p.Vehicles)
                     .HasForeignKey(d => d.DriverId)
-                    .HasConstraintName("FK__Vehicle__driver___1AD3FDA4");
+                    .HasConstraintName("FK__Vehicle__driver___32767D0B");
 
                 entity.HasOne(d => d.VehicleOwnerNavigation)
                     .WithMany(p => p.Vehicles)
                     .HasForeignKey(d => d.VehicleOwner)
-                    .HasConstraintName("FK__Vehicle__vehicle__1CBC4616");
+                    .HasConstraintName("FK__Vehicle__vehicle__345EC57D");
 
                 entity.HasOne(d => d.VehicleType)
                     .WithMany(p => p.Vehicles)
                     .HasForeignKey(d => d.VehicleTypeId)
-                    .HasConstraintName("FK__Vehicle__vehicle__1BC821DD");
+                    .HasConstraintName("FK__Vehicle__vehicle__336AA144");
             });
 
             modelBuilder.Entity<VehicleSeatStatus>(entity =>
             {
-                entity.ToTable("VehicleSeatStatus");
+                entity.ToTable("VehicleSeatStatus", "dbo");
 
                 entity.Property(e => e.Id).HasColumnName("id");
 
@@ -1275,15 +1286,15 @@ namespace MyAPI.Models
                 entity.HasOne(d => d.Vehicle)
                     .WithMany(p => p.VehicleSeatStatuses)
                     .HasForeignKey(d => d.VehicleId)
-                    .HasConstraintName("FK__VehicleSe__vehic__1DB06A4F");
+                    .HasConstraintName("FK__VehicleSe__vehic__3552E9B6");
             });
 
             modelBuilder.Entity<VehicleTrip>(entity =>
             {
                 entity.HasKey(e => new { e.TripId, e.VehicleId })
-                    .HasName("PK__VehicleT__3F031A225F5E5653");
+                    .HasName("PK__VehicleT__3F031A221C0764AC");
 
-                entity.ToTable("VehicleTrip");
+                entity.ToTable("VehicleTrip", "dbo");
 
                 entity.Property(e => e.TripId).HasColumnName("trip_id");
 
@@ -1306,18 +1317,18 @@ namespace MyAPI.Models
                     .WithMany(p => p.VehicleTrips)
                     .HasForeignKey(d => d.TripId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__VehicleTr__trip___1EA48E88");
+                    .HasConstraintName("FK__VehicleTr__trip___36470DEF");
 
                 entity.HasOne(d => d.Vehicle)
                     .WithMany(p => p.VehicleTrips)
                     .HasForeignKey(d => d.VehicleId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__VehicleTr__vehic__1F98B2C1");
+                    .HasConstraintName("FK__VehicleTr__vehic__373B3228");
             });
 
             modelBuilder.Entity<VehicleType>(entity =>
             {
-                entity.ToTable("VehicleType");
+                entity.ToTable("VehicleType", "dbo");
 
                 entity.Property(e => e.Id).HasColumnName("id");
 
