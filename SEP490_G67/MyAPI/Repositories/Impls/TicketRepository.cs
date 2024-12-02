@@ -247,12 +247,12 @@ namespace MyAPI.Repositories.Impls
                     Note = request.Note,
                     UserId = request.UserId,
                     TypeOfTicket = Constant.VE_XE_DU_LICH,
-                    TypeOfPayment = Constant.CHUYEN_KHOAN,
+                    TypeOfPayment = Constant.TIEN_MAT,
                     CreatedAt = DateTime.UtcNow,
                     CreatedBy = request.UserId,
                     UpdateAt = DateTime.UtcNow,
                     UpdateBy = Constant.ADMIN,
-                    Status = "Approved"
+                    Status = "Thanh toán bằng tiền mặt"
                 };
 
                 await _context.Tickets.AddAsync(ticket);

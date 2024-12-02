@@ -535,7 +535,8 @@ namespace MyAPI.Repositories.Impls
 
                 var addRentVehicle = new Request
                 {
-                    UserId = userId,
+                    UserId =1,
+                    DriverId = userId,
                     TypeId = 7,
                     Status = false,
                     Description = "Tài xế muốn thuê xe của hệ thống",
