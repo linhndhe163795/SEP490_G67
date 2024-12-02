@@ -103,7 +103,7 @@ namespace MyAPI.Controllers
                 }
                 else
                 {
-                    return NotFound("Incorrect Email or Password");
+                    return NotFound("Incorrect Username or Password");
                 }
             }
             catch (Exception ex)
