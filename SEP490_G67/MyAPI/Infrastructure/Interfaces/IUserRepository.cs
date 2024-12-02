@@ -13,6 +13,12 @@ namespace MyAPI.Infrastructure.Interfaces
         Task<bool> checkLogin(UserLoginDTO userLoginDTO);
         Task ForgotPassword(ForgotPasswordDTO forgotPassword);
         Task ResetPassword(ResetPasswordDTO resetPasswordDTO);
+        Task ChangePassword(ChangePasswordDTO changePasswordDTO);
+        Task<User> EditProfile( EditProfileDTO editProfileDTO);
+        Task<UserLoginDTO> GetUserLogin(UserLoginDTO userLogin);
+        Task<UserPostLoginDTO> getUserById(int id);
+
+
 
     }
 }

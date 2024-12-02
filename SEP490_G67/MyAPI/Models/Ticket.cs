@@ -7,8 +7,8 @@ namespace MyAPI.Models
     {
         public Ticket()
         {
+            ChangeTimeTrips = new HashSet<ChangeTimeTrip>();
             Payments = new HashSet<Payment>();
-            StatusTrips = new HashSet<StatusTrip>();
             UserCancleTickets = new HashSet<UserCancleTicket>();
         }
 
@@ -16,7 +16,7 @@ namespace MyAPI.Models
         public decimal? Price { get; set; }
         public string? CodePromotion { get; set; }
         public decimal? PricePromotion { get; set; }
-        public string? SeatCode { get; set; }
+        public int? NumberTicket { get; set; }
         public string? PointStart { get; set; }
         public string? PointEnd { get; set; }
         public DateTime? TimeFrom { get; set; }
@@ -39,8 +39,8 @@ namespace MyAPI.Models
         public virtual TypeOfTicket? TypeOfTicketNavigation { get; set; }
         public virtual User? User { get; set; }
         public virtual Vehicle? Vehicle { get; set; }
+        public virtual ICollection<ChangeTimeTrip> ChangeTimeTrips { get; set; }
         public virtual ICollection<Payment> Payments { get; set; }
-        public virtual ICollection<StatusTrip> StatusTrips { get; set; }
         public virtual ICollection<UserCancleTicket> UserCancleTickets { get; set; }
     }
 }

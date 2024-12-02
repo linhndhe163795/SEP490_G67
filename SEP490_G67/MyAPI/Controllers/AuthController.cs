@@ -1,11 +1,14 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using MyAPI.DTOs;
 using MyAPI.DTOs.UserDTOs;
 using MyAPI.Helper;
 using MyAPI.Infrastructure.Interfaces;
 using MyAPI.Models;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace MyAPI.Controllers
 {
@@ -14,17 +17,23 @@ namespace MyAPI.Controllers
     public class AuthController : ControllerBase
     {
         private readonly IUserRepository _userRepository;
+        private readonly GetInforFromToken _getInforFromToken;
         private readonly IUserRoleRepository _userRoleRepository;
+        private readonly IPointUserRepository _pointUserRepository;
         private readonly SendMail _sendMail;
         private readonly IMapper _mapper;
-        public AuthController(IUserRepository userRepository, IUserRoleRepository userRoleRepository, SendMail sendMail, IMapper mapper)
+        private readonly Jwt _Jwt;
+        public AuthController(IPointUserRepository pointUserRepository,IUserRepository userRepository, Jwt Jwt, GetInforFromToken getInforFromToken, IUserRoleRepository userRoleRepository, SendMail sendMail, IMapper mapper)
         {
             _mapper = mapper;
+            _pointUserRepository = pointUserRepository;
             _sendMail = sendMail;
             _userRoleRepository = userRoleRepository;
             _userRepository = userRepository;
+            _Jwt = Jwt;
+            _getInforFromToken = getInforFromToken;
         }
-        [HttpPost]
+        [HttpPost("register")]
         public async Task<IActionResult> Register(UserRegisterDTO user)
         {
             try
@@ -42,6 +51,7 @@ namespace MyAPI.Controllers
                         UserId = lastIdUser.Result
                     };
                     await _userRoleRepository.Add(ur);
+                    await _pointUserRepository.addNewPointUser(lastIdUser.Result);
                     return Ok(user);
                 }
                 return BadRequest("ton tai account");
@@ -62,7 +72,10 @@ namespace MyAPI.Controllers
                 {
                     return Ok();
                 }
-                return Ok("Incorrect code");
+                else
+                {
+                    return BadRequest("Incorrect Code");
+                }
             }
             catch (Exception ex)
             {
@@ -76,7 +89,17 @@ namespace MyAPI.Controllers
             {
                 if (await _userRepository.checkLogin(userLogin))
                 {
-                    return Ok("Login Successfull");
+                    var getUserLogin = await _userRepository.GetUserLogin(userLogin);
+                    var tokenString = _Jwt.CreateToken(getUserLogin);
+                    var cookieOptions = new CookieOptions
+                    {
+                        HttpOnly = false,   
+                        Secure = false,     
+                        SameSite = SameSiteMode.Strict,
+                        Expires = DateTime.UtcNow.AddHours(1) 
+                    };
+                    Response.Cookies.Append("AuthToken", tokenString, cookieOptions);
+                    return Ok(tokenString);
                 }
                 else
                 {
@@ -122,6 +145,34 @@ namespace MyAPI.Controllers
             {
                 return BadRequest(ex.Message);
                 throw new Exception("Failed " + ex.Message);
+            }
+        }
+        [Authorize]
+        [HttpGet("userProfile")]
+        public async Task<IActionResult> GetUserProfile()
+        {
+            string token = Request.Headers["Authorization"];
+            if (token.StartsWith("Bearer"))
+            {
+                token = token.Substring("Bearer ".Length).Trim();
+            }
+            if (string.IsNullOrEmpty(token))
+            {
+                return BadRequest("Token is required.");
+            }
+            try
+            {   var userId = _getInforFromToken.GetIdInHeader(token);
+                var user = await _userRepository.getUserById(userId);
+                if (user == null)
+                {
+                    return NotFound();
+                }
+
+                return Ok(user);
+            }
+            catch (SecurityTokenException)
+            {
+                return Unauthorized("Invalid token.");
             }
         }
 

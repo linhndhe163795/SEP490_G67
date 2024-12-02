@@ -9,6 +9,7 @@ namespace MyAPI.Models
         public int? UserId { get; set; }
         public int? PaymentId { get; set; }
         public int? Points { get; set; }
+        public int? PointsMinus { get; set; }
         public DateTime? Date { get; set; }
         public DateTime? CreatedAt { get; set; }
         public int? CreatedBy { get; set; }

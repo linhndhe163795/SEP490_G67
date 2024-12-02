@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MyAPI.DTOs.UserDTOs;
 using MyAPI.Helper;
@@ -13,33 +14,33 @@ namespace MyAPI.Controllers
     public class AccountController : ControllerBase
     {
         private readonly IAccountRepository _accountRepository;
-        public AccountController(IAccountRepository accountRepository,  IMapper mapper)
+        public AccountController(IAccountRepository accountRepository, IMapper mapper)
         {
             _accountRepository = accountRepository;
         }
-
-        [HttpPost("listAccount")]
+        [Authorize(Roles = "Admin")]
+        [HttpGet("listAccount")]
         public async Task<IActionResult> GetListAccount()
         {
             try
             {
                 var listAccount = await _accountRepository.GetListAccount();
-                if(listAccount != null)
+                if (listAccount != null)
                 {
                     return Ok(listAccount);
-                }else
+                }
+                else
                 {
                     return NotFound("Not found list Account");
                 }
             }
             catch (Exception ex)
             {
-                throw new Exception("GetListAccount Failed " + ex.Message);
+                return BadRequest(new { Message = "Account get list failed", Details = ex.Message });
             }
-
         }
-
-        [HttpPost("detailsAccount/{id}")]
+        [Authorize(Roles = "Admin")]
+        [HttpGet("detailsAccount/{id}")]
         public async Task<IActionResult> GetDetailsAccountById(int id)
         {
             try
@@ -56,12 +57,11 @@ namespace MyAPI.Controllers
             }
             catch (Exception ex)
             {
-                throw new Exception("GetDetailsAccount Failed " + ex.Message);
+                return BadRequest(new { Message = "Account details failed", Details = ex.Message });
             }
-
         }
 
-
+        [Authorize(Roles = "Admin")]
         [HttpPost("deleteAccount/{id}")]
         public async Task<IActionResult> DelteAccountById(int id)
         {
@@ -79,36 +79,30 @@ namespace MyAPI.Controllers
             }
             catch (Exception ex)
             {
-                throw new Exception("DeleteAccount Failed " + ex.Message);
+                return BadRequest(new { Message = "Account delete failed", Details = ex.Message });
             }
 
         }
 
-        
-
-        [HttpPost("updateAccount/{id}/{roleId}/{userIdUpdate}")]
-        public async Task<IActionResult> UpdateAccountById(int id, int roleId, int userIdUpdate)
+        [Authorize(Roles = "Admin")]
+        [HttpPost("updateAccount/{id}/{newIdUpdate}")]
+        public async Task<IActionResult> UpdateAccountById(int id, int newIdUpdate)
         {
             try
             {
-                var accountUpdated = await _accountRepository.UpdateRoleOfAccount(id, roleId, userIdUpdate);
+                var accountUpdated = await _accountRepository.UpdateRoleOfAccount(id, newIdUpdate);
 
-                if (accountUpdated)
-                {
-                    return Ok("Update Success!!");
-                }
-                else
-                {
-                    return NotFound("Account does not exist");
-                }
+                return Ok(new { Message = "Account Update successfully." });
+
             }
             catch (Exception ex)
             {
-                throw new Exception("DeleteAccount Failed " + ex.Message);
+                return BadRequest(new { Message = "Account update failed", Details = ex.Message });
             }
-        }
 
-        [HttpPost("listRole")]
+        }
+        [Authorize(Roles = "Admin")]
+        [HttpGet("listRole")]
         public async Task<IActionResult> GetListRole()
         {
             try
@@ -125,16 +119,10 @@ namespace MyAPI.Controllers
             }
             catch (Exception ex)
             {
-                throw new Exception("GetListRole Failed " + ex.Message);
+                return BadRequest(new { Message = "Account list failed", Details = ex.Message });
             }
 
         }
-
-
-
-
-
-
-
+       
     }
 }

@@ -10,10 +10,12 @@ namespace MyAPI.Models
             Payments = new HashSet<Payment>();
             PointUsers = new HashSet<PointUser>();
             PromotionUsers = new HashSet<PromotionUser>();
+            Requests = new HashSet<Request>();
             Reviews = new HashSet<Review>();
             Tickets = new HashSet<Ticket>();
             UserCancleTickets = new HashSet<UserCancleTicket>();
             UserRoles = new HashSet<UserRole>();
+            Vehicles = new HashSet<Vehicle>();
         }
 
         public int Id { get; set; }
@@ -35,9 +37,11 @@ namespace MyAPI.Models
         public virtual ICollection<Payment> Payments { get; set; }
         public virtual ICollection<PointUser> PointUsers { get; set; }
         public virtual ICollection<PromotionUser> PromotionUsers { get; set; }
+        public virtual ICollection<Request> Requests { get; set; }
         public virtual ICollection<Review> Reviews { get; set; }
         public virtual ICollection<Ticket> Tickets { get; set; }
         public virtual ICollection<UserCancleTicket> UserCancleTickets { get; set; }
         public virtual ICollection<UserRole> UserRoles { get; set; }
+        public virtual ICollection<Vehicle> Vehicles { get; set; }
     }
 }

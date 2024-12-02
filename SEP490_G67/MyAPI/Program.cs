@@ -1,9 +1,12 @@
+﻿using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.CookiePolicy;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using MyAPI.Helper;
 using MyAPI.Infrastructure.Interfaces;
+using MyAPI.Infrastructure.Repositories;
 using MyAPI.MappingProfile;
 using MyAPI.Models;
 using MyAPI.Repositories.Impls;
@@ -17,16 +20,71 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddDbContext<SEP490_G67Context>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddScoped<IRepository<User>, UserRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserRoleRepository, UserRoleRepository>();
 builder.Services.AddScoped<IAccountRepository, AccountRepository>();
-builder.Services.AddAutoMapper(typeof(AutoMappings));
-builder.Services.AddScoped<HashPassword>();
-builder.Services.AddScoped<SendMail>();
+builder.Services.AddScoped<ITripRepository, TripRepository>();
+builder.Services.AddScoped<IDriverRepository, DriverRepository>();
+builder.Services.AddScoped<ITypeOfDriverRepository, TypeOfDriverRepository>();
+builder.Services.AddScoped<ITypeOfRequestRepository, TypeOfRequestRepository>();
+builder.Services.AddScoped<ITypeOfTicketRepository, TypeOfTicketRepository>();
+builder.Services.AddScoped<ITypeOfPaymentRepository, TypeOfPaymentRepository>();
+builder.Services.AddScoped<ITypeOfTripRepository, TypeOfTripRepository>();
+builder.Services.AddScoped<IRequestRepository, RequestRepository>();
+builder.Services.AddScoped<IRequestDetailRepository, RequestDetailRepository>();
+builder.Services.AddScoped<IPromotionRepository, PromotionRepository>();
+builder.Services.AddScoped<IPromotionUserRepository, PromotionUserRepository>();
+builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
+builder.Services.AddScoped<ILossCostTypeRepository, LossCostTypeRepository>();
+builder.Services.AddScoped<IPointUserRepository, PointUserRepository>();
+builder.Services.AddScoped<IVehicleSeatStatustRepository, VehicleSeatStatusRepository>();
+builder.Services.AddScoped<IVehicleRepository, VehicleRepository>();
+builder.Services.AddScoped<IUserCancleTicketRepository, UserCancleTicketRepository>();
+builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
+builder.Services.AddScoped<IHistoryRentVehicleRepository, HistoryRentVehicleRepository>();
+builder.Services.AddScoped<IHistoryRentDriverRepository, HistoryRentDriverRepository>();
+builder.Services.AddScoped<IPaymentRentVehicleRepository, PaymentRentVehicleRepository>();
 
+//builder.Services.AddScoped<ITicketRepository, TicketRepository>();
+builder.Services.AddScoped<ITripDetailsRepository, TripDetailsRepository>();
+builder.Services.AddScoped<ITicketRepository, TicketRepository>();
+builder.Services.AddScoped<ILossCostVehicleRepository, LossCostVehicleRepository>();
+
+builder.Services.AddAutoMapper(typeof(AutoMappings));
+
+
+builder.Services.AddScoped<HashPassword>();
+builder.Services.AddScoped<RevenueRepository>();
+builder.Services.AddScoped<SendMail>();
+builder.Services.AddScoped<Jwt>();
+builder.Services.AddScoped<GetInforFromToken>();
+builder.Services.AddScoped<ParseStringToDateTime>();
+builder.Services.AddScoped<ServiceImport>();
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddHttpContextAccessor();
+//builder.Services.AddControllers()
+//    .AddJsonOptions(options =>
+//    {
+//        options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
+//    });
+
+builder.Services.Configure<CookiePolicyOptions>(options =>
+{
+    options.MinimumSameSitePolicy = SameSiteMode.Strict; // SameSite policy
+    options.HttpOnly = HttpOnlyPolicy.Always;            // Make all cookies HttpOnly
+    options.Secure = CookieSecurePolicy.Always;          // Use Secure cookies in production
+});
+
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(10);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true; 
+});
 builder.Services.AddAuthentication(opt =>
 {
     opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -61,6 +119,13 @@ builder.Services.AddAuthentication(opt =>
         }
     };
 });
+builder.Services.Configure<CookiePolicyOptions>(options =>
+{
+    options.MinimumSameSitePolicy = SameSiteMode.Strict; 
+    options.HttpOnly = HttpOnlyPolicy.Always;           
+    options.Secure = CookieSecurePolicy.Always;          
+});
+
 builder.Services.AddHealthChecks();
 builder.Services.AddSwaggerGen(c =>
 {
@@ -112,6 +177,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+app.UseCookiePolicy();
+app.UseSession();
 app.UseCors("corsapp");
 app.UseAuthentication();
 app.UseAuthorization();
