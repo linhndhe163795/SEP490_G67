@@ -506,10 +506,6 @@ namespace MyAPI.Repositories.Impls
                 {
                     throw new Exception("Invalid user ID from token.");
                 }
-                if (rentVehicleAddDTO == null)
-                {
-                    throw new Exception("Request data is required.");
-                }
 
                 if (string.IsNullOrWhiteSpace(rentVehicleAddDTO.StartLocation))
                 {
@@ -586,7 +582,34 @@ namespace MyAPI.Repositories.Impls
             {
                 var token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
                 int vehicleOwnerId = _tokenHelper.GetIdInHeader(token);
+                if (rentDriverAddDTO.VehicleId == null)
+                {
+                    throw new Exception("VehicleId is required.");
+                }
+                if (string.IsNullOrWhiteSpace(rentDriverAddDTO.StartLocation))
+                {
+                    throw new Exception("Start location is required.");
+                }
 
+                if (string.IsNullOrWhiteSpace(rentDriverAddDTO.EndLocation))
+                {
+                    throw new Exception("End location is required.");
+                }
+
+                if (rentDriverAddDTO.StartTime >= rentDriverAddDTO.EndTime)
+                {
+                    throw new Exception("Start time must be earlier than end time.");
+                }
+
+                if (rentDriverAddDTO.Seats <= 0)
+                {
+                    throw new Exception("Number of seats must be greater than 0.");
+                }
+
+                if (rentDriverAddDTO.Price <= 0)
+                {
+                    throw new Exception("Price must be greater than 0.");
+                }
                 if (vehicleOwnerId == -1)
                 {
                     throw new Exception("Invalid user ID from token.");
@@ -609,35 +632,6 @@ namespace MyAPI.Repositories.Impls
 
                     await _context.Requests.AddAsync(addRentDriver);
                     await _context.SaveChangesAsync();
-                    if (rentDriverAddDTO == null)
-                    {
-                        throw new Exception("Request data is required.");
-                    }
-
-                    if (string.IsNullOrWhiteSpace(rentDriverAddDTO.StartLocation))
-                    {
-                        throw new Exception("Start location is required.");
-                    }
-
-                    if (string.IsNullOrWhiteSpace(rentDriverAddDTO.EndLocation))
-                    {
-                        throw new Exception("End location is required.");
-                    }
-
-                    if (rentDriverAddDTO.StartTime >= rentDriverAddDTO.EndTime)
-                    {
-                        throw new Exception("Start time must be earlier than end time.");
-                    }
-
-                    if (rentDriverAddDTO.Seats <= 0)
-                    {
-                        throw new Exception("Number of seats must be greater than 0.");
-                    }
-
-                    if (rentDriverAddDTO.Price <= 0)
-                    {
-                        throw new Exception("Price must be greater than 0.");
-                    }
 
                     var addRentDriverRequestDetails = new RequestDetail
                     {
@@ -983,6 +977,35 @@ namespace MyAPI.Repositories.Impls
             catch (Exception ex)
             {
                 throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<Request?> GetRequestByIdAsync(int id)
+        {
+            return await _context.Requests
+                .Include(r => r.RequestDetails) 
+                .FirstOrDefaultAsync(r => r.Id == id);
+        }
+
+        
+        public async Task DeleteRequestWithDetailsAsync(Request request)
+        {
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                var requestDetails = _context.RequestDetails.Where(rd => rd.RequestId == request.Id);
+                _context.RequestDetails.RemoveRange(requestDetails);
+
+                _context.Requests.Remove(request);
+
+                await _context.SaveChangesAsync();
+
+                await transaction.CommitAsync();
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
             }
         }
     }

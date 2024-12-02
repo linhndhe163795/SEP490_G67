@@ -96,15 +96,26 @@ namespace MyAPI.Controllers
         [HttpPost("Delete/{id}")]
         public async Task<IActionResult> DeleteRequest(int id)
         {
-
-            var requests = await _requestRepository.Get(id);
-            if (requests == null)
+            try
             {
-                return NotFound("request not found");
-            }
-            await _requestRepository.Delete(requests);
+                var request = await _requestRepository.GetRequestByIdAsync(id);
+                if (request == null)
+                {
+                    return NotFound("Request not found.");
+                }
 
-            return NoContent();
+                if (request.Note != "Đã xác nhận")
+                {
+                    return BadRequest("Only requests with 'Đã xác nhận' note can be deleted.");
+                }
+
+                await _requestRepository.DeleteRequestWithDetailsAsync(request);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Error while deleting request: {ex.Message}");
+            }
         }
 
         [Authorize(Roles = "Staff")]
