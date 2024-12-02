@@ -46,7 +46,7 @@ namespace MyAPI.Helper
             {
                 Subject = new ClaimsIdentity(new Claim[]
                 {
-            new Claim(ClaimTypes.Email, driver.Email),
+            new Claim(ClaimTypes.Email, driver.Email ?? null),
             new Claim("ID", driver.Id.ToString()),
             new Claim(ClaimTypes.Role, driver.RoleName.ToString())
                 }),

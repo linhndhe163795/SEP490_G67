@@ -137,8 +137,6 @@ namespace MyAPI.Controllers
                 return StatusCode(500, new { Message = "Failed to update vehicle for the request.", Details = ex.Message });
             }
         }
-
-
         [HttpGet]
         public async Task<IActionResult> getListTicket()
         {
