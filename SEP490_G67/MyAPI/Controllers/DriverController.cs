@@ -131,6 +131,20 @@ namespace MyAPI.Controllers
             await _driverRepository.Delete(driver);
             return Ok("Driver deleted successfully");
         }
+        [Authorize]
+        [HttpPost("banDrive/{id}")]
+        public async Task<IActionResult> banDriver(int id)
+        {
+            try
+            {
+                await _driverRepository.BanDriver(id);
+                return Ok("update success");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
         [Authorize(Roles = "Staff")]
         [HttpGet("driversWithoutVehicle")]
         public async Task<IActionResult> GetDriversWithoutVehicle()

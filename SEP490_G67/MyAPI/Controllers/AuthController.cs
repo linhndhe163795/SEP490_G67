@@ -96,7 +96,7 @@ namespace MyAPI.Controllers
                         HttpOnly = false,   
                         Secure = false,     
                         SameSite = SameSiteMode.Strict,
-                        Expires = DateTime.UtcNow.AddHours(1) 
+                        Expires = DateTime.UtcNow.AddDays(1)
                     };
                     Response.Cookies.Append("AuthToken", tokenString, cookieOptions);
                     return Ok(tokenString);

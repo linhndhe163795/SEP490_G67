@@ -120,9 +120,9 @@ namespace MyAPI.Repositories.Impls
                     throw new Exception("Discount must be between 1 and 100.");
                 }
                 if (promotionDTO.Discount <= 0 || promotionDTO.Discount > 100)
-        {
-            throw new Exception("Discount must be between 1 and 100.");
-        }
+                {
+                    throw new Exception("Discount must be between 1 and 100.");
+                }
                 promotion.CodePromotion = promotionDTO.CodePromotion;
                 promotion.ImagePromotion = promotionDTO.ImagePromotion;
                 promotion.Description = promotionDTO.Description;
@@ -156,7 +156,7 @@ namespace MyAPI.Repositories.Impls
                 if (promotionId <= 0)
                 {
                     throw new ArgumentException("PromotionId must be greater than zero.", nameof(promotionId));
-                }   
+                }
                 var pointUserId = await _context.PointUsers.OrderByDescending(x => x.Id).FirstOrDefaultAsync(x => x.UserId == userId);
                 var promotion = await _context.Promotions.FirstOrDefaultAsync(x => x.Id == promotionId);
                 if (promotion == null)
@@ -164,7 +164,7 @@ namespace MyAPI.Repositories.Impls
                     throw new Exception("Promotion not found.");
                 }
                 bool checkPromotion = await checkPromtionUserCanChange(promotionId, userId);
-                if (!checkPromotion) 
+                if (!checkPromotion)
                 {
                     throw new Exception("You have promotion !");
                 }
@@ -209,33 +209,51 @@ namespace MyAPI.Repositories.Impls
             }
             foreach (var promotion in listPromtion)
             {
-                if(promotion.Id == promotionId)
+                if (promotion.Id == promotionId)
                 {
                     return true;
                 }
             }
             return false;
         }
-    
-    public async Task<List<PromotionDTO>> listPromotionCanChange(int userId)
-    {
-        try
-        {
-            var userPromotionIds = await _context.PromotionUsers
-                                    .Where(pu => pu.UserId == userId)
-                                    .Select(pu => pu.PromotionId)
-                                    .ToListAsync();
-            var listPromotionCanChange = await _context.Promotions
-                                    .Where(p => !userPromotionIds.Contains(p.Id)) // Loại bỏ Promotion user đã có
-                                    .ToListAsync();
 
-            var mapper = _mapper.Map<List<PromotionDTO>>(listPromotionCanChange);
-            return mapper;
-        }
-        catch (Exception ex)
+        public async Task<List<PromotionDTO>> listPromotionCanChange(int userId)
         {
-            throw new Exception(ex.Message);
+            try
+            {
+                var userPromotionIds = await _context.PromotionUsers
+                                        .Where(pu => pu.UserId == userId)
+                                        .Select(pu => pu.PromotionId)
+                                        .ToListAsync();
+                var listPromotionCanChange = await _context.Promotions
+                                        .Where(p => !userPromotionIds.Contains(p.Id)) // Loại bỏ Promotion user đã có
+                                        .ToListAsync();
+
+                var mapper = _mapper.Map<List<PromotionDTO>>(listPromotionCanChange);
+                return mapper;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<PromotionDTO> getPromotionByPromotionId(int promotionId)
+        {
+            try
+            {
+                var promotionById = await _context.Promotions.FirstOrDefaultAsync(x => x.Id == promotionId);
+                if (promotionById == null)
+                {
+                    throw new Exception("Not Found Promotion");
+                }
+                var mapper = _mapper.Map<PromotionDTO>(promotionById);
+                return mapper;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
         }
     }
-}
 }

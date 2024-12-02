@@ -28,7 +28,7 @@ namespace MyAPI.Repositories.Impls
             _sendMail = sendMail;
         }
 
-        public async Task<int> CreateTicketByUser(string? promotionCode, int tripDetailsId, BookTicketDTOs ticketDTOs, int userId, int numberTicket)
+        public async Task<int> CreateTicketByUser(string? promotionCode, int tripDetailsId, BookTicketDTOs ticketDTOs, int userId, int numberTicket, DateTime dateTicket)
         {
             try
             {
@@ -54,8 +54,7 @@ namespace MyAPI.Repositories.Impls
                 var promotionUserUsed = await _context.PromotionUsers.Include(x => x.Promotion)
                                         .FirstOrDefaultAsync(x => x.Promotion.CodePromotion == promotionCode && x.UserId == userId);
                 //var dateString = _httpContextAccessor?.HttpContext?.Session.GetString("date") ?? DateTime.Now.ToString("MM/dd/yyyy");
-                var dateString = _httpContextAccessor?.HttpContext?.Request.Cookies["date"]
-                 ?? DateTime.Now.ToString("MM/dd/yyyy");
+                var dateString = dateTicket.ToString("MM/dd/yyyy");
 
                 var tripDetails = await (from td in _context.TripDetails
                                          join t in _context.Trips on td.TripId equals t.Id
@@ -227,7 +226,7 @@ namespace MyAPI.Repositories.Impls
 
                 }
 
-                var type_id = await _context.Requests.Where(s=> s.Id == addTicketForRentCarDTO.requestId).Select(r => r.TypeId).FirstOrDefaultAsync();
+                var type_id = await _context.Requests.Where(s => s.Id == addTicketForRentCarDTO.requestId).Select(r => r.TypeId).FirstOrDefaultAsync();
 
                 if (type_id != 2)
                 {
@@ -464,29 +463,24 @@ namespace MyAPI.Repositories.Impls
                     throw new Exception("Invalid driver ID.");
                 }
                 var ticketNotPaid = await _context.Tickets.FirstOrDefaultAsync(x => x.Id == id && x.TypeOfPayment == Constant.TIEN_MAT);
-
+                if(ticketNotPaid == null)
+                {
+                    throw new Exception("Not ticket valid");
+                }
                 var pointTicket = ticketNotPaid.PricePromotion * 10 / 100;
 
-                var paymentTicket = new Payment
+                var vehicleID = _context.Vehicles.Where(x => x.DriverId ==  driverId).Select(x => x.Id).FirstOrDefault();
+                if(ticketNotPaid.VehicleId != vehicleID)
                 {
-                    UserId = ticketNotPaid.UserId,
-                    Code = "NULL",
-                    Description = "THANH TOÁN TIỀN MẶT",
-                    Price = ticketNotPaid.Price,
-                    Time = DateTime.Now,
-                    CreatedAt = DateTime.Now,
-                    CreatedBy = driverId,
-                    TypeOfPayment = Constant.TIEN_MAT,
-                };
-                await _context.Payments.AddAsync(paymentTicket);
-                await _context.SaveChangesAsync();
+                    throw new Exception("Driver not valid");
+                }
 
                 var addPointUser = new PointUser
                 {
                     Points = (int)pointTicket,
                     UserId = ticketNotPaid.UserId,
                     Date = DateTime.Now,
-                    PaymentId = paymentTicket.PaymentId,
+                    PaymentId = null,
                     CreatedBy = driverId,
                     CreatedAt = DateTime.Now,
                     PointsMinus = 0
@@ -678,12 +672,15 @@ namespace MyAPI.Repositories.Impls
         public async Task<bool> deleteTicketTimeOut(int ticketId)
         {
             var checkTicket = await _context.Tickets.FirstOrDefaultAsync(s => s.Id == ticketId);
-
             if (checkTicket == null)
             {
                 throw new Exception("Ticket id not found");
             }
-
+            if (checkTicket.TypeOfPayment == 1 && checkTicket.Status.Equals("Đã thanh toán bằng tài khoản"))
+            {
+                throw new Exception("Ticket đã thanh toán");
+            }
+            
             _context.Tickets.Remove(checkTicket);
             await _context.SaveChangesAsync();
             return true;
@@ -708,6 +705,6 @@ namespace MyAPI.Repositories.Impls
             }
         }
 
-        
+
     }
 }

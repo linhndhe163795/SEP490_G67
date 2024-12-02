@@ -87,10 +87,7 @@ namespace MyAPI.Repositories.Impls
 
         public async Task<List<TripDetailsDTO>> TripDetailsByTripId(int TripId)
         {
-            if (TripId == null)
-            {
-                throw new ArgumentNullException(nameof(TripId), "Trip ID cannot be null.");
-            }
+            
 
             if (TripId <= 0)
             {

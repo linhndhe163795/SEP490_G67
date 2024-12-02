@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using DocumentFormat.OpenXml.Bibliography;
 using Microsoft.EntityFrameworkCore;
 using MyAPI.DTOs;
 using MyAPI.DTOs.DriverDTOs;
@@ -85,7 +86,7 @@ namespace MyAPI.Repositories.Impls
                 await Add(driver);
                 return driver;
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 throw;
             }
@@ -135,51 +136,51 @@ namespace MyAPI.Repositories.Impls
                 .ToListAsync();
         }
 
-        
+
 
         public async Task SendEmailToDriversWithoutVehicle(int price)
         {
-        try
-        {
-            var driversWithoutVehicle = await GetDriversWithoutVehicleAsync();
-
-            if (!driversWithoutVehicle.Any())
+            try
             {
-                Console.WriteLine("No drivers without vehicles found.");
-                return;
-            }
+                var driversWithoutVehicle = await GetDriversWithoutVehicleAsync();
 
-            string formattedPrice = string.Format(new CultureInfo("vi-VN"), "{0:N0} VND", price);
-
-            foreach (var driver in driversWithoutVehicle)
-            {
-                if (string.IsNullOrWhiteSpace(driver.Email))
+                if (!driversWithoutVehicle.Any())
                 {
-                    Console.WriteLine($"Driver {driver.Name} does not have an email address. Skipping...");
-                    continue;
+                    Console.WriteLine("No drivers without vehicles found.");
+                    return;
                 }
 
-                SendMailDTO sendMailDTO = new()
-                {
-                    FromEmail = "duclinh5122002@gmail.com",
-                    Password = "jetj haze ijdw euci",
-                    ToEmail = driver.Email,
-                    Subject = "Vehicle Rental Opportunity",
-                    Body = $"Hello {driver.Name},\n\nWe currently have vehicles available and would like to hire you at a rate of {formattedPrice}. Please contact us if you are interested in renting a vehicle.\n\nBest regards,\nYour Company Name"
-                };
+                string formattedPrice = string.Format(new CultureInfo("vi-VN"), "{0:N0} VND", price);
 
-                if (!await _sendMail.SendEmail(sendMailDTO))
+                foreach (var driver in driversWithoutVehicle)
                 {
-                    Console.WriteLine($"Failed to send email to driver {driver.Email}.");
+                    if (string.IsNullOrWhiteSpace(driver.Email))
+                    {
+                        Console.WriteLine($"Driver {driver.Name} does not have an email address. Skipping...");
+                        continue;
+                    }
+
+                    SendMailDTO sendMailDTO = new()
+                    {
+                        FromEmail = "duclinh5122002@gmail.com",
+                        Password = "jetj haze ijdw euci",
+                        ToEmail = driver.Email,
+                        Subject = "Vehicle Rental Opportunity",
+                        Body = $"Hello {driver.Name},\n\nWe currently have vehicles available and would like to hire you at a rate of {formattedPrice}. Please contact us if you are interested in renting a vehicle.\n\nBest regards,\nYour Company Name"
+                    };
+
+                    if (!await _sendMail.SendEmail(sendMailDTO))
+                    {
+                        Console.WriteLine($"Failed to send email to driver {driver.Email}.");
+                    }
                 }
             }
+            catch (Exception ex)
+            {
+                Console.WriteLine("SendEmailToDriversWithoutVehicle error: " + ex.Message);
+                throw new Exception("Failed to send email to drivers without vehicles.", ex);
+            }
         }
-        catch (Exception ex)
-        {
-            Console.WriteLine("SendEmailToDriversWithoutVehicle error: " + ex.Message);
-            throw new Exception("Failed to send email to drivers without vehicles.", ex);
-        }
-    }
 
         public async Task<bool> checkLogin(LoginDriverDTO login)
         {
@@ -200,11 +201,11 @@ namespace MyAPI.Repositories.Impls
             try
             {
                 var hashPassword = _hashPassword.HashMD5Password(login.Password);
-                var driver = await _context.Drivers.FirstOrDefaultAsync((x => (x.UserName == login.UserName || x.Email == login.Email) && x.Password == hashPassword));
+                var driver = await _context.Drivers.FirstOrDefaultAsync((x => (x.UserName == login.UserName || x.Email == login.Email) && x.Password == hashPassword && x.Status == true));
                 return driver != null ? true : false;
 
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 throw new Exception(ex.Message);
             }
@@ -239,6 +240,25 @@ namespace MyAPI.Repositories.Impls
             var driveListDTOs = _mapper.Map<List<ListDriverDTO>>(listDriver);
 
             return driveListDTOs;
+        }
+
+        public async Task BanDriver(int id)
+        {
+            try
+            {
+                var driverId = _context.Drivers.FirstOrDefault(x => x.Id == id);
+                if(driverId == null)
+                {
+                    throw new Exception("Not found dirver");
+                }
+                driverId.Status = !driverId.Status;
+                _context.Update(driverId);
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
         }
     }
 }

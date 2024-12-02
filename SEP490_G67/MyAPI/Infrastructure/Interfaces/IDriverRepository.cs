@@ -20,5 +20,6 @@ namespace MyAPI.Infrastructure.Interfaces
         Task<DriverLoginRespone> getDriverLogin(LoginDriverDTO login);
 
         Task<List<ListDriverDTO>> getListDriverForVehicle();
+        Task BanDriver(int id);
     }
 }
