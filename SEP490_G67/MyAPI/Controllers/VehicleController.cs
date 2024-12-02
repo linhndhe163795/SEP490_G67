@@ -348,45 +348,34 @@ namespace MyAPI.Controllers
             }
             return Ok("Import confirmed successfully!");
         }
-        [HttpGet("getNumberSeatAvaiable/{tripId}")]
-        public async Task<IActionResult> GetNumberSeatAvailable(int tripId)
+        [HttpGet("getNumberSeatAvaiable/{tripId}/{date}")]
+        public async Task<IActionResult> GetNumberSeatAvailable(int tripId, DateTime date)
         {
             try
             {
-                var cookies = HttpContext.Request.Headers["Cookie"].ToString();
-                Console.WriteLine($"Cookies: {cookies}");
-                var date = HttpContext.Request.Cookies["date"];
-                //var date = _httpContextAccessor?.HttpContext.Session.GetString("date");
-                if (!string.IsNullOrEmpty(date) && DateTime.TryParse(date, out var parsedDate))
+                var trip = await _tripRepository.GetTripById(tripId);
+                if (trip == null)
                 {
-                    var trip = await _tripRepository.GetTripById(tripId);
-                    if (trip != null)
-                    {
-                        if (trip.StartTime.HasValue)
-                        {
-                            var dateTime = parsedDate.Date.Add(trip.StartTime.Value);
-                            Console.WriteLine($"DateTime: {dateTime}");
+                    return NotFound($"Trip with ID {tripId} was not found.");
+                }
 
-                            var count = await _vehicleRepository.GetNumberSeatAvaiable(tripId, dateTime);
-                            return Ok(count);
-                        }
-                        else
-                        {
-                            return BadRequest("Trip StartTime is not available.");
-                        }
-                    }
-                    else
-                    {
-                        return NotFound($"Trip with ID {tripId} was not found.");
-                    }
-                }
-                else
+                if (!trip.StartTime.HasValue)
                 {
-                    return BadRequest("Invalid or missing date in session.");
+                    return BadRequest("Trip StartTime is not available.");
                 }
+
+                // Combine the provided date with the trip start time
+                var tripDateTime = new DateTime(date.Year, date.Month, date.Day).Add(trip.StartTime.Value);
+                Console.WriteLine($"Trip DateTime: {tripDateTime}");
+
+                // Retrieve the number of available seats
+                var availableSeats = await _vehicleRepository.GetNumberSeatAvaiable(tripId, tripDateTime);
+                return Ok(availableSeats);
             }
             catch (Exception ex)
             {
+                Console.Error.WriteLine($"An error occurred: {ex.Message}");
+
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
