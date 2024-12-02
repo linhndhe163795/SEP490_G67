@@ -467,6 +467,7 @@ namespace MyAPI.Repositories.Impls
                 inforTicketCancle.t.PricePromotion = 0;
                 inforTicketCancle.t.Status = "Hủy vé";
                 inforTicketCancle.p.Price = 0;
+                inforTicketCancle.t.NumberTicket = 0;
                 var UserCancleTicket = new UserCancleTicket
                 {
                     PaymentId = inforTicketCancle.p.PaymentId,
@@ -768,7 +769,7 @@ namespace MyAPI.Repositories.Impls
                 EndLocation = convenientTripDTO.PointEnd,
                 StartTime = convenientTripDTO.StartTime,
                 EndTime = null,
-                Seats = null,
+                Seats = convenientTripDTO.SeatNumber,
                 Price = convenientTripDTO.Price,
                 CreatedAt = DateTime.Now,
                 CreatedBy = userId,

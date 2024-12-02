@@ -86,7 +86,6 @@ namespace MyAPI.Repositories.Impls
         {
             try
             {
-
                 if (startDate > endDate)
                 {
                     throw new Exception("Start date must be earlier than or equal to end date.");
