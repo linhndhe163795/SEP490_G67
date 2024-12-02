@@ -466,6 +466,7 @@ namespace MyAPI.Repositories.Impls
                 inforTicketCancle.t.PricePromotion = 0;
                 inforTicketCancle.t.Status = "Hủy vé";
                 inforTicketCancle.p.Price = 0;
+                inforTicketCancle.t.NumberTicket = 0;
                 var UserCancleTicket = new UserCancleTicket
                 {
                     PaymentId = inforTicketCancle.p.PaymentId,
