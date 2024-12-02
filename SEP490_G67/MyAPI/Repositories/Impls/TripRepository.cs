@@ -108,12 +108,9 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception("SreachTrip: " + ex.Message);
             }
         }
-        public async Task AddTrip(TripDTO trip, int? vehicleId, int userId)
+        public async Task AddTrip(TripDTO trip, int userId)
         {
-            if (trip == null)
-            {
-                throw new ArgumentNullException(nameof(trip), "Trip data cannot be null.");
-            }
+
 
             if (string.IsNullOrWhiteSpace(trip.Name))
             {
@@ -131,11 +128,28 @@ namespace MyAPI.Repositories.Impls
             }
 
             if (trip.StartTime == null)
+
             {
                 throw new ArgumentException("Start time cannot be null.");
             }
+            if (trip.PointEndDetail.Keys.Count == 0 && trip.TypeOfTrip == 1)
+            {
+                throw new ArgumentException("At least 1 Point End Detail cannot be null.");
+            }
+            if (trip.PointEndDetail.Values.Count == 0 && trip.TypeOfTrip == 1)
+            {
+                throw new ArgumentException("At least 1 Time End Details cannot be null.");
+            }
+            if (trip.PointStartDetail.Keys.Count == 0 && trip.TypeOfTrip == 1)
+            {
+                throw new ArgumentException("At least 1 Point Start Detail cannot be null.");
+            }
+            if (trip.PointEndDetail.Values.Count == 0 && trip.TypeOfTrip == 1)
+            {
+                throw new ArgumentException("At least 1 Time Start Detail cannot be null.");
+            }
 
-            if (trip.Price <= 0)
+            if (!trip.Price.HasValue || trip.Price <= 0)
             {
                 throw new ArgumentException("Price must be greater than 0.");
             }
@@ -144,11 +158,15 @@ namespace MyAPI.Repositories.Impls
             {
                 throw new ArgumentException("User ID must be greater than 0.");
             }
-            if (trip.TypeOfTrip == null || trip.TypeOfTrip <= 0)
+            if (!trip.TypeOfTrip.HasValue || trip.TypeOfTrip <= 0 || (trip.TypeOfTrip != 1 && trip.TypeOfTrip != 2 && trip.TypeOfTrip != 3))
             {
-                throw new ArgumentException("Type of trip must be greater than 0.");
+                throw new ArgumentException("Type of trip invalid");
             }
-
+            var vechicleById = await _context.Vehicles.Where(x => x.LicensePlate == trip.LicensePlate).Select(v => v.Id).FirstOrDefaultAsync();
+            if (vechicleById == 0)
+            {
+                throw new Exception("Not found vehicle");
+            }
             try
             {
                 Trip addTrip = new Trip
@@ -161,6 +179,7 @@ namespace MyAPI.Repositories.Impls
                     CreatedAt = DateTime.Now,
                     CreatedBy = userId,
                     Price = trip.Price,
+                    TypeOfTrip = trip.TypeOfTrip,
                     UpdateAt = null,
                     UpdateBy = null,
                     Status = trip.Status,
@@ -188,21 +207,19 @@ namespace MyAPI.Repositories.Impls
                 }
                 await _context.AddRangeAsync(td);
                 await _context.SaveChangesAsync();
-                var vechicleById = await _context.Vehicles.FirstOrDefaultAsync(x => x.Id == vehicleId);
-                if (vechicleById != null)
+                
+
+                VehicleTripDTO vehicleTripDTO = new VehicleTripDTO
                 {
-                    VehicleTripDTO vehicleTripDTO = new VehicleTripDTO
-                    {
-                        TripId = addTrip.Id,
-                        VehicleId = vechicleById.Id,
-                        CreatedAt = DateTime.Now,
-                        CreatedBy = userId,
-                        UpdateAt = null,
-                        UpdateBy = null
-                    };
-                    var vehicleTripMapper = _mapper.Map<VehicleTrip>(vehicleTripDTO);
-                    _context.VehicleTrips.Add(vehicleTripMapper);
-                }
+                    TripId = addTrip.Id,
+                    VehicleId = vechicleById,
+                    CreatedAt = DateTime.Now,
+                    CreatedBy = userId,
+                    UpdateAt = null,
+                    UpdateBy = null
+                };
+                var vehicleTripMapper = _mapper.Map<VehicleTrip>(vehicleTripDTO);
+                _context.VehicleTrips.Add(vehicleTripMapper);
                 await _context.SaveChangesAsync();
             }
             catch (Exception ex)
@@ -214,56 +231,64 @@ namespace MyAPI.Repositories.Impls
         {
             if (tripId <= 0)
             {
-                throw new ArgumentException("Trip ID must be greater than 0.");
+                throw new Exception("Trip ID must be greater than 0.");
             }
 
             if (trip == null)
             {
-                throw new ArgumentNullException(nameof(trip), "Trip data cannot be null.");
+                throw new Exception("Trip data cannot be null.");
             }
 
             if (string.IsNullOrWhiteSpace(trip.Name))
             {
-                throw new ArgumentException("Trip name cannot be null or empty.");
+                throw new Exception("Trip name cannot be null or empty.");
             }
 
             if (string.IsNullOrWhiteSpace(trip.Description))
             {
-                throw new ArgumentException("Description cannot be null or empty.");
+                throw new Exception("Description cannot be null or empty.");
             }
 
             if (trip.Price == null || trip.Price <= 0)
             {
-                throw new ArgumentException("Price must be greater than 0.");
+                throw new Exception("Price must be greater than 0.");
             }
 
             if (string.IsNullOrWhiteSpace(trip.PointStart))
             {
-                throw new ArgumentException("Start point cannot be null or empty.");
+                throw new Exception("Start point cannot be null or empty.");
             }
 
             if (string.IsNullOrWhiteSpace(trip.PointEnd))
             {
-                throw new ArgumentException("End point cannot be null or empty.");
+                throw new Exception("End point cannot be null or empty.");
             }
 
             if (trip.StartTime == null)
             {
-                throw new ArgumentException("Start time cannot be null.");
+                throw new Exception("Start time cannot be null.");
             }
 
             if (trip.Status == null)
             {
-                throw new ArgumentException("Status cannot be null.");
+                throw new Exception("Status cannot be null.");
             }
 
             if (userId <= 0)
             {
-                throw new ArgumentException("User ID must be greater than 0.");
+                throw new Exception("User ID must be greater than 0.");
+            }
+            if (!trip.TypeOfTrip.HasValue || trip.TypeOfTrip <= 0 || (trip.TypeOfTrip != 1 && trip.TypeOfTrip != 2 && trip.TypeOfTrip != 3))
+            {
+                throw new ArgumentException("Type of trip invalid");
             }
             try
             {
                 var tripById = await _context.Trips.FirstOrDefaultAsync(x => x.Id == tripId);
+                if (tripById == null) 
+                {
+                    throw new Exception("Not found Trip");
+                }
                 var tripDetailById = await _context.TripDetails.Where(x => x.TripId == tripId).ToListAsync();
                 if (tripById != null)
                 {
@@ -273,6 +298,7 @@ namespace MyAPI.Repositories.Impls
                     tripById.PointStart = trip.PointStart;
                     tripById.PointEnd = trip.PointEnd;
                     tripById.StartTime = trip.StartTime;
+                    tripById.TypeOfTrip = trip.TypeOfTrip;
                     tripById.UpdateAt = DateTime.Now;
                     tripById.UpdateBy = userId;
                     tripById.Status = trip.Status;
@@ -280,7 +306,7 @@ namespace MyAPI.Repositories.Impls
                 }
                 else
                 {
-                    throw new NullReferenceException();
+                    throw new Exception();
                 }
             }
             catch (Exception ex)
@@ -313,7 +339,7 @@ namespace MyAPI.Repositories.Impls
                 }
                 else
                 {
-                    throw new NullReferenceException();
+                    throw new Exception();
                 }
             }
             catch (Exception ex)
@@ -689,5 +715,22 @@ namespace MyAPI.Repositories.Impls
             }
         }
 
+        public async Task<TripByIdDTO> getTripByTripId(int tripId)
+        {
+            try
+            {
+                var tripID = await _context.Trips.FirstOrDefaultAsync(x => x.Id == tripId);
+                if(tripID == null)
+                {
+                    throw new Exception("Not found trip");
+                }
+                var mapper = _mapper.Map<TripByIdDTO>(tripID);
+                return mapper;
+            }
+            catch (Exception ex) 
+            {
+                throw new Exception(ex.Message);
+            }
+        }
     }
 }

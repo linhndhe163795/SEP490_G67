@@ -43,10 +43,7 @@ namespace MyAPI.Controllers
                 var userId = _getInforFromToken.GetIdInHeader(token);
 
                 var ticketId = await _ticketRepository.CreateTicketByUser(promotionCode, tripDetailsId, ticketDTOs, userId, numberTicket);
-                if(ticketId > 0)
-                {
-                    Response.Cookies.Delete("date");
-                }
+               
                 return Ok(new { ticketId, ticketDetails = ticketDTOs });
             }
             catch (Exception ex)
@@ -83,11 +80,11 @@ namespace MyAPI.Controllers
         }
         [Authorize]
         [HttpPost("createTicketForRentCar")]
-        public async Task<IActionResult> CreateTicketForRentCar(int requestId, bool choose, int vehicleId, decimal price)
+        public async Task<IActionResult> CreateTicketForRentCar([FromBody] AddTicketForRentCarDTO addTicketForRentCarDTO )
         {
             try
             {
-                await _ticketRepository.AcceptOrDenyRequestRentCar(requestId, choose, vehicleId, price);
+                await _ticketRepository.AcceptOrDenyRequestRentCar(addTicketForRentCarDTO);
 
                 return Ok("Ticket created successfully.");
             }

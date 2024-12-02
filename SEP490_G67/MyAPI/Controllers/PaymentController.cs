@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using MyAPI.DTOs.VehicleDTOs;
 using MyAPI.Infrastructure.Interfaces;
 using MyAPI.Repositories.Impls;
@@ -15,8 +16,9 @@ namespace MyAPI.Controllers
             _paymentRepository = paymentRepository;
         }
 
+        [Authorize]
         [HttpPost]
-        public async Task<IActionResult> CheckHistoryPayment(int amout, string description, string codePayment, int ticketID, int typePayment, string email)
+        public async Task<IActionResult> CheckHistoryPayment(int amout, string description, string? codePayment, int ticketID, int typePayment, string email)
         {
             try
             {
@@ -44,7 +46,7 @@ namespace MyAPI.Controllers
         {
             try
             {
-                var randomCode = _paymentRepository.GenerateRandomNumbers();
+                var randomCode = await _paymentRepository.GenerateRandomNumbers();
                 if (randomCode != null)
                 {
                     return Ok(new { Message = "Payment generate code successfully.", RandomNumbers = randomCode });

@@ -50,11 +50,6 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception("Description is required.");
             }
 
-            if (string.IsNullOrWhiteSpace(codePayment))
-            {
-                throw new Exception("CodePayment is required.");
-            }
-
             if (ticketID <= 0)
             {
                 throw new Exception("Invalid ticket ID.");
@@ -231,6 +226,7 @@ namespace MyAPI.Repositories.Impls
                 var payment = new Payment
                 {
                     Code = paymentAddDTO.Code,
+                    UserId= paymentAddDTO.UserId,
                     CreatedAt = DateTime.Now,
                     CreatedBy = paymentAddDTO.UserId,
                     Description = paymentAddDTO.Description,

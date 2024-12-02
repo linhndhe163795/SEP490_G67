@@ -11,6 +11,7 @@ using MyAPI.Helper;
 using MyAPI.Infrastructure.Interfaces;
 using MyAPI.Models;
 using System.Reflection.Metadata;
+using System.Text.RegularExpressions;
 using Constant = MyAPI.Helper.Constant;
 
 namespace MyAPI.Repositories.Impls
@@ -701,6 +702,13 @@ namespace MyAPI.Repositories.Impls
                 throw new UnauthorizedAccessException("Invalid user ID from token.");
             }
 
+            string pattern = @"^0[0-9]{9}$";
+            var checkSdt = Regex.IsMatch(convenientTripDTO.PhoneNumber,pattern);
+            if (checkSdt == false)
+            {
+                throw new Exception("Số điện thoại không hợp lệ");
+            }
+
             int type_Of_Trip;
             string descriptionType = "";
             if (convenientTripDTO.TypeOfTrip == 2)
@@ -791,6 +799,10 @@ namespace MyAPI.Repositories.Impls
                 throw new UnauthorizedAccessException("Invalid user ID from token.");
             }
 
+            if(checkRequest.TypeId != 5)
+            {
+                throw new Exception("Request musst be for rent convenient!!!");
+            }
             checkRequest.Note = choose ? "Đã xác nhận" : "Từ chối xác nhận";
             checkRequest.Status = choose;
 
@@ -937,14 +949,14 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception(ex.Message);
             }
         }
-        public async Task updateRequest(int requestID, RequestDetailDTO requestDetailDTO)
+        public async Task updateRequest(RequestDetailDTO requestDetailDTO)
         {
             try
             {
-                var requestDetails = await _context.RequestDetails.FirstOrDefaultAsync(x => x.RequestId == requestID); 
+                var requestDetails = await _context.RequestDetails.FirstOrDefaultAsync(x => x.RequestId == requestDetailDTO.RequestId); 
                 if (requestDetails == null)
                 {
-                    throw new Exception($"RequestDetail with Request ID {requestID} not found.");
+                    throw new Exception($"RequestDetail with Request ID {requestDetailDTO.RequestId} not found.");
                 }
                 if (string.IsNullOrWhiteSpace(requestDetailDTO.StartLocation))
                 {
