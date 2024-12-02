@@ -323,7 +323,7 @@ namespace MyAPI.Controllers
             try
             {
                 var listStart = await _tripRepository.getListStartPoint();
-                if(listStart == null)
+                if (listStart == null)
                 {
                     return NotFound();
                 }
@@ -364,16 +364,31 @@ namespace MyAPI.Controllers
             try
             {
                 var tripId = await _tripRepository.getTripByTripId(id);
-                if (tripId == null) 
+                if (tripId == null)
                 {
                     return NotFound("Not found trip");
                 }
                 return Ok(tripId);
 
-            }catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 return BadRequest(ex.Message);
-            } 
+            }
+        }
+        [HttpGet("gettripDetailsId/{pointStart}/{pointEnd}/{dateStartPoint}/{dateEndPoint}")]
+        public async Task<IActionResult> getTripDetailsId(string pointStart, string pointEnd, TimeSpan dateStartPoint, TimeSpan dateEndPoint)
+        {
+            try
+            {
+                var tripDetailsId = await _tripRepository.getTripDetailsId(pointStart, pointEnd, dateStartPoint, dateEndPoint);
+                return Ok(tripDetailsId);
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }

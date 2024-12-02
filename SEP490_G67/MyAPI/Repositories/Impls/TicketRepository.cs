@@ -101,7 +101,7 @@ namespace MyAPI.Repositories.Impls
                     TypeOfTicket = (tripDetails.Vehicle.NumberSeat >= Constant.SO_GHE_XE_TIEN_CHUYEN) ? Constant.VE_XE_LIEN_TINH : Constant.VE_XE_TIEN_CHUYEN,
                     Note = ticketDTOs.Note + "\n" +
                         " Xe sẽ đến điểm " + tripDetails.TripDetails.PointStartDetails +
-                        " vào lúc: " + tripDetails.TripDetails.PointStartDetails,
+                        " vào lúc: " + tripDetails.TripDetails.TimeStartDetils,
                     UserId = userId,
                     CreatedAt = DateTime.Now,
                     CreatedBy = userId,
@@ -707,5 +707,7 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception(ex.Message);
             }
         }
+
+        
     }
 }

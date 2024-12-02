@@ -207,7 +207,7 @@ namespace MyAPI.Repositories.Impls
                 }
                 await _context.AddRangeAsync(td);
                 await _context.SaveChangesAsync();
-                
+
 
                 VehicleTripDTO vehicleTripDTO = new VehicleTripDTO
                 {
@@ -285,7 +285,7 @@ namespace MyAPI.Repositories.Impls
             try
             {
                 var tripById = await _context.Trips.FirstOrDefaultAsync(x => x.Id == tripId);
-                if (tripById == null) 
+                if (tripById == null)
                 {
                     throw new Exception("Not found Trip");
                 }
@@ -720,14 +720,30 @@ namespace MyAPI.Repositories.Impls
             try
             {
                 var tripID = await _context.Trips.FirstOrDefaultAsync(x => x.Id == tripId);
-                if(tripID == null)
+                if (tripID == null)
                 {
                     throw new Exception("Not found trip");
                 }
                 var mapper = _mapper.Map<TripByIdDTO>(tripID);
                 return mapper;
             }
-            catch (Exception ex) 
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public Task<int> getTripDetailsId(string pointStart, string pointEnd, TimeSpan dateStartPoint, TimeSpan dateEndPoint)
+        {
+            try
+            {
+                var tripDetailsID = _context.TripDetails.Where(x => x.PointStartDetails == pointStart &&
+                                                        x.PointEndDetails == pointEnd &&
+                                                        x.TimeEndDetails == dateEndPoint &&
+                                                        x.TimeStartDetils == dateStartPoint).Select(x => x.Id).FirstOrDefaultAsync();
+                return tripDetailsID;
+            }
+            catch (Exception ex)
             {
                 throw new Exception(ex.Message);
             }
