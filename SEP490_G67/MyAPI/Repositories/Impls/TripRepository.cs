@@ -44,6 +44,7 @@ namespace MyAPI.Repositories.Impls
                                           Status = t.Status,
                                           TypeOfTrip = t.TypeOfTrip,
                                           StartTime = t.StartTime,
+                                          VehicleId = v.Id,
                                           LicensePlate = v.LicensePlate
                                       }).ToListAsync();
 
@@ -289,6 +290,10 @@ namespace MyAPI.Repositories.Impls
             {
                 throw new Exception("Status cannot be null.");
             }
+            if (trip.VehicleId == 0)
+            {
+                throw new Exception("Vehicle cannot be null.");
+            }
 
             if (userId <= 0)
             {
@@ -300,12 +305,35 @@ namespace MyAPI.Repositories.Impls
             }
             try
             {
-                var tripById = await _context.Trips.FirstOrDefaultAsync(x => x.Id == tripId);
+                var tripById = await _context.Trips
+                            .Include(x => x.VehicleTrips)
+                            .ThenInclude(x => x.Vehicle)
+                            .FirstOrDefaultAsync(x => x.Id == tripId);
                 if (tripById == null)
                 {
                     throw new Exception("Not found Trip");
                 }
-                var tripDetailById = await _context.TripDetails.Where(x => x.TripId == tripId).ToListAsync();
+                var tripList = await (from t in _context.Trips
+                                      join vh in _context.VehicleTrips
+                                      on t.Id equals vh.TripId
+                                      join v in _context.Vehicles
+                                      on vh.VehicleId equals v.Id
+                                      select new TripDTO
+                                      {
+                                          Id = t.Id,
+                                          Name = t.Name,
+                                          Description = t.Description,
+                                          PointStart = t.PointStart,
+                                          PointEnd = t.PointEnd,
+                                          Price = t.Price,
+                                          Status = t.Status,
+                                          TypeOfTrip = t.TypeOfTrip,
+                                          StartTime = t.StartTime,
+                                          VehicleId = v.Id,
+                                          LicensePlate = v.LicensePlate
+                                      }).FirstOrDefaultAsync(x => x.Id == tripId);
+                var vehicleTrip = await _context.VehicleTrips.FirstOrDefaultAsync(x => x.TripId.Equals(tripId) && x.VehicleId == tripList.VehicleId);
+
                 if (tripById != null)
                 {
                     tripById.Name = trip.Name;
@@ -318,6 +346,20 @@ namespace MyAPI.Repositories.Impls
                     tripById.UpdateAt = DateTime.Now;
                     tripById.UpdateBy = userId;
                     tripById.Status = trip.Status;
+
+                    if (vehicleTrip != null && vehicleTrip.VehicleId != trip.VehicleId)
+                    {
+                        _context.VehicleTrips.Remove(vehicleTrip);
+                        await _context.SaveChangesAsync();
+
+                        var newVehicleTrip = new VehicleTrip
+                        {
+                            TripId = tripId,
+                            VehicleId = trip.VehicleId
+                        };
+                        _context.VehicleTrips.Add(newVehicleTrip);
+                    }
+
                     await _context.SaveChangesAsync();
                 }
                 else

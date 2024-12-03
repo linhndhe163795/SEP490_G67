@@ -16,6 +16,7 @@ namespace MyAPI.DTOs.TripDTOs
         public string? PointEnd { get; set; }
         public bool? Status { get; set; }
         public int? TypeOfTrip { get; set; }
+        public int? VehicleId { get; set; }
         public string LicensePlate { get; set; }
         public DateTime? CreatedAt { get; set; }
         public int? CreatedBy { get; set; }
