@@ -277,8 +277,7 @@ namespace MyAPI.Repositories.Impls
                     Note = requestDTO.Note,
                     Status = requestDTO.Status,
                     TypeId = requestDTO.TypeId,
-                    UserId = 1,
-                    DriverId = userId
+                    UserId = userId,
                 };
 
                 await _context.Requests.AddAsync(newRequest);
