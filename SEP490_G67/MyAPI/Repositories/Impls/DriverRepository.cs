@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using DocumentFormat.OpenXml.Bibliography;
+using DocumentFormat.OpenXml.Vml.Office;
 using Microsoft.EntityFrameworkCore;
 using MyAPI.DTOs;
 using MyAPI.DTOs.DriverDTOs;
@@ -31,7 +32,24 @@ namespace MyAPI.Repositories.Impls
             _hashPassword = hashPassword;
             _mapper = mapper;
         }
-
+        public bool IsValidEmail(string email)
+        {
+            var emailPattern = @"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$";
+            return Regex.IsMatch(email, emailPattern);
+        }
+        public bool IsValidPhone(string phone)
+        {
+            var phonePattern = @"^(03|05|07|08|09)\d{8}$";
+            return Regex.IsMatch(phone, phonePattern);
+        }
+        public bool IsPasswordValid(string password)
+        {
+            return password.Length >= 6;
+        }
+        public async Task<bool> checkEmailDriver(string email)
+        {
+            return await _context.Drivers.AnyAsync(x => x.Email == email);
+        } 
         public async Task<Driver> GetDriverWithVehicle(int id)
         {
             return await _context.Drivers.Include(d => d.Vehicles).FirstOrDefaultAsync(d => d.Id == id);
@@ -53,21 +71,37 @@ namespace MyAPI.Repositories.Impls
                 {
                     throw new Exception("User Name is exist in system");
                 }
-                if (updateDriverDto.NumberPhone == null)
+                if (string.IsNullOrEmpty(updateDriverDto.NumberPhone))
                 {
-                    throw new ArgumentNullException(nameof(updateDriverDto.NumberPhone), "NumberPhone cannot be null");
+                    throw new Exception("NumberPhone must contain only digits.");
                 }
                 if (updateDriverDto.Password == null)
                 {
-                    throw new ArgumentNullException(nameof(updateDriverDto.Password), "Password cannot be null");
+                    throw new Exception("Password cannot be null");
                 }
                 if (updateDriverDto.UserName == null)
                 {
-                    throw new ArgumentNullException(nameof(updateDriverDto.UserName), "UserName cannot be null");
+                    throw new Exception( "UserName cannot be null");
                 }
                 if (string.IsNullOrWhiteSpace(updateDriverDto.License))
                 {
-                    throw new ArgumentNullException(nameof(updateDriverDto.License), "License cannot be null or empty");
+                    throw new Exception("License cannot be null or empty");
+                }
+                if (!IsValidEmail(updateDriverDto.Email))
+                {
+                    throw new Exception("Email is invalid.");
+                }
+                if (!IsValidPhone(updateDriverDto.NumberPhone))
+                {
+                    throw new Exception("Phone is invalid");
+                }
+                if (!IsPasswordValid(updateDriverDto.Password))
+                {
+                    throw new Exception("Password is weak, please input password has length more than 6 charater");
+                }
+                if (await checkEmailDriver(updateDriverDto.Email))
+                {
+                    throw new Exception("Driver exsit system");
                 }
                 var hashPassword = _hashPassword.HashMD5Password(updateDriverDto.Password);
                 var driver = new Driver
@@ -76,6 +110,7 @@ namespace MyAPI.Repositories.Impls
                     Name = updateDriverDto.Name,
                     NumberPhone = updateDriverDto.NumberPhone,
                     Avatar = updateDriverDto.Avatar,
+                    Email = updateDriverDto.Email,
                     Dob = updateDriverDto.Dob,
                     License = updateDriverDto.License,
                     Password = hashPassword,
@@ -108,13 +143,25 @@ namespace MyAPI.Repositories.Impls
             {
                 throw new Exception("Name cannot be null or empty.");
             }
-            if (!string.IsNullOrEmpty(updateDriverDto.NumberPhone) && !Regex.IsMatch(updateDriverDto.NumberPhone, @"^\d+$"))
+            if (string.IsNullOrEmpty(updateDriverDto.NumberPhone))
             {
                 throw new Exception("NumberPhone must contain only digits.");
             }
             if (string.IsNullOrWhiteSpace(updateDriverDto.License))
             {
                 throw new ArgumentNullException(nameof(updateDriverDto.License), "License cannot be null or empty");
+            }
+            if (!IsValidEmail(updateDriverDto.Email))
+            {
+                throw new Exception("Email is invalid.");
+            }
+            if (!IsValidPhone(updateDriverDto.NumberPhone))
+            {
+                throw new Exception("Phone is invalid");
+            }
+            if (!IsPasswordValid(updateDriverDto.Password))
+            {
+                throw new Exception("Password is weak, please input password has length more than 6 charater");
             }
             existingDriver.Name = updateDriverDto.Name;
             existingDriver.NumberPhone = updateDriverDto.NumberPhone;

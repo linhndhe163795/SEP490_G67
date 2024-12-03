@@ -22,9 +22,9 @@ namespace MyAPI.Helper
             {
                 Subject = new ClaimsIdentity(new Claim[]
                 {
-            new Claim(ClaimTypes.Email, userLogin.Email),
-            new Claim("ID", userLogin.Id.ToString()),
-            new Claim(ClaimTypes.Role, userLogin.RoleName.ToString())
+                    new Claim(ClaimTypes.Email, userLogin.Email ?? null),
+                    new Claim("ID", userLogin.Id.ToString()),
+                    new Claim(ClaimTypes.Role, userLogin.RoleName.ToString())
                 }),
                 IssuedAt = DateTime.UtcNow,
                 Issuer = _configuration["JWT:Issuer"],
@@ -47,6 +47,7 @@ namespace MyAPI.Helper
                 Subject = new ClaimsIdentity(new Claim[]
                 {
             new Claim(ClaimTypes.Email, driver.Email ?? null),
+            new Claim("User Name", driver.UserName?? null),
             new Claim("ID", driver.Id.ToString()),
             new Claim(ClaimTypes.Role, driver.RoleName.ToString())
                 }),
