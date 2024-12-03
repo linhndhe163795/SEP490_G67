@@ -28,15 +28,31 @@ namespace MyAPI.Repositories.Impls
         {
             try
             {
-                var tripList = await _context.Trips.ToListAsync();
+                var tripList = await (from t in _context.Trips
+                                      join vh in _context.VehicleTrips
+                                      on t.Id equals vh.TripId
+                                      join v in _context.Vehicles
+                                      on vh.VehicleId equals v.Id
+                                      select new TripDTO
+                                      {
+                                          Id = t.Id,
+                                          Name = t.Name,
+                                          Description = t.Description,
+                                          PointStart = t.PointStart,
+                                          PointEnd = t.PointEnd,
+                                          Price = t.Price,
+                                          Status = t.Status,
+                                          TypeOfTrip = t.TypeOfTrip,
+                                          StartTime = t.StartTime,
+                                          LicensePlate = v.LicensePlate
+                                      }).ToListAsync();
 
                 if (tripList == null || !tripList.Any())
                 {
                     throw new KeyNotFoundException("No trips found.");
                 }
 
-                var mapperTrip = _mapper.Map<List<TripDTO>>(tripList);
-                return mapperTrip;
+                return tripList;
             }
             catch (Exception ex)
             {

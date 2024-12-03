@@ -2,6 +2,7 @@
 {
     public class ListTicketDTOs
     {
+        public int Id { get; set; }
         public decimal? Price { get; set; }
         public string? CodePromotion { get; set; }
         public decimal? PricePromotion { get; set; }

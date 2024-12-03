@@ -50,7 +50,6 @@ namespace MyAPI.Repositories.Impls
             {
                 throw new Exception("Invalid user ID from token.");
             }
-
             // Kiểm tra logic thời gian
             if (startTime > endTime)
             {

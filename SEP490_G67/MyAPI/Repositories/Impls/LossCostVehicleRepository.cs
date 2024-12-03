@@ -92,6 +92,7 @@ namespace MyAPI.Repositories.Impls
                                             {
                                                 VehicleId = ls.VehicleId,
                                                 LicensePlate = ls.Vehicle.LicensePlate,
+                                                VehicleOwnerId = ls.Vehicle.VehicleOwner,
                                                 DateIncurred = ls.DateIncurred,
                                                 Description = ls.Description,
                                                 Price = ls.Price,
@@ -162,7 +163,8 @@ namespace MyAPI.Repositories.Impls
                                                 Description = ls.Description,
                                                 Price = ls.Price,
                                                 LossCostType = ls.LossCostType.Description,
-                                                VehicleOwner = _context.Users.Include(uv => uv.Vehicles).Where(u => u.Id == ls.Vehicle.VehicleOwner).Select(u => u.FullName).FirstOrDefault()
+                                                VehicleOwner = _context.Users.Include(uv => uv.Vehicles).Where(u => u.Id == ls.Vehicle.VehicleOwner).Select(u => u.FullName).FirstOrDefault(),
+                                                VehicleOwnerId = ls.Vehicle.VehicleOwner
                                             }).ToListAsync();
             var combineResult = new TotalLossCost
             {
@@ -212,7 +214,8 @@ namespace MyAPI.Repositories.Impls
                                                 Description = ls.Description,
                                                 Price = ls.Price,
                                                 LossCostType = ls.LossCostType.Description,
-                                                VehicleOwner = _context.Users.Include(uv => uv.Vehicles).Where(u => u.Id == ls.Vehicle.VehicleOwner).Select(u => u.FullName).FirstOrDefault()
+                                                VehicleOwner = _context.Users.Include(uv => uv.Vehicles).Where(u => u.Id == ls.Vehicle.VehicleOwner).Select(u => u.FullName).FirstOrDefault(),
+                                                VehicleOwnerId = ls.Vehicle.VehicleOwner
                                             }).ToListAsync();
             
             var combineResult = new TotalLossCost

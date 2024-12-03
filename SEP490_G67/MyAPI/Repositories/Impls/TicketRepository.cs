@@ -27,7 +27,6 @@ namespace MyAPI.Repositories.Impls
             _mapper = mapper;
             _sendMail = sendMail;
         }
-
         public async Task<int> CreateTicketByUser(string? promotionCode, int tripDetailsId, BookTicketDTOs ticketDTOs, int userId, int numberTicket, DateTime dateTicket)
         {
             try
@@ -133,7 +132,6 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception("CreateTicketByUser: " + ex.StackTrace);
             }
         }
-
         public async Task CreatTicketFromDriver(int priceTrip, int vehicleId, TicketFromDriverDTOs ticket, int driverId, int numberTicket)
         {
             try
@@ -197,8 +195,6 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception(ex.Message);
             }
         }
-
-
         public async Task AcceptOrDenyRequestRentCar(AddTicketForRentCarDTO addTicketForRentCarDTO)
         {
             try
@@ -282,7 +278,6 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception("AcceptOrDenyRequestRentCar: " + ex.Message);
             }
         }
-
         public async Task<bool> UpdateVehicleInRequestAsync(int vehicleId, int requestId)
         {
             try
@@ -349,8 +344,6 @@ namespace MyAPI.Repositories.Impls
                 return Enumerable.Empty<VehicleBasicDto>();
             }
         }
-
-
         public async Task<List<ListTicketDTOs>> getAllTicket()
         {
             try
@@ -364,7 +357,6 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception("getAllTicket: " + ex.Message);
             }
         }
-
         public async Task<TicketNotPaidSummary> GetListTicketNotPaid(int vehicleId)
         {
             try
@@ -406,7 +398,6 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception("GetListTicketNotPaid: " + ex.Message);
             }
         }
-
         public async Task<int> GetPriceFromPoint(TicketFromDriverDTOs ticket, int vehicleId)
         {
             try
@@ -448,7 +439,6 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception("GetPriceFromPoint: " + ex.Message);
             }
         }
-
         public async Task UpdateStatusTicketNotPaid(int id, int driverId)
         {
             try
@@ -556,7 +546,6 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception($"Error fetching ticket details: {ex.Message}", ex);
             }
         }
-
         public async Task<bool> UpdateStatusTicketForPayment(int id)
         {
             try
@@ -580,7 +569,6 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception(ex.Message);
             }
         }
-
         public async Task<RevenueTicketDTO> getRevenueTicket(DateTime startTime, DateTime endTime, int? vehicleId, int? vehicleOwner, int userId)
         {
             try
@@ -669,7 +657,6 @@ namespace MyAPI.Repositories.Impls
             };
             return combineResult;
         }
-
         public async Task<bool> deleteTicketTimeOut(int ticketId)
         {
             var checkTicket = await _context.Tickets.FirstOrDefaultAsync(s => s.Id == ticketId);
@@ -686,7 +673,6 @@ namespace MyAPI.Repositories.Impls
             await _context.SaveChangesAsync();
             return true;
         }
-        [Authorize]
         public async Task<List<ListTicketDTOs>> GetTicketByUserId(int userId)
         {
             try
@@ -696,7 +682,7 @@ namespace MyAPI.Repositories.Impls
                 {
                     throw new Exception("Invalid user.");
                 }
-                var listTicket = await _context.Tickets.Where(x => x.UserId == userId).ToListAsync();
+                var listTicket = await _context.Tickets.Where(x => x.UserId == userId).OrderByDescending(t => t.Id).ToListAsync();
                 var mapper = _mapper.Map<List<ListTicketDTOs>>(listTicket);
                 return mapper;
             }

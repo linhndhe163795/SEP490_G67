@@ -49,7 +49,6 @@ namespace MyAPI.Repositories.Impls
             {
                 throw new Exception("Email cannot be null or empty.");
             }
-            
             if (string.IsNullOrWhiteSpace(entity.NumberPhone))
             {
                 throw new Exception("NumberPhone cannot be null or empty.");
@@ -66,7 +65,6 @@ namespace MyAPI.Repositories.Impls
             {
                 throw new Exception("Password is weak, please input password has length more than 6 charater");
             }
-
             if (entity.Dob == null)
             {
                 throw new Exception("Date of Birth cannot be null.");

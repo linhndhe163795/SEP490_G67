@@ -7,6 +7,7 @@
         public string? LossCostType { get; set; }
         public decimal? Price { get; set; }
         public string? Description { get; set; }
+        public int? VehicleOwnerId { get; set; }
         public string? VehicleOwner { get; set; }
         public DateTime? DateIncurred { get; set; }
 
