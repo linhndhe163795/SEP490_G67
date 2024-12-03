@@ -1061,7 +1061,23 @@ namespace MyAPI.Repositories.Impls
                 return (false, errors);
             }
         }
+        public async Task<List<VehicleBasicDto>> GetAvailableVehiclesAsync()
+        {
+            try
+            {
+                var vehicles = await (from v in _context.Vehicles
+                                      where !_context.VehicleTrips.Any(vt => vt.VehicleId == v.Id)
+                                      select v).ToListAsync();
 
-        
+                return _mapper.Map<List<VehicleBasicDto>>(vehicles);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("GetAvailableVehiclesAsync: " + ex.Message);
+            }
+        }
+
+
+
     }
 }

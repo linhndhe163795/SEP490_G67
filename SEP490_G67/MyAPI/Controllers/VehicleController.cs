@@ -440,6 +440,21 @@ namespace MyAPI.Controllers
                 return BadRequest(ex.Message);
 
             }
-        }        
+        }
+
+        [Authorize(Roles = "Staff")]
+        [HttpGet("VehicleNoTrip")]
+        public async Task<IActionResult> GetAvailableVehicles()
+        {
+            try
+            {
+                var vehicles = await _vehicleRepository.GetAvailableVehiclesAsync();
+                return Ok(vehicles);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
     }
 }
