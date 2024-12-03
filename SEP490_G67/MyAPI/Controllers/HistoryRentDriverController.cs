@@ -99,8 +99,8 @@ namespace MyAPI.Controllers
                 return StatusCode(500, new { Message = "Failed to update driver for the request.", Details = ex.Message });
             }
         }
-
-        [HttpGet("driver-history")]
+        [Authorize(Roles = "Driver")]
+        [HttpGet("GetHistoryRentDriverById")]
         public async Task<IActionResult> GetDriverHistory()
         {
             try
@@ -119,8 +119,25 @@ namespace MyAPI.Controllers
                 return StatusCode(500, new { message = "Failed to fetch driver history.", error = ex.Message });
             }
         }
+        [Authorize(Roles = "Staff")]
+        [HttpPost("GetHistoryRentDriverForStaff")]
+        public async Task<IActionResult> GetDriverRentInfo([FromBody] DriverRentFilterDTO filter)
+        {
+            try
+            {
+                var rentInfo = await _historyRentDriverRepository.GetDriverRentInfo(filter);
 
+                if (rentInfo == null || !rentInfo.Any())
+                {
+                    return NotFound(new { Message = "No rent info found for the specified   criteria." });
+                }
 
-
+                return Ok(rentInfo);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Message = "Failed to fetch driver rent info.", Details = ex.Message });
+            }
+        }
     }
 }

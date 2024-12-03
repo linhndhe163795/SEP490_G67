@@ -450,7 +450,48 @@ namespace MyAPI.Repositories.Impls
             }
         }
 
+        public async Task<List<DriverRentInfoDTO>> GetDriverRentInfo(DriverRentFilterDTO filter)
+        {
+            try
+            {
+                
+                var query = _context.HistoryRentDrivers.AsQueryable();
 
+                if (filter.StartDate.HasValue)
+                    query = query.Where(hrd => hrd.TimeStart >= filter.StartDate.Value);
 
+                if (filter.EndDate.HasValue)
+                    query = query.Where(hrd => hrd.EndStart <= filter.EndDate.Value);
+
+                var rentInfo = await query
+                    .Join(_context.PaymentRentDrivers,
+                        hrd => hrd.HistoryId,
+                        prd => prd.HistoryRentDriverId,
+                        (hrd, prd) => new { hrd, prd })
+                    .Join(_context.Drivers,
+                        joined => joined.hrd.DriverId,
+                        d => d.Id,
+                        (joined, d) => new { joined.hrd, joined.prd, d })
+                    .Join(_context.Vehicles,
+                        joined => joined.hrd.VehicleId,
+                        v => v.Id,
+                        (joined, v) => new DriverRentInfoDTO
+                        {
+                            HistoryId = joined.hrd.HistoryId,
+                            DriverName = joined.d.Name,
+                            VehicleLicense = v.LicensePlate,
+                            TimeStart = joined.hrd.TimeStart,
+                            EndStart = joined.hrd.EndStart,
+                            Price = joined.prd.Price
+                        })
+                    .ToListAsync();
+
+                return rentInfo;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error in GetDriverRentInfo: {ex.Message}");
+            }
+        }
     }
 }
