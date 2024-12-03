@@ -45,9 +45,6 @@ namespace MyAPI.Repositories.Impls
             {
                 throw new Exception("Password cannot be null or empty.");
             }
-         
-
-
             if (string.IsNullOrWhiteSpace(entity.Email))
             {
                 throw new Exception("Email cannot be null or empty.");

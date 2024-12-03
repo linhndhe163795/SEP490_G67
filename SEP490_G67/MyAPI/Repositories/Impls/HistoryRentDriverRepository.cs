@@ -246,7 +246,9 @@ namespace MyAPI.Repositories.Impls
             var rentDetails = await query.Select(x => new PaymentRentDriverDTO
             {
                 Price = x.Price,
+                vehicleId = x.VehicleId,
                 LicenseVehicle = _context.Vehicles.Where(v => v.Id == x.VehicleId).Select(x => x.LicensePlate).FirstOrDefault(),
+                DriverId = x.DriverId,
                 DriverName = _context.Drivers.Where(d => d.Id == x.DriverId).Select(x => x.Name).FirstOrDefault(),
                 CreatedAt = x.CreatedAt,
             }).ToListAsync();

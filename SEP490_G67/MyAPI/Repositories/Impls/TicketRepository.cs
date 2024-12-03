@@ -655,6 +655,7 @@ namespace MyAPI.Repositories.Impls
                     x => new TicketRevenue
                     {
                         PricePromotion = x.PricePromotion,
+                        VehicleId = x.VehicleId,
                         CreatedAt = x.CreatedAt,
                         LiscenseVehicle = x.Vehicle.LicensePlate,
                         TypeOfTicket = x.TypeOfTicketNavigation.Description,
