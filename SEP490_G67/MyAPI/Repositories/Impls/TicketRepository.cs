@@ -28,7 +28,7 @@ namespace MyAPI.Repositories.Impls
             _sendMail = sendMail;
         }
 
-        public async Task<int> CreateTicketByUser(string? promotionCode, int tripDetailsId, BookTicketDTOs ticketDTOs, int userId, int numberTicket)
+        public async Task<int> CreateTicketByUser(string? promotionCode, int tripDetailsId, BookTicketDTOs ticketDTOs, int userId, int numberTicket, DateTime dateTicket)
         {
             try
             {
@@ -54,8 +54,7 @@ namespace MyAPI.Repositories.Impls
                 var promotionUserUsed = await _context.PromotionUsers.Include(x => x.Promotion)
                                         .FirstOrDefaultAsync(x => x.Promotion.CodePromotion == promotionCode && x.UserId == userId);
                 //var dateString = _httpContextAccessor?.HttpContext?.Session.GetString("date") ?? DateTime.Now.ToString("MM/dd/yyyy");
-                var dateString = _httpContextAccessor?.HttpContext?.Request.Cookies["date"]
-                 ?? DateTime.Now.ToString("MM/dd/yyyy");
+                var dateString = dateTicket.ToString("MM/dd/yyyy");
 
                 var tripDetails = await (from td in _context.TripDetails
                                          join t in _context.Trips on td.TripId equals t.Id
@@ -101,7 +100,7 @@ namespace MyAPI.Repositories.Impls
                     TypeOfTicket = (tripDetails.Vehicle.NumberSeat >= Constant.SO_GHE_XE_TIEN_CHUYEN) ? Constant.VE_XE_LIEN_TINH : Constant.VE_XE_TIEN_CHUYEN,
                     Note = ticketDTOs.Note + "\n" +
                         " Xe sẽ đến điểm " + tripDetails.TripDetails.PointStartDetails +
-                        " vào lúc: " + tripDetails.TripDetails.PointStartDetails,
+                        " vào lúc: " + tripDetails.TripDetails.TimeStartDetils,
                     UserId = userId,
                     CreatedAt = DateTime.Now,
                     CreatedBy = userId,
@@ -117,7 +116,7 @@ namespace MyAPI.Repositories.Impls
                 await _context.SaveChangesAsync();
                 var pointUser = new PointUser
                 {
-                    Points = (int?)((int?) createTicket.PricePromotion * Constant.TICH_DIEM),
+                    Points = (int?)((int?)createTicket.PricePromotion * Constant.TICH_DIEM),
                     UserId = userId,
                     PointsMinus = 0,
                     CreatedAt = DateTime.Now,
@@ -227,7 +226,7 @@ namespace MyAPI.Repositories.Impls
 
                 }
 
-                var type_id = await _context.Requests.Where(s=> s.Id == addTicketForRentCarDTO.requestId).Select(r => r.TypeId).FirstOrDefaultAsync();
+                var type_id = await _context.Requests.Where(s => s.Id == addTicketForRentCarDTO.requestId).Select(r => r.TypeId).FirstOrDefaultAsync();
 
                 if (type_id != 2)
                 {
@@ -308,7 +307,7 @@ namespace MyAPI.Repositories.Impls
 
                 return true;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return false;
                 throw new Exception(ex.Message);
@@ -464,29 +463,24 @@ namespace MyAPI.Repositories.Impls
                     throw new Exception("Invalid driver ID.");
                 }
                 var ticketNotPaid = await _context.Tickets.FirstOrDefaultAsync(x => x.Id == id && x.TypeOfPayment == Constant.TIEN_MAT);
-
+                if(ticketNotPaid == null)
+                {
+                    throw new Exception("Not ticket valid");
+                }
                 var pointTicket = ticketNotPaid.PricePromotion * 10 / 100;
 
-                var paymentTicket = new Payment
+                var vehicleID = _context.Vehicles.Where(x => x.DriverId ==  driverId).Select(x => x.Id).FirstOrDefault();
+                if(ticketNotPaid.VehicleId != vehicleID)
                 {
-                    UserId = ticketNotPaid.UserId,
-                    Code = "NULL",
-                    Description = "THANH TOÁN TIỀN MẶT",
-                    Price = ticketNotPaid.Price,
-                    Time = DateTime.Now,
-                    CreatedAt = DateTime.Now,
-                    CreatedBy = driverId,
-                    TypeOfPayment = Constant.TIEN_MAT,
-                };
-                await _context.Payments.AddAsync(paymentTicket);
-                await _context.SaveChangesAsync();
+                    throw new Exception("Driver not valid");
+                }
 
                 var addPointUser = new PointUser
                 {
                     Points = (int)pointTicket,
                     UserId = ticketNotPaid.UserId,
                     Date = DateTime.Now,
-                    PaymentId = paymentTicket.PaymentId,
+                    PaymentId = null,
                     CreatedBy = driverId,
                     CreatedAt = DateTime.Now,
                     PointsMinus = 0
@@ -508,22 +502,58 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception("UpdateStatusTicketNotPaid: " + ex.Message);
             }
         }
-
-        public async Task<TicketByIdDTOs> getTicketById(int ticketId)
+        public async Task<TicketByIdDTOs> getTicketDetailsById(int ticketId, int userId)
         {
             try
             {
                 if (ticketId <= 0)
                 {
-                    throw new Exception("Invalid ticket ID.");
+                    throw new ArgumentException("Invalid ticket ID.");
                 }
-                var ticketById = await _context.Tickets.FirstOrDefaultAsync(x => x.Id == ticketId);
-                var mapperTicketById = _mapper.Map<TicketByIdDTOs>(ticketById);
-                return mapperTicketById;
+
+                var getInforUser = await _context.Users
+                    .Include(x => x.UserRoles)
+                    .ThenInclude(x => x.Role)
+                    .FirstOrDefaultAsync(x => x.Id == userId);
+
+                if (getInforUser == null)
+                {
+                    throw new ArgumentException("User not found.");
+                }
+
+                if (IsUserRole(getInforUser, "Staff"))
+                {
+                    var ticketById = await _context.Tickets
+                        .FirstOrDefaultAsync(x => x.Id == ticketId);
+
+                    if (ticketById == null)
+                    {
+                        throw new ArgumentException("Ticket not found.");
+                    }
+
+                    var mapperTicketById = _mapper.Map<TicketByIdDTOs>(ticketById);
+                    return mapperTicketById;
+                }
+
+                if (IsUserRole(getInforUser, "User"))
+                {
+                    var ticketById = await _context.Tickets
+                        .FirstOrDefaultAsync(x => x.Id == ticketId && x.UserId == userId);
+
+                    if (ticketById == null)
+                    {
+                        throw new ArgumentException("Ticket not found or you do not have access to this ticket.");
+                    }
+
+                    var mapperTicketById = _mapper.Map<TicketByIdDTOs>(ticketById);
+                    return mapperTicketById;
+                }
+
+                throw new UnauthorizedAccessException("User does not have valid roles to access the ticket.");
             }
             catch (Exception ex)
             {
-                throw new Exception(ex.Message);
+                throw new Exception($"Error fetching ticket details: {ex.Message}", ex);
             }
         }
 
@@ -625,6 +655,7 @@ namespace MyAPI.Repositories.Impls
                     x => new TicketRevenue
                     {
                         PricePromotion = x.PricePromotion,
+                        VehicleId = x.VehicleId,
                         CreatedAt = x.CreatedAt,
                         LiscenseVehicle = x.Vehicle.LicensePlate,
                         TypeOfTicket = x.TypeOfTicketNavigation.Description,
@@ -642,12 +673,15 @@ namespace MyAPI.Repositories.Impls
         public async Task<bool> deleteTicketTimeOut(int ticketId)
         {
             var checkTicket = await _context.Tickets.FirstOrDefaultAsync(s => s.Id == ticketId);
-
             if (checkTicket == null)
             {
                 throw new Exception("Ticket id not found");
             }
-
+            if (checkTicket.TypeOfPayment == 1 && checkTicket.Status.Equals("Đã thanh toán bằng tài khoản"))
+            {
+                throw new Exception("Ticket đã thanh toán");
+            }
+            
             _context.Tickets.Remove(checkTicket);
             await _context.SaveChangesAsync();
             return true;
@@ -657,7 +691,7 @@ namespace MyAPI.Repositories.Impls
         {
             try
             {
-              
+
                 if (userId <= 0)
                 {
                     throw new Exception("Invalid user.");
@@ -671,5 +705,7 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception(ex.Message);
             }
         }
+
+
     }
 }

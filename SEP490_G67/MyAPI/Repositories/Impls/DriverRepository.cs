@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using DocumentFormat.OpenXml.Bibliography;
+using DocumentFormat.OpenXml.Vml.Office;
 using Microsoft.EntityFrameworkCore;
 using MyAPI.DTOs;
 using MyAPI.DTOs.DriverDTOs;
@@ -30,7 +32,24 @@ namespace MyAPI.Repositories.Impls
             _hashPassword = hashPassword;
             _mapper = mapper;
         }
-
+        public bool IsValidEmail(string email)
+        {
+            var emailPattern = @"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$";
+            return Regex.IsMatch(email, emailPattern);
+        }
+        public bool IsValidPhone(string phone)
+        {
+            var phonePattern = @"^(03|05|07|08|09)\d{8}$";
+            return Regex.IsMatch(phone, phonePattern);
+        }
+        public bool IsPasswordValid(string password)
+        {
+            return password.Length >= 6;
+        }
+        public async Task<bool> checkEmailDriver(string email)
+        {
+            return await _context.Drivers.AnyAsync(x => x.Email == email);
+        } 
         public async Task<Driver> GetDriverWithVehicle(int id)
         {
             return await _context.Drivers.Include(d => d.Vehicles).FirstOrDefaultAsync(d => d.Id == id);
@@ -52,21 +71,37 @@ namespace MyAPI.Repositories.Impls
                 {
                     throw new Exception("User Name is exist in system");
                 }
-                if (updateDriverDto.NumberPhone == null)
+                if (string.IsNullOrEmpty(updateDriverDto.NumberPhone))
                 {
-                    throw new ArgumentNullException(nameof(updateDriverDto.NumberPhone), "NumberPhone cannot be null");
+                    throw new Exception("NumberPhone must contain only digits.");
                 }
                 if (updateDriverDto.Password == null)
                 {
-                    throw new ArgumentNullException(nameof(updateDriverDto.Password), "Password cannot be null");
+                    throw new Exception("Password cannot be null");
                 }
                 if (updateDriverDto.UserName == null)
                 {
-                    throw new ArgumentNullException(nameof(updateDriverDto.UserName), "UserName cannot be null");
+                    throw new Exception( "UserName cannot be null");
                 }
                 if (string.IsNullOrWhiteSpace(updateDriverDto.License))
                 {
-                    throw new ArgumentNullException(nameof(updateDriverDto.License), "License cannot be null or empty");
+                    throw new Exception("License cannot be null or empty");
+                }
+                if (!IsValidEmail(updateDriverDto.Email))
+                {
+                    throw new Exception("Email is invalid.");
+                }
+                if (!IsValidPhone(updateDriverDto.NumberPhone))
+                {
+                    throw new Exception("Phone is invalid");
+                }
+                if (!IsPasswordValid(updateDriverDto.Password))
+                {
+                    throw new Exception("Password is weak, please input password has length more than 6 charater");
+                }
+                if (await checkEmailDriver(updateDriverDto.Email))
+                {
+                    throw new Exception("Driver exsit system");
                 }
                 var hashPassword = _hashPassword.HashMD5Password(updateDriverDto.Password);
                 var driver = new Driver
@@ -75,6 +110,7 @@ namespace MyAPI.Repositories.Impls
                     Name = updateDriverDto.Name,
                     NumberPhone = updateDriverDto.NumberPhone,
                     Avatar = updateDriverDto.Avatar,
+                    Email = updateDriverDto.Email,
                     Dob = updateDriverDto.Dob,
                     License = updateDriverDto.License,
                     Password = hashPassword,
@@ -85,7 +121,7 @@ namespace MyAPI.Repositories.Impls
                 await Add(driver);
                 return driver;
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 throw;
             }
@@ -107,13 +143,25 @@ namespace MyAPI.Repositories.Impls
             {
                 throw new Exception("Name cannot be null or empty.");
             }
-            if (!string.IsNullOrEmpty(updateDriverDto.NumberPhone) && !Regex.IsMatch(updateDriverDto.NumberPhone, @"^\d+$"))
+            if (string.IsNullOrEmpty(updateDriverDto.NumberPhone))
             {
                 throw new Exception("NumberPhone must contain only digits.");
             }
             if (string.IsNullOrWhiteSpace(updateDriverDto.License))
             {
                 throw new ArgumentNullException(nameof(updateDriverDto.License), "License cannot be null or empty");
+            }
+            if (!IsValidEmail(updateDriverDto.Email))
+            {
+                throw new Exception("Email is invalid.");
+            }
+            if (!IsValidPhone(updateDriverDto.NumberPhone))
+            {
+                throw new Exception("Phone is invalid");
+            }
+            if (!IsPasswordValid(updateDriverDto.Password))
+            {
+                throw new Exception("Password is weak, please input password has length more than 6 charater");
             }
             existingDriver.Name = updateDriverDto.Name;
             existingDriver.NumberPhone = updateDriverDto.NumberPhone;
@@ -135,51 +183,51 @@ namespace MyAPI.Repositories.Impls
                 .ToListAsync();
         }
 
-        
+
 
         public async Task SendEmailToDriversWithoutVehicle(int price)
         {
-        try
-        {
-            var driversWithoutVehicle = await GetDriversWithoutVehicleAsync();
-
-            if (!driversWithoutVehicle.Any())
+            try
             {
-                Console.WriteLine("No drivers without vehicles found.");
-                return;
-            }
+                var driversWithoutVehicle = await GetDriversWithoutVehicleAsync();
 
-            string formattedPrice = string.Format(new CultureInfo("vi-VN"), "{0:N0} VND", price);
-
-            foreach (var driver in driversWithoutVehicle)
-            {
-                if (string.IsNullOrWhiteSpace(driver.Email))
+                if (!driversWithoutVehicle.Any())
                 {
-                    Console.WriteLine($"Driver {driver.Name} does not have an email address. Skipping...");
-                    continue;
+                    Console.WriteLine("No drivers without vehicles found.");
+                    return;
                 }
 
-                SendMailDTO sendMailDTO = new()
-                {
-                    FromEmail = "duclinh5122002@gmail.com",
-                    Password = "jetj haze ijdw euci",
-                    ToEmail = driver.Email,
-                    Subject = "Vehicle Rental Opportunity",
-                    Body = $"Hello {driver.Name},\n\nWe currently have vehicles available and would like to hire you at a rate of {formattedPrice}. Please contact us if you are interested in renting a vehicle.\n\nBest regards,\nYour Company Name"
-                };
+                string formattedPrice = string.Format(new CultureInfo("vi-VN"), "{0:N0} VND", price);
 
-                if (!await _sendMail.SendEmail(sendMailDTO))
+                foreach (var driver in driversWithoutVehicle)
                 {
-                    Console.WriteLine($"Failed to send email to driver {driver.Email}.");
+                    if (string.IsNullOrWhiteSpace(driver.Email))
+                    {
+                        Console.WriteLine($"Driver {driver.Name} does not have an email address. Skipping...");
+                        continue;
+                    }
+
+                    SendMailDTO sendMailDTO = new()
+                    {
+                        FromEmail = "duclinh5122002@gmail.com",
+                        Password = "jetj haze ijdw euci",
+                        ToEmail = driver.Email,
+                        Subject = "Vehicle Rental Opportunity",
+                        Body = $"Hello {driver.Name},\n\nWe currently have vehicles available and would like to hire you at a rate of {formattedPrice}. Please contact us if you are interested in renting a vehicle.\n\nBest regards,\nYour Company Name"
+                    };
+
+                    if (!await _sendMail.SendEmail(sendMailDTO))
+                    {
+                        Console.WriteLine($"Failed to send email to driver {driver.Email}.");
+                    }
                 }
             }
+            catch (Exception ex)
+            {
+                Console.WriteLine("SendEmailToDriversWithoutVehicle error: " + ex.Message);
+                throw new Exception("Failed to send email to drivers without vehicles.", ex);
+            }
         }
-        catch (Exception ex)
-        {
-            Console.WriteLine("SendEmailToDriversWithoutVehicle error: " + ex.Message);
-            throw new Exception("Failed to send email to drivers without vehicles.", ex);
-        }
-    }
 
         public async Task<bool> checkLogin(LoginDriverDTO login)
         {
@@ -200,11 +248,11 @@ namespace MyAPI.Repositories.Impls
             try
             {
                 var hashPassword = _hashPassword.HashMD5Password(login.Password);
-                var driver = await _context.Drivers.FirstOrDefaultAsync((x => (x.UserName == login.UserName || x.Email == login.Email) && x.Password == hashPassword));
+                var driver = await _context.Drivers.FirstOrDefaultAsync((x => (x.UserName == login.UserName || x.Email == login.Email) && x.Password == hashPassword && x.Status == true));
                 return driver != null ? true : false;
 
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 throw new Exception(ex.Message);
             }
@@ -239,6 +287,25 @@ namespace MyAPI.Repositories.Impls
             var driveListDTOs = _mapper.Map<List<ListDriverDTO>>(listDriver);
 
             return driveListDTOs;
+        }
+
+        public async Task BanDriver(int id)
+        {
+            try
+            {
+                var driverId = _context.Drivers.FirstOrDefault(x => x.Id == id);
+                if(driverId == null)
+                {
+                    throw new Exception("Not found dirver");
+                }
+                driverId.Status = !driverId.Status;
+                _context.Update(driverId);
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
         }
     }
 }

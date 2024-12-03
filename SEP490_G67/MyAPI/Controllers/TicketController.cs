@@ -26,8 +26,8 @@ namespace MyAPI.Controllers
             _vehicleRepository = vehicleRepository;
         }
         [Authorize]
-        [HttpPost("bookTicket/{tripDetailsId}")]
-        public async Task<IActionResult> createTicket([FromBody] BookTicketDTOs ticketDTOs, int tripDetailsId, string? promotionCode, int numberTicket)
+        [HttpPost("bookTicket/{tripDetailsId}/{date}")]
+        public async Task<IActionResult> createTicket([FromBody] BookTicketDTOs ticketDTOs, int tripDetailsId, string? promotionCode, int numberTicket, DateTime date)
         {
             try
             {
@@ -42,7 +42,7 @@ namespace MyAPI.Controllers
                 }
                 var userId = _getInforFromToken.GetIdInHeader(token);
 
-                var ticketId = await _ticketRepository.CreateTicketByUser(promotionCode, tripDetailsId, ticketDTOs, userId, numberTicket);
+                var ticketId = await _ticketRepository.CreateTicketByUser(promotionCode, tripDetailsId, ticketDTOs, userId, numberTicket, date);
                
                 return Ok(new { ticketId, ticketDetails = ticketDTOs });
             }
@@ -188,7 +188,17 @@ namespace MyAPI.Controllers
         {
             try
             {
-                var ticketById = await _ticketRepository.getTicketById(ticketId);
+                string token = Request.Headers["Authorization"];
+                if (token.StartsWith("Bearer"))
+                {
+                    token = token.Substring("Bearer ".Length).Trim();
+                }
+                if (string.IsNullOrEmpty(token))
+                {
+                    return BadRequest("Token is required.");
+                }
+                var userId = _getInforFromToken.GetIdInHeader(token);
+                var ticketById = await _ticketRepository.getTicketDetailsById(ticketId,userId);
                 return Ok(ticketById);
             }
             catch (Exception ex)

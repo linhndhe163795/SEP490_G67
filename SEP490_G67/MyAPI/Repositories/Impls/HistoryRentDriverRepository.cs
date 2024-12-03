@@ -246,7 +246,9 @@ namespace MyAPI.Repositories.Impls
             var rentDetails = await query.Select(x => new PaymentRentDriverDTO
             {
                 Price = x.Price,
+                vehicleId = x.VehicleId,
                 LicenseVehicle = _context.Vehicles.Where(v => v.Id == x.VehicleId).Select(x => x.LicensePlate).FirstOrDefault(),
+                DriverId = x.DriverId,
                 DriverName = _context.Drivers.Where(d => d.Id == x.DriverId).Select(x => x.Name).FirstOrDefault(),
                 CreatedAt = x.CreatedAt,
             }).ToListAsync();
@@ -263,11 +265,6 @@ namespace MyAPI.Repositories.Impls
             if (startDate > endDate)
             {
                 throw new Exception("Start date must be earlier than or equal to end date.");
-            }
-
-            if (vehicleOwner < 0 || vehicleOwner == null)
-            {
-                throw new Exception("Invalid vehicle owner ID.");
             }
 
 
@@ -296,11 +293,6 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception("Start date must be earlier than or equal to end date.");
             }
 
-            if (vehicleOwner < 0 || vehicleOwner == null)
-            {
-                throw new Exception("Invalid vehicle owner ID.");
-            }
-
             IQueryable<PaymentRentDriver> query = _context.PaymentRentDrivers.Where(x => x.CreatedAt >= startDate && x.CreatedAt <= endDate);
             if (vehicleId != 0 && vehicleId.HasValue)
             {
@@ -319,10 +311,6 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception("Start date must be earlier than or equal to end date.");
             }
 
-            if (driverId < 0 || driverId == null)
-            {
-                throw new Exception("Invalid vehicle driver ID.");
-            }
 
             IQueryable<PaymentRentDriver> query = _context.PaymentRentDrivers.Where(x => x.CreatedAt >= startDate && x.CreatedAt <= endDate);
             if(driverId != 0)

@@ -11,5 +11,6 @@ namespace MyAPI.Infrastructure.Interfaces
         Task<PromotionPost> UpdatePromotion(int id, PromotionPost promotionDTO);
         Task exchangePromotion(int userId, int promotionId);
         Task<List<PromotionDTO>> listPromotionCanChange(int userId);
+        Task<PromotionDTO> getPromotionByPromotionId(int promotionId);
     }
 }

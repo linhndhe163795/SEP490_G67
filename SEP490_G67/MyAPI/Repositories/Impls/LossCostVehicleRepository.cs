@@ -164,10 +164,6 @@ namespace MyAPI.Repositories.Impls
                                                 LossCostType = ls.LossCostType.Description,
                                                 VehicleOwner = _context.Users.Include(uv => uv.Vehicles).Where(u => u.Id == ls.Vehicle.VehicleOwner).Select(u => u.FullName).FirstOrDefault()
                                             }).ToListAsync();
-            //if (!lossCostVehicleByDate.Any())
-            //{
-            //    throw new Exception("No loss cost data found for the specified criteria.");
-            //}
             var combineResult = new TotalLossCost
             {
                 listLossCostVehicle = lossCostVehicleByDate,

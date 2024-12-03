@@ -42,6 +42,19 @@ namespace MyAPI.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        [HttpGet("getPromotionById/{promotionId}")]
+        public async Task<IActionResult> getPromotionByPromotionId(int promotionId)
+        {
+            try
+            {
+                var promotion = await _promotionRepository.getPromotionByPromotionId(promotionId);
+                return Ok(promotion);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
         [Authorize]
         [HttpGet("getPromotionById")]
         public async Task<IActionResult> GetPromotionByUser()
@@ -86,7 +99,7 @@ namespace MyAPI.Controllers
         }
         [Authorize(Roles = "Staff")]
         [HttpPost("updatePromotion/id")]
-        public async Task<IActionResult> UpdatePromotion(int id, [FromForm] PromotionDTO promotionDTO, IFormFile? imageFile)
+        public async Task<IActionResult> UpdatePromotion(int id, PromotionDTO promotionDTO)
         {
             try
             {
@@ -101,21 +114,21 @@ namespace MyAPI.Controllers
                 getPromotionById.UpdateBy = 1;
                 getPromotionById.StartDate = promotionDTO.StartDate;
                 getPromotionById.EndDate = promotionDTO.EndDate;
-                if (imageFile != null && imageFile.Length > 0)
-                {
-                    var fileName = Path.GetFileNameWithoutExtension(imageFile.FileName);
-                    var fileExtension = Path.GetExtension(imageFile.FileName);
-                    var newFileName = $"{fileName}_{DateTime.Now.Ticks}{fileExtension}";
-                    var filePath = Path.Combine("wwwroot/uploads", newFileName);
+                //if (imageFile != null && imageFile.Length > 0)
+                //{
+                //    var fileName = Path.GetFileNameWithoutExtension(imageFile.FileName);
+                //    var fileExtension = Path.GetExtension(imageFile.FileName);
+                //    var newFileName = $"{fileName}_{DateTime.Now.Ticks}{fileExtension}";
+                //    var filePath = Path.Combine("wwwroot/uploads", newFileName);
 
-                    Directory.CreateDirectory(Path.GetDirectoryName(filePath));
-                    using (var stream = new FileStream(filePath, FileMode.Create))
-                    {
-                        await imageFile.CopyToAsync(stream);
-                    }
+                //    Directory.CreateDirectory(Path.GetDirectoryName(filePath));
+                //    using (var stream = new FileStream(filePath, FileMode.Create))
+                //    {
+                //        await imageFile.CopyToAsync(stream);
+                //    }
 
-                    getPromotionById.ImagePromotion = $"/uploads/{newFileName}";
-                }
+                //    getPromotionById.ImagePromotion = $"/uploads/{newFileName}";
+                //}
                 await _promotionRepository.Update(getPromotionById);
                 return Ok(promotionDTO);
             }
@@ -258,10 +271,8 @@ namespace MyAPI.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message); 
+                return BadRequest(ex.Message);
             }
-
-
         }
     }
 }

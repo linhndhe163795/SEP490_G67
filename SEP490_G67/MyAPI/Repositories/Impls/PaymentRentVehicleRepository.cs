@@ -86,7 +86,6 @@ namespace MyAPI.Repositories.Impls
         {
             try
             {
-
                 if (startDate > endDate)
                 {
                     throw new Exception("Start date must be earlier than or equal to end date.");
@@ -125,8 +124,10 @@ namespace MyAPI.Repositories.Impls
                  await query.Select(x => new PaymentRentVehicelDTO
                  {
                      CreatedAt = x.CreatedAt,
+                     driverId = x.DriverId,
                      DriverName = _context.Drivers.Where(d => d.Id == x.DriverId).Select(d => d.Name).FirstOrDefault(),
                      Price = x.Price ?? 0,
+                     vehicelId = x.VehicleId,
                      LicenseVehicle = _context.Vehicles.Where(v => v.Id == x.DriverId).Select(v => v.LicensePlate).FirstOrDefault(),
                      CarOwner = _context.Users.Include(uv => uv.Vehicles).Where(u => u.Id == x.CarOwnerId).Select(u => u.FullName).FirstOrDefault()
                  }).ToListAsync();

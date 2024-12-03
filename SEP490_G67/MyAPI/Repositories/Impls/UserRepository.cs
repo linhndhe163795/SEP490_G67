@@ -45,15 +45,26 @@ namespace MyAPI.Repositories.Impls
             {
                 throw new Exception("Password cannot be null or empty.");
             }
-
             if (string.IsNullOrWhiteSpace(entity.Email))
             {
                 throw new Exception("Email cannot be null or empty.");
             }
-
+            
             if (string.IsNullOrWhiteSpace(entity.NumberPhone))
             {
                 throw new Exception("NumberPhone cannot be null or empty.");
+            }
+            if (!IsValidEmail(entity.Email))
+            {
+                throw new Exception("Email is invalid.");
+            }
+            if (!IsValidPhone(entity.NumberPhone))
+            {
+                throw new Exception("Phone is invalid");
+            }
+            if (!IsPasswordValid(entity.Password))
+            {
+                throw new Exception("Password is weak, please input password has length more than 6 charater");
             }
 
             if (entity.Dob == null)
@@ -149,7 +160,7 @@ namespace MyAPI.Repositories.Impls
         {
             if (userLoginDTO == null)
             {
-                throw new ArgumentNullException(nameof(userLoginDTO), "Login data cannot be null.");
+                throw new Exception("Login data cannot be null.");
             }
 
             if (string.IsNullOrWhiteSpace(userLoginDTO.Username))
@@ -177,7 +188,7 @@ namespace MyAPI.Repositories.Impls
         {
             if (entity == null)
             {
-                throw new ArgumentNullException(nameof(entity), "Forgot password data cannot be null.");
+                throw new Exception("Forgot password data cannot be null.");
             }
 
             if (string.IsNullOrWhiteSpace(entity.Email))

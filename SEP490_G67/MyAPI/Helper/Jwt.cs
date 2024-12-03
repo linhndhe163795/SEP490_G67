@@ -22,14 +22,14 @@ namespace MyAPI.Helper
             {
                 Subject = new ClaimsIdentity(new Claim[]
                 {
-            new Claim(ClaimTypes.Email, userLogin.Email),
-            new Claim("ID", userLogin.Id.ToString()),
-            new Claim(ClaimTypes.Role, userLogin.RoleName.ToString())
+                    new Claim(ClaimTypes.Email, userLogin.Email ?? null),
+                    new Claim("ID", userLogin.Id.ToString()),
+                    new Claim(ClaimTypes.Role, userLogin.RoleName.ToString())
                 }),
                 IssuedAt = DateTime.UtcNow,
                 Issuer = _configuration["JWT:Issuer"],
                 Audience = _configuration["JWT:Audience"],
-                Expires = DateTime.UtcNow.AddMinutes(30),
+                Expires = DateTime.UtcNow.AddDays(1),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),
             };
 
@@ -47,13 +47,14 @@ namespace MyAPI.Helper
                 Subject = new ClaimsIdentity(new Claim[]
                 {
             new Claim(ClaimTypes.Email, driver.Email ?? null),
+            new Claim("User Name", driver.UserName?? null),
             new Claim("ID", driver.Id.ToString()),
             new Claim(ClaimTypes.Role, driver.RoleName.ToString())
                 }),
                 IssuedAt = DateTime.UtcNow,
                 Issuer = _configuration["JWT:Issuer"],
                 Audience = _configuration["JWT:Audience"],
-                Expires = DateTime.UtcNow.AddMinutes(30),
+                Expires = DateTime.UtcNow.AddDays(1),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),
             };
 
