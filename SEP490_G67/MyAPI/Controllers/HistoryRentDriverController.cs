@@ -100,7 +100,7 @@ namespace MyAPI.Controllers
             }
         }
         [Authorize(Roles = "Driver")]
-        [HttpGet("GetHistoryRentDriverById")]
+        [HttpGet("GetHistoryRentDriverByDriverId")]
         public async Task<IActionResult> GetDriverHistory()
         {
             try
@@ -120,16 +120,16 @@ namespace MyAPI.Controllers
             }
         }
         [Authorize(Roles = "Staff")]
-        [HttpPost("GetHistoryRentDriverForStaff")]
-        public async Task<IActionResult> GetDriverRentInfo([FromBody] DriverRentFilterDTO filter)
+        [HttpGet("GetHistoryRentDriverForStaff")]
+        public async Task<IActionResult> GetDriverRentInfo([FromQuery] DateTime? startDate, [FromQuery] DateTime? endDate)
         {
             try
             {
-                var rentInfo = await _historyRentDriverRepository.GetDriverRentInfo(filter);
+                var rentInfo = await _historyRentDriverRepository.GetDriverRentInfo(startDate, endDate);
 
                 if (rentInfo == null || !rentInfo.Any())
                 {
-                    return NotFound(new { Message = "No rent info found for the specified   criteria." });
+                    return NotFound(new { Message = "No rent info found for the specified criteria." });
                 }
 
                 return Ok(rentInfo);
@@ -139,5 +139,26 @@ namespace MyAPI.Controllers
                 return StatusCode(500, new { Message = "Failed to fetch driver rent info.", Details = ex.Message });
             }
         }
+        [Authorize(Roles = "VehicleOwner")]
+        [HttpGet("GetHistoryRentDriverForVehicleOwner")]
+        public async Task<IActionResult> GetHistoryByVehicleOwner()
+        {
+            try
+            {
+                var historyList = await _historyRentDriverRepository.GetHistoryByVehicleOwnerAsync();
+
+                if (historyList == null || !historyList.Any())
+                {
+                    return NotFound(new { Message = "No history found for the vehicle owner." });
+                }
+
+                return Ok(historyList);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Message = "Failed to fetch history by vehicle owner.", Details = ex.Message });
+            }
+        }
+
     }
 }

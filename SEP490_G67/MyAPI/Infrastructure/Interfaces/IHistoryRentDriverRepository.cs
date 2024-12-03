@@ -12,7 +12,8 @@ namespace MyAPI.Infrastructure.Interfaces
         Task<bool> UpdateDriverInRequestAsync(int driverId, int requestId);
 
         Task<List<DriverHistoryDTO>> GetDriverHistoryByUserIdAsync();
-        Task<List<DriverRentInfoDTO>> GetDriverRentInfo(DriverRentFilterDTO filter);
+        Task<List<DriverRentInfoDTO>> GetDriverRentInfo(DateTime? startDate, DateTime? endDate);
+        Task<List<DriverHistoryDTO>> GetHistoryByVehicleOwnerAsync();
 
     }
 }

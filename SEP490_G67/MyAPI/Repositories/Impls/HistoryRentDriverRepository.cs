@@ -410,23 +410,38 @@ namespace MyAPI.Repositories.Impls
                 var token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
                 int userId = _tokenHelper.GetIdInHeader(token);
 
-                        if (userId == -1)
+                if (userId == -1)
                 {
                     throw new Exception("Invalid user ID from token.");
                 }
+
                 var historyList = await _context.HistoryRentDrivers
-                    .Where(hrd => hrd.DriverId == userId)
-                    .Select(hrd => new DriverHistoryDTO
+                    .Join(_context.Vehicles,
+                          hrd => hrd.VehicleId,
+                          v => v.Id,
+                          (hrd, v) => new { hrd, v })
+                    .Join(_context.Drivers,
+                          joined => joined.hrd.DriverId,
+                          d => d.Id,
+                          (joined, d) => new
+                          {
+                              joined.hrd,
+                              joined.v,
+                              DriverName = d.Name,
+                              LicensePlate = joined.v.LicensePlate
+                          })
+                    .Where(joined => joined.hrd.DriverId == userId)
+                    .Select(joined => new DriverHistoryDTO
                     {
-                        HistoryId = hrd.HistoryId,
-                        DriverId = hrd.DriverId,
-                        VehicleId = hrd.VehicleId,
-                        TimeStart = hrd.TimeStart,
-                        EndStart = hrd.EndStart,
-                        CreatedAt = hrd.CreatedAt,
-                        CreatedBy = hrd.CreatedBy,
-                        UpdatedAt = hrd.UpdateAt,
-                        UpdatedBy = hrd.UpdateBy
+                        HistoryId = joined.hrd.HistoryId,
+                        DriverName = joined.DriverName,
+                        LicensePlate = joined.LicensePlate,
+                        TimeStart = joined.hrd.TimeStart,
+                        EndStart = joined.hrd.EndStart,
+                        CreatedAt = joined.hrd.CreatedAt,
+                        CreatedBy = joined.hrd.CreatedBy,
+                        UpdatedAt = joined.hrd.UpdateAt,
+                        UpdatedBy = joined.hrd.UpdateBy
                     })
                     .ToListAsync();
 
@@ -438,19 +453,19 @@ namespace MyAPI.Repositories.Impls
             }
         }
 
-        public async Task<List<DriverRentInfoDTO>> GetDriverRentInfo(DriverRentFilterDTO filter)
+
+        public async Task<List<DriverRentInfoDTO>> GetDriverRentInfo(DateTime? startDate, DateTime? endDate)
         {
             try
             {
-                
                 var query = _context.HistoryRentDrivers.AsQueryable();
 
-                if (filter.StartDate.HasValue)
-                    query = query.Where(hrd => hrd.TimeStart >= filter.StartDate.Value);
+                if (startDate.HasValue)
+                    query = query.Where(hrd => hrd.TimeStart >= startDate.Value);
 
-                if (filter.EndDate.HasValue)
-                    query = query.Where(hrd => hrd.EndStart <= filter.EndDate.Value);
-
+                if (endDate.HasValue)
+                    query = query.Where(hrd => hrd.EndStart <= endDate.Value);
+                
                 var rentInfo = await query
                     .Join(_context.PaymentRentDrivers,
                         hrd => hrd.HistoryId,
@@ -481,5 +496,52 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception($"Error in GetDriverRentInfo: {ex.Message}");
             }
         }
+
+
+        public async Task<List<DriverHistoryDTO>> GetHistoryByVehicleOwnerAsync()
+        {
+            try
+            {
+                var token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+                int vehicleOwnerId = _tokenHelper.GetIdInHeader(token);
+
+                if (vehicleOwnerId == -1)
+                {
+                    throw new Exception("Invalid vehicle owner ID from token.");
+                }
+
+                var historyList = await _context.HistoryRentDrivers
+                    .Join(_context.Vehicles,
+                          hrd => hrd.VehicleId,
+                          v => v.Id,
+                          (hrd, v) => new { hrd, v })
+                    .Join(_context.Drivers,
+                          joined => joined.hrd.DriverId,
+                          d => d.Id,
+                          (joined, d) => new { joined.hrd, joined.v, DriverName = d.Name })
+                    .Where(joined => joined.v.VehicleOwner == vehicleOwnerId)
+                    .Select(joined => new DriverHistoryDTO
+                    {
+                        HistoryId = joined.hrd.HistoryId,
+                        DriverName = joined.DriverName,
+                        LicensePlate = joined.v.LicensePlate,
+                        TimeStart = joined.hrd.TimeStart,
+                        EndStart = joined.hrd.EndStart,
+                        CreatedAt = joined.hrd.CreatedAt,
+                        CreatedBy = joined.hrd.CreatedBy,
+                        UpdatedAt = joined.hrd.UpdateAt,
+                        UpdatedBy = joined.hrd.UpdateBy
+                    })
+                    .ToListAsync();
+
+                return historyList;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error fetching history by vehicle owner: {ex.Message}");
+            }
+        }
+
+
     }
 }

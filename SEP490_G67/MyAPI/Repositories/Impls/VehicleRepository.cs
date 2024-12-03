@@ -910,7 +910,18 @@ namespace MyAPI.Repositories.Impls
                     .Select(x => new VehicleLicenscePlateDTOs
                     {
                         Id = x.Id,
-                        LicensePlate = x.LicensePlate
+                        LicensePlate = x.LicensePlate,
+                        NumberSeat = x.NumberSeat,
+                        VehicleTypeName = _context.VehicleTypes
+                    .Where(vt => vt.Id == x.VehicleTypeId)
+                    .Select(vt => vt.Description)
+                    .FirstOrDefault(),
+                        DriverName = _context.Drivers
+                    .Where(d => d.Id == x.DriverId)
+                    .Select(d => d.Name)
+                    .FirstOrDefault(),
+                        Status = x.Status,
+                        Description = x.Description
                     })
                     .ToListAsync();
 

@@ -392,7 +392,7 @@ namespace MyAPI.Controllers
                 return BadRequest(ex.Message);
             }
         }
-        [Authorize(Roles = "Staff")]
+        [Authorize(Roles = "Driver")]
         [HttpGet("getVehicleByDriverId")]
         public async Task<IActionResult> getListVehicleByDriverId()
         {
