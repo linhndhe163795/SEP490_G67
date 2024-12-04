@@ -16,6 +16,9 @@ using MyAPI.DTOs.VehicleTripDTOs;
 using MyAPI.Models;
 using MyAPI.DTOs.LossCostDTOs.LossCostVehicleDTOs;
 using MyAPI.DTOs.PointUserDTOs;
+using MyAPI.DTOs.HistoryRentDriverDTOs;
+using MyAPI.DTOs.HistoryRentVehicleDTOs;
+using MyAPI.DTOs.HistoryRentVehicles;
 
 namespace MyAPI.MappingProfile
 {
@@ -75,6 +78,7 @@ namespace MyAPI.MappingProfile
             CreateMap<Driver, ListDriverDTO>().ReverseMap();
             CreateMap<Request, RequestDetailDTO>().ReverseMap();
             CreateMap<RequestDetail, RequestDetailDTO>().ReverseMap();
+            CreateMap<HistoryRentVehicle, HistoryVehicleRentDTO>().ReverseMap();
 
 
         }
