@@ -19,9 +19,9 @@ namespace MyAPI.Repositories.Impls
         private readonly IRequestRepository _requestRepository;
         private readonly IRequestDetailRepository _requestDetailRepository;
         private readonly IMapper _mapper;
-
+        private readonly GetInforFromToken _getInforFromToken;
         public HistoryRentVehicleRepository(SEP490_G67Context context,
-            SendMail sendMail, IHttpContextAccessor httpContextAccessor, GetInforFromToken tokenHelper, IRequestRepository requestRepository, IRequestDetailRepository requestDetailRepository, IMapper mapper) : base(context)
+            SendMail sendMail, IHttpContextAccessor httpContextAccessor, GetInforFromToken tokenHelper, IRequestRepository requestRepository, IRequestDetailRepository requestDetailRepository, IMapper mapper, GetInforFromToken getInforFromToken) : base(context)
 
         {
             _httpContextAccessor = httpContextAccessor;
@@ -30,6 +30,7 @@ namespace MyAPI.Repositories.Impls
             _requestRepository = requestRepository;
             _requestDetailRepository = requestDetailRepository;
             _mapper = mapper;
+            _getInforFromToken = getInforFromToken;
         }
         //dành cho driver thuê xe 
         public async Task<bool> AccpetOrDeninedRentVehicle(AddHistoryVehicleUseRent add)
@@ -331,63 +332,43 @@ namespace MyAPI.Repositories.Impls
 
             return true;
         }
-        //public string GetUserRole(int userId)
-        //{
-        //    // Kiểm tra nếu user là Driver
-        //    var isDriver = _context.Drivers.Any(d => d.Id == userId);
-        //    if (isDriver) return "Driver";
+      
+        public async Task<List<HistoryVehicleRentDTO>> listHistoryRentVehicle(int userId, string roleName)
+        {
+            try
+            {
+                List<HistoryVehicleRentDTO> history;
+                if (roleName == "Staff")
+                {
+                    var listHistory = await _context.HistoryRentVehicles.ToListAsync();
+                    history = _mapper.Map<List<HistoryVehicleRentDTO>>(listHistory);
+                }
+                else if (roleName == "VehicleOwner")
+                {
+                    var listHistory = await _context.HistoryRentVehicles
+                        .Where(h => h.OwnerId == userId)
+                        .ToListAsync();
+                    history = _mapper.Map<List<HistoryVehicleRentDTO>>(listHistory);
+                }
+                else if (roleName == "Driver")
+                {
+                    var listHistory = await _context.HistoryRentVehicles
+                        .Where(h => h.DriverId == userId)
+                        .ToListAsync();
+                    history = _mapper.Map<List<HistoryVehicleRentDTO>>(listHistory);
+                }
+                else
+                {
+                    throw new Exception("Role not recognized");
+                }
 
-        //    // Kiểm tra vai trò trong UserRoles
-        //    var user = _context.Users
-        //        .Include(u => u.UserRoles)
-        //        .ThenInclude(ur => ur.Role)
-        //        .FirstOrDefault(u => u.Id == userId);
-
-        //    if (user == null) throw new Exception("User not found");
-
-        //    if (user.UserRoles.Any(ur => ur.Role.RoleName == "Staff")) return "Staff";
-        //    if (user.UserRoles.Any(ur => ur.Role.RoleName == "VehicleOwner")) return "VehicleOwner";
-
-        //    return "Unknown";
-        //}
-        //public async Task<List<HistoryVehicleRentDTO>> listHistoryRentVehicle(int userId)
-        //{
-        //    try
-        //    {
-        //        var role = GetUserRole(userId); // Lấy vai trò của User
-
-        //        List<HistoryVehicleRentDTO> history;
-        //        if (role == "Staff")
-        //        {
-        //            var listHistory = await _context.HistoryRentVehicles.ToListAsync();
-        //            history = _mapper.Map<List<HistoryVehicleRentDTO>>(listHistory);
-        //        }
-        //        else if (role == "VehicleOwner")
-        //        {
-        //            var listHistory = await _context.HistoryRentVehicles
-        //                .Where(h => h.OwnerId == userId)
-        //                .ToListAsync();
-        //            history = _mapper.Map<List<HistoryVehicleRentDTO>>(listHistory);
-        //        }
-        //        else if (role == "Driver")
-        //        {
-        //            var listHistory = await _context.HistoryRentVehicles
-        //                .Where(h => h.DriverId == userId)
-        //                .ToListAsync();
-        //            history = _mapper.Map<List<HistoryVehicleRentDTO>>(listHistory);
-        //        }
-        //        else
-        //        {
-        //            throw new Exception("Role not recognized");
-        //        }
-
-        //        return history;
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        throw new Exception($"Error: {ex.Message}");
-        //    }
-        //}
+                return history;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error: {ex.Message}");
+            }
+        }
 
     }
 }
