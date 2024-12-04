@@ -153,7 +153,7 @@ namespace MyAPI.Controllers
         }
 
         [Authorize(Roles = "Staff")]
-        [HttpPut("updateVehicleOwner/{id}")]
+        [HttpPost("updateVehicleOwner/{id}")]
         public async Task<IActionResult> UpdateVehicleOwner(int id, UpdateVehicleOwnerDTO vehicleOwnerDTO)
         {
             try
@@ -186,7 +186,7 @@ namespace MyAPI.Controllers
             }
         }
         [Authorize(Roles = "Staff")]
-        [HttpDelete("deleteVehicleOwner/{id}")]
+        [HttpPost("deleteVehicleOwner/{id}")]
         public async Task<IActionResult> DeleteVehicleOwner(int id)
         {
             try

@@ -214,46 +214,6 @@ namespace MyAPI.Controllers
             }
         }
 
-
-        [HttpGet("export_Template")]
-        public async Task<IActionResult> ExportTemplateExcel()
-        {
-            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
-            using (var package = new ExcelPackage())
-            {
-                var worksheet = package.Workbook.Worksheets.Add("TripTemplate");
-
-                worksheet.Cells[1, 1].Value = "Name";
-                worksheet.Cells[1, 2].Value = "StartTime";
-                worksheet.Cells[1, 3].Value = "Description";
-                worksheet.Cells[1, 4].Value = "Price";
-                worksheet.Cells[1, 5].Value = "PointStart";
-                worksheet.Cells[1, 6].Value = "PointEnd";
-                worksheet.Cells[1, 7].Value = "Status";
-                var sampleData = new List<object[]>
-            {
-                new object[] { "Trip A", "10:00", "Trip to ha noi", 50.0m, "Ha Noi", "Bac Giang", true },
-                new object[] { "Trip B", "12:00", "Trip to Bac Giang", 80.0m, "Bac Giang", "Ha Noi", false }
-            };
-
-                for (int i = 0; i < sampleData.Count; i++)
-                {
-                    for (int j = 0; j < sampleData[i].Length; j++)
-                    {
-                        worksheet.Cells[i + 2, j + 1].Value = sampleData[i][j];
-                    }
-                }
-
-                var stream = new MemoryStream();
-                await package.SaveAsAsync(stream);
-                stream.Position = 0;
-
-                string fileName = "TripTemplate.xlsx";
-                string contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-                return File(stream, contentType, fileName);
-            }
-        }
-
         [HttpPost("import")]
         public async Task<IActionResult> ImportExcel(IFormFile file)
         {

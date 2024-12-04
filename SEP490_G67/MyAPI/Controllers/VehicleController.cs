@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using AutoMapper.Internal;
 using ClosedXML.Excel;
+using DocumentFormat.OpenXml.Spreadsheet;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MyAPI.DTOs.VehicleDTOs;
@@ -8,6 +9,8 @@ using MyAPI.Helper;
 using MyAPI.Infrastructure.Interfaces;
 using MyAPI.Models;
 using MyAPI.Repositories.Impls;
+using OfficeOpenXml;
+using System.IO.Packaging;
 
 namespace MyAPI.Controllers
 {
@@ -264,45 +267,23 @@ namespace MyAPI.Controllers
         {
             try
             {
-                using (var workbook = new XLWorkbook())
+                var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "templates", "TemplateVehicle.xlsx");
+                if
+                    (!System.IO.File.Exists(filePath))
                 {
-
-                    var Vehicel = workbook.Worksheets.Add("Vehicle");
-                    Vehicel.Cell(1, 1).Value = "Point Start Details";
-                    Vehicel.Cell(1, 2).Value = "Point End Details";
-                    Vehicel.Cell(1, 3).Value = "Time Start Details";
-                    Vehicel.Cell(1, 4).Value = "Time End Details";
-                    Vehicel.Cell(1, 7).Value = "Type_vehicel_id";
-                    Vehicel.Cell(1, 8).Value = "Description";
-
-                    Vehicel.Cell(2, 1).Value = "29";
-                    Vehicel.Cell(2, 2).Value = "1";
-                    Vehicel.Cell(2, 3).Value = "98B-01273";
-                    Vehicel.Cell(2, 4).Value = "Thaco";
-
-                    Vehicel.Cell(2, 7).Value = "1";
-                    Vehicel.Cell(2, 8).Value = "Xe liên tỉnh";
-
-                    Vehicel.Cell(3, 7).Value = "2";
-                    Vehicel.Cell(3, 8).Value = "Xe tiện chuyến";
-
-                    Vehicel.Cell(4, 7).Value = "3";
-                    Vehicel.Cell(4, 8).Value = "Xe  du lịch";
-
-                    var VehicelRow = Vehicel.Row(1);
-                    VehicelRow.Style.Font.Bold = true;
-                    VehicelRow.Style.Fill.BackgroundColor = XLColor.Gray;
-                    VehicelRow.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
-                    Vehicel.Columns().AdjustToContents();
-                    using (var stream = new MemoryStream())
-                    {
-                        workbook.SaveAs(stream);
-                        stream.Seek(0, SeekOrigin.Begin);
-
-                        var content = stream.ToArray();
-                        return File(content, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "TemplateDataVehicels.xlsx");
-                    }
+                    return NotFound();
                 }
+                byte[] fileBytes;
+                using (var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read))
+                {
+                    using (var memoryStream = new MemoryStream())
+                    {
+                        stream.CopyTo(memoryStream);
+                        fileBytes = memoryStream.ToArray();
+                    }
+                    return File(fileBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "TemplateVehicle.xlsx");
+                }
+
             }
             catch (Exception ex)
             {

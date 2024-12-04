@@ -5,6 +5,7 @@ using MyAPI.DTOs.TripDTOs;
 using MyAPI.DTOs.VehicleDTOs;
 using MyAPI.Models;
 using System.Globalization;
+using System.Text.RegularExpressions;
 
 namespace MyAPI.Helper
 {
@@ -206,7 +207,7 @@ namespace MyAPI.Helper
                             .Where(u => u.UserRoles.Any(ur => ur.Role.RoleName == "VehicleOwner"))
                             .Select(u => u.Username)
                             .ToListAsync();
-           
+            var licensePlateTracker = new Dictionary<string, List<VehicleImportDTO>>();
             var licensePlateSet = new HashSet<string>(existingLicensePlates);
             var vehicleOwnerSet = new HashSet<string>(vehicleOwners);
             using (var stream = new MemoryStream())
@@ -241,6 +242,14 @@ namespace MyAPI.Helper
                         {
                             errors.Add("Duplicate license plate in row :" + row);
                         }
+                        if (!Regex.IsMatch(vehicle.LicensePlate, @"^\d{2}[A-Z]-\d{5}$"))
+                        {
+                            errors.Add($"Invalid License Plate format '{vehicle.LicensePlate}' in row: {row.RowNumber()}");
+                        }
+                        if (licensePlateTracker.ContainsKey(vehicle.LicensePlate))
+                        {
+                            errors.Add($"Duplicate License Plate '{vehicle.LicensePlate}' in row: {row.RowNumber()}");
+                        }
 
                         // Kiểm tra VehicleOwner
                         if (!vehicleOwnerSet.Contains(userNameVehicleOwner))
@@ -260,7 +269,7 @@ namespace MyAPI.Helper
                         else
                         {
                             validEntries.Add(vehicle);
-                            licensePlateSet.Add(vehicle.LicensePlate); // Thêm vào HashSet để kiểm tra trùng lặp
+                            licensePlateSet.Add(vehicle.LicensePlate); 
                         }
                     }
                 }
