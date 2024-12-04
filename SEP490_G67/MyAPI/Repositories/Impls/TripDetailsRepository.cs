@@ -87,7 +87,7 @@ namespace MyAPI.Repositories.Impls
 
         public async Task<List<TripDetailsDTO>> TripDetailsByTripId(int TripId)
         {
-            
+
 
             if (TripId <= 0)
             {
@@ -188,6 +188,46 @@ namespace MyAPI.Repositories.Impls
                 tripDetail.PointEndDetails = updateTripDetails.PointEndDetails;
                 tripDetail.TimeEndDetails = updateTripDetails.TimeEndDetails;
                 _context.TripDetails.Update(tripDetail);
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task AddTripDetailsByTripId(int tripId, TripDetailsDTO tripDetailsDTO, int userId)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(tripDetailsDTO.PointStartDetails))
+                {
+                    throw new Exception("Point Start Details is not null");
+                }
+                if (string.IsNullOrEmpty(tripDetailsDTO.PointEndDetails))
+                {
+                    throw new Exception("Point End Details is not null");
+                }
+                // Kiểm tra TimeStartDetails và TimeEndDetails có giá trị và hợp lệ
+                if (tripDetailsDTO.TimeStartDetils.HasValue && tripDetailsDTO.TimeEndDetails.HasValue)
+                {
+                    if (tripDetailsDTO.TimeStartDetils.Value >= tripDetailsDTO.TimeEndDetails.Value)
+                    {
+                        throw new Exception("TimeStartDetils must be less than TimeEndDetails.");
+                    }
+                }
+                var tripDetails = new TripDetail
+                {
+                    PointEndDetails = tripDetailsDTO.PointEndDetails,
+                    TimeStartDetils = tripDetailsDTO.TimeStartDetils,
+                    PointStartDetails = tripDetailsDTO.PointStartDetails,
+                    TimeEndDetails = tripDetailsDTO.TimeEndDetails,
+                    TripId = tripId,
+                    Status = tripDetailsDTO.Status,
+                    CreatedAt = DateTime.Now,
+                    CreatedBy = userId
+                };
+                _context.TripDetails.Add(tripDetails);
                 await _context.SaveChangesAsync();
             }
             catch (Exception ex)

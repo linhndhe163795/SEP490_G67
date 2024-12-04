@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using MyAPI.DTOs.TripDetailsDTOs;
 using MyAPI.DTOs.TripDTOs;
+using MyAPI.Helper;
 using MyAPI.Infrastructure.Interfaces;
 
 namespace MyAPI.Controllers
@@ -11,12 +12,14 @@ namespace MyAPI.Controllers
     [ApiController]
     public class TripDetailsController : ControllerBase
     {
+        private readonly GetInforFromToken _getInforFromToken;
         private readonly ITripDetailsRepository _tripDetailsRepository;
-        public TripDetailsController(ITripDetailsRepository tripDetailsRepository)
+        public TripDetailsController(ITripDetailsRepository tripDetailsRepository, GetInforFromToken getInforFromToken)
         {
             _tripDetailsRepository = tripDetailsRepository;
+            _getInforFromToken = getInforFromToken;
         }
-        
+
         [HttpGet("tripId")]
         public async Task<IActionResult> getListTripDetailsbyTripId(int TripId)
         {
@@ -70,6 +73,29 @@ namespace MyAPI.Controllers
                 return Ok();
             }
             catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [HttpPost("addTripDetails/{tripId}")]
+        public async Task<IActionResult> addTripDetailsByTripId(int tripId, TripDetailsDTO tripDetailsDTO)
+        {
+            try
+            {
+                string token = Request.Headers["Authorization"];
+                if (token.StartsWith("Bearer"))
+                {
+                    token = token.Substring("Bearer ".Length).Trim();
+                }
+                if (string.IsNullOrEmpty(token))
+                {
+                    return BadRequest("Token is required.");
+                }
+                var userId = _getInforFromToken.GetIdInHeader(token);
+                await _tripDetailsRepository.AddTripDetailsByTripId(tripId, tripDetailsDTO,userId);
+                return Ok("Add tripdetails success");
+            }
+            catch (Exception ex) 
             {
                 return BadRequest(ex.Message);
             }

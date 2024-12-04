@@ -53,6 +53,19 @@ namespace MyAPI.Controllers
                 return StatusCode(500, "Error:  " + ex.Message);
             }
         }
-
+        [Authorize]
+        [HttpGet("listVehicleOwner")]
+        public async Task<IActionResult> listVehicleOwner()
+        {
+            try
+            {
+                var listVehicle = await _userRepository.getListVehicleOwner();
+                return Ok(listVehicle);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }

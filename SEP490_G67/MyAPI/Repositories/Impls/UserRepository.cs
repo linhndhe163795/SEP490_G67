@@ -1,9 +1,13 @@
 ﻿using AutoMapper;
+using DocumentFormat.OpenXml.Office2010.Excel;
+using DocumentFormat.OpenXml.Spreadsheet;
+using DocumentFormat.OpenXml.Vml.Office;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using MyAPI.DTOs;
 using MyAPI.DTOs.UserDTOs;
+using MyAPI.DTOs.VehicleOwnerDTOs;
 using MyAPI.Helper;
 using MyAPI.Infrastructure.Interfaces;
 using MyAPI.Models;
@@ -467,7 +471,113 @@ namespace MyAPI.Repositories.Impls
             }
         }
 
+        public async Task<List<UserPostLoginDTO>> getListVehicleOwner()
+        {
+            try
+            {
+                var vehicleOwner = await (from u in _context.Users
+                                          join ur in _context.UserRoles
+                                          on u.Id equals ur.UserId
+                                          join r in _context.Roles
+                                          on ur.RoleId equals r.Id
+                                          where r.RoleName == "VehicleOwner"
+                                          select new UserPostLoginDTO
+                                          {
+                                              Id = u.Id,
+                                              Email = u.Email,
+                                              FullName = u.FullName,
+                                              NumberPhone = u.NumberPhone,
+                                              Address = u.Address,
+                                              Dob = u.Dob,
+                                              Status = u.Status,
+                                              Username = u.Username,
+                                              Avatar = u.Avatar,
+                                              Password = u.Password,
+                                              Role = r.RoleName
+                                          }).ToListAsync();
+                if (vehicleOwner == null)
+                {
+                    throw new Exception("Not found any vehicle owner");
+                }
+                return vehicleOwner;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
 
+        public async Task<User> RegisterVehicleOwner(VehicleOwnerDTO vehicleOwnerRegister, int staffId)
+        {
+            try
+            {
+                if(string.IsNullOrWhiteSpace(vehicleOwnerRegister.Username))
+            {
+                    throw new Exception("Username cannot be null or empty.");
+                }
 
+                if (string.IsNullOrWhiteSpace(vehicleOwnerRegister.Password))
+                {
+                    throw new Exception("Password cannot be null or empty.");
+                }
+                if (string.IsNullOrWhiteSpace(vehicleOwnerRegister.Email))
+                {
+                    throw new Exception("Email cannot be null or empty.");
+                }
+                if (string.IsNullOrWhiteSpace(vehicleOwnerRegister.NumberPhone))
+                {
+                    throw new Exception("NumberPhone cannot be null or empty.");
+                }
+                if (!IsValidEmail(vehicleOwnerRegister.Email))
+                {
+                    throw new Exception("Email is invalid.");
+                }
+                if (!IsValidPhone(vehicleOwnerRegister.NumberPhone))
+                {
+                    throw new Exception("Phone is invalid");
+                }
+                if (!IsPasswordValid(vehicleOwnerRegister.Password))
+                {
+                    throw new Exception("Password is weak, please input password has length more than 6 charater");
+                }
+                if (vehicleOwnerRegister.Dob == null)
+                {
+                    throw new Exception("Date of Birth cannot be null.");
+                }
+                var userMapper = _mapper.Map<User>(vehicleOwnerRegister);
+                if (await checkAccountExsit(userMapper))
+                {
+                    throw new Exception("User name or email is exist");
+                }
+                var vehicleOwner = new User
+                {
+                    Email = vehicleOwnerRegister.Email,
+                    Address = vehicleOwnerRegister.Address,
+                    Avatar = vehicleOwnerRegister.Avatar,
+                    FullName = vehicleOwnerRegister.FullName,
+                    NumberPhone = vehicleOwnerRegister.NumberPhone,
+                    Password = vehicleOwnerRegister.Password,
+                    Dob = vehicleOwnerRegister.Dob,
+                    CreatedAt = DateTime.Now,
+                    CreatedBy = staffId,
+                };
+                _context.Users.Add(vehicleOwner);
+                await _context.SaveChangesAsync();
+                var userRole = new UserRole
+                {
+                    RoleId = 3,
+                    UserId = vehicleOwner.Id
+                };
+                _context.UserRoles.Add(userRole);
+                await _context.SaveChangesAsync();
+                return vehicleOwner;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+       
     }
 }

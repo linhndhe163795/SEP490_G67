@@ -1,5 +1,6 @@
 ﻿using MyAPI.DTOs;
 using MyAPI.DTOs.UserDTOs;
+using MyAPI.DTOs.VehicleOwnerDTOs;
 using MyAPI.Models;
 
 namespace MyAPI.Infrastructure.Interfaces
@@ -17,8 +18,8 @@ namespace MyAPI.Infrastructure.Interfaces
         Task<User> EditProfile( EditProfileDTO editProfileDTO);
         Task<UserLoginDTO> GetUserLogin(UserLoginDTO userLogin);
         Task<UserPostLoginDTO> getUserById(int id);
-
-
+        Task<List<UserPostLoginDTO>> getListVehicleOwner();
+        Task<User> RegisterVehicleOwner(VehicleOwnerDTO userRegisterDTO, int userId);
 
     }
 }
