@@ -345,6 +345,8 @@ namespace MyAPI.Repositories.Impls
                                    on hrv.VehicleId equals v.Id
                                    join u in _context.Users
                                    on v.VehicleOwner equals u.Id
+                                   join p in _context.PaymentRentVehicles
+                                   on hrv.HistoryId equals p.HistoryRentVehicleId
                                    select new HistoryVehicleRentDTO
                                    {
                                        Id = hrv.HistoryId,
@@ -353,6 +355,7 @@ namespace MyAPI.Repositories.Impls
                                        OwnerId = hrv.OwnerId,
                                        VehicleOwner = u.FullName,
                                        VehicleId = hrv.VehicleId,
+                                       VehiclePrice = p.Price,
                                        TimeStart = hrv.TimeStart,
                                        EndStart = hrv.EndStart,
                                    }).ToListAsync();

@@ -8,6 +8,7 @@
         public int? VehicleId { get; set; }
         public string VehicleOwner { get; set; }
         public int? OwnerId { get; set; }
+        public decimal? VehiclePrice { get; set; }
         public DateTime? TimeStart { get; set; }
         public DateTime? EndStart { get; set; }
     }
