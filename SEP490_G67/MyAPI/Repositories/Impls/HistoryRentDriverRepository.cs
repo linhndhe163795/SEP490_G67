@@ -542,6 +542,45 @@ namespace MyAPI.Repositories.Impls
             }
         }
 
-
+        public async Task<List<DriverHistoryDTO>> getHistoryRentDriver(int userId, string role)
+        {
+            try
+            {
+                List<DriverHistoryDTO> history = new List<DriverHistoryDTO> ();
+                var query = await (from htd in _context.HistoryRentDrivers join d in _context.Drivers
+                                     on htd.DriverId equals d.Id join v in _context.Vehicles
+                                     on htd.VehicleId equals v.Id join u in _context.Users
+                                     on v.VehicleOwner equals u.Id
+                                     select new DriverHistoryDTO
+                                     {
+                                         HistoryId = htd.HistoryId,
+                                         DriverId = htd.DriverId,
+                                         DriverName = d.Name ?? "",
+                                         vehicleOwnerId = u.Id,
+                                         vehicleOwner = u.FullName ?? "",
+                                         LicensePlate = v.LicensePlate ?? "",
+                                         TimeStart = htd.TimeStart,
+                                         EndStart = htd.EndStart
+                                     }
+                                     ).ToListAsync();
+                if(role == "Staff")
+                {
+                     history = query;
+                }
+                if(role == "VehicleOwner")
+                {
+                     history = query.Where(x => x.vehicleOwnerId == userId).ToList();
+                }
+                if(role == "Driver")
+                {
+                     history = query.Where(x => x.DriverId == userId).ToList();
+                }
+                return history;
+            }
+            catch (Exception ex) 
+            {
+                throw new Exception(ex.Message);
+            }
+        }
     }
 }

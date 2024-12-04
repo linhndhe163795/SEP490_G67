@@ -1,9 +1,10 @@
 ﻿using MyAPI.DTOs.HistoryRentDriverDTOs;
 using MyAPI.DTOs.PaymentRentDriver;
+using MyAPI.Models;
 
 namespace MyAPI.Infrastructure.Interfaces
 {
-    public interface IHistoryRentDriverRepository
+    public interface IHistoryRentDriverRepository : IRepository<HistoryRentDriver>
     {
         Task<IEnumerable<HistoryRentDriverListDTOs>> GetListHistoryRentDriver();
         Task<bool> AcceptOrDenyRentDriver(AddHistoryRentDriver add);
@@ -14,6 +15,6 @@ namespace MyAPI.Infrastructure.Interfaces
         Task<List<DriverHistoryDTO>> GetDriverHistoryByUserIdAsync();
         Task<List<DriverRentInfoDTO>> GetDriverRentInfo(DateTime? startDate, DateTime? endDate);
         Task<List<DriverHistoryDTO>> GetHistoryByVehicleOwnerAsync();
-
+        Task<List<DriverHistoryDTO>> getHistoryRentDriver(int userId, string role);
     }
 }

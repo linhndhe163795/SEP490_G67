@@ -62,6 +62,13 @@ namespace MyAPI.Repositories.Impls
                 {
                     throw new ArgumentException("StartDate must be earlier than or equal to EndDate.", nameof(promotionDTO.StartDate));
                 }
+                var existingPromotion = await _context.Promotions
+                                    .FirstOrDefaultAsync(p => p.CodePromotion == promotionDTO.CodePromotion);
+
+                if (existingPromotion != null)
+                {
+                    throw new Exception("Promotion code already exists.");
+                }
                 var promotion = _mapper.Map<Promotion>(promotionDTO);
                 promotion.CreatedAt = DateTime.UtcNow;
                 promotion.CreatedBy = Constant.STAFF;
@@ -123,6 +130,15 @@ namespace MyAPI.Repositories.Impls
                 {
                     throw new Exception("Discount must be between 1 and 100.");
                 }
+
+                var existingPromotion = await _context.Promotions
+                                        .FirstOrDefaultAsync(p => p.CodePromotion == promotionDTO.CodePromotion);
+
+                if (existingPromotion != null)
+                {
+                    throw new Exception("Promotion code already exists.");
+                }
+
                 promotion.CodePromotion = promotionDTO.CodePromotion;
                 promotion.ImagePromotion = promotionDTO.ImagePromotion;
                 promotion.Description = promotionDTO.Description;

@@ -332,30 +332,45 @@ namespace MyAPI.Repositories.Impls
 
             return true;
         }
-      
+
         public async Task<List<HistoryVehicleRentDTO>> listHistoryRentVehicle(int userId, string roleName)
         {
             try
             {
                 List<HistoryVehicleRentDTO> history;
+                var query = await (from hrv in _context.HistoryRentVehicles
+                                   join d in _context.Drivers
+                                   on hrv.DriverId equals d.Id
+                                   join v in _context.Vehicles
+                                   on hrv.VehicleId equals v.Id
+                                   join u in _context.Users
+                                   on v.VehicleOwner equals u.Id
+                                   select new HistoryVehicleRentDTO
+                                   {
+                                       Id = hrv.HistoryId,
+                                       DriverId = hrv.DriverId,
+                                       DriverName = d.Name,
+                                       OwnerId = hrv.OwnerId,
+                                       VehicleOwner = u.FullName,
+                                       VehicleId = hrv.VehicleId,
+                                       TimeStart = hrv.TimeStart,
+                                       EndStart = hrv.EndStart,
+                                   }).ToListAsync();
+
                 if (roleName == "Staff")
                 {
-                    var listHistory = await _context.HistoryRentVehicles.ToListAsync();
+                    var listHistory = query;
+
                     history = _mapper.Map<List<HistoryVehicleRentDTO>>(listHistory);
                 }
                 else if (roleName == "VehicleOwner")
                 {
-                    var listHistory = await _context.HistoryRentVehicles
-                        .Where(h => h.OwnerId == userId)
-                        .ToListAsync();
-                    history = _mapper.Map<List<HistoryVehicleRentDTO>>(listHistory);
+                     history =  query.Where(x => x.OwnerId == userId).ToList();
+                       
                 }
                 else if (roleName == "Driver")
                 {
-                    var listHistory = await _context.HistoryRentVehicles
-                        .Where(h => h.DriverId == userId)
-                        .ToListAsync();
-                    history = _mapper.Map<List<HistoryVehicleRentDTO>>(listHistory);
+                     history = query.Where(x => x.DriverId == userId).ToList();
                 }
                 else
                 {

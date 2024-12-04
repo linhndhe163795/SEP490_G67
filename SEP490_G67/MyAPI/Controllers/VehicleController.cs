@@ -133,23 +133,6 @@ namespace MyAPI.Controllers
             }
 
         }
-        //[Authorize(Roles = "Staff, VehicleOwner")]
-        //[HttpPost("updateVehicle/{id}/{driverName}")]
-        //public async Task<IActionResult> UpdateVehicle(int id, string driverName)   
-        //{
-        //    try
-        //    {
-        //        var checkUpdate = await _vehicleRepository.UpdateVehicleAsync(id, driverName);
-
-        //        return Ok(new { Message = "Vehicle Update successfully." });
-
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return BadRequest(new { Message = "UpdateVehicle Update failed", Details = ex.Message });
-        //    }
-
-        //}
 
         [Authorize(Roles = "Staff")]
         [HttpPost("updateVehicleInformation/{id}")]

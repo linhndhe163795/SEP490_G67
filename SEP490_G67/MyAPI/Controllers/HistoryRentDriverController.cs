@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MyAPI.DTOs.HistoryRentDriverDTOs;
+using MyAPI.Helper;
 using MyAPI.Infrastructure.Interfaces;
 using MyAPI.Repositories.Impls;
 
@@ -12,10 +13,12 @@ namespace MyAPI.Controllers
     public class HistoryRentDriverController : ControllerBase
     {
         private readonly IHistoryRentDriverRepository _historyRentDriverRepository;
+        private readonly GetInforFromToken _getInforFromToken;
 
-        public HistoryRentDriverController(IHistoryRentDriverRepository historyRentDriverRepository)
+        public HistoryRentDriverController(IHistoryRentDriverRepository historyRentDriverRepository, GetInforFromToken getInforFromToken)
         {
             _historyRentDriverRepository = historyRentDriverRepository;
+            _getInforFromToken = getInforFromToken;
         }
 
         [HttpGet("ListDriverRent")]
@@ -62,12 +65,12 @@ namespace MyAPI.Controllers
 
         [Authorize]
         [HttpGet("rent-details-with-total-for-owner")]
-        public async Task<IActionResult> GetRentDetailsWithTotalForOwner([FromQuery] DateTime startDate,[FromQuery] DateTime endDate , int? vehicleId, int? vehicleOwnerId)
+        public async Task<IActionResult> GetRentDetailsWithTotalForOwner([FromQuery] DateTime startDate, [FromQuery] DateTime endDate, int? vehicleId, int? vehicleOwnerId)
         {
             try
             {
                 // Gọi phương thức repository để lấy thông tin chi tiết các lần thuê và tổng chi phí
-                var result = await _historyRentDriverRepository.GetRentDetailsWithTotalForOwner(startDate, endDate, vehicleId,vehicleOwnerId);
+                var result = await _historyRentDriverRepository.GetRentDetailsWithTotalForOwner(startDate, endDate, vehicleId, vehicleOwnerId);
 
                 return Ok(result);
             }
@@ -157,6 +160,31 @@ namespace MyAPI.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, new { Message = "Failed to fetch history by vehicle owner.", Details = ex.Message });
+            }
+        }
+        [Authorize(Roles = "Staff, VehicleOwner, Driver")]
+        [HttpGet("listHistoryRentDriver")]
+        public async Task<IActionResult> getHistoryRentDriver()
+        {
+            try
+            {
+                string token = Request.Headers["Authorization"];
+                if (token.StartsWith("Bearer"))
+                {
+                    token = token.Substring("Bearer ".Length).Trim();
+                }
+                if (string.IsNullOrEmpty(token))
+                {
+                    return BadRequest("Token is required.");
+                }
+                var userId = _getInforFromToken.GetIdInHeader(token);
+                var role = _getInforFromToken.GetRoleFromToken(token);
+                var listHistoryRentDriver = await _historyRentDriverRepository.getHistoryRentDriver(userId, role);
+                return Ok(listHistoryRentDriver);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
             }
         }
 
