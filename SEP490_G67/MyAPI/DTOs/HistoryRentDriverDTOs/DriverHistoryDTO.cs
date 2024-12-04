@@ -8,6 +8,7 @@
         public string LicensePlate { get; set; }
         public int vehicleOwnerId { get; set; }
         public string vehicleOwner { get; set; }
+        public decimal? price { get; set; }
         public DateTime? TimeStart { get; set; }
         public DateTime? EndStart { get; set; }
         public DateTime? CreatedAt { get; set; }

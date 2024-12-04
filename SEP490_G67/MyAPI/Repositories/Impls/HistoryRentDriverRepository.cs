@@ -410,7 +410,8 @@ namespace MyAPI.Repositories.Impls
                 var query = await (from htd in _context.HistoryRentDrivers join d in _context.Drivers
                                      on htd.DriverId equals d.Id join v in _context.Vehicles
                                      on htd.VehicleId equals v.Id join u in _context.Users
-                                     on v.VehicleOwner equals u.Id
+                                     on v.VehicleOwner equals u.Id join p in _context.PaymentRentDrivers
+                                     on htd.HistoryId equals p.HistoryRentDriverId
                                      select new DriverHistoryDTO
                                      {
                                          HistoryId = htd.HistoryId,
@@ -419,6 +420,7 @@ namespace MyAPI.Repositories.Impls
                                          vehicleOwnerId = u.Id,
                                          vehicleOwner = u.FullName ?? "",
                                          LicensePlate = v.LicensePlate ?? "",
+                                         price = p.Price,
                                          TimeStart = htd.TimeStart,
                                          EndStart = htd.EndStart
                                      }
