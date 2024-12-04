@@ -151,5 +151,63 @@ namespace MyAPI.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        [Authorize(Roles = "Staff")]
+        [HttpPut("updateVehicleOwner/{id}")]
+        public async Task<IActionResult> UpdateVehicleOwner(int id, UpdateVehicleOwnerDTO vehicleOwnerDTO)
+        {
+            try
+            {
+                string token = Request.Headers["Authorization"];
+                if (token.StartsWith("Bearer"))
+                {
+                    token = token.Substring("Bearer ".Length).Trim();
+                }
+                if (string.IsNullOrEmpty(token))
+                {
+                    return BadRequest("Token is required.");
+                }
+
+                var staffId = _getInforFromToken.GetIdInHeader(token);
+
+                var isUpdated = await _accountRepository.UpdateVehicleOwner(id, vehicleOwnerDTO, staffId);
+                if (isUpdated)
+                {
+                    return Ok(new { Message = "VehicleOwner updated successfully.", Data = vehicleOwnerDTO });
+                }
+                else
+                {
+                    return NotFound(new { Message = "VehicleOwner not found." });
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Message = "VehicleOwner update failed", Details = ex.Message });
+            }
+        }
+        [Authorize(Roles = "Staff")]
+        [HttpDelete("deleteVehicleOwner/{id}")]
+        public async Task<IActionResult> DeleteVehicleOwner(int id)
+        {
+            try
+            {
+                // Xóa mềm VehicleOwner
+                var isDeleted = await _accountRepository.SoftDeleteVehicleOwner(id);
+                if (isDeleted)
+                {
+                    return Ok(new { Message = "VehicleOwner soft-deleted successfully." });
+                }
+                else
+                {
+                    return NotFound(new { Message = "VehicleOwner not found." });
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Message = "VehicleOwner soft-delete failed", Details = ex.Message });
+            }
+        }
+
+
     }
 }

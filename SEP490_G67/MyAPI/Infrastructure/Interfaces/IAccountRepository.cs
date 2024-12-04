@@ -1,4 +1,5 @@
 ﻿using MyAPI.DTOs.AccountDTOs;
+using MyAPI.DTOs.VehicleOwnerDTOs;
 using MyAPI.Models;
 
 namespace MyAPI.Infrastructure.Interfaces
@@ -15,6 +16,7 @@ namespace MyAPI.Infrastructure.Interfaces
         Task<bool> UpdateRoleOfAccount(int id, int newRoleId);
 
         Task<List<AccountRoleDTO>> GetListRole();
-
+        Task<bool> UpdateVehicleOwner(int id, UpdateVehicleOwnerDTO vehicleOwnerDTO, int staffId);
+        Task<bool> SoftDeleteVehicleOwner(int id);
     }
 }

@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using MyAPI.DTOs.AccountDTOs;
 using MyAPI.DTOs.UserDTOs;
+using MyAPI.DTOs.VehicleOwnerDTOs;
 using MyAPI.Helper;
 using MyAPI.Infrastructure.Interfaces;
 using MyAPI.Models;
@@ -112,6 +113,70 @@ namespace MyAPI.Repositories.Impls
             await _context.SaveChangesAsync();
             return true;
         }
+
+        public async Task<bool> SoftDeleteVehicleOwner(int id)
+        {
+            var vehicleOwner = await _context.Users.FindAsync(id);
+            if (vehicleOwner == null)
+            {
+                return false;
+            }
+
+            vehicleOwner.Status = false;
+            vehicleOwner.UpdateAt = DateTime.Now;
+
+            _context.Users.Update(vehicleOwner);
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
+
+        public async Task<bool> UpdateVehicleOwner(int id, UpdateVehicleOwnerDTO vehicleOwnerDTO, int staffId)
+        {
+            var vehicleOwner = await _context.Users.FindAsync(id);
+            if (vehicleOwner == null)
+            {
+                return false;
+            }
+
+            if (!string.IsNullOrEmpty(vehicleOwnerDTO.Username))
+            {
+                var existingUsername = await _context.Users
+                    .AnyAsync(v => v.Username == vehicleOwnerDTO.Username && v.Id != id);
+                if (existingUsername)
+                {
+                    throw new Exception("Username already exists. Please provide a different username.");
+                }
+                vehicleOwner.Username = vehicleOwnerDTO.Username;
+            }
+
+            if (!string.IsNullOrEmpty(vehicleOwnerDTO.Email))
+            {
+                var existingEmail = await _context.Users
+                    .AnyAsync(v => v.Email == vehicleOwnerDTO.Email && v.Id != id);
+                if (existingEmail)
+                {
+                    throw new Exception("Email already exists. Please provide a different email.");
+                }
+                vehicleOwner.Email = vehicleOwnerDTO.Email;
+            }
+
+            vehicleOwner.NumberPhone = vehicleOwnerDTO.NumberPhone ?? vehicleOwner.NumberPhone;
+            vehicleOwner.FullName = vehicleOwnerDTO.FullName ?? vehicleOwner.FullName;
+            vehicleOwner.Address = vehicleOwnerDTO.Address ?? vehicleOwner.Address;
+            vehicleOwner.Avatar = vehicleOwnerDTO.Avatar ?? vehicleOwner.Avatar;
+            vehicleOwner.Status = vehicleOwnerDTO.Status ?? vehicleOwner.Status;
+            vehicleOwner.Dob = vehicleOwnerDTO.Dob ?? vehicleOwner.Dob;
+            vehicleOwner.UpdateBy = staffId;
+            vehicleOwner.UpdateAt = DateTime.Now;
+
+            _context.Users.Update(vehicleOwner);
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
+
+
 
 
     }
