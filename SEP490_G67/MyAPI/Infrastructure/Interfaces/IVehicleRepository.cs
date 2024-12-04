@@ -35,5 +35,6 @@ namespace MyAPI.Infrastructure.Interfaces
         Task<bool> UpdateVehicleAsync(int id, VehicleUpdateDTO updateDTO);
         Task<List<VehicleLicenscePlateDTOs>> getVehicleByVehicleOwner(int vehicleOwner);
         Task<(bool IsSuccess, List<ValidationErrorDTO> Errors)> ConfirmAddValidEntryImportVehicle(List<VehicleImportDTO> validEntries);
+        Task<List<VehicleBasicDto>> GetAvailableVehiclesAsync();
     }
 }
