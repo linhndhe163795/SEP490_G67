@@ -117,35 +117,6 @@ namespace MyAPI.Repositories.Impls
 
         public async Task UpdateTripDetailsById(int tripId, int tripDetailsId, UpdateTripDetails updateTripDetails)
         {
-            if (tripId <= 0)
-            {
-                throw new ArgumentException("Trip ID must be a valid positive integer.");
-            }
-
-            if (tripDetailsId <= 0)
-            {
-                throw new ArgumentException("Trip Details ID must be a valid positive integer.");
-            }
-
-            if (updateTripDetails == null)
-            {
-                throw new ArgumentNullException(nameof(updateTripDetails), "UpdateTripDetails cannot be null.");
-            }
-
-            if (string.IsNullOrWhiteSpace(updateTripDetails.PointStartDetails))
-            {
-                throw new ArgumentException("PointStartDetails cannot be null or empty.");
-            }
-
-            if (string.IsNullOrWhiteSpace(updateTripDetails.PointEndDetails))
-            {
-                throw new ArgumentException("PointEndDetails cannot be null or empty.");
-            }
-
-            if (updateTripDetails.TimeStartDetils == default || updateTripDetails.TimeEndDetails == default)
-            {
-                throw new ArgumentException("Start and End Times cannot be default values.");
-            }
             try
             {
                 if (tripId <= 0)
