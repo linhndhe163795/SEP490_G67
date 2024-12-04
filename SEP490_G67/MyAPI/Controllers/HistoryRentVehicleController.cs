@@ -42,28 +42,30 @@ namespace MyAPI.Controllers
                 return BadRequest(new { Message = "Get List Vehicle List failed", Details = ex.Message });
             }
         }
-        //[HttpGet("listHistoryRentVehicle")]
-        //public async Task<IActionResult> getListHistoryRentVehile()
-        //{
-        //    try
-        //    {
-        //        string token = Request.Headers["Authorization"];
-        //        if (token.StartsWith("Bearer"))
-        //        {
-        //            token = token.Substring("Bearer ".Length).Trim();
-        //        }
-        //        if (string.IsNullOrEmpty(token))
-        //        {
-        //            return BadRequest("Token is required.");
-        //        }
-        //        var userId = _getInforFromToken.GetIdInHeader(token);
-        //        var listHistoryRentVehicel = await _historyRentVehicleRepository.listHistoryRentVehicle(userId);
-        //        return Ok(listHistoryRentVehicel);
-        //    }catch(Exception ex)
-        //    {
-        //        return BadRequest(ex.Message);
-        //    }
-        //}
+        [HttpGet("listHistoryRentVehicle")]
+        public async Task<IActionResult> getListHistoryRentVehile()
+        {
+            try
+            {
+                string token = Request.Headers["Authorization"];
+                if (token.StartsWith("Bearer"))
+                {
+                    token = token.Substring("Bearer ".Length).Trim();
+                }
+                if (string.IsNullOrEmpty(token))
+                {
+                    return BadRequest("Token is required.");
+                }
+                var userId = _getInforFromToken.GetIdInHeader(token);
+                var role = _getInforFromToken.GetRoleFromToken(token);
+                var listHistoryRentVehicel = await _historyRentVehicleRepository.listHistoryRentVehicle(userId, role);
+                return Ok(listHistoryRentVehicel);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
         [Authorize(Roles = "Staff")]
         [HttpPost("AddHistoryVehicle")]
         public async Task<IActionResult> AddHistoryVehicleUseRent(AddHistoryVehicleUseRent add)
