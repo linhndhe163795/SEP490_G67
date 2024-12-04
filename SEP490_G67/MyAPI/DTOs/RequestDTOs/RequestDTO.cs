@@ -2,10 +2,10 @@
 {
     public class RequestDTO
     {
-        public string Id { get; set; }
+        public int Id { get; set; }
         public int UserId { get; set; }
+        public string? UserName { get; set; }
         public int? TypeId { get; set; }
-        public string? TypeRequest { get; set; }
         public bool Status { get; set; }
         public string? Description { get; set; }
         public string? Note { get; set; }

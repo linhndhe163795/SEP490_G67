@@ -36,9 +36,15 @@ namespace MyAPI.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAllRequest()
         {
-            var requests = await _requestRepository.GetAll();
-            var UpdateRequestDto = _mapper.Map<IEnumerable<RequestDTO>>(requests);
-            return Ok(UpdateRequestDto);
+            try
+            {
+                var requests = await _requestRepository.GetAllRequestsWithUserNameAsync();
+                return Ok(requests);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
         }
         [Authorize(Roles = "Staff,Admin")]
         [HttpGet("{id}")]

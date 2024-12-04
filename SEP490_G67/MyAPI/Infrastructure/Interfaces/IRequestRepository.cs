@@ -29,5 +29,7 @@ namespace MyAPI.Infrastructure.Interfaces
         Task<List<RequestDTO>> GetListRequestForDriver(int driverId);
         Task<Request?> GetRequestByIdAsync(int id);
         Task DeleteRequestWithDetailsAsync(Request request);
+        Task<List<RequestDTO>> GetAllRequestsWithUserNameAsync();
+
     }
 }

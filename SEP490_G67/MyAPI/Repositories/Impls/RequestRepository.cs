@@ -1022,5 +1022,36 @@ namespace MyAPI.Repositories.Impls
                 throw;
             }
         }
+
+        public async Task<List<RequestDTO>> GetAllRequestsWithUserNameAsync()
+        {
+            try
+            {
+                var requests = await _context.Requests
+                    .Include(r => r.User) 
+                    .Select(r => new RequestDTO
+                    {
+                        Id = r.Id,
+                        UserId = r.UserId,
+                        UserName = r.User.Username, 
+                        TypeId = r.TypeId,
+                        Status = r.Status,
+                        Description = r.Description,
+                        Note = r.Note,
+                        CreatedAt = r.CreatedAt,
+                        CreatedBy = r.CreatedBy,
+                        UpdatedAt = r.UpdateAt,
+                        UpdatedBy = r.UpdateBy,
+                    })
+                    .ToListAsync();
+
+                return requests;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error in GetAllRequestsWithUserNameAsync: {ex.Message}");
+            }
+        }
+
     }
 }
