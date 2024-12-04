@@ -13,6 +13,6 @@ namespace MyAPI.Infrastructure.Interfaces
         Task<List<HistoryRentVehicleListDTO>> historyRentVehicleListDTOs();
 
         Task<bool> AccpetOrDeninedRentVehicle(AddHistoryVehicleUseRent add);
-
+        Task<List<HistoryVehicleRentDTO>> listHistoryRentVehicle(int userId);
     }
 }

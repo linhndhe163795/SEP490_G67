@@ -363,7 +363,7 @@ namespace MyAPI.Controllers
         {
             try
             {
-                var tripId = await _tripRepository.getTripByTripId(id);
+                var tripId = await _tripRepository.GetTripById(id);
                 if (tripId == null)
                 {
                     return NotFound("Not found trip");

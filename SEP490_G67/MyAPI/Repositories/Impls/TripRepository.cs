@@ -709,7 +709,25 @@ namespace MyAPI.Repositories.Impls
 
             try
             {
-                var trip = await _context.Trips.FirstOrDefaultAsync(x => x.Id == id);
+                var trip = await (from t in _context.Trips
+                                      join vh in _context.VehicleTrips
+                                      on t.Id equals vh.TripId
+                                      join v in _context.Vehicles
+                                      on vh.VehicleId equals v.Id
+                                      select new TripDTO
+                                      {
+                                          Id = t.Id,
+                                          Name = t.Name,
+                                          Description = t.Description,
+                                          PointStart = t.PointStart,
+                                          PointEnd = t.PointEnd,
+                                          Price = t.Price,
+                                          Status = t.Status,
+                                          TypeOfTrip = t.TypeOfTrip,
+                                          StartTime = t.StartTime,
+                                          VehicleId = v.Id,
+                                          LicensePlate = v.LicensePlate
+                                      }).FirstOrDefaultAsync(x => x.Id == id);
 
                 if (trip == null)
                 {

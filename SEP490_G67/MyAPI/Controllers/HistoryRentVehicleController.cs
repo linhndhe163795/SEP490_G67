@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MyAPI.DTOs.HistoryRentVehicleDTOs;
+using MyAPI.Helper;
 using MyAPI.Infrastructure.Interfaces;
 using MyAPI.Repositories.Impls;
 
@@ -12,13 +13,15 @@ namespace MyAPI.Controllers
     public class HistoryRentVehicleController : ControllerBase
     {
         private readonly IHistoryRentVehicleRepository _historyRentVehicleRepository;
+        private readonly GetInforFromToken _getInforFromToken;
 
-        public HistoryRentVehicleController(IHistoryRentVehicleRepository historyRentVehicleRepository)
+        public HistoryRentVehicleController(IHistoryRentVehicleRepository historyRentVehicleRepository, GetInforFromToken getInforFromToken)
         {
             _historyRentVehicleRepository = historyRentVehicleRepository;
+            _getInforFromToken = getInforFromToken;
         }
         //thiếu role
-        [HttpGet("ListVehicleRent")]
+        [HttpGet("listVehicleUseRent")]
         public async Task<IActionResult> GetVehicleUseRent()
         {
             try
@@ -38,7 +41,28 @@ namespace MyAPI.Controllers
             {
                 return BadRequest(new { Message = "Get List Vehicle List failed", Details = ex.Message });
             }
-
+        }
+        [HttpGet("listHistoryRentVehicle")]
+        public async Task<IActionResult> getListHistoryRentVehile()
+        {
+            try
+            {
+                string token = Request.Headers["Authorization"];
+                if (token.StartsWith("Bearer"))
+                {
+                    token = token.Substring("Bearer ".Length).Trim();
+                }
+                if (string.IsNullOrEmpty(token))
+                {
+                    return BadRequest("Token is required.");
+                }
+                var userId = _getInforFromToken.GetIdInHeader(token);
+                var listHistoryRentVehicel = await _historyRentVehicleRepository.listHistoryRentVehicle(userId);
+                return Ok(listHistoryRentVehicel);
+            }catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
         [Authorize(Roles = "Staff")]
         [HttpPost("AddHistoryVehicle")]

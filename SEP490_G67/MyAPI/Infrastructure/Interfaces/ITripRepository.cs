@@ -21,7 +21,7 @@ namespace MyAPI.Infrastructure.Interfaces
         Task<TripDTO> GetTripById(int id);
         Task<List<StartPointDTO>> getListStartPoint();
         Task<List<EndPointDTO>> getListEndPoint();
-        Task<TripByIdDTO> getTripByTripId(int tripId);
+        //Task<TripByIdDTO> getTripByTripId(int tripId);
         Task<int> getTripDetailsId(string pointStart, string pointEnd, TimeSpan timeStartPoint, TimeSpan timeEndPoint);
     }
 }
