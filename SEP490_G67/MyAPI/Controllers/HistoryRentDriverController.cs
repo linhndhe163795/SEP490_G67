@@ -102,66 +102,7 @@ namespace MyAPI.Controllers
                 return StatusCode(500, new { Message = "Failed to update driver for the request.", Details = ex.Message });
             }
         }
-        [Authorize(Roles = "Driver")]
-        [HttpGet("GetHistoryRentDriverByDriverId")]
-        public async Task<IActionResult> GetDriverHistory()
-        {
-            try
-            {
-                var history = await _historyRentDriverRepository.GetDriverHistoryByUserIdAsync();
-
-                if (history == null || !history.Any())
-                {
-                    return NotFound($"No history found for driver with ID");
-                }
-
-                return Ok(history);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = "Failed to fetch driver history.", error = ex.Message });
-            }
-        }
-        [Authorize(Roles = "Staff")]
-        [HttpGet("GetHistoryRentDriverForStaff")]
-        public async Task<IActionResult> GetDriverRentInfo([FromQuery] DateTime? startDate, [FromQuery] DateTime? endDate)
-        {
-            try
-            {
-                var rentInfo = await _historyRentDriverRepository.GetDriverRentInfo(startDate, endDate);
-
-                if (rentInfo == null || !rentInfo.Any())
-                {
-                    return NotFound(new { Message = "No rent info found for the specified criteria." });
-                }
-
-                return Ok(rentInfo);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { Message = "Failed to fetch driver rent info.", Details = ex.Message });
-            }
-        }
-        [Authorize(Roles = "VehicleOwner")]
-        [HttpGet("GetHistoryRentDriverForVehicleOwner")]
-        public async Task<IActionResult> GetHistoryByVehicleOwner()
-        {
-            try
-            {
-                var historyList = await _historyRentDriverRepository.GetHistoryByVehicleOwnerAsync();
-
-                if (historyList == null || !historyList.Any())
-                {
-                    return NotFound(new { Message = "No history found for the vehicle owner." });
-                }
-
-                return Ok(historyList);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { Message = "Failed to fetch history by vehicle owner.", Details = ex.Message });
-            }
-        }
+        
         [Authorize(Roles = "Staff, VehicleOwner, Driver")]
         [HttpGet("listHistoryRentDriver")]
         public async Task<IActionResult> getHistoryRentDriver()
