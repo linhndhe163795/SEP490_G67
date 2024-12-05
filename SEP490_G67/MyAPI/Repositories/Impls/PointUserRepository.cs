@@ -100,6 +100,37 @@ namespace MyAPI.Repositories.Impls
             }
         }
 
+        public async Task<List<PointHistoryDTO>> getPointHistoryByUserId(int userId)
+        {
+            try
+            {
+                var pointHistory = await _context.PointUsers
+                    .Where(x => x.UserId == userId)
+                    .OrderBy(x => x.Id)
+                    .Select(x => new PointHistoryDTO
+                    {
+                        Id = x.Id,
+                        UserId = x.UserId,
+                        Points = x.Points,
+                        MinusPoints = x.PointsMinus,
+                        Date = x.Date
+                    })
+                    .ToListAsync();
+
+                if (pointHistory == null || !pointHistory.Any())
+                {
+                    throw new Exception("No history founded!");
+                }
+
+                return pointHistory;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("getPointHistoryByUserId: " + ex.Message);
+            }
+        }
+
+
         public async Task<bool> updatePointUser(int userId, PointUserUpdateDTO pointUserUpdateDTO)
         {
             var checkPoint = await _context.PointUsers.FirstOrDefaultAsync(s => s.UserId == userId);

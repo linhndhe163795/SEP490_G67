@@ -14,5 +14,6 @@ namespace MyAPI.Infrastructure.Interfaces
         Task<bool> updatePointUser(int userId, PointUserUpdateDTO pointUserUpdateDTO);
 
         Task addNewPointUser(int userId);
+        Task<List<PointHistoryDTO>> getPointHistoryByUserId(int userId);
     }
 }
