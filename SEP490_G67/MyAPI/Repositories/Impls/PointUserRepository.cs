@@ -106,7 +106,7 @@ namespace MyAPI.Repositories.Impls
             {
                 var pointHistory = await _context.PointUsers
                     .Where(x => x.UserId == userId)
-                    .OrderBy(x => x.Id)
+                    .OrderByDescending(x => x.Id)
                     .Select(x => new PointHistoryDTO
                     {
                         Id = x.Id,
