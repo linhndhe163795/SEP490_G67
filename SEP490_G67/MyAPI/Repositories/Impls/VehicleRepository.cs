@@ -742,12 +742,17 @@ namespace MyAPI.Repositories.Impls
 
             try
             {
-                var vehicleByDriverID = await _context.Vehicles
+                var vehicleByDriverID = await _context.Vehicles.Include(v => v.VehicleType)
                     .Where(x => x.DriverId == driverId)
                     .Select(x => new VehicleLicenscePlateDTOs
                     {
                         Id = x.Id,
-                        LicensePlate = x.LicensePlate
+                        LicensePlate = x.LicensePlate,
+                        NumberSeat = x.NumberSeat,
+                        VehicleTypeName = x.VehicleType.Description,
+                        DriverName = x.Driver.Name, 
+                        Status = x.Status,
+                        Description = x.Description
                     }).ToListAsync();
 
                 if (vehicleByDriverID == null || !vehicleByDriverID.Any())
