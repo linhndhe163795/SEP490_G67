@@ -85,12 +85,11 @@ namespace MyAPI.Repositories.Impls
         {
             try
             {
-                var pointOfUser = await _context.PointUsers.Where(x => x.UserId == userId).ToListAsync();
-                var point = pointOfUser.Sum(x => x.Points);
+                var pointOfUser = await _context.PointUsers.Where(x => x.UserId == userId).OrderByDescending(x => x.Id).FirstOrDefaultAsync();
                 PointUserDTOs puds = new PointUserDTOs
                 {
                     id = 1,
-                    Points = point
+                    Points = pointOfUser?.Points ?? 0
                 };
                 return puds;
 
