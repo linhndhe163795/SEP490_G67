@@ -42,6 +42,7 @@ namespace MyAPI.Controllers
                 return BadRequest(new { Message = "Get List Vehicle List failed", Details = ex.Message });
             }
         }
+        [Authorize(Roles = "Staff,VehicleOwner,Driver")]
         [HttpGet("listHistoryRentVehicle")]
         public async Task<IActionResult> getListHistoryRentVehile()
         {
