@@ -99,7 +99,14 @@ namespace MyAPI.Controllers
                         Expires = DateTime.UtcNow.AddDays(1)
                     };
                     Response.Cookies.Append("AuthToken", tokenString, cookieOptions);
-                    return Ok(tokenString);
+                    var role = _getInforFromToken.GetRoleFromToken(tokenString);
+                    var userId = _getInforFromToken.GetIdInHeader(tokenString);
+                    return Ok( new
+                    {
+                        token = tokenString,
+                        role = role,
+                        userName = userLogin.Username ?? null,
+                    });
                 }
                 else
                 {

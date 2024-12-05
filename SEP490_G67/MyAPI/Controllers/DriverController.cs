@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using MyAPI.Helper;
 using MyAPI.Repositories.Impls;
+using ClosedXML;
 
 namespace MyAPI.Controllers
 {
@@ -18,15 +19,17 @@ namespace MyAPI.Controllers
         private readonly IDriverRepository _driverRepository;
         ITypeOfDriverRepository _typeOfDriverRepository;
         private readonly IMapper _mapper;
+        private readonly GetInforFromToken _getInforFromToken;
         private readonly Jwt _Jwt;
 
 
-        public DriverController(IDriverRepository driverRepository, ITypeOfDriverRepository typeOfDriverRepository, IMapper mapper, Jwt jwt)
+        public DriverController(IDriverRepository driverRepository, ITypeOfDriverRepository typeOfDriverRepository, IMapper mapper, Jwt jwt, GetInforFromToken getInforFromToken)
         {
             _driverRepository = driverRepository;
             _typeOfDriverRepository = typeOfDriverRepository;
             _mapper = mapper;
             _Jwt = jwt;
+            _getInforFromToken = getInforFromToken;
         }
         [HttpPost("/loginDriver")]
         public async Task<IActionResult> loginDriver(LoginDriverDTO login)
@@ -44,8 +47,17 @@ namespace MyAPI.Controllers
                         SameSite = SameSiteMode.Strict,
                         Expires = DateTime.UtcNow.AddHours(1)
                     };
-                    Response.Cookies.Append("AuthToken", tokenString, cookieOptions);
-                    return Ok(tokenString);
+                    string token = Request.Headers["Authorization"];
+                   
+                    var userId = _getInforFromToken.GetIdInHeader(tokenString);
+                    var role = _getInforFromToken.GetRoleFromToken(tokenString);
+                    var driverinfor = await _driverRepository.Get(userId);
+                    return Ok(new
+                    {
+                        token = tokenString,
+                        role = role,
+                        userName = login.UserName ?? null,
+                    });
                 }
                 else
                 {
