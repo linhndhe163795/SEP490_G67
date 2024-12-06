@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using DocumentFormat.OpenXml.Spreadsheet;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileSystemGlobbing.Internal;
 using MyAPI.DTOs;
@@ -339,6 +340,7 @@ namespace MyAPI.Repositories.Impls
         {
             try
             {
+             
                 var listVehicleType = await _context.VehicleTypes.ToListAsync();
 
                 var vehicleTypeListDTOs = _mapper.Map<List<VehicleTypeDTO>>(listVehicleType);
@@ -446,11 +448,33 @@ namespace MyAPI.Repositories.Impls
             }
         }
 
-        public async Task<List<VehicleListDTO>> GetVehicleDTOsAsync()
+        public bool IsUserRole(User user, string roleName)
+        {
+            return user.UserRoles.Any(ur => ur.Role.RoleName == roleName);
+        }
+        public async Task<List<VehicleListDTO>> GetVehicleDTOsAsync(int userId, string role)
         {
             try
             {
-                var listVehicle = await _context.Vehicles.ToListAsync();
+                var getInforUser = _context.Users.Include(x => x.UserRoles).ThenInclude(x => x.Role).Where(x => x.Id == userId).FirstOrDefault();
+                if (getInforUser == null) 
+                {
+                    throw new Exception("Invalid user");
+                }
+
+                List<Vehicle> listVehicle = new List<Vehicle>();
+                if (role == "Staff")
+                {
+                     listVehicle = await _context.Vehicles.ToListAsync();
+                }
+                if(role == "VehicleOwner") 
+                {
+                     listVehicle = await _context.Vehicles.Where(x => x.VehicleOwner == userId).ToListAsync();
+                }
+                if (role == "Driver")
+                {
+                    listVehicle = await _context.Vehicles.Where(x => x.DriverId == userId).ToListAsync();
+                }
 
                 var vehicleListDTOs = _mapper.Map<List<VehicleListDTO>>(listVehicle);
 

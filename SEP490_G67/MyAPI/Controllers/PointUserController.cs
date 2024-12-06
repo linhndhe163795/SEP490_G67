@@ -12,7 +12,7 @@ namespace MyAPI.Controllers
     {
         private readonly IPointUserRepository _pointUserRepository;
         private readonly GetInforFromToken _getInforFromToken;
-        public PointUserController(IPointUserRepository pointUserRepository, GetInforFromToken getInforFromToken) 
+        public PointUserController(IPointUserRepository pointUserRepository, GetInforFromToken getInforFromToken)
         {
             _pointUserRepository = pointUserRepository;
             _getInforFromToken = getInforFromToken;
@@ -39,8 +39,9 @@ namespace MyAPI.Controllers
             catch (Exception ex)
             {
                 return BadRequest(ex.Message);
-            } 
+            }
         }
+
 
         [Authorize]
         [HttpGet("GetPointHistoryByUserId")]
@@ -66,6 +67,5 @@ namespace MyAPI.Controllers
                 return BadRequest(ex.Message);
             }
         }
-
     }
 }

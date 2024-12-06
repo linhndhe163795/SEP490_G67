@@ -58,13 +58,24 @@ namespace MyAPI.Controllers
             }
 
         }
-        [Authorize(Roles = "Staff")]
+        [Authorize(Roles = "Staff, VehicleOwner, Driver")]
         [HttpGet("listVehicle")]
         public async Task<IActionResult> GetVehicleList()
         {
             try
             {
-                var requests = await _vehicleRepository.GetVehicleDTOsAsync();
+                string token = Request.Headers["Authorization"];
+                if (token.StartsWith("Bearer"))
+                {
+                    token = token.Substring("Bearer ".Length).Trim();
+                }
+                if (string.IsNullOrEmpty(token))
+                {
+                    return BadRequest("Token is required.");
+                }
+                var userId = _inforFromToken.GetIdInHeader(token);
+                var role = _inforFromToken.GetRoleFromToken(token);
+                var requests = await _vehicleRepository.GetVehicleDTOsAsync(userId, role);
                 if (requests != null)
                 {
                     return Ok(requests);
@@ -80,7 +91,7 @@ namespace MyAPI.Controllers
                 return BadRequest(new { Message = "Get List Vehicle failed", Details = ex.Message });
             }
         }
-
+        [Authorize(Roles ="Staff, VehicleOwner")]
         [HttpGet("getInforVehicle/{id}")]
         public async Task<IActionResult> getVehicleDetailsById(int id)
         {
@@ -202,7 +213,6 @@ namespace MyAPI.Controllers
                 return BadRequest(new { ex.Message });
             }
         }
-        [Authorize(Roles = "Driver,Staff")]
         [Authorize]
         [HttpGet("getEndPointTripFromVehicle/{vehicleId}")]
         public async Task<IActionResult> getEndPointTripFromVehicle(int vehicleId)
@@ -244,7 +254,7 @@ namespace MyAPI.Controllers
                 return BadRequest(new { Message = "AssignDriverForVehicle failed", Details = ex.Message });
             }
         }
-        [Authorize]
+        [Authorize(Roles = "Staff")]
         [HttpPost("export_template_vehicel")]
         public async Task<IActionResult> exportTemplateVehicel()
         {
@@ -273,7 +283,7 @@ namespace MyAPI.Controllers
                 return BadRequest(ex.Message);
             }
         }
-        [Authorize]
+        [Authorize(Roles = "Staff")]
         [HttpPost("import_vehicle")]
         public async Task<IActionResult> importVehicel(IFormFile fileExcleVehicel)
         {
@@ -301,6 +311,7 @@ namespace MyAPI.Controllers
                 return BadRequest(e.Message);
             }
         }
+        [Authorize(Roles = "Staff")]
         [HttpPost("confirmImportVehicle")]
         public async Task<IActionResult> confirmImportVehicle(List<VehicleImportDTO> validEntries)
         {
