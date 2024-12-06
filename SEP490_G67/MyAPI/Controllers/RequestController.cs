@@ -34,20 +34,31 @@ namespace MyAPI.Controllers
             _Jwt = jwt;
             _getInforFromToken = getInforFromToken;
         }
-        //[Authorize(Roles = "Staff,Admin")]
-        //[HttpGet]
-        //public async Task<IActionResult> GetAllRequest()
-        //{
-        //    try
-        //    {
-        //        var requests = await _requestRepository.GetAllRequestsWithUserNameAsync();
-        //        return Ok(requests);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return BadRequest(new { message = ex.Message });
-        //    }
-        //}
+        [Authorize(Roles = "Staff, VehicleOwner, Driver,Admin")]
+        [HttpGet]
+        public async Task<IActionResult> getListRequest()
+        {
+            try
+            {
+                string token = Request.Headers["Authorization"];
+                if (token.StartsWith("Bearer"))
+                {
+                    token = token.Substring("Bearer ".Length).Trim();
+                }
+                if (string.IsNullOrEmpty(token))
+                {
+                    return BadRequest("Token is required.");
+                }
+                var userId = _getInforFromToken.GetIdInHeader(token);
+                var role = _getInforFromToken.GetRoleFromToken(token);
+                var listHistoryRentDriver = await _requestRepository.GetRequestsByRole(userId, role);
+                return Ok(listHistoryRentDriver);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
         [Authorize(Roles = "Staff,Admin")]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetRequestById(int id)
@@ -355,30 +366,6 @@ namespace MyAPI.Controllers
                 return BadRequest(ex.Message);
             }
         }
-        [Authorize(Roles = "Staff, VehicleOwner, Driver,Admin")]
-        [HttpGet]
-        public async Task<IActionResult> getListRequest()
-        {
-            try
-            {
-                string token = Request.Headers["Authorization"];
-                if (token.StartsWith("Bearer"))
-                {
-                    token = token.Substring("Bearer ".Length).Trim();
-                }
-                if (string.IsNullOrEmpty(token))
-                {
-                    return BadRequest("Token is required.");
-                }
-                var userId = _getInforFromToken.GetIdInHeader(token);
-                var role = _getInforFromToken.GetRoleFromToken(token);
-                var listHistoryRentDriver = await _requestRepository.GetRequestsByRole(userId, role);
-                return Ok(listHistoryRentDriver);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
+        
     }
 }
