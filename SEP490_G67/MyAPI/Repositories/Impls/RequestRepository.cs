@@ -1053,5 +1053,52 @@ namespace MyAPI.Repositories.Impls
             }
         }
 
+        public async Task<List<RequestDTO>> GetRequestsByRole(int userId, string role)
+        {
+            try
+            {
+                List<RequestDTO> requests = new List<RequestDTO>();
+
+                var query = await (from r in _context.Requests
+                                   join u in _context.Users on r.UserId equals u.Id
+                                   select new RequestDTO
+                                   {
+                                       Id = r.Id,
+                                       UserId = r.UserId,
+                                       UserName = u.FullName ?? "",
+                                       TypeId = r.TypeId,
+                                       Status = r.Status,
+                                       DriverId = r.DriverId,
+                                       Description = r.Description ?? "",
+                                       Note = r.Note ?? "",
+                                       CreatedAt = r.CreatedAt,
+                                       CreatedBy = r.CreatedBy,
+                                       UpdatedAt = r.UpdateAt,
+                                       UpdatedBy = r.UpdateBy
+                                   }).ToListAsync();
+
+                
+                if (role == "Staff" || role =="Admin")
+                {
+                    requests = query;
+                }
+                else if (role == "VehicleOwner")
+                {
+                    requests = query.Where(x => x.UserId == userId).ToList(); 
+                }
+                else if (role == "Driver")
+                {
+                    requests = query.Where(x => x.DriverId == userId).ToList();
+                }
+
+                return requests;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+
     }
 }

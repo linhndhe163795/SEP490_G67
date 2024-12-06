@@ -24,28 +24,30 @@ namespace MyAPI.Controllers
         private readonly GetInforFromToken _token;
         private readonly IMapper _mapper;
         private readonly Jwt _Jwt;
+        private readonly GetInforFromToken _getInforFromToken;
 
-        public RequestController(IRequestRepository requestRepository, GetInforFromToken token, IMapper mapper, Jwt jwt)
+        public RequestController(IRequestRepository requestRepository, GetInforFromToken token, IMapper mapper, Jwt jwt, GetInforFromToken getInforFromToken)
         {
             _token = token;
             _requestRepository = requestRepository;
             _mapper = mapper;
             _Jwt = jwt;
+            _getInforFromToken = getInforFromToken;
         }
-        [Authorize(Roles = "Staff,Admin")]
-        [HttpGet]
-        public async Task<IActionResult> GetAllRequest()
-        {
-            try
-            {
-                var requests = await _requestRepository.GetAllRequestsWithUserNameAsync();
-                return Ok(requests);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-        }
+        //[Authorize(Roles = "Staff,Admin")]
+        //[HttpGet]
+        //public async Task<IActionResult> GetAllRequest()
+        //{
+        //    try
+        //    {
+        //        var requests = await _requestRepository.GetAllRequestsWithUserNameAsync();
+        //        return Ok(requests);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return BadRequest(new { message = ex.Message });
+        //    }
+        //}
         [Authorize(Roles = "Staff,Admin")]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetRequestById(int id)
@@ -347,6 +349,31 @@ namespace MyAPI.Controllers
                 var driverid = _token.GetIdInHeader(token);
                 var result = await _requestRepository.GetListRequestForDriver(driverid);
                 return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [Authorize(Roles = "Staff, VehicleOwner, Driver,Admin")]
+        [HttpGet]
+        public async Task<IActionResult> getListRequest()
+        {
+            try
+            {
+                string token = Request.Headers["Authorization"];
+                if (token.StartsWith("Bearer"))
+                {
+                    token = token.Substring("Bearer ".Length).Trim();
+                }
+                if (string.IsNullOrEmpty(token))
+                {
+                    return BadRequest("Token is required.");
+                }
+                var userId = _getInforFromToken.GetIdInHeader(token);
+                var role = _getInforFromToken.GetRoleFromToken(token);
+                var listHistoryRentDriver = await _requestRepository.GetRequestsByRole(userId, role);
+                return Ok(listHistoryRentDriver);
             }
             catch (Exception ex)
             {

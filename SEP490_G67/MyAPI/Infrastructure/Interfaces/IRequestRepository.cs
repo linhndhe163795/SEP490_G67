@@ -30,6 +30,7 @@ namespace MyAPI.Infrastructure.Interfaces
         Task<Request?> GetRequestByIdAsync(int id);
         Task DeleteRequestWithDetailsAsync(Request request);
         Task<List<RequestDTO>> GetAllRequestsWithUserNameAsync();
+        Task<List<RequestDTO>> GetRequestsByRole(int userId, string role);
 
     }
 }
