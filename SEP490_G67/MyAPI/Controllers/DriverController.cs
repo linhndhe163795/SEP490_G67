@@ -56,6 +56,7 @@ namespace MyAPI.Controllers
                     {
                         token = tokenString,
                         role = role,
+                        id = userId,
                         userName = login.UserName ?? null,
                     });
                 }
