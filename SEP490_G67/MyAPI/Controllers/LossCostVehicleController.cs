@@ -22,6 +22,7 @@ namespace MyAPI.Controllers
             _getInforFromToken = getInforFromToken;
             _mapper = mapper;
         }
+        [Authorize(Roles = "Staff,VehicleOwner")]
         [HttpGet("lossCostCar/vehicleId/startDate/endDate")]
         public async Task<IActionResult> lossCostVehicleByDate(int? vehicleId, DateTime? startDate, DateTime? endDate, int? vehicleOwnerId)
         {
@@ -98,7 +99,7 @@ namespace MyAPI.Controllers
             }
         }
         [HttpGet("totalLossVehicel/{startDate}/{endDate}")]
-        public async Task<IActionResult> getTotalLossVvehicle(DateTime startDate, DateTime endDate, int? vehicleId, int? vehicleOwner)
+        public async Task<IActionResult> getTotalLossVehicle(DateTime startDate, DateTime endDate, int? vehicleId, int? vehicleOwner)
         {
             try
             {
