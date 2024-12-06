@@ -58,7 +58,7 @@ namespace MyAPI.Controllers
             }
 
         }
-        [Authorize(Roles = "Staff, VehicleOwner")]
+        [Authorize(Roles = "Staff, VehicleOwner, Driver")]
         [HttpGet("listVehicle")]
         public async Task<IActionResult> GetVehicleList()
         {
@@ -74,7 +74,8 @@ namespace MyAPI.Controllers
                     return BadRequest("Token is required.");
                 }
                 var userId = _inforFromToken.GetIdInHeader(token);
-                var requests = await _vehicleRepository.GetVehicleDTOsAsync(userId);
+                var role = _inforFromToken.GetRoleFromToken(token);
+                var requests = await _vehicleRepository.GetVehicleDTOsAsync(userId, role);
                 if (requests != null)
                 {
                     return Ok(requests);
@@ -310,6 +311,7 @@ namespace MyAPI.Controllers
                 return BadRequest(e.Message);
             }
         }
+        [Authorize(Roles = "Staff")]
         [HttpPost("confirmImportVehicle")]
         public async Task<IActionResult> confirmImportVehicle(List<VehicleImportDTO> validEntries)
         {

@@ -448,23 +448,33 @@ namespace MyAPI.Repositories.Impls
             }
         }
 
-        public async Task<List<VehicleListDTO>> GetVehicleDTOsAsync(int userId)
+        public bool IsUserRole(User user, string roleName)
+        {
+            return user.UserRoles.Any(ur => ur.Role.RoleName == roleName);
+        }
+        public async Task<List<VehicleListDTO>> GetVehicleDTOsAsync(int userId, string role)
         {
             try
             {
+                var getInforUser = _context.Users.Include(x => x.UserRoles).ThenInclude(x => x.Role).Where(x => x.Id == userId).FirstOrDefault();
+                if (getInforUser == null) 
+                {
+                    throw new Exception("Invalid user");
+                }
+
                 List<Vehicle> listVehicle = new List<Vehicle>();
-                var isRoleStaff = await _context.UserRoles
-                .Include(x => x.Role)
-                .AnyAsync(u => u.UserId == userId && u.Role.RoleName == "Staff");
-                if (isRoleStaff)
+                if (role == "Staff")
                 {
                      listVehicle = await _context.Vehicles.ToListAsync();
                 }
-                else
+                if(role == "VehicleOwner") 
                 {
                      listVehicle = await _context.Vehicles.Where(x => x.VehicleOwner == userId).ToListAsync();
                 }
-
+                if (role == "Driver")
+                {
+                    listVehicle = await _context.Vehicles.Where(x => x.DriverId == userId).ToListAsync();
+                }
 
                 var vehicleListDTOs = _mapper.Map<List<VehicleListDTO>>(listVehicle);
 

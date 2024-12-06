@@ -42,6 +42,7 @@ namespace MyAPI.Controllers
             }
         }
 
+
         [Authorize]
         [HttpGet("GetPointHistoryByUserId")]
         public async Task<IActionResult> GetPointHistoryByUserId()
@@ -66,6 +67,5 @@ namespace MyAPI.Controllers
                 return BadRequest(ex.Message);
             }
         }
-
     }
 }
