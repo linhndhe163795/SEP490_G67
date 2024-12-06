@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using DocumentFormat.OpenXml.Spreadsheet;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileSystemGlobbing.Internal;
 using MyAPI.DTOs;
@@ -339,6 +340,7 @@ namespace MyAPI.Repositories.Impls
         {
             try
             {
+             
                 var listVehicleType = await _context.VehicleTypes.ToListAsync();
 
                 var vehicleTypeListDTOs = _mapper.Map<List<VehicleTypeDTO>>(listVehicleType);
@@ -446,11 +448,23 @@ namespace MyAPI.Repositories.Impls
             }
         }
 
-        public async Task<List<VehicleListDTO>> GetVehicleDTOsAsync()
+        public async Task<List<VehicleListDTO>> GetVehicleDTOsAsync(int userId)
         {
             try
             {
-                var listVehicle = await _context.Vehicles.ToListAsync();
+                List<Vehicle> listVehicle = new List<Vehicle>();
+                var isRoleStaff = await _context.UserRoles
+                .Include(x => x.Role)
+                .AnyAsync(u => u.UserId == userId && u.Role.RoleName == "Staff");
+                if (isRoleStaff)
+                {
+                     listVehicle = await _context.Vehicles.ToListAsync();
+                }
+                else
+                {
+                     listVehicle = await _context.Vehicles.Where(x => x.VehicleOwner == userId).ToListAsync();
+                }
+
 
                 var vehicleListDTOs = _mapper.Map<List<VehicleListDTO>>(listVehicle);
 
