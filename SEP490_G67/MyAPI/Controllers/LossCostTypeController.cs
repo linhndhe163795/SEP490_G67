@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MyAPI.DTOs.LossCostDTOs.LossCostTypeDTOs;
 using MyAPI.DTOs.VehicleDTOs;
@@ -17,7 +18,7 @@ namespace MyAPI.Controllers
             _lossCostTypeRepository = lossCostTypeRepository;
         }
 
-
+        [Authorize(Roles = "Staff")]
         [HttpGet("listLossCostType")]
         public async Task<IActionResult> GetLossCostType()
         {
@@ -41,7 +42,7 @@ namespace MyAPI.Controllers
 
         }
 
-
+        [Authorize(Roles = "Staff")]
         [HttpPost("addLossCostType")]
         public async Task<IActionResult> AddLossCostType(LossCostTypeAddDTO lossCostTypeAddDTO)
         {
@@ -57,7 +58,7 @@ namespace MyAPI.Controllers
                 return BadRequest(new { Message = "LossCostType add failed", Details = ex.Message });
             }
         }
-
+        [Authorize(Roles = "Staff")]
         [HttpPost("updateLossCostType/{id}")]
         public async Task<IActionResult> UpdateLossCostType(int id, LossCostTypeAddDTO lossCostTypeAddDTO)
         {
@@ -75,6 +76,7 @@ namespace MyAPI.Controllers
 
         }
         //tạm thời chưa dùng
+        [Authorize(Roles = "Staff")]
         [HttpPost("updateStatusLossCostType/{id}")]
         public async Task<IActionResult> UpdateStatusLossCostType(int id)
         {
