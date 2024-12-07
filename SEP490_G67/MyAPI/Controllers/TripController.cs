@@ -94,7 +94,6 @@ namespace MyAPI.Controllers
                 return BadRequest(ex.Message);
             }
         }
-
         [HttpGet("download_template_trip")]
         public IActionResult DownloadTemplateTrip()
         {
@@ -148,7 +147,6 @@ namespace MyAPI.Controllers
             await _tripRepository.confirmAddValidEntryImport(validEntries);
             return Ok("Successfully imported valid entries.");
         }
-
         [Authorize(Roles = "Staff")]
         [HttpPost("updateTrip/{id}")]
         public async Task<IActionResult> updateTrip(int id, UpdateTrip tripDTO)
@@ -213,7 +211,6 @@ namespace MyAPI.Controllers
                 return BadRequest(ex.Message);
             }
         }
-
         [HttpPost("import")]
         public async Task<IActionResult> ImportExcel(IFormFile file)
         {
@@ -231,7 +228,6 @@ namespace MyAPI.Controllers
                 });
             }
         }
-
         [HttpGet("searchTripForConvenient/{startPoint}/{endPoint}/{typeOfTrip}")]
         public async Task<IActionResult> SearchTripForConvenient(string startPoint, string endPoint, int typeOfTrip, string? promotion)
         {
@@ -255,7 +251,6 @@ namespace MyAPI.Controllers
                 return StatusCode(400, new { Message = "An unexpected error occurred.", Detail = ex.Message });
             }
         }
-
         [HttpGet("listConvenientStartEnd")]
         public async Task<IActionResult> GetListconvenient()
         {

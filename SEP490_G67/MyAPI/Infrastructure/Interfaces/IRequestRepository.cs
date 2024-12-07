@@ -16,13 +16,9 @@ namespace MyAPI.Infrastructure.Interfaces
         Task createRequestCancleTicket(RequestCancleTicketDTOs requestCancleTicketDTOs, int userId);
         Task<List<ResponeCancleTicketDTOs>> getListRequestCancle();
         Task updateStatusRequestCancleTicket(int requestId, int staffId);
-
         Task<bool> CreateRequestRentVehicleAsync(RentVehicleAddDTO rentVehicleAddDTO);
-
         Task<bool> CreateRequestRentDriverAsync(RequestDetailForRentDriver rentVehicleAddDTO);
-
         Task<bool> CreateRequestCovenient(ConvenientTripDTO convenientTripDTO);
-
         Task<bool> UpdateStatusRequestConvenient(int requestId, bool choose);
         Task<List<RequestDTO>> getListRequestForUser(int userId);
         Task updateRequest(RequestDetailDTO requestDetailDTO);

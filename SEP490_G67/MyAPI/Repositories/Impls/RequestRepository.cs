@@ -993,15 +993,12 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception(ex.Message);
             }
         }
-
         public async Task<Request?> GetRequestByIdAsync(int id)
         {
             return await _context.Requests
                 .Include(r => r.RequestDetails) 
                 .FirstOrDefaultAsync(r => r.Id == id);
         }
-
-        
         public async Task DeleteRequestWithDetailsAsync(Request request)
         {
             using var transaction = await _context.Database.BeginTransactionAsync();
@@ -1022,7 +1019,6 @@ namespace MyAPI.Repositories.Impls
                 throw;
             }
         }
-
         public async Task<List<RequestDTO>> GetAllRequestsWithUserNameAsync()
         {
             try
@@ -1052,7 +1048,6 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception($"Error in GetAllRequestsWithUserNameAsync: {ex.Message}");
             }
         }
-
         public async Task<List<RequestDTO>> GetRequestsByRole(int userId, string role)
         {
             try

@@ -171,8 +171,6 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception($"Error in AccpetOrDeninedRentVehicle: {ex.Message}");
             }
         }
-
-
         private async Task<bool> checkVehicleNotDriver(int? vehicleId)
         {
             try
@@ -193,7 +191,6 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception(ex.Message);
             }
         }
-
         public async Task<bool> createVehicleForUser(HistoryVehicleRentDTO historyVehicleDTO)
         {
             try
@@ -226,7 +223,6 @@ namespace MyAPI.Repositories.Impls
 
 
         }
-
         public async Task<List<HistoryRentVehicleListDTO>> historyRentVehicleListDTOs()
         {
             try
@@ -299,7 +295,6 @@ namespace MyAPI.Repositories.Impls
             if (user?.UserRoles == null) return false;
             return user.UserRoles.Any(ur => string.Equals(ur.Role?.RoleName, roleName));
         }
-
         public async Task<bool> sendMailRequestRentVehicle(string description)
         {
             var users = await _context.Users.ToListAsync();
@@ -332,7 +327,6 @@ namespace MyAPI.Repositories.Impls
 
             return true;
         }
-
         public async Task<List<HistoryVehicleRentDTO>> listHistoryRentVehicle(int userId, string roleName)
         {
             try

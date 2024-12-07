@@ -149,43 +149,6 @@ namespace MyAPI.Helper
             }
             return (validEntries, invalidEntries);
         }
-        public async Task ImportTripDetailsByTripId(IFormFile excelFileTripDetails, int staffId, int tripId)
-        {
-            string path = Path.GetFileName(excelFileTripDetails.FileName);
-            if (checkFile(path))
-            {
-                using var stream = new MemoryStream();
-                await excelFileTripDetails.CopyToAsync(stream);
-                using var workbook = new XLWorkbook(stream);
-                var tripSheets = workbook.Worksheet("TripDetail");
-                var tripDetails = new List<TripDetail>();
-                foreach (var row in tripSheets.RowsUsed().Skip(1))
-                {
-                    var tripDetail = new TripDetail
-                    {
-                        PointStartDetails = row.Cell(1).GetValue<string>(),
-                        PointEndDetails = row.Cell(2).GetValue<string>(),
-                        TimeStartDetils = row.Cell(3).GetValue<TimeSpan>(),
-                        TimeEndDetails = row.Cell(4).GetValue<TimeSpan>(),
-                        TripId = tripId,
-                        Status = true,
-                        CreatedAt = DateTime.Now,
-                        CreatedBy = staffId,
-                        UpdateAt = null,
-                        UpdateBy = null,
-                    };
-                    tripDetails.Add(tripDetail);
-                }
-                await _context.TripDetails.AddRangeAsync(tripDetails);
-                await _context.SaveChangesAsync();
-            }
-            else
-            {
-                throw new Exception("File không hợp lệ");
-            }
-        }
-
-
         public async Task<(List<VehicleImportDTO> validEntries, List<VehicleImportDTO> invalidEntries)> ImportVehicel(IFormFile excelFile, int staffId)
         {
            

@@ -231,7 +231,6 @@ namespace MyAPI.Controllers
                 return BadRequest(new { ex.Message });
             }
         }
-
         [Authorize(Roles = "Staff")]
         [HttpPost("assignDriverForVehicle/{vehicleId}/{driverId}")]
         public async Task<IActionResult> AssignDriverForVehicle(int vehicleId, int driverId)
@@ -416,7 +415,6 @@ namespace MyAPI.Controllers
 
             }
         }
-
         [Authorize(Roles = "Staff")]
         [HttpGet("VehicleNoTrip")]
         public async Task<IActionResult> GetAvailableVehicles()

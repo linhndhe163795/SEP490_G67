@@ -586,7 +586,6 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception("UpdateVehicleByStaff: " + ex.Message);
             }
         }
-
         public async Task<bool> AssignDriverToVehicleAsync(int vehicleId, int driverId)
         {
             try
@@ -633,7 +632,6 @@ namespace MyAPI.Repositories.Impls
             }
 
         }
-
         public async Task<int> GetNumberSeatAvaiable(int tripId, DateTime dateTime)
         {
             if (tripId == null)
@@ -675,8 +673,6 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception("GetNumberSeatAvaiable: " + ex.Message);
             }
         }
-
-
         public async Task<VehicleAddDTO> GetVehicleById(int vehicleId)
         {
             if (vehicleId == null)
@@ -705,8 +701,6 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception("GetVehicleById: " + ex.Message);
             }
         }
-
-
         public Task<List<VehicleLicenscePlateDTOs>> getLicensecePlate()
         {
             try
@@ -723,7 +717,6 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception(ex.Message);
             }
         }
-
         public async Task<int> VehicleByDriverId(int driverId)
         {
             if (driverId == null)
@@ -750,8 +743,6 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception("VehicleByDriverId: " + ex.Message);
             }
         }
-
-
         public async Task<List<VehicleLicenscePlateDTOs>> getVehicleByDriverId(int driverId)
         {
             if (driverId == null)
@@ -791,8 +782,6 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception("getVehicleByDriverId: " + ex.Message);
             }
         }
-
-
         public async Task<bool> checkDriver(int vehicleId, int driverId)
         {
             if (vehicleId == null)
@@ -830,8 +819,6 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception("checkDriver: " + ex.Message);
             }
         }
-
-
         public async Task<bool> UpdateVehicleAsync(int id, VehicleUpdateDTO updateDTO)
         {
             try
@@ -919,7 +906,6 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception(ex.Message);
             }
         }
-
         public async Task<List<VehicleLicenscePlateDTOs>> getVehicleByVehicleOwner(int vehicleOwner)
         {
             if (vehicleOwner == null)
@@ -966,7 +952,6 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception("getVehicleByVehicleOwner: " + ex.Message);
             }
         }
-
         public async Task<(bool IsSuccess, List<ValidationErrorDTO> Errors)> ConfirmAddValidEntryImportVehicle(List<VehicleImportDTO> validEntries)
         {
             var errors = new List<ValidationErrorDTO>(); // Danh sách lỗi

@@ -180,8 +180,6 @@ namespace MyAPI.Controllers
                 return StatusCode(500, "An error occurred while sending emails: " + ex.Message);
             }
         }
-
-
         [HttpGet("listDriveDTO")]
         public async Task<IActionResult> GetDriveList()
         {
