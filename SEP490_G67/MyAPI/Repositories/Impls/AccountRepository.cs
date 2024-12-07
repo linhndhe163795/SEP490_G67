@@ -216,8 +216,31 @@ namespace MyAPI.Repositories.Impls
             return true;
         }
 
+        public async Task<List<VehicleOwnerDTO>> listVehicleOnwer()
+        {
+            try
+            {
+                var listVehicleOwner = await (from u in _context.Users
+                                             join ur in _context.UserRoles on u.Id equals ur.UserId
+                                             join r in _context.Roles on ur.RoleId equals r.Id
+                                             where r.RoleName == "VehicleOwner"
+                                             select new VehicleOwnerDTO
+                                             {
+                                                 Id = u.Id,
+                                                 Username = u.Username,
+                                                 Email = u.Email
+                                             }).ToListAsync();
+                if(listVehicleOwner == null)
+                {
+                    throw new Exception("Not found vehicle owner");
+                }
 
-
-
+                return listVehicleOwner;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error while fetching vehicle owners: {ex.Message}");
+            }
+        }
     }
 }

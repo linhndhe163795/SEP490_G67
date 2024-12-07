@@ -119,6 +119,7 @@ namespace MyAPI.Repositories.Impls
                     UserId = userId,
                     PointsMinus = 0,
                     CreatedAt = DateTime.Now,
+                    Date = DateTime.Now,
                     CreatedBy = userId,
                     UpdateAt = DateTime.Now,
                     UpdateBy = userId
@@ -308,7 +309,6 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception(ex.Message);
             }
         }
-        //note
         public async Task<IEnumerable<VehicleBasicDto>> GetVehiclesByRequestIdAsync(int requestId)
         {
             try
@@ -453,14 +453,14 @@ namespace MyAPI.Repositories.Impls
                     throw new Exception("Invalid driver ID.");
                 }
                 var ticketNotPaid = await _context.Tickets.FirstOrDefaultAsync(x => x.Id == id && x.TypeOfPayment == Constant.TIEN_MAT);
-                if(ticketNotPaid == null)
+                if (ticketNotPaid == null)
                 {
                     throw new Exception("Not ticket valid");
                 }
                 var pointTicket = ticketNotPaid.PricePromotion * 10 / 100;
 
-                var vehicleID = _context.Vehicles.Where(x => x.DriverId ==  driverId).Select(x => x.Id).FirstOrDefault();
-                if(ticketNotPaid.VehicleId != vehicleID)
+                var vehicleID = _context.Vehicles.Where(x => x.DriverId == driverId).Select(x => x.Id).FirstOrDefault();
+                if (ticketNotPaid.VehicleId != vehicleID)
                 {
                     throw new Exception("Driver not valid");
                 }
@@ -510,33 +510,57 @@ namespace MyAPI.Repositories.Impls
                 {
                     throw new ArgumentException("User not found.");
                 }
-
+                var query = (from t in _context.Tickets
+                             join tp in _context.TypeOfPayments
+                             on t.TypeOfPayment equals tp.Id
+                             join tt in _context.TypeOfTickets
+                             on t.TypeOfTicket equals tt.Id
+                             join v in _context.Vehicles
+                             on t.VehicleId equals v.Id
+                             join u in _context.Users
+                             on t.UserId equals u.Id
+                             where t.Id == ticketId
+                             select new TicketByIdDTOs
+                             {
+                                 VehicleId = v.Id,
+                                 CodePromotion = t.CodePromotion,
+                                 Price = t.Price,
+                                 PricePromotion = t.PricePromotion,
+                                 Description = t.Description,
+                                 Status = t.Status,
+                                 TimeFrom = t.TimeFrom,
+                                 TimeTo = t.TimeTo,
+                                 Note = t.Note,
+                                 PointStart = t.PointStart,
+                                 PointEnd = t.PointEnd,
+                                 TripId = t.TripId,
+                                 TypeOfPayment = tp.TypeOfPayment1,
+                                 LicsenceVehicle = v.LicensePlate,
+                                 UserId = t.UserId,
+                                 fullName = u.FullName
+                             });
                 if (IsUserRole(getInforUser, "Staff"))
                 {
-                    var ticketById = await _context.Tickets
-                        .FirstOrDefaultAsync(x => x.Id == ticketId);
+                    var ticketById = await query.FirstOrDefaultAsync();
 
                     if (ticketById == null)
                     {
                         throw new ArgumentException("Ticket not found.");
                     }
 
-                    var mapperTicketById = _mapper.Map<TicketByIdDTOs>(ticketById);
-                    return mapperTicketById;
+                    return ticketById;
                 }
 
                 if (IsUserRole(getInforUser, "User"))
                 {
-                    var ticketById = await _context.Tickets
-                        .FirstOrDefaultAsync(x => x.Id == ticketId && x.UserId == userId);
+                    var ticket = await query.FirstOrDefaultAsync(x => x.UserId == userId);
 
-                    if (ticketById == null)
+                    if (ticket == null)
                     {
                         throw new ArgumentException("Ticket not found or you do not have access to this ticket.");
                     }
 
-                    var mapperTicketById = _mapper.Map<TicketByIdDTOs>(ticketById);
-                    return mapperTicketById;
+                    return ticket;
                 }
 
                 throw new UnauthorizedAccessException("User does not have valid roles to access the ticket.");
@@ -668,7 +692,7 @@ namespace MyAPI.Repositories.Impls
             {
                 throw new Exception("Ticket đã thanh toán");
             }
-            
+
             _context.Tickets.Remove(checkTicket);
             await _context.SaveChangesAsync();
             return true;
@@ -692,6 +716,65 @@ namespace MyAPI.Repositories.Impls
             }
         }
 
+        public async Task updateTicketByTicketId(int ticketId, int userId, TicketUpdateDTOs ticket)
+        {
+            try
+            {
+                var ticketById = await _context.Tickets.FirstOrDefaultAsync(t => t.Id == ticketId);
 
+                if (ticket.PricePromotion == null)
+                    throw new ArgumentException("PricePromotion cannot be null.");
+
+                if (string.IsNullOrWhiteSpace(ticket.PointStart))
+                    throw new ArgumentException("PointStart cannot be null or empty.");
+
+                if (string.IsNullOrWhiteSpace(ticket.PointEnd))
+                    throw new ArgumentException("PointEnd cannot be null or empty.");
+
+                ticketById.Note = ticket.Note;
+                ticketById.Description = ticket.Description;
+                ticketById.PricePromotion = ticket.PricePromotion;
+                ticketById.PointStart = ticket.PointStart;
+                ticketById.PointEnd = ticket.PointEnd;
+                ticketById.UpdateAt = DateTime.Now;
+                ticketById.UpdateBy = userId;
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task deleteTicketByTicketId(int id ,int userId)
+        {
+            try
+            {
+                var ticketById = await _context.Tickets.FirstOrDefaultAsync(x => x.TypeOfPayment == Constant.TIEN_MAT && x.Id == id && x.TypeOfTicket == Constant.XE_LIEN_TINH);
+                if(ticketById == null)
+                {
+                    throw new Exception("Not found ticket valid");
+                }
+                 _context.Tickets.Remove(ticketById);
+              
+                var pointUser = await _context.PointUsers.OrderByDescending(x => x.Id).FirstOrDefaultAsync(x => x.UserId == ticketById.UserId);
+                var pointUserUpdate = new PointUser
+                {
+                    Points = pointUser.Points -  (int?)((int?)ticketById.PricePromotion * Constant.TICH_DIEM),
+                    PointsMinus = (int?)((int?)ticketById.PricePromotion * Constant.TICH_DIEM),
+                    Date = DateTime.Now,
+                    CreatedAt = DateTime.Now,
+                    CreatedBy = userId,
+                    PaymentId = null
+                };
+                _context.PointUsers.Add(pointUserUpdate);
+                await _context.SaveChangesAsync();
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
     }
 }

@@ -464,7 +464,6 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception("Error during import: " + ex.Message);
             }
         }
-
         public async Task<List<TripDTO>> getListTripNotVehicle()
         {
             try
@@ -491,7 +490,6 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception("getListTripNotVehicle: " + ex.Message);
             }
         }
-
         public async Task<int> GetTicketCount(int tripId, DateTime dateTime)
         {
             if (tripId <= 0)
@@ -531,10 +529,6 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception("GetTicketCount: " + ex.Message);
             }
         }
-
-
-
-
         public async Task<(List<Trip>, List<string>)> ImportExcel(Stream excelStream)
         {
 
@@ -642,8 +636,6 @@ namespace MyAPI.Repositories.Impls
             return (correctTrips, errorAdd);
 
         }
-
-
         public async Task<decimal> SearchVehicleConvenient(string startPoint, string endPoint, int typeOfTrip, string? promotion)
         {
             if (typeOfTrip <= 0)
@@ -675,8 +667,6 @@ namespace MyAPI.Repositories.Impls
             var pricePromotion = price.Value * (1 - (discount / 100m));
             return pricePromotion;
         }
-
-
         public async Task<List<ListCovenientStartEndDTO>> getListStartAndEndPoint()
         {
             try
@@ -698,8 +688,6 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception("getListStartAndEndPoint: " + ex.Message);
             }
         }
-
-
         public async Task<TripDTO> GetTripById(int id)
         {
             if (id <= 0)
@@ -742,8 +730,6 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception("GetTripById: " + ex.Message);
             }
         }
-
-
         public async Task<List<StartPointDTO>> getListStartPoint()
         {
             try
@@ -790,7 +776,6 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception("getListEndPoint: " + ex.Message);
             }
         }
-
         public async Task<TripByIdDTO> getTripByTripId(int tripId)
         {
             try
@@ -808,7 +793,6 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception(ex.Message);
             }
         }
-
         public Task<int> getTripDetailsId(string pointStart, string pointEnd, TimeSpan dateStartPoint, TimeSpan dateEndPoint)
         {
             try

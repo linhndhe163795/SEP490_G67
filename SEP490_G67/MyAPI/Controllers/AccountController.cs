@@ -207,7 +207,17 @@ namespace MyAPI.Controllers
                 return BadRequest(new { Message = "VehicleOwner soft-delete failed", Details = ex.Message });
             }
         }
-
-
+        [HttpGet("listVehicleOwner")]
+        public async Task<IActionResult> listVehicleOwner()
+        {
+            try
+            {
+                var listVehicleOwner = await _accountRepository.listVehicleOnwer();
+                return Ok(listVehicleOwner);
+            }catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }

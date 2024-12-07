@@ -196,7 +196,6 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception(ex.Message);
             }
         }
-
         public async Task<TotalPayementRentDriver> GetRentDetailsWithTotalForOwner(DateTime startDate, DateTime endDate, int? vehicleId, int? vehicleOwnerId)
         {
             try
@@ -323,7 +322,6 @@ namespace MyAPI.Repositories.Impls
         {
             return user.UserRoles.Any(ur => ur.Role.RoleName == roleName);
         }
-
         public async Task<IEnumerable<HistoryRentDriverListDTOs>> GetListHistoryRentDriver()
         {
             try
@@ -367,7 +365,6 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception($"Error in GetListHistoryRentDriver: {ex.Message}");
             }
         }
-
         public async Task<bool> UpdateDriverInRequestAsync(int driverId, int requestId)
         {
             try

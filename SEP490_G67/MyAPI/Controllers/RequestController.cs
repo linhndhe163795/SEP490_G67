@@ -109,8 +109,6 @@ namespace MyAPI.Controllers
             }
             return Ok(requestdetail);
         }
-
-
         [Authorize(Roles = "Staff")]
         [HttpPost("Delete/{id}")]
         public async Task<IActionResult> DeleteRequest(int id)
@@ -136,7 +134,6 @@ namespace MyAPI.Controllers
                 return BadRequest($"Error while deleting request: {ex.Message}");
             }
         }
-
         [Authorize(Roles = "Staff")]
         [HttpPost("acceptCancleTicket/{id}")]
         public async Task<IActionResult> AcceptCancleTicketRequest(int id)
@@ -175,7 +172,6 @@ namespace MyAPI.Controllers
                 return BadRequest(ex.Message);
             }
         }
-        // create request from user
         [Authorize]
         [HttpPost("createRequestCancleTicket")]
         public async Task<IActionResult> createRequestCanleTicket(RequestCancleTicketDTOs requestCancleTicketDTOs)
@@ -200,7 +196,6 @@ namespace MyAPI.Controllers
                 return BadRequest(ex.Message);
             }
         }
-        
         [Authorize(Roles = "Driver")]
         [HttpPost("CreateRentVehicleForDriverRequest")]
         public async Task<IActionResult> AddVehicle(RentVehicleAddDTO rentVehicleAddDTO)
@@ -232,7 +227,6 @@ namespace MyAPI.Controllers
                 return BadRequest(new { Message = "AddDriver rent Add failed", Details = ex.Message });
             }
         }
-
         [Authorize]
         [HttpPost("ConvenientTripCreateForUser")]
         public async Task<IActionResult> CreateRequestConvenientTrip(ConvenientTripDTO convenientTripDTO)

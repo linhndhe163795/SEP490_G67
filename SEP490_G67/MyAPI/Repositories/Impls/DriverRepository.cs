@@ -54,13 +54,11 @@ namespace MyAPI.Repositories.Impls
         {
             return await _context.Drivers.Include(d => d.Vehicles).FirstOrDefaultAsync(d => d.Id == id);
         }
-
         public async Task<int> lastIdDriver()
         {
             int lastId = await _context.Drivers.OrderByDescending(x => x.Id).Select(x => x.Id).FirstOrDefaultAsync();
             return lastId;
         }
-
         public async Task<Driver> CreateDriverAsync(UpdateDriverDTO updateDriverDto)
         {
             try
@@ -126,7 +124,6 @@ namespace MyAPI.Repositories.Impls
                 throw;
             }
         }
-
         public async Task<Driver> UpdateDriverAsync(int id, UpdateDriverDTO updateDriverDto)
         {
             if (updateDriverDto == null)
@@ -175,16 +172,12 @@ namespace MyAPI.Repositories.Impls
             await Update(existingDriver);
             return existingDriver;
         }
-
         public async Task<IEnumerable<Driver>> GetDriversWithoutVehicleAsync()
         {
             return await _context.Drivers
                 .Where(d => !_context.Vehicles.Any(v => v.DriverId == d.Id))
                 .ToListAsync();
         }
-
-
-
         public async Task SendEmailToDriversWithoutVehicle(int price)
         {
             try
@@ -228,7 +221,6 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception("Failed to send email to drivers without vehicles.", ex);
             }
         }
-
         public async Task<bool> checkLogin(LoginDriverDTO login)
         {
             if (login == null)
@@ -257,7 +249,6 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception(ex.Message);
             }
         }
-
         public async Task<DriverLoginRespone> getDriverLogin(LoginDriverDTO login)
         {
             try
@@ -279,7 +270,6 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception(ex.Message);
             }
         }
-
         public async Task<List<ListDriverDTO>> getListDriverForVehicle()
         {
             var listDriver = await _context.Drivers.ToListAsync();
@@ -288,7 +278,6 @@ namespace MyAPI.Repositories.Impls
 
             return driveListDTOs;
         }
-
         public async Task BanDriver(int id)
         {
             try
