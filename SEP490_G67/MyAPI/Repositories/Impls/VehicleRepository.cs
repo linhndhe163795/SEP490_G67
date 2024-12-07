@@ -888,7 +888,7 @@ namespace MyAPI.Repositories.Impls
                 if (updateDTO.VehicleTypeId.HasValue) vehicle.VehicleTypeId = updateDTO.VehicleTypeId.Value;
                 if (updateDTO.Status.HasValue) vehicle.Status = updateDTO.Status.Value;
                 if (!string.IsNullOrEmpty(updateDTO.Image)) vehicle.Image = updateDTO.Image;
-                vehicle.DriverId = (vehicle.Driver != null) ? updateDTO.DriverId.Value : null;
+                vehicle.DriverId = (updateDTO.DriverId != null) ? updateDTO.DriverId.Value : null;
                 if (updateDTO.VehicleOwner.HasValue) vehicle.VehicleOwner = updateDTO.VehicleOwner.Value;
                 if (!string.IsNullOrEmpty(updateDTO.LicensePlate)) vehicle.LicensePlate = updateDTO.LicensePlate;
                 if (!string.IsNullOrEmpty(updateDTO.Description)) vehicle.Description = updateDTO.Description;
