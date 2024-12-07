@@ -158,6 +158,7 @@ namespace MyAPI.Repositories.Impls
                 tripDetail.TimeStartDetils = updateTripDetails.TimeStartDetils;
                 tripDetail.PointEndDetails = updateTripDetails.PointEndDetails;
                 tripDetail.TimeEndDetails = updateTripDetails.TimeEndDetails;
+                tripDetail.Status = updateTripDetails.Status;
                 _context.TripDetails.Update(tripDetail);
                 await _context.SaveChangesAsync();
             }
