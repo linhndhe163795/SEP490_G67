@@ -43,7 +43,7 @@ namespace MyAPI.Controllers
                 var userId = _getInforFromToken.GetIdInHeader(token);
 
                 var ticketId = await _ticketRepository.CreateTicketByUser(promotionCode, tripDetailsId, ticketDTOs, userId, numberTicket, date);
-               
+
                 return Ok(new { ticketId, ticketDetails = ticketDTOs });
             }
             catch (Exception ex)
@@ -80,7 +80,7 @@ namespace MyAPI.Controllers
         }
         [Authorize]
         [HttpPost("createTicketForRentCar")]
-        public async Task<IActionResult> CreateTicketForRentCar([FromBody] AddTicketForRentCarDTO addTicketForRentCarDTO )
+        public async Task<IActionResult> CreateTicketForRentCar([FromBody] AddTicketForRentCarDTO addTicketForRentCarDTO)
         {
             try
             {
@@ -120,7 +120,7 @@ namespace MyAPI.Controllers
         {
             try
             {
-                
+
                 var result = await _ticketRepository.UpdateVehicleInRequestAsync(vehicleId, requestId);
 
                 if (result)
@@ -169,9 +169,9 @@ namespace MyAPI.Controllers
                 }
                 var userId = _getInforFromToken.GetIdInHeader(token);
                 var role = _getInforFromToken.GetRoleFromToken(token);
-                if (role == "Driver" && await _vehicleRepository.checkDriver(vehicleId,userId) == false)
+                if (role == "Driver" && await _vehicleRepository.checkDriver(vehicleId, userId) == false)
                 {
-                   return NotFound("Not Authentication");
+                    return NotFound("Not Authentication");
                 }
                 var listTicket = await _ticketRepository.GetListTicketNotPaid(vehicleId);
                 if (listTicket == null) return NotFound();
@@ -198,7 +198,7 @@ namespace MyAPI.Controllers
                     return BadRequest("Token is required.");
                 }
                 var userId = _getInforFromToken.GetIdInHeader(token);
-                var ticketById = await _ticketRepository.getTicketDetailsById(ticketId,userId);
+                var ticketById = await _ticketRepository.getTicketDetailsById(ticketId, userId);
                 return Ok(ticketById);
             }
             catch (Exception ex)
@@ -206,6 +206,31 @@ namespace MyAPI.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        [HttpPost("updateTicket/{id}")]
+        public async Task<IActionResult> updateTicketByTicketId(int id, TicketUpdateDTOs ticket)
+        {
+            try
+            {
+                string token = Request.Headers["Authorization"];
+                if (token.StartsWith("Bearer"))
+                {
+                    token = token.Substring("Bearer ".Length).Trim();
+                }
+                if (string.IsNullOrEmpty(token))
+                {
+                    return BadRequest("Token is required.");
+                }
+                var userId = _getInforFromToken.GetIdInHeader(token);
+                await _ticketRepository.updateTicketByTicketId(id, userId, ticket);
+                return Ok("Update Ticket Success !");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+
         [Authorize(Roles = "Driver")]
         [HttpPost("updateStatusticketNotPaid/id")]
         public async Task<IActionResult> updateStatusTicketNotPaid(int id)
@@ -222,7 +247,7 @@ namespace MyAPI.Controllers
                     return BadRequest("Token is required.");
                 }
                 var driverId = _getInforFromToken.GetIdInHeader(token);
-                await _ticketRepository.UpdateStatusTicketNotPaid(id,driverId);
+                await _ticketRepository.UpdateStatusTicketNotPaid(id, driverId);
                 return Ok();
             }
             catch (Exception ex)
@@ -295,11 +320,12 @@ namespace MyAPI.Controllers
                 var list = await _ticketRepository.GetTicketByUserId(userId);
                 return Ok(list);
 
-            }catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }
         }
-        
+
     }
 }

@@ -21,5 +21,6 @@ namespace MyAPI.Infrastructure.Interfaces
         Task<bool> UpdateVehicleInRequestAsync(int vehicleId, int requestId);
         Task<IEnumerable<VehicleBasicDto>> GetVehiclesByRequestIdAsync(int requestId);
         Task<List<ListTicketDTOs>> GetTicketByUserId(int userId);
+        Task updateTicketByTicketId(int ticketId, int userId, TicketUpdateDTOs ticket);
     }
 }
