@@ -119,6 +119,7 @@ namespace MyAPI.Repositories.Impls
                     UserId = userId,
                     PointsMinus = 0,
                     CreatedAt = DateTime.Now,
+                    Date = DateTime.Now,
                     CreatedBy = userId,
                     UpdateAt = DateTime.Now,
                     UpdateBy = userId
@@ -745,11 +746,30 @@ namespace MyAPI.Repositories.Impls
             }
         }
 
-        public Task deleteTicketByTicketId(int id)
+        public async Task deleteTicketByTicketId(int id ,int userId)
         {
             try
             {
-                throw new Exception("abcd");
+                var ticketById = await _context.Tickets.FirstOrDefaultAsync(x => x.TypeOfPayment == Constant.TIEN_MAT && x.Id == id && x.TypeOfTicket == Constant.XE_LIEN_TINH);
+                if(ticketById == null)
+                {
+                    throw new Exception("Not found ticket valid");
+                }
+                 _context.Tickets.Remove(ticketById);
+              
+                var pointUser = await _context.PointUsers.OrderByDescending(x => x.Id).FirstOrDefaultAsync(x => x.UserId == ticketById.UserId);
+                var pointUserUpdate = new PointUser
+                {
+                    Points = pointUser.Points -  (int?)((int?)ticketById.PricePromotion * Constant.TICH_DIEM),
+                    PointsMinus = (int?)((int?)ticketById.PricePromotion * Constant.TICH_DIEM),
+                    Date = DateTime.Now,
+                    CreatedAt = DateTime.Now,
+                    CreatedBy = userId,
+                    PaymentId = null
+                };
+                _context.PointUsers.Add(pointUserUpdate);
+                await _context.SaveChangesAsync();
+
             }
             catch (Exception ex)
             {

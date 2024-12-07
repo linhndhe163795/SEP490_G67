@@ -22,6 +22,6 @@ namespace MyAPI.Infrastructure.Interfaces
         Task<IEnumerable<VehicleBasicDto>> GetVehiclesByRequestIdAsync(int requestId);
         Task<List<ListTicketDTOs>> GetTicketByUserId(int userId);
         Task updateTicketByTicketId(int ticketId, int userId, TicketUpdateDTOs ticket);
-        Task deleteTicketByTicketId(int id);
+        Task deleteTicketByTicketId(int id, int userId);
     }
 }

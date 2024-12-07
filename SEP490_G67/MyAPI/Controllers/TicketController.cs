@@ -253,13 +253,23 @@ namespace MyAPI.Controllers
                 return BadRequest(ex.Message);
             }
         }
-        [Authorize]
+        [Authorize(Roles = "Staff")]
         [HttpPost("deleteTicket/{id}")]
         public async Task<IActionResult> deleteTicketById(int id)
         {
             try
             {
-                await _ticketRepository.deleteTicketByTicketId(id);
+                string token = Request.Headers["Authorization"];
+                if (token.StartsWith("Bearer"))
+                {
+                    token = token.Substring("Bearer ".Length).Trim();
+                }
+                if (string.IsNullOrEmpty(token))
+                {
+                    return BadRequest("Token is required.");
+                }
+                var userId = _getInforFromToken.GetIdInHeader(token);
+                await _ticketRepository.deleteTicketByTicketId(id, userId);
                 return Ok("delete success");
             }
             catch (Exception ex)
