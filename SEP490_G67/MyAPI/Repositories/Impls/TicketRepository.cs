@@ -729,7 +729,7 @@ namespace MyAPI.Repositories.Impls
 
                 if (string.IsNullOrWhiteSpace(ticket.PointEnd))
                     throw new ArgumentException("PointEnd cannot be null or empty.");
-                
+
                 ticketById.Note = ticket.Note;
                 ticketById.Description = ticket.Description;
                 ticketById.PricePromotion = ticket.PricePromotion;
@@ -738,6 +738,18 @@ namespace MyAPI.Repositories.Impls
                 ticketById.UpdateAt = DateTime.Now;
                 ticketById.UpdateBy = userId;
                 await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public Task deleteTicketByTicketId(int id)
+        {
+            try
+            {
+                throw new Exception("abcd");
             }
             catch (Exception ex)
             {

@@ -229,8 +229,6 @@ namespace MyAPI.Controllers
                 return BadRequest(ex.Message);
             }
         }
-
-
         [Authorize(Roles = "Driver")]
         [HttpPost("updateStatusticketNotPaid/id")]
         public async Task<IActionResult> updateStatusTicketNotPaid(int id)
@@ -255,7 +253,20 @@ namespace MyAPI.Controllers
                 return BadRequest(ex.Message);
             }
         }
-
+        [Authorize]
+        [HttpPost("deleteTicket/{id}")]
+        public async Task<IActionResult> deleteTicketById(int id)
+        {
+            try
+            {
+                await _ticketRepository.deleteTicketByTicketId(id);
+                return Ok("delete success");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
         [Authorize(Roles = "VehicleOwner, Staff")]
         [HttpGet("RevenueTicket/{startTime}/{endTime}")]
         public async Task<IActionResult> getRevenueTicket(DateTime startTime, DateTime endTime, int? vehicle, int? vehicleOwner)
@@ -326,6 +337,5 @@ namespace MyAPI.Controllers
                 return BadRequest(ex.Message);
             }
         }
-
     }
 }
