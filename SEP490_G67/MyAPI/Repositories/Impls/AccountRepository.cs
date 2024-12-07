@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using DocumentFormat.OpenXml.Spreadsheet;
 using Microsoft.EntityFrameworkCore;
 using MyAPI.DTOs.AccountDTOs;
 using MyAPI.DTOs.UserDTOs;
@@ -47,6 +48,13 @@ namespace MyAPI.Repositories.Impls
             if (userDetail != null)
             {
                 var accountListDTO = _mapper.Map<AccountListDTO>(userDetail);
+                accountListDTO.Role = _context.UserRoles
+                        .Where(ur => ur.UserId == userDetail.Id)
+                        .Join(_context.Roles,
+                              ur => ur.RoleId,
+                              role => role.Id,
+                              (ur, role) => role.RoleName)
+                        .FirstOrDefault();
                 return accountListDTO;
             }else
             {
@@ -56,12 +64,36 @@ namespace MyAPI.Repositories.Impls
 
         public async Task<List<AccountListDTO>> GetListAccount()
         {
-            var listAccount = _context.Users.ToList();
+            var listAccount = await _context.Users
+                .Select(user => new AccountListDTO
+                {
+                    Id = user.Id,
+                    Username = user.Username,
+                    Email = user.Email,
+                    NumberPhone = user.NumberPhone,
+                    Password = user.Password,
+                    Avatar = user.Avatar,
+                    FullName = user.FullName,
+                    Address = user.Address,
+                    Status = user.Status,
+                    Dob = user.Dob,
+                    CreatedAt = user.CreatedAt,
+                    CreatedBy = user.CreatedBy,
+                    UpdateAt = user.UpdateAt,
+                    UpdateBy = user.UpdateBy,
+                    Role = _context.UserRoles
+                        .Where(ur => ur.UserId == user.Id)
+                        .Join(_context.Roles,
+                              ur => ur.RoleId,
+                              role => role.Id,
+                              (ur, role) => role.RoleName)
+                        .FirstOrDefault() 
+                })
+                .ToListAsync();
 
-            var accountListDTOs = _mapper.Map<List<AccountListDTO>>(listAccount);
-
-            return accountListDTOs;
+            return listAccount;
         }
+
 
         public async Task<List<AccountRoleDTO>> GetListRole()
         {
@@ -85,7 +117,6 @@ namespace MyAPI.Repositories.Impls
 
             var user = await _context.Users
                 .Include(u => u.UserRoles)
-                    .ThenInclude(ur => ur.Role)
                 .SingleOrDefaultAsync(u => u.Id == id);
 
             if (user == null)
@@ -105,14 +136,23 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception("New role does not exist.");
             }
 
-            userRole.RoleId = newRoleId;
+            _context.UserRoles.Remove(userRole);
 
-            user.UpdateBy = userId; 
+            var newUserRole = new UserRole
+            {
+                UserId = id,
+                RoleId = newRoleId,
+                Status = true  
+            };
+            _context.UserRoles.Add(newUserRole);
+
+            user.UpdateBy = userId;
             user.UpdateAt = DateTime.Now;
 
             await _context.SaveChangesAsync();
             return true;
         }
+
 
         public async Task<bool> SoftDeleteVehicleOwner(int id)
         {
