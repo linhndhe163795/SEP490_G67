@@ -90,6 +90,7 @@ namespace MyAPI.Repositories.Impls
                 var lossCostVehicle = await _context.LossCosts.Include(x => x.Vehicle).Include(x => x.LossCostType)
                                             .Select(ls => new AddLostCostVehicleDTOs
                                             {
+                                                Id = ls.Id,
                                                 VehicleId = ls.VehicleId,
                                                 LicensePlate = ls.Vehicle.LicensePlate,
                                                 VehicleOwnerId = ls.Vehicle.VehicleOwner,
