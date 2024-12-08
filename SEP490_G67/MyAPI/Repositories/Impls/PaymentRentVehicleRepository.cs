@@ -76,6 +76,7 @@ namespace MyAPI.Repositories.Impls
 
             var query = _context.PaymentRentVehicles
                            .Where(prv => prv.CreatedAt >= startDate && prv.CreatedAt <= endDate && prv.CarOwnerId == userId);
+          
             if (vehicleId.HasValue && vehicleId != 0)
             {
                 query = query.Where(x => x.VehicleId == vehicleId);

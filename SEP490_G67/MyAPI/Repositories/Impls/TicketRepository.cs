@@ -662,23 +662,40 @@ namespace MyAPI.Repositories.Impls
         }
         private async Task<RevenueTicketDTO> GetRevenueTicketDTO(IQueryable<Ticket> query)
         {
-            var listTicket =
-                await query.Select(
-                    x => new TicketRevenue
-                    {
-                        PricePromotion = x.PricePromotion,
-                        VehicleId = x.VehicleId,
-                        CreatedAt = x.CreatedAt,
-                        LiscenseVehicle = x.Vehicle.LicensePlate,
-                        TypeOfTicket = x.TypeOfTicketNavigation.Description,
-                        TypeOfPayment = x.TypeOfPaymentNavigation.TypeOfPayment1,
-                    }).ToListAsync();
-            var sumPriceTicket = query.Sum(x => x.PricePromotion);
+            var listTicket = await query
+                .Join(_context.Vehicles, ticket => ticket.VehicleId, vehicle => vehicle.Id, (ticket, vehicle) => new { ticket, vehicle })
+                .Join(_context.Users, tv => tv.vehicle.VehicleOwner, user => user.Id, (tv, user) => new
+                {
+                    tv.ticket.PricePromotion,
+                    tv.ticket.VehicleId,
+                    tv.ticket.CreatedAt,
+                    LiscenseVehicle = tv.vehicle.LicensePlate,
+                    VehicleOwner = user.FullName, // Lấy tên chủ xe
+                    TypeOfTicket = tv.ticket.TypeOfTicketNavigation.Description,
+                    TypeOfPayment = tv.ticket.TypeOfPaymentNavigation.TypeOfPayment1
+                })
+                .Select(x => new TicketRevenue
+                {
+                    PricePromotion = x.PricePromotion,
+                    VehicleId = x.VehicleId,
+                    CreatedAt = x.CreatedAt,
+                    LiscenseVehicle = x.LiscenseVehicle,
+                    VehicleOwner = x.VehicleOwner,
+                    TypeOfTicket = x.TypeOfTicket,
+                    TypeOfPayment = x.TypeOfPayment
+                })
+                .ToListAsync();
+
+            // Tính tổng giá trị vé
+            var sumPriceTicket = await query.SumAsync(x => x.PricePromotion);
+
+            // Kết hợp dữ liệu
             var combineResult = new RevenueTicketDTO
             {
                 total = sumPriceTicket,
                 listTicket = listTicket
             };
+
             return combineResult;
         }
         public async Task<bool> deleteTicketTimeOut(int ticketId)
@@ -746,21 +763,21 @@ namespace MyAPI.Repositories.Impls
             }
         }
 
-        public async Task deleteTicketByTicketId(int id ,int userId)
+        public async Task deleteTicketByTicketId(int id, int userId)
         {
             try
             {
                 var ticketById = await _context.Tickets.FirstOrDefaultAsync(x => x.TypeOfPayment == Constant.TIEN_MAT && x.Id == id && x.TypeOfTicket == Constant.XE_LIEN_TINH);
-                if(ticketById == null)
+                if (ticketById == null)
                 {
                     throw new Exception("Not found ticket valid");
                 }
-                 _context.Tickets.Remove(ticketById);
-              
+                _context.Tickets.Remove(ticketById);
+
                 var pointUser = await _context.PointUsers.OrderByDescending(x => x.Id).FirstOrDefaultAsync(x => x.UserId == ticketById.UserId);
                 var pointUserUpdate = new PointUser
                 {
-                    Points = pointUser.Points -  (int?)((int?)ticketById.PricePromotion * Constant.TICH_DIEM),
+                    Points = pointUser.Points - (int?)((int?)ticketById.PricePromotion * Constant.TICH_DIEM),
                     PointsMinus = (int?)((int?)ticketById.PricePromotion * Constant.TICH_DIEM),
                     Date = DateTime.Now,
                     CreatedAt = DateTime.Now,

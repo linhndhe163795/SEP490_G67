@@ -72,7 +72,7 @@ namespace MyAPI.Repositories.Impls
                 {
                     throw new Exception("Purpose of request is not rent driver");
                 }
-                if(checkRequest.Note == "Đã xác nhận")
+                if (checkRequest.Note == "Đã xác nhận")
                 {
                     throw new Exception("Request has been accepted!");
                 }
@@ -85,10 +85,10 @@ namespace MyAPI.Repositories.Impls
                 }
 
                 var requestDetail = await (from r in _context.Requests
-                                          join rd in _context.RequestDetails
-                                          on r.Id equals rd.RequestId
-                                          where r.Id == requestId
-                                          select rd).FirstOrDefaultAsync();
+                                           join rd in _context.RequestDetails
+                                           on r.Id equals rd.RequestId
+                                           where r.Id == requestId
+                                           select rd).FirstOrDefaultAsync();
 
                 if (requestDetail == null)
                 {
@@ -120,12 +120,12 @@ namespace MyAPI.Repositories.Impls
                     updateRequest.Note = choose ? "Đã xác nhận" : "Từ chối xác nhận";
                     updateRequest.Status = choose;
                     var updateRequestRentDriver = await _requestRepository.UpdateRequestVehicleAsync(requestId, updateRequest);
-                    
+
                     var vechileAssgin = await _context.Vehicles.FirstOrDefaultAsync(x => x.Id == requestDetail.VehicleId);
                     vechileAssgin.DriverId = driverId;
                     _context.Vehicles.Update(vechileAssgin);
                     await _context.SaveChangesAsync();
-                    
+
                     requestDetail.DriverId = driverId;
                     requestDetail.UpdateBy = userId;
                     requestDetail.UpdateAt = DateTime.Now;
@@ -184,14 +184,14 @@ namespace MyAPI.Repositories.Impls
                                         select d).ToListAsync();
                 foreach (var driver in listDriver)
                 {
-                    if(driver.Id == driverId)
+                    if (driver.Id == driverId)
                     {
                         return true;
                     }
                 }
                 return false;
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 throw new Exception(ex.Message);
             }
@@ -214,25 +214,30 @@ namespace MyAPI.Repositories.Impls
                 }
                 var token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
                 int userId = _tokenHelper.GetIdInHeader(token);
+                var role = _tokenHelper.GetRoleFromToken(token);
 
                 if (userId == -1)
                 {
                     throw new Exception("Invalid user ID from token.");
                 }
                 var getInforUser = _context.Users.Include(x => x.UserRoles).ThenInclude(x => x.Role).Where(x => x.Id == userId).FirstOrDefault();
-                if (IsUserRole(getInforUser, "VehicleOwner"))
+                if (role == "VehicleOwner")
                 {
                     return await GetRentDriverTotalForOwner(startDate, endDate, vehicleId, userId);
                 }
-                else if (IsUserRole(getInforUser, "Staff"))
+                else if (role == "Staff")
                 {
                     return await GetRentDriverTotalForStaff(startDate, endDate, vehicleId, vehicleOwnerId);
                 }
-                else
+                else if (role == "Driver")
                 {
                     return await GetRentDriverTotalForDriver(startDate, endDate, userId);
                 }
-                
+                else
+                {
+                    return null;
+                }
+
             }
             catch (Exception ex)
             {
@@ -242,21 +247,37 @@ namespace MyAPI.Repositories.Impls
         }
         public async Task<TotalPayementRentDriver> GetRentDriver(IQueryable<PaymentRentDriver> query)
         {
-            var rentDetails = await query.Select(x => new PaymentRentDriverDTO
-            {
-                Price = x.Price,
-                vehicleId = x.VehicleId,
-                LicenseVehicle = _context.Vehicles.Where(v => v.Id == x.VehicleId).Select(x => x.LicensePlate).FirstOrDefault(),
-                DriverId = x.DriverId,
-                DriverName = _context.Drivers.Where(d => d.Id == x.DriverId).Select(x => x.Name).FirstOrDefault(),
-                CreatedAt = x.CreatedAt,
-            }).ToListAsync();
+            var rentDetails = await query
+                .Join(_context.Vehicles, rent => rent.VehicleId, vehicle => vehicle.Id, (rent, vehicle) => new { rent, vehicle })
+                .Join(_context.Users, rv => rv.vehicle.VehicleOwner, user => user.Id, (rv, user) => new { rv.rent, rv.vehicle, VehicleOwnerName = user.FullName })
+                .Join(_context.Drivers, rv => rv.rent.DriverId, driver => driver.Id, (rv, driver) => new
+                {
+                    rv.rent.Price,
+                    rv.rent.VehicleId,
+                    LicenseVehicle = rv.vehicle.LicensePlate,
+                    rv.rent.DriverId,
+                    DriverName = driver.Name,
+                    rv.rent.CreatedAt,
+                    VehicleOwnerName = rv.VehicleOwnerName
+                })
+                .Select(x => new PaymentRentDriverDTO
+                {
+                    Price = x.Price,
+                    vehicleOwner = x.VehicleOwnerName,
+                    vehicleId = x.VehicleId,
+                    LicenseVehicle = x.LicenseVehicle,
+                    DriverId = x.DriverId,
+                    DriverName = x.DriverName,
+                    CreatedAt = x.CreatedAt,
+                })
+                .ToListAsync();
             var total = query.Sum(x => x.Price);
             var combine = new TotalPayementRentDriver
             {
                 Total = total,
                 PaymentRentDriverDTOs = rentDetails
             };
+
             return combine;
         }
         private async Task<TotalPayementRentDriver> GetRentDriverTotalForOwner(DateTime startDate, DateTime endDate, int? vehicleId, int? vehicleOwner)
@@ -270,7 +291,7 @@ namespace MyAPI.Repositories.Impls
             IQueryable<PaymentRentDriver> query = _context.PaymentRentDrivers.Where(x => x.CreatedAt >= startDate && x.CreatedAt <= endDate);
             if (vehicleId != 0 && vehicleId.HasValue)
             {
-                query = query.Where(x => x.VehicleId == vehicleId);
+                query = query.Include(x => x.HistoryRentDriver).ThenInclude(hrd => hrd.Vehicle).Where(x => x.HistoryRentDriver.Vehicle.VehicleOwner == vehicleOwner && x.VehicleId == vehicleId);
             }
             else
             {
@@ -293,13 +314,17 @@ namespace MyAPI.Repositories.Impls
             }
 
             IQueryable<PaymentRentDriver> query = _context.PaymentRentDrivers.Where(x => x.CreatedAt >= startDate && x.CreatedAt <= endDate);
-            if (vehicleId != 0 && vehicleId.HasValue)
+            if (vehicleId != 0 && vehicleId.HasValue && vehicleOwner == null)
             {
                 query = query.Where(x => x.VehicleId == vehicleId);
             }
-            else if (vehicleOwner != 0 && vehicleOwner.HasValue)
+            if (vehicleOwner != 0 && vehicleOwner.HasValue && vehicleId == null)
             {
                 query = query.Include(x => x.HistoryRentDriver).ThenInclude(hrd => hrd.Vehicle).Where(x => x.HistoryRentDriver.Vehicle.VehicleOwner == vehicleOwner);
+            } 
+            if(vehicleId != 0 && vehicleOwner != 0 && vehicleId.HasValue && vehicleOwner.HasValue)
+            {
+                query = query.Include(x => x.HistoryRentDriver).ThenInclude(hrd => hrd.Vehicle).Where(x => x.HistoryRentDriver.Vehicle.VehicleOwner == vehicleOwner && x.VehicleId == vehicleId);
             }
             return GetRentDriver(query);
         }
@@ -312,7 +337,7 @@ namespace MyAPI.Repositories.Impls
 
 
             IQueryable<PaymentRentDriver> query = _context.PaymentRentDrivers.Where(x => x.CreatedAt >= startDate && x.CreatedAt <= endDate);
-            if(driverId != 0)
+            if (driverId != 0)
             {
                 query = query.Where(x => x.DriverId == driverId);
             }
@@ -329,7 +354,7 @@ namespace MyAPI.Repositories.Impls
                 int limit = 5;
 
                 var driversWithRentCount = await _context.Drivers
-                    .Where(d => !_context.Vehicles.Any(v => v.DriverId == d.Id)) 
+                    .Where(d => !_context.Vehicles.Any(v => v.DriverId == d.Id))
                     .Select(d => new
                     {
                         Driver = d,
@@ -382,61 +407,65 @@ namespace MyAPI.Repositories.Impls
 
                 if (requestDetail == null)
                 {
-                    return false; 
+                    return false;
                 }
 
-                
+
                 requestDetail.DriverId = driverId;
 
-               
+
                 _context.RequestDetails.Update(requestDetail);
                 await _context.SaveChangesAsync();
 
-                return true; 
+                return true;
             }
             catch
             {
-                return false; 
+                return false;
             }
         }
         public async Task<List<DriverHistoryDTO>> getHistoryRentDriver(int userId, string role)
         {
             try
             {
-                List<DriverHistoryDTO> history = new List<DriverHistoryDTO> ();
-                var query = await (from htd in _context.HistoryRentDrivers join d in _context.Drivers
-                                     on htd.DriverId equals d.Id join v in _context.Vehicles
-                                     on htd.VehicleId equals v.Id join u in _context.Users
-                                     on v.VehicleOwner equals u.Id join p in _context.PaymentRentDrivers
+                List<DriverHistoryDTO> history = new List<DriverHistoryDTO>();
+                var query = await (from htd in _context.HistoryRentDrivers
+                                   join d in _context.Drivers
+                                     on htd.DriverId equals d.Id
+                                   join v in _context.Vehicles
+                                     on htd.VehicleId equals v.Id
+                                   join u in _context.Users
+                                     on v.VehicleOwner equals u.Id
+                                   join p in _context.PaymentRentDrivers
                                      on htd.HistoryId equals p.HistoryRentDriverId
-                                     select new DriverHistoryDTO
-                                     {
-                                         HistoryId = htd.HistoryId,
-                                         DriverId = htd.DriverId,
-                                         DriverName = d.Name ?? "",
-                                         vehicleOwnerId = u.Id,
-                                         vehicleOwner = u.FullName ?? "",
-                                         LicensePlate = v.LicensePlate ?? "",
-                                         price = p.Price,
-                                         TimeStart = htd.TimeStart,
-                                         EndStart = htd.EndStart
-                                     }
+                                   select new DriverHistoryDTO
+                                   {
+                                       HistoryId = htd.HistoryId,
+                                       DriverId = htd.DriverId,
+                                       DriverName = d.Name ?? "",
+                                       vehicleOwnerId = u.Id,
+                                       vehicleOwner = u.FullName ?? "",
+                                       LicensePlate = v.LicensePlate ?? "",
+                                       price = p.Price,
+                                       TimeStart = htd.TimeStart,
+                                       EndStart = htd.EndStart
+                                   }
                                      ).ToListAsync();
-                if(role == "Staff")
+                if (role == "Staff")
                 {
-                     history = query;
+                    history = query;
                 }
-                if(role == "VehicleOwner")
+                if (role == "VehicleOwner")
                 {
-                     history = query.Where(x => x.vehicleOwnerId == userId).ToList();
+                    history = query.Where(x => x.vehicleOwnerId == userId).ToList();
                 }
-                if(role == "Driver")
+                if (role == "Driver")
                 {
-                     history = query.Where(x => x.DriverId == userId).ToList();
+                    history = query.Where(x => x.DriverId == userId).ToList();
                 }
                 return history;
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 throw new Exception(ex.Message);
             }
