@@ -1,4 +1,6 @@
-﻿namespace MyAPI.DTOs.LossCostDTOs.LossCostVehicleDTOs
+﻿using System.Text.Json.Serialization;
+
+namespace MyAPI.DTOs.LossCostDTOs.LossCostVehicleDTOs
 {
     public class LossCostUpdateDTO
     {
@@ -7,6 +9,7 @@
         public decimal? Price { get; set; }
         public string? Description { get; set; }
         public DateTime? DateIncurred { get; set; }
+        [JsonIgnore]
         public DateTime? UpdateAt { get; set; }
       
     }
