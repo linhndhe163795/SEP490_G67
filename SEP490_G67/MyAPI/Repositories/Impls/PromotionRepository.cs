@@ -201,6 +201,7 @@ namespace MyAPI.Repositories.Impls
                         PaymentId = null,
                         CreatedAt = DateTime.UtcNow,
                         CreatedBy = userId,
+                        Date = DateTime.Now,
                         UpdateAt = DateTime.UtcNow,
                         UpdateBy = userId,
                     };
@@ -243,7 +244,7 @@ namespace MyAPI.Repositories.Impls
                                         .Select(pu => pu.PromotionId)
                                         .ToListAsync();
                 var listPromotionCanChange = await _context.Promotions
-                                        .Where(p => !userPromotionIds.Contains(p.Id) && p.EndDate < DateTime.Now) // Loại bỏ Promotion user đã có
+                                        .Where(p => !userPromotionIds.Contains(p.Id) && p.EndDate < DateTime.Now)
                                         .ToListAsync();
 
                 var mapper = _mapper.Map<List<PromotionDTO>>(listPromotionCanChange);

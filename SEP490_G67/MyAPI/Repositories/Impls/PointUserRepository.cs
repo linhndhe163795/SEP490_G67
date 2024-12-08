@@ -113,7 +113,7 @@ namespace MyAPI.Repositories.Impls
                         UserId = x.UserId,
                         Points = x.Points,
                         MinusPoints = x.PointsMinus,
-                        Date = x.Date
+                        Date = x.CreatedAt
                     })
                     .ToListAsync();
 
@@ -137,6 +137,7 @@ namespace MyAPI.Repositories.Impls
             if (checkPoint != null)
             {
                 checkPoint.Points = checkPoint.Points + pointUserUpdateDTO.Points;
+                checkPoint.Date = DateTime.Now;
                 checkPoint.UpdateAt = DateTime.Now;
                 checkPoint.UpdateBy = pointUserUpdateDTO.UpdateBy;
                 await _context.SaveChangesAsync();
