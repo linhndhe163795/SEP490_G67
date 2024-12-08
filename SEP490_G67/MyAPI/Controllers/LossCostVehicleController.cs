@@ -114,7 +114,7 @@ namespace MyAPI.Controllers
                     return BadRequest("Token is required.");
                 }
                 var userId = _getInforFromToken.GetIdInHeader(token);
-                var result = await _lossCostVehicleRepository.GetLossCostVehicleByDate(vehicleId, startDate, endDate, vehicleOwner, userId);  
+                var result = await _lossCostVehicleRepository.GetLossCostVehicleByDate(vehicleId, startDate, endDate, vehicleOwner, userId);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -122,5 +122,5 @@ namespace MyAPI.Controllers
                 return BadRequest(ex.Message);
             }
         }
-    }
+        [Authorize]
 }
