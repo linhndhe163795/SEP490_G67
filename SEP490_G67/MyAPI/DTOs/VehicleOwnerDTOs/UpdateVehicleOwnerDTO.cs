@@ -10,7 +10,5 @@
         public string? Avatar { get; set; }
         public bool? Status { get; set; }
         public DateTime? Dob { get; set; }
-        public DateTime? CreatedAt { get; set; }
-        public DateTime? UpdateAt { get; set; }
     }
 }
