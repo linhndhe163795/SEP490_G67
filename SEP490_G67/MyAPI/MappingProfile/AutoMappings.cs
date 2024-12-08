@@ -19,6 +19,7 @@ using MyAPI.DTOs.PointUserDTOs;
 using MyAPI.DTOs.HistoryRentDriverDTOs;
 using MyAPI.DTOs.HistoryRentVehicleDTOs;
 using MyAPI.DTOs.HistoryRentVehicles;
+using MyAPI.DTOs.VehicleOwnerDTOs;
 
 namespace MyAPI.MappingProfile
 {
@@ -31,6 +32,7 @@ namespace MyAPI.MappingProfile
             CreateMap<Role, UserLoginDTO>().ReverseMap();
             CreateMap<User, ForgotPasswordDTO>().ReverseMap();
             CreateMap<User, UserPostLoginDTO>().ReverseMap();
+            CreateMap<User, VehicleOwnerDTO>().ReverseMap();
             CreateMap<UserPostLoginDTO, User>().ReverseMap();
             CreateMap<User, AccountListDTO>().ReverseMap();
             CreateMap<Role, AccountRoleDTO>().ReverseMap();

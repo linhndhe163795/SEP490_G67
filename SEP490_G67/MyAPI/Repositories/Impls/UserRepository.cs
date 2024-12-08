@@ -552,6 +552,7 @@ namespace MyAPI.Repositories.Impls
                 var vehicleOwner = new User
                 {
                     Email = vehicleOwnerRegister.Email,
+                    Username = vehicleOwnerRegister.Username,
                     Address = vehicleOwnerRegister.Address,
                     Avatar = vehicleOwnerRegister.Avatar,
                     FullName = vehicleOwnerRegister.FullName,
