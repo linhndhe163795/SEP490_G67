@@ -196,6 +196,7 @@ namespace MyAPI.Repositories.Impls
                     var pointUserAfterExchange = new PointUser
                     {
                         Points = pointUserId.Points - promotion.ExchangePoint,
+                        UserId = userId,
                         PointsMinus = promotion.ExchangePoint,
                         PaymentId = null,
                         CreatedAt = DateTime.UtcNow,
