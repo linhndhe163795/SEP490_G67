@@ -176,37 +176,59 @@ namespace MyAPI.Repositories.Impls
             var vehicleOwner = await _context.Users.FindAsync(id);
             if (vehicleOwner == null)
             {
-                return false;
+                throw new Exception("Vehicle owner not found.");
             }
 
-            if (!string.IsNullOrEmpty(vehicleOwnerDTO.Username))
+            if (string.IsNullOrEmpty(vehicleOwnerDTO.Username))
             {
-                var existingUsername = await _context.Users
-                    .AnyAsync(v => v.Username == vehicleOwnerDTO.Username && v.Id != id);
-                if (existingUsername)
-                {
-                    throw new Exception("Username already exists. Please provide a different username.");
-                }
-                vehicleOwner.Username = vehicleOwnerDTO.Username;
+                throw new Exception("Username cannot be null or empty.");
             }
-
-            if (!string.IsNullOrEmpty(vehicleOwnerDTO.Email))
+            var existingUsername = await _context.Users
+                .AnyAsync(v => v.Username == vehicleOwnerDTO.Username && v.Id != id);
+            if (existingUsername)
             {
-                var existingEmail = await _context.Users
-                    .AnyAsync(v => v.Email == vehicleOwnerDTO.Email && v.Id != id);
-                if (existingEmail)
-                {
-                    throw new Exception("Email already exists. Please provide a different email.");
-                }
-                vehicleOwner.Email = vehicleOwnerDTO.Email;
+                throw new Exception("Username already exists. Please choose a different one.");
             }
+            vehicleOwner.Username = vehicleOwnerDTO.Username;
 
-            vehicleOwner.NumberPhone = vehicleOwnerDTO.NumberPhone ?? vehicleOwner.NumberPhone;
-            vehicleOwner.FullName = vehicleOwnerDTO.FullName ?? vehicleOwner.FullName;
-            vehicleOwner.Address = vehicleOwnerDTO.Address ?? vehicleOwner.Address;
+            if (string.IsNullOrEmpty(vehicleOwnerDTO.Email))
+            {
+                throw new Exception("Email cannot be null or empty.");
+            }
+            var existingEmail = await _context.Users
+                .AnyAsync(v => v.Email == vehicleOwnerDTO.Email && v.Id != id);
+            if (existingEmail)
+            {
+                throw new Exception("Email already exists. Please choose a different one.");
+            }
+            vehicleOwner.Email = vehicleOwnerDTO.Email;
+
+            if (string.IsNullOrEmpty(vehicleOwnerDTO.NumberPhone))
+            {
+                throw new Exception("Phone number cannot be null or empty.");
+            }
+            vehicleOwner.NumberPhone = vehicleOwnerDTO.NumberPhone;
+
+            if (string.IsNullOrEmpty(vehicleOwnerDTO.FullName))
+            {
+                throw new Exception("Full name cannot be null or empty.");
+            }
+            vehicleOwner.FullName = vehicleOwnerDTO.FullName;
+
+            if (string.IsNullOrEmpty(vehicleOwnerDTO.Address))
+            {
+                throw new Exception("Address cannot be null or empty.");
+            }
+            vehicleOwner.Address = vehicleOwnerDTO.Address;
+
+            if (!vehicleOwnerDTO.Dob.HasValue)
+            {
+                throw new Exception("Date of birth cannot be null.");
+            }
+            vehicleOwner.Dob = vehicleOwnerDTO.Dob;
+
             vehicleOwner.Avatar = vehicleOwnerDTO.Avatar ?? vehicleOwner.Avatar;
             vehicleOwner.Status = vehicleOwnerDTO.Status ?? vehicleOwner.Status;
-            vehicleOwner.Dob = vehicleOwnerDTO.Dob ?? vehicleOwner.Dob;
             vehicleOwner.UpdateBy = staffId;
             vehicleOwner.UpdateAt = DateTime.Now;
 
@@ -215,6 +237,7 @@ namespace MyAPI.Repositories.Impls
 
             return true;
         }
+
 
         public async Task<List<VehicleOwnerDTO>> listVehicleOnwer()
         {
