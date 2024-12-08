@@ -33,14 +33,12 @@ namespace MyAPI.Controllers
                 return NotFound();
             return Ok(requestDetail);
         }
-
         [HttpPost]
         public async Task<IActionResult> CreateRequestDetail(RequestDetailDTO requestDetailDto)
         {
             var createdRequestDetail = await _requestDetailRepository.CreateRequestDetailAsync(requestDetailDto);
             return CreatedAtAction(nameof(GetRequestDetailById), new { id = createdRequestDetail.RequestId }, createdRequestDetail);
         }
-
         [HttpPost("{id}")]
         public async Task<IActionResult> UpdateRequestDetail(int id, RequestDetailDTO requestDetailDto)
         {
@@ -50,8 +48,6 @@ namespace MyAPI.Controllers
             var updatedRequestDetail = await _requestDetailRepository.UpdateRequestDetailAsync(id, requestDetailDto);
             return Ok(updatedRequestDetail);
         }
-
-
         [HttpPost("Delete/{id}")]
         public async Task<IActionResult> DeleteRequestDetail(int id)
         {
@@ -62,5 +58,6 @@ namespace MyAPI.Controllers
             await _requestDetailRepository.Delete(requestDetail);
             return NoContent();
         }
+
     }
 }

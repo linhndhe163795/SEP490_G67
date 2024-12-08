@@ -276,7 +276,6 @@ namespace MyAPI.Controllers
                 });
             }
         }
-
         [Authorize(Roles = "Staff")]
         [HttpPost("ConvenientTripUpdateForStaff")]
         public async Task<IActionResult> UpdateRequestConvenientTrip(int requestId, bool choose)
@@ -335,7 +334,6 @@ namespace MyAPI.Controllers
                 return BadRequest(ex.Message);
             }
         }
-
         [Authorize]
         [HttpGet("getListRequestForDriver")]
         public async Task<IActionResult> getListRequestForDriver()
@@ -360,6 +358,7 @@ namespace MyAPI.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
         
     }
 }

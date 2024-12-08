@@ -10,7 +10,6 @@ namespace MyAPI.Repositories.Impls
         public RequestDetailRepository(SEP490_G67Context context) : base(context)
         {
         }
-
         public async Task<RequestDetail> CreateRequestDetailAsync(RequestDetailDTO requestDetailDto)
         {
             var typeId = await _context.Requests
@@ -75,7 +74,6 @@ namespace MyAPI.Repositories.Impls
 
             return requestDetail;
         }
-
         public async Task<RequestDetail> UpdateRequestDetailAsync(int id, RequestDetailDTO requestDetailDto)
         {
             try
