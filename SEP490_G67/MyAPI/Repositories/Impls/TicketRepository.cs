@@ -666,6 +666,7 @@ namespace MyAPI.Repositories.Impls
                 .Join(_context.Vehicles, ticket => ticket.VehicleId, vehicle => vehicle.Id, (ticket, vehicle) => new { ticket, vehicle })
                 .Join(_context.Users, tv => tv.vehicle.VehicleOwner, user => user.Id, (tv, user) => new
                 {
+                    Id = tv.ticket.Id,
                     tv.ticket.PricePromotion,
                     tv.ticket.VehicleId,
                     tv.ticket.CreatedAt,
@@ -676,6 +677,7 @@ namespace MyAPI.Repositories.Impls
                 })
                 .Select(x => new TicketRevenue
                 {
+                    Id = x.Id,
                     PricePromotion = x.PricePromotion,
                     VehicleId = x.VehicleId,
                     CreatedAt = x.CreatedAt,

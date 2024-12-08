@@ -157,6 +157,7 @@ namespace MyAPI.Repositories.Impls
             var lossCostVehicleByDate = await query
                                             .Select(ls => new AddLostCostVehicleDTOs
                                             {
+                                                Id = ls.Id,
                                                 VehicleId = ls.VehicleId,
                                                 LicensePlate = ls.Vehicle.LicensePlate,
                                                 DateIncurred = ls.DateIncurred,
@@ -208,6 +209,7 @@ namespace MyAPI.Repositories.Impls
             var lossCostVehicleByDate = await query
                                             .Select(ls => new AddLostCostVehicleDTOs
                                             {
+                                                Id = ls.Id,
                                                 VehicleId = ls.VehicleId,
                                                 LicensePlate = ls.Vehicle.LicensePlate,
                                                 DateIncurred = ls.DateIncurred,

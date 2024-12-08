@@ -2,6 +2,7 @@
 {
     public class PaymentRentDriverDTO
     {
+        public int Id { get; set; }
         public int? DriverId { get; set; }
         public string? DriverName{ get; set; }
         public int? vehicleId { get; set; }

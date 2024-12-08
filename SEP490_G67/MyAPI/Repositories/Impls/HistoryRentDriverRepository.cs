@@ -252,6 +252,7 @@ namespace MyAPI.Repositories.Impls
                 .Join(_context.Users, rv => rv.vehicle.VehicleOwner, user => user.Id, (rv, user) => new { rv.rent, rv.vehicle, VehicleOwnerName = user.FullName })
                 .Join(_context.Drivers, rv => rv.rent.DriverId, driver => driver.Id, (rv, driver) => new
                 {
+                    rv.rent.Id,
                     rv.rent.Price,
                     rv.rent.VehicleId,
                     LicenseVehicle = rv.vehicle.LicensePlate,
@@ -262,6 +263,7 @@ namespace MyAPI.Repositories.Impls
                 })
                 .Select(x => new PaymentRentDriverDTO
                 {
+                    Id = x.Id,
                     Price = x.Price,
                     vehicleOwner = x.VehicleOwnerName,
                     vehicleId = x.VehicleId,

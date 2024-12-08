@@ -9,6 +9,7 @@
 
     public class TicketRevenue
     {
+        public int Id { get; set; }
         public decimal? PricePromotion { get; set; }
         public string? VehicleOwner { get; set; }
         public int? VehicleId { get; set; }

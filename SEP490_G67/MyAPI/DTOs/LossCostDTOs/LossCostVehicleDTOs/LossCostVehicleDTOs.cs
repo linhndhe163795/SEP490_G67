@@ -2,6 +2,7 @@
 {
     public class AddLostCostVehicleDTOs
     {
+        public int Id { get; set; }
         public int? VehicleId { get; set; }
         public string? LicensePlate { get; set; }
         public string? LossCostType { get; set; }
