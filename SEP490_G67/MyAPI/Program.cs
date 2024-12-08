@@ -163,7 +163,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("corsapp", builder =>
     {
-        builder.AllowAnyOrigin()
+                builder.AllowAnyOrigin()
                        .AllowAnyMethod()
                        .AllowAnyHeader();
     });

@@ -98,6 +98,7 @@ namespace MyAPI.Controllers
                 return BadRequest("deleteCostById: " + ex.Message);
             }
         }
+        [Authorize(Roles = "Staff, VehicleOwner")]
         [HttpGet("totalLossVehicel/{startDate}/{endDate}")]
         public async Task<IActionResult> getTotalLossVehicle(DateTime startDate, DateTime endDate, int? vehicleId, int? vehicleOwner)
         {
