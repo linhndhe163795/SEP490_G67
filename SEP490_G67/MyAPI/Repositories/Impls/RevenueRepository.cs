@@ -1,4 +1,5 @@
 ﻿using DocumentFormat.OpenXml.VariantTypes;
+using Microsoft.AspNetCore.Authorization;
 using MyAPI.DTOs.LossCostDTOs.LossCostVehicelDTOs;
 using MyAPI.DTOs.PaymentRentDriver;
 using MyAPI.DTOs.PaymentRentVehicle;
@@ -39,7 +40,8 @@ namespace MyAPI.Repositories.Impls
 
 
         }
-        public async Task<RevenueDTO> RevenueStatistic(DateTime startTime, DateTime endTime, int? vehicleId, int? vehicleOwner)
+        [Authorize(Roles = "Staff, VehicleOwner")]
+        public async Task<RevenueDTO> RevenueStatistic()
         {
 
             var token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
@@ -50,15 +52,11 @@ namespace MyAPI.Repositories.Impls
             {
                 throw new Exception("Invalid user ID from token.");
             }
-            // Kiểm tra logic thời gian
-            if (startTime > endTime)
-            {
-                throw new Exception("Start time must be earlier than end time.");
-            }
-            var listRenvenueTicket = await _ticketRepository.getRevenueTicket(startTime, endTime, vehicleId, vehicleOwner, userId);
-            var listRevenueRentVehicle = await _paymentRentVehicleRepository.getPaymentRentVehicleByDate(startTime, endTime, vehicleId, vehicleOwner, userId);
-            var listLossCost = await _lossCostVehicleRepository.GetLossCostVehicleByDate(vehicleId, startTime, endTime, vehicleOwner, userId);
-            var listExpenseRentDriver = await _historyRentDriverRepository.GetRentDetailsWithTotalForOwner(startTime, endTime, vehicleId, vehicleOwner);
+           
+            var listRenvenueTicket = await _ticketRepository.getRevenueTicket(userId);
+            var listRevenueRentVehicle = await _paymentRentVehicleRepository.getPaymentRentVehicleByDate( userId);
+            var listLossCost = await _lossCostVehicleRepository.GetLossCostVehicleByDate(userId);
+            var listExpenseRentDriver = await _historyRentDriverRepository.GetRentDetailsWithTotalForOwner();
 
             var revenue = new RevenueDTO
             {

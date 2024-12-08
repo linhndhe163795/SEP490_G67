@@ -99,8 +99,8 @@ namespace MyAPI.Controllers
             }
         }
         [Authorize(Roles = "Staff, VehicleOwner")]
-        [HttpGet("totalLossVehicel/{startDate}/{endDate}")]
-        public async Task<IActionResult> getTotalLossVehicle(DateTime startDate, DateTime endDate, int? vehicleId, int? vehicleOwner)
+        [HttpGet("totalLossVehicel")]
+        public async Task<IActionResult> getTotalLossVehicle()
         {
             try
             {
@@ -114,7 +114,7 @@ namespace MyAPI.Controllers
                     return BadRequest("Token is required.");
                 }
                 var userId = _getInforFromToken.GetIdInHeader(token);
-                var result = await _lossCostVehicleRepository.GetLossCostVehicleByDate(vehicleId, startDate, endDate, vehicleOwner, userId);
+                var result = await _lossCostVehicleRepository.GetLossCostVehicleByDate(userId);
                 return Ok(result);
             }
             catch (Exception ex)

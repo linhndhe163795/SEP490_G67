@@ -196,22 +196,11 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception(ex.Message);
             }
         }
-        public async Task<TotalPayementRentDriver> GetRentDetailsWithTotalForOwner(DateTime startDate, DateTime endDate, int? vehicleId, int? vehicleOwnerId)
+        public async Task<TotalPayementRentDriver> GetRentDetailsWithTotalForOwner()
         {
             try
             {
-                if (startDate > endDate)
-                {
-                    throw new Exception("Start date must be earlier than or equal to end date.");
-                }
-                if (vehicleId.HasValue && vehicleId < 0)
-                {
-                    throw new Exception("Invalid vehicle ID.");
-                }
-                if (vehicleOwnerId.HasValue && vehicleOwnerId < 0)
-                {
-                    throw new Exception("Invalid vehicle owner ID.");
-                }
+              
                 var token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
                 int userId = _tokenHelper.GetIdInHeader(token);
                 var role = _tokenHelper.GetRoleFromToken(token);
@@ -223,15 +212,15 @@ namespace MyAPI.Repositories.Impls
                 var getInforUser = _context.Users.Include(x => x.UserRoles).ThenInclude(x => x.Role).Where(x => x.Id == userId).FirstOrDefault();
                 if (role == "VehicleOwner")
                 {
-                    return await GetRentDriverTotalForOwner(startDate, endDate, vehicleId, userId);
+                    return await GetRentDriverTotalForOwner(userId);
                 }
                 else if (role == "Staff")
                 {
-                    return await GetRentDriverTotalForStaff(startDate, endDate, vehicleId, vehicleOwnerId);
+                    return await GetRentDriverTotalForStaff();
                 }
                 else if (role == "Driver")
                 {
-                    return await GetRentDriverTotalForDriver(startDate, endDate, userId);
+                    return await GetRentDriverTotalForDriver(userId);
                 }
                 else
                 {
@@ -282,23 +271,14 @@ namespace MyAPI.Repositories.Impls
 
             return combine;
         }
-        private async Task<TotalPayementRentDriver> GetRentDriverTotalForOwner(DateTime startDate, DateTime endDate, int? vehicleId, int? vehicleOwner)
+        private async Task<TotalPayementRentDriver> GetRentDriverTotalForOwner(int? vehicleOwner)
         {
-            if (startDate > endDate)
-            {
-                throw new Exception("Start date must be earlier than or equal to end date.");
-            }
+            
 
 
-            IQueryable<PaymentRentDriver> query = _context.PaymentRentDrivers.Where(x => x.CreatedAt >= startDate && x.CreatedAt <= endDate);
-            if (vehicleId != 0 && vehicleId.HasValue)
-            {
-                query = query.Include(x => x.HistoryRentDriver).ThenInclude(hrd => hrd.Vehicle).Where(x => x.HistoryRentDriver.Vehicle.VehicleOwner == vehicleOwner && x.VehicleId == vehicleId);
-            }
-            else
-            {
-                query = query.Include(x => x.HistoryRentDriver).ThenInclude(hrd => hrd.Vehicle).Where(x => x.HistoryRentDriver.Vehicle.VehicleOwner == vehicleOwner);
-            }
+            IQueryable<PaymentRentDriver> query = _context.PaymentRentDrivers.AsQueryable();
+            query = query.Include(x => x.HistoryRentDriver).ThenInclude(hrd => hrd.Vehicle).Where(x => x.HistoryRentDriver.Vehicle.VehicleOwner == vehicleOwner);
+          
             var result = await GetRentDriver(query);
             if (result == null)
             {
@@ -308,37 +288,17 @@ namespace MyAPI.Repositories.Impls
             return result;
 
         }
-        private Task<TotalPayementRentDriver> GetRentDriverTotalForStaff(DateTime startDate, DateTime endDate, int? vehicleId, int? vehicleOwner)
+        private Task<TotalPayementRentDriver> GetRentDriverTotalForStaff()
         {
-            if (startDate > endDate)
-            {
-                throw new Exception("Start date must be earlier than or equal to end date.");
-            }
+           
 
-            IQueryable<PaymentRentDriver> query = _context.PaymentRentDrivers.Where(x => x.CreatedAt >= startDate && x.CreatedAt <= endDate);
-            if (vehicleId != 0 && vehicleId.HasValue && vehicleOwner == null)
-            {
-                query = query.Where(x => x.VehicleId == vehicleId);
-            }
-            if (vehicleOwner != 0 && vehicleOwner.HasValue && vehicleId == null)
-            {
-                query = query.Include(x => x.HistoryRentDriver).ThenInclude(hrd => hrd.Vehicle).Where(x => x.HistoryRentDriver.Vehicle.VehicleOwner == vehicleOwner);
-            } 
-            if(vehicleId != 0 && vehicleOwner != 0 && vehicleId.HasValue && vehicleOwner.HasValue)
-            {
-                query = query.Include(x => x.HistoryRentDriver).ThenInclude(hrd => hrd.Vehicle).Where(x => x.HistoryRentDriver.Vehicle.VehicleOwner == vehicleOwner && x.VehicleId == vehicleId);
-            }
+            IQueryable<PaymentRentDriver> query = _context.PaymentRentDrivers.AsQueryable();
+           
             return GetRentDriver(query);
         }
-        private Task<TotalPayementRentDriver> GetRentDriverTotalForDriver(DateTime startDate, DateTime endDate, int driverId)
+        private Task<TotalPayementRentDriver> GetRentDriverTotalForDriver(int driverId)
         {
-            if (startDate > endDate)
-            {
-                throw new Exception("Start date must be earlier than or equal to end date.");
-            }
-
-
-            IQueryable<PaymentRentDriver> query = _context.PaymentRentDrivers.Where(x => x.CreatedAt >= startDate && x.CreatedAt <= endDate);
+            IQueryable<PaymentRentDriver> query = _context.PaymentRentDrivers.AsQueryable();
             if (driverId != 0)
             {
                 query = query.Where(x => x.DriverId == driverId);

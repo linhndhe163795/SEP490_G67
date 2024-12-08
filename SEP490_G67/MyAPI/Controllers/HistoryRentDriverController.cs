@@ -65,12 +65,12 @@ namespace MyAPI.Controllers
 
         [Authorize]
         [HttpGet("rent-details-with-total-for-owner")]
-        public async Task<IActionResult> GetRentDetailsWithTotalForOwner([FromQuery] DateTime startDate, [FromQuery] DateTime endDate, int? vehicleId, int? vehicleOwnerId)
+        public async Task<IActionResult> GetRentDetailsWithTotalForOwner()
         {
             try
             {
                 // Gọi phương thức repository để lấy thông tin chi tiết các lần thuê và tổng chi phí
-                var result = await _historyRentDriverRepository.GetRentDetailsWithTotalForOwner(startDate, endDate, vehicleId, vehicleOwnerId);
+                var result = await _historyRentDriverRepository.GetRentDetailsWithTotalForOwner();
 
                 return Ok(result);
             }

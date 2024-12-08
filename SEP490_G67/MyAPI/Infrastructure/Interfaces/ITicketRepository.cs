@@ -16,7 +16,7 @@ namespace MyAPI.Infrastructure.Interfaces
         Task<bool> UpdateStatusTicketForPayment(int id);
         Task AcceptOrDenyRequestRentCar(AddTicketForRentCarDTO addTicketForRentCarDTO);
         Task<TicketByIdDTOs> getTicketDetailsById(int ticketId, int userId);
-        Task<RevenueTicketDTO> getRevenueTicket(DateTime startTime, DateTime endTime, int? vehicle,int? vehicleOwner, int userId);
+        Task<RevenueTicketDTO> getRevenueTicket(int userId);
         Task<bool> deleteTicketTimeOut(int ticketId);
         Task<bool> UpdateVehicleInRequestAsync(int vehicleId, int requestId);
         Task<IEnumerable<VehicleBasicDto>> GetVehiclesByRequestIdAsync(int requestId);

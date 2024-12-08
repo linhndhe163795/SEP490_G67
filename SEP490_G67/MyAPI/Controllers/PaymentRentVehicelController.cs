@@ -16,8 +16,8 @@ namespace MyAPI.Controllers
             _paymentRentVehicleRepository = paymentRentVehicleRepository;
             _getInforFromToken = getInforFromToken;
         }
-        [HttpGet("getPaymentRentVehicle/{timeStart}/{timeEnd}")]
-        public async Task<IActionResult> getPaymentRentVehicle(DateTime timeStart, DateTime timeEnd, int? vehicelId, int? vehicelOwner)
+        [HttpGet("getPaymentRentVehicle")]
+        public async Task<IActionResult> getPaymentRentVehicle()
         {
             try
             {
@@ -31,7 +31,7 @@ namespace MyAPI.Controllers
                     return BadRequest("Token is required.");
                 }
                 var userId = _getInforFromToken.GetIdInHeader(token);
-                var respone = await _paymentRentVehicleRepository.getPaymentRentVehicleByDate(timeStart, timeEnd, vehicelOwner, vehicelId, userId);
+                var respone = await _paymentRentVehicleRepository.getPaymentRentVehicleByDate(userId);
                 return Ok(respone);
             }
             catch (Exception ex)

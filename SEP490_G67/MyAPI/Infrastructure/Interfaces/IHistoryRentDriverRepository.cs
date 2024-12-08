@@ -9,7 +9,7 @@ namespace MyAPI.Infrastructure.Interfaces
         Task<IEnumerable<HistoryRentDriverListDTOs>> GetListHistoryRentDriver();
         Task<bool> AcceptOrDenyRentDriver(AddHistoryRentDriver add);
 
-        Task<TotalPayementRentDriver> GetRentDetailsWithTotalForOwner(DateTime startDate, DateTime endDate, int? vehicleId, int? vehicleOwnerId);
+        Task<TotalPayementRentDriver> GetRentDetailsWithTotalForOwner();
         Task<bool> UpdateDriverInRequestAsync(int driverId, int requestId);
         Task<List<DriverHistoryDTO>> getHistoryRentDriver(int userId, string role);
     }

@@ -16,12 +16,12 @@ namespace MyAPI.Controllers
         {
             _revenueRepository = revenueRepository;
         }
-        [HttpGet("getRevenue/{timeStart}/{timeEnd}")]
-        public async Task<IActionResult> getRevenue(DateTime timeStart, DateTime timeEnd, int? vehicleId, int? vehicleOwner)
+        [HttpGet("getRevenue")]
+        public async Task<IActionResult> getRevenue()
         {
             try
             {
-                var result = await _revenueRepository.RevenueStatistic(timeStart, timeEnd, vehicleId, vehicleOwner);
+                var result = await _revenueRepository.RevenueStatistic();
                 return Ok(result);
             }
             catch (Exception ex) 

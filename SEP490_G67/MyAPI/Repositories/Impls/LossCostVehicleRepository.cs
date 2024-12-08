@@ -114,7 +114,7 @@ namespace MyAPI.Repositories.Impls
             }
         }
 
-        public async Task<TotalLossCost> GetLossCostVehicleByDate(int? vehicleId, DateTime startDate, DateTime endDate, int? vehicleOwnerId, int userId)
+        public async Task<TotalLossCost> GetLossCostVehicleByDate(int userId)
         {
             try
             {
@@ -125,11 +125,11 @@ namespace MyAPI.Repositories.Impls
                 }
                 if (IsUserRole(getInforUser, "VehicleOwner"))
                 {
-                    return await GetLossCosstForVehicleOwner(startDate, endDate, userId, vehicleId);
+                    return await GetLossCosstForVehicleOwner(userId);
                 }
                 if (IsUserRole(getInforUser, "Staff"))
                 {
-                    return await GetLossCosstForStaff(startDate,endDate, vehicleOwnerId, vehicleId, userId);
+                    return await GetLossCosstForStaff(userId);
                 }
                 throw new Exception("User role is not supported.");
             }
@@ -142,18 +142,11 @@ namespace MyAPI.Repositories.Impls
         {
             return user.UserRoles.Any(ur => ur.Role.RoleName == roleName);
         }
-        private async Task<TotalLossCost> GetLossCosstForVehicleOwner(DateTime? startDate, DateTime? endDate, int? vehicleOwner, int? vechileId)
+        private async Task<TotalLossCost> GetLossCosstForVehicleOwner(int? vehicleOwner)
         {
             var query =  _context.LossCosts.Include(x => x.Vehicle)
                                            .Include(x => x.LossCostType)
-                                           .Where(x => x.DateIncurred >= startDate && 
-                                                 x.DateIncurred <= endDate &&
-                                                 x.Vehicle.VehicleOwner == vehicleOwner);
-            if(vechileId.HasValue && vechileId != 0)
-            {
-                query = query.Where(x => x.VehicleId == vechileId);
-            }
-
+                                           .Where(x => x.Vehicle.VehicleOwner == vehicleOwner);
             var totalLossCost = query.Sum(x => x.Price);
             var lossCostVehicleByDate = await query
                                             .Select(ls => new AddLostCostVehicleDTOs
@@ -175,37 +168,12 @@ namespace MyAPI.Repositories.Impls
             };
             return combineResult;
         }
-        private async Task<TotalLossCost> GetLossCosstForStaff(DateTime startDate, DateTime endDate, int? vehicleOwner, int? vehicleId ,int userId)
-        {
-
-            if (startDate > endDate)
-            {
-                throw new Exception("Start date must be earlier than or equal to end date.");
-            }
-
-            if (vehicleId.HasValue && vehicleId <= 0)
-            {
-                throw new Exception("Invalid vehicle ID.");
-            }
-
-            if (vehicleOwner.HasValue && vehicleOwner <= 0)
-            {
-                throw new Exception("Invalid vehicle owner ID.");
-            }
-
-            var query = _context.LossCosts.Include(x => x.Vehicle)
+        private async Task<TotalLossCost> GetLossCosstForStaff(int userId)
+        {         
+            var query =  _context.LossCosts.Include(x => x.Vehicle)
                                           .ThenInclude(x => x.VehicleOwnerNavigation)
-                                          .Include(x => x.LossCostType)
-                                          .Where(x => x.DateIncurred >= startDate && x.DateIncurred <= endDate);
-            if(vehicleOwner.HasValue && vehicleOwner != 0)
-            {
-                query = query.Where(x => x.Vehicle.VehicleOwner == vehicleOwner.Value);
-            }
-            if (vehicleId.HasValue && vehicleId != 0) 
-            {
-                query = query.Where(x => x.VehicleId == vehicleId);
-            }
-            
+                                          .Include(x => x.LossCostType).AsQueryable();
+           
             var totalLossCost = query.Sum(x => x.Price);
             var lossCostVehicleByDate = await query
                                             .Select(ls => new AddLostCostVehicleDTOs
@@ -220,7 +188,6 @@ namespace MyAPI.Repositories.Impls
                                                 VehicleOwner = _context.Users.Include(uv => uv.Vehicles).Where(u => u.Id == ls.Vehicle.VehicleOwner).Select(u => u.FullName).FirstOrDefault(),
                                                 VehicleOwnerId = ls.Vehicle.VehicleOwner
                                             }).ToListAsync();
-            
             var combineResult = new TotalLossCost
             {
                 listLossCostVehicle = lossCostVehicleByDate,
