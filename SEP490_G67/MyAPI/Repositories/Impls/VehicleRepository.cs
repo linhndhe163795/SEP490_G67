@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using DocumentFormat.OpenXml.Spreadsheet;
+using DocumentFormat.OpenXml.VariantTypes;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileSystemGlobbing.Internal;
 using MyAPI.DTOs;
@@ -696,14 +697,33 @@ namespace MyAPI.Repositories.Impls
 
             try
             {
-                var vehicleById = await _context.Vehicles.FirstOrDefaultAsync(x => x.Id == vehicleId);
-                if (vehicleById == null)
+                //var vehicleById = await _context.Vehicles.Include(u => u.Users).FirstOrDefaultAsync(x => x.Id == vehicleId);
+                var vehicle = await (from v in _context.Vehicles
+                                     join u in _context.Users
+                                     on v.VehicleOwner equals u.Id
+                                     join vt in _context.VehicleTypes on v.VehicleTypeId equals vt.Id
+                                     where v.Id == vehicleId
+                                     select new VehicleAddDTO
+                                     {
+                                         Image = v.Image,
+                                         driverName = v.Driver.Name ?? null,
+                                         LicensePlate = v.LicensePlate,
+                                         NumberSeat = v.NumberSeat,
+                                         VehicleOwner = v.VehicleOwner,
+                                         Description = v.Description,
+                                         vehicleOwnerName = u.FullName,
+                                         driverId = v.DriverId ?? null,
+                                         VehicleTypeId = vt.Id,
+                                         vehicleTypeName = vt.Description,
+                                         Status = v.Status,
+                                     }).FirstOrDefaultAsync();
+                if (vehicle == null)
                 {
                     throw new Exception("Vehicle not found.");
                 }
 
-                var vehicleMapper = _mapper.Map<VehicleAddDTO>(vehicleById);
-                return vehicleMapper;
+                //var vehicleMapper = _mapper.Map<VehicleAddDTO>(vehicleById);
+                return vehicle;
             }
             catch (Exception ex)
             {

@@ -244,7 +244,7 @@ namespace MyAPI.Repositories.Impls
                                         .Select(pu => pu.PromotionId)
                                         .ToListAsync();
                 var listPromotionCanChange = await _context.Promotions
-                                        .Where(p => !userPromotionIds.Contains(p.Id) && p.EndDate < DateTime.Now)
+                                        .Where(p => !userPromotionIds.Contains(p.Id) && p.EndDate >= DateTime.Now)
                                         .ToListAsync();
 
                 var mapper = _mapper.Map<List<PromotionDTO>>(listPromotionCanChange);
