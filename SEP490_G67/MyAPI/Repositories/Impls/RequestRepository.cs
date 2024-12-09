@@ -40,7 +40,7 @@ namespace MyAPI.Repositories.Impls
 
         public async Task<RequestDetailDTO> GetRequestDetailByIdAsync(int requestId)
         {
-            var requestDetail = await _context.RequestDetails
+            var requestDetail = await _context.RequestDetails.Include(x => x.Request).ThenInclude(x => x.Type)
                 .Where(rd => rd.RequestId == requestId)
                 .Select(rd => new RequestDetailDTO
                 {
@@ -48,6 +48,8 @@ namespace MyAPI.Repositories.Impls
                     TicketId = rd.TicketId,
                     VehicleId = rd.VehicleId,
                     DriverId = rd.DriverId,
+                    typeRequestId = rd.Request.TypeId,
+                    typeName = rd.Request.Type.TypeName,
                     StartLocation = rd.StartLocation,
                     EndLocation = rd.EndLocation,
                     StartTime = rd.StartTime,

@@ -7,6 +7,7 @@
         public int? VehicleId { get; set; }
         public int? DriverId { get; set; }
         public string? Note { get; set; }
+        public int? typeRequestId { get; set; }
         public string? typeName { get; set; }
         public string? StartLocation { get; set; }
         public string? EndLocation { get; set; }
