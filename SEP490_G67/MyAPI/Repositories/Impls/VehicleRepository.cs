@@ -245,6 +245,10 @@ namespace MyAPI.Repositories.Impls
                                               .SelectMany(rq => rq.RequestDetails)
                                               .Select(rq => rq.VehicleId)
                                               .FirstOrDefaultAsync();
+                var requestDetails = await _context.RequestDetails.FirstOrDefaultAsync(x => x.RequestId == requestId);
+                _context.RequestDetails.Remove(requestDetails);
+                _context.Requests.Remove(checkRequestExits);
+                await _context.SaveChangesAsync();
 
                 if (vehicleID == 0 || vehicleID == null)
                 {

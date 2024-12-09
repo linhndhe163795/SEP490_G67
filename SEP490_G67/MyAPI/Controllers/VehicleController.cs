@@ -134,7 +134,7 @@ namespace MyAPI.Controllers
                 }
                 else
                 {
-                    return BadRequest(new { Message = "Vehicle addition denied." });
+                    return Ok(new { Message = "Vehicle addition denied." });
                 }
 
             }
