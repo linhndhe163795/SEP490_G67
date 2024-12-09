@@ -340,7 +340,7 @@ namespace MyAPI.Repositories.Impls
         {
             try
             {
-             
+
                 var listVehicleType = await _context.VehicleTypes.ToListAsync();
 
                 var vehicleTypeListDTOs = _mapper.Map<List<VehicleTypeDTO>>(listVehicleType);
@@ -457,7 +457,7 @@ namespace MyAPI.Repositories.Impls
             try
             {
                 var getInforUser = _context.Users.Include(x => x.UserRoles).ThenInclude(x => x.Role).Where(x => x.Id == userId).FirstOrDefault();
-                if (getInforUser == null) 
+                if (getInforUser == null)
                 {
                     throw new Exception("Invalid user");
                 }
@@ -465,11 +465,11 @@ namespace MyAPI.Repositories.Impls
                 List<Vehicle> listVehicle = new List<Vehicle>();
                 if (role == "Staff")
                 {
-                     listVehicle = await _context.Vehicles.ToListAsync();
+                    listVehicle = await _context.Vehicles.ToListAsync();
                 }
-                if(role == "VehicleOwner") 
+                if (role == "VehicleOwner")
                 {
-                     listVehicle = await _context.Vehicles.Where(x => x.VehicleOwner == userId).ToListAsync();
+                    listVehicle = await _context.Vehicles.Where(x => x.VehicleOwner == userId).ToListAsync();
                 }
                 if (role == "Driver")
                 {
@@ -765,7 +765,7 @@ namespace MyAPI.Repositories.Impls
                         LicensePlate = x.LicensePlate,
                         NumberSeat = x.NumberSeat,
                         VehicleTypeName = x.VehicleType.Description,
-                        DriverName = x.Driver.Name, 
+                        DriverName = x.Driver.Name,
                         Status = x.Status,
                         Description = x.Description
                     }).ToListAsync();
@@ -845,7 +845,9 @@ namespace MyAPI.Repositories.Impls
                 {
                     throw new Exception("Not found driver");
                 }
-                var checkLicensePlate = await _context.Vehicles.FirstOrDefaultAsync(s => s.LicensePlate.Equals(updateDTO.LicensePlate));
+                var checkLicensePlate = await _context.Vehicles
+                                    .Where(s => s.LicensePlate.Equals(updateDTO.LicensePlate) && s.Id != id) 
+                                    .FirstOrDefaultAsync();
                 if (checkLicensePlate != null)
                 {
                     throw new Exception("License plate is duplicate.");
