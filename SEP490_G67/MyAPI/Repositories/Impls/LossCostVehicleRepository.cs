@@ -157,6 +157,7 @@ namespace MyAPI.Repositories.Impls
                                                 DateIncurred = ls.DateIncurred,
                                                 Description = ls.Description,
                                                 Price = ls.Price,
+                                                LossCostTypeId = ls.LossCostType.Id,
                                                 LossCostType = ls.LossCostType.Description,
                                                 VehicleOwner = _context.Users.Include(uv => uv.Vehicles).Where(u => u.Id == ls.Vehicle.VehicleOwner).Select(u => u.FullName).FirstOrDefault(),
                                                 VehicleOwnerId = ls.Vehicle.VehicleOwner
@@ -184,6 +185,7 @@ namespace MyAPI.Repositories.Impls
                                                 DateIncurred = ls.DateIncurred,
                                                 Description = ls.Description,
                                                 Price = ls.Price,
+                                                LossCostTypeId = ls.LossCostType.Id,
                                                 LossCostType = ls.LossCostType.Description,
                                                 VehicleOwner = _context.Users.Include(uv => uv.Vehicles).Where(u => u.Id == ls.Vehicle.VehicleOwner).Select(u => u.FullName).FirstOrDefault(),
                                                 VehicleOwnerId = ls.Vehicle.VehicleOwner
