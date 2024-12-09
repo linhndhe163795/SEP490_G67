@@ -541,7 +541,7 @@ namespace MyAPI.Repositories.Impls
         //    }
         //}
 
-        private bool UpdateVehicleByStaff(int? id, int? userIdUpdate, bool updateStatus)
+        private async bool UpdateVehicleByStaff(int? id, int? userIdUpdate, bool updateStatus)
         {
             try
             {
@@ -571,7 +571,12 @@ namespace MyAPI.Repositories.Impls
                 {
                     throw new Exception("Vehicle not found in the system.");
                 }
-
+                if(updateStatus == false)
+                {
+                    _context.Vehicles.Remove(vehicleUpdate);
+                    await _context.SaveChangesAsync();
+                    return true;
+                }
                 vehicleUpdate.Status = updateStatus;
                 vehicleUpdate.UpdateBy = userIdUpdate.Value;
                 vehicleUpdate.UpdateAt = DateTime.Now;
