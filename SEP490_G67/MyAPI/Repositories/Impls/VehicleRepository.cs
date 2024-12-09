@@ -541,7 +541,7 @@ namespace MyAPI.Repositories.Impls
         //    }
         //}
 
-        private async bool UpdateVehicleByStaff(int? id, int? userIdUpdate, bool updateStatus)
+        private async Task<bool> UpdateVehicleByStaff(int? id, int? userIdUpdate, bool updateStatus)
         {
             try
             {
