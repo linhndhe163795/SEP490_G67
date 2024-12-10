@@ -94,28 +94,64 @@ namespace MyAPI.Controllers
                 return BadRequest(ex.Message);
             }
         }
-        [HttpGet("download_template_trip")]
-        public IActionResult DownloadTemplateTrip()
+        [HttpGet("download_template_trip/typeOfTrip")]
+        public IActionResult DownloadTemplateTrip(int typeOfTrip)
         {
-            var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "templates", "TemplateTrip.xlsx");
-            if
-                (!System.IO.File.Exists(filePath))
+            try
             {
-                return NotFound();
-            }
-            byte[] fileBytes;
-            using (var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read))
-            {
-                using (var memoryStream = new MemoryStream())
+                if (typeOfTrip == 0)
                 {
-                    stream.CopyTo(memoryStream);
-                    fileBytes = memoryStream.ToArray();
+                    return BadRequest("Please choosen type of trip");
                 }
-                return File(fileBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "TemplateDataTrip.xlsx");
+                if (typeOfTrip == Constant.CHUYEN_DI_LIEN_TINH)
+                {
+                    var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "templates", "Template_Inter_Provincial.xlsx");
+                    if
+                        (!System.IO.File.Exists(filePath))
+                    {
+                        return NotFound();
+                    }
+                    byte[] fileBytes;
+                    using (var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read))
+                    {
+                        using (var memoryStream = new MemoryStream())
+                        {
+                            stream.CopyTo(memoryStream);
+                            fileBytes = memoryStream.ToArray();
+                        }
+                        return File(fileBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Template_Inter_Provincial.xlsx");
+                    }
+                }
+                if (typeOfTrip == Constant.VE_XE_TIEN_CHUYEN)
+                {
+                    var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "templates", "Template_Trip_Convenience.xlsx");
+                    if
+                        (!System.IO.File.Exists(filePath))
+                    {
+                        return NotFound();
+                    }
+                    byte[] fileBytes;
+                    using (var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read))
+                    {
+                        using (var memoryStream = new MemoryStream())
+                        {
+                            stream.CopyTo(memoryStream);
+                            fileBytes = memoryStream.ToArray();
+                        }
+                        return File(fileBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Template_Trip_Convenience.xlsx");
+                    }
+                }
+                return BadRequest("Please choosen type of trip");
             }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
+
         }
         [Authorize(Roles = "Staff")]
-        [HttpPost("importTrip/{typeOfTrip}")]
+        [HttpPost("importTrip/typeOfTrip")]
         public async Task<IActionResult> importTrip(IFormFile fileExcelTrip, int typeOfTrip)
         {
 
@@ -129,12 +165,25 @@ namespace MyAPI.Controllers
                 return BadRequest("Token is required.");
             }
             var staffId = _getInforFromToken.GetIdInHeader(token);
-            var (validEntries, invalidEntries) = await _serviceImport.ImportTrip(fileExcelTrip, staffId, typeOfTrip);
-            return Ok(new
+            if (typeOfTrip == Constant.CHUYEN_DI_LIEN_TINH)
             {
-                validEntries,
-                invalidEntries
-            });
+                var (validEntriesI, invalidEntriesI) = await _serviceImport.ImportTrip(fileExcelTrip, staffId, typeOfTrip);
+                return Ok(new
+                {
+                    ValidEntries = validEntriesI,
+                    InvalidEntries = invalidEntriesI
+                });
+            }
+            else
+            {
+                var (validEntriesC, invalidEntriesC) = await _serviceImport.ImportTripConvenience(fileExcelTrip, staffId, typeOfTrip);
+                return Ok(new
+                {
+                    ValidEntries = validEntriesC,
+                    InvalidEntries = invalidEntriesC
+                });
+
+            }
         }
         [Authorize(Roles = "Staff")]
         [HttpPost("confirmImportTrip")]
