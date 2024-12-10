@@ -269,36 +269,12 @@ namespace MyAPI.Repositories.Impls
             }
         }
 
-        public async Task ChangePassword(ChangePasswordDTO changeEmailDTO)
+        public async Task ChangePassword(ChangePasswordDTO changeEmailDTO, int userId)
         {
             try
             {
-                if (string.IsNullOrEmpty(changeEmailDTO.CurrentEmail))
-                {
-                    throw new Exception("Email is not null or empty");
-                }
-                if (!IsValidEmail(changeEmailDTO.CurrentEmail))
-                {
-                    throw new Exception("Email is invalid.");
-                }
 
-
-                var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == changeEmailDTO.CurrentEmail);
-                var sendMailDTO = new SendMailDTO
-                {
-                    FromEmail = "duclinh5122002@gmail.com",
-                    Password = "jetj haze ijdw euci",
-                    ToEmail = changeEmailDTO.CurrentEmail,
-                    Subject = "Đổi mật khẩu thành công",
-                    Body = "Mật khẩu của bạn đã được đổi thành công."
-                };
-
-                bool isSent = await _sendMail.SendEmail(sendMailDTO);
-                if (!isSent)
-                {
-                    throw new Exception("Cannot send notification.");
-                }
-
+                var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
                 if (user == null)
                 {
                     throw new Exception("Not exist user!");
@@ -314,10 +290,9 @@ namespace MyAPI.Repositories.Impls
                 var hashPassword = new HashPassword();
                 string hashedCurrentPassword = hashPassword.HashMD5Password(changeEmailDTO.OldPassword);
 
-
                 if (user.Password != hashedCurrentPassword)
                 {
-                    throw new Exception("Password is not correct");
+                    throw new Exception("Password Current is not correct");
                 }
 
 

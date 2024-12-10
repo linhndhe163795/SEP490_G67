@@ -14,11 +14,13 @@ namespace MyAPI.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUserRepository _userRepository;
+        private readonly GetInforFromToken _getInforFromToken;
         
 
-        public UserController(IUserRepository userRepository, SendMail sendMailHelper)
+        public UserController(IUserRepository userRepository, SendMail sendMailHelper, GetInforFromToken getInforFromToken)
         {
             _userRepository = userRepository;
+            _getInforFromToken = getInforFromToken;
             
         }
 
@@ -28,7 +30,17 @@ namespace MyAPI.Controllers
         {
             try
             {
-                await _userRepository.ChangePassword(changePasswordDTO);
+                string token = Request.Headers["Authorization"];
+                if (token.StartsWith("Bearer"))
+                {
+                    token = token.Substring("Bearer ".Length).Trim();
+                }
+                if (string.IsNullOrEmpty(token))
+                {
+                    return BadRequest("Token is required.");
+                }
+                var userId = _getInforFromToken.GetIdInHeader(token);
+                await _userRepository.ChangePassword(changePasswordDTO, userId);
 
                 
                 return Ok("Change password successfully");
