@@ -247,9 +247,7 @@ namespace MyAPI.Repositories.Impls
                                               .Select(rq => rq.VehicleId)
                                               .FirstOrDefaultAsync();
                 var requestDetails = await _context.RequestDetails.FirstOrDefaultAsync(x => x.RequestId == requestId);
-                _context.RequestDetails.Remove(requestDetails);
-                _context.Requests.Remove(checkRequestExits);
-                await _context.SaveChangesAsync();
+               
 
                 if (vehicleID == 0 || vehicleID == null)
                 {
@@ -257,7 +255,9 @@ namespace MyAPI.Repositories.Impls
                 }
 
                 UpdateVehicleByStaff(vehicleID.Value, user.Id, isApprove);
-
+                _context.RequestDetails.Remove(requestDetails);
+                _context.Requests.Remove(checkRequestExits);
+                await _context.SaveChangesAsync();
                 return isApprove;
             }
             catch (Exception ex)
@@ -587,7 +587,7 @@ namespace MyAPI.Repositories.Impls
                 vehicleUpdate.UpdateAt = DateTime.Now;
 
                 _context.Vehicles.Update(vehicleUpdate);
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
 
                 return true;
             }
