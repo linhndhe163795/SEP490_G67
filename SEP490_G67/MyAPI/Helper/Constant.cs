@@ -18,6 +18,7 @@
         public const int VE_XE_LIEN_TINH = 1;
         public const int VE_XE_TIEN_CHUYEN = 2;
         public const int VE_XE_DU_LICH = 3;
+        public const int VE_BAO_XE = 4;
 
         public const int SO_GHE_XE_TIEN_CHUYEN = 5;
 

@@ -19,7 +19,7 @@ namespace MyAPI.Infrastructure.Interfaces
         Task<bool> CreateRequestRentVehicleAsync(RentVehicleAddDTO rentVehicleAddDTO);
         Task<bool> CreateRequestRentDriverAsync(RequestDetailForRentDriver rentVehicleAddDTO);
         Task<bool> CreateRequestCovenient(ConvenientTripDTO convenientTripDTO);
-        Task<bool> UpdateStatusRequestConvenient(int requestId, bool choose);
+        Task<bool> UpdateStatusRequestConvenient(int requestId, bool choose, int? vechicleId);
         Task<List<RequestDTO>> getListRequestForUser(int userId);
         Task updateRequest(RequestDetailDTO requestDetailDTO);
         Task<List<RequestDTO>> GetListRequestForDriver(int driverId);

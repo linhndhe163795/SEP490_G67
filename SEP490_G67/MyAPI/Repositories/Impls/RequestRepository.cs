@@ -317,7 +317,7 @@ namespace MyAPI.Repositories.Impls
                     throw new Exception($"Request with ID {requestId} not found.");
                 }
 
-                existingRequest.Status = request.Status;
+                existingRequest.Status = true;
                 existingRequest.Note = request.Note;
                 existingRequest.UpdateAt = DateTime.UtcNow; 
              
@@ -791,7 +791,7 @@ namespace MyAPI.Repositories.Impls
 
             return true;
         }
-        public async Task<bool> UpdateStatusRequestConvenient(int requestId, bool choose)
+        public async Task<bool> UpdateStatusRequestConvenient(int requestId, bool choose, int? vehicleId)
         {
             var checkRequest = await _context.Requests.FirstOrDefaultAsync(s => s.Id == requestId);
             if (checkRequest == null)
@@ -842,11 +842,11 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception("Invalid TypeId for determining TypeOfTrip.");
             }
 
-            int typeOfTrip = checkRequest.TypeId == 5 ? 2 : 4;
+            int typeOfTrip = checkRequest.TypeId == 5 ? Constant.VE_XE_TIEN_CHUYEN : Constant.VE_BAO_XE;
 
             decimal price = checkRequestDetail.Price ?? throw new Exception("Price is required.");
             decimal? pricePromotion = null;
-
+            pricePromotion = price;
             if (!string.IsNullOrEmpty(checkRequestDetail.PromotionCode))
             {
                 var discount = await _context.Promotions
@@ -859,8 +859,8 @@ namespace MyAPI.Repositories.Impls
                     throw new Exception("Invalid promotion code or no discount available.");
                 }
 
-                pricePromotion = price;
-                price = price / (1 - (discount / 100m));
+                price = price + (price * discount / 100);
+             
             }
 
             //if (checkRequestDetail.VehicleId == 0 || checkRequestDetail.VehicleId == null)
@@ -879,9 +879,11 @@ namespace MyAPI.Repositories.Impls
                 TimeFrom = checkRequestDetail.StartTime,
                 TimeTo = DateTime.Now,
                 UserId = checkRequest.UserId,
-                VehicleId = checkRequestDetail.VehicleId,
+                VehicleId = vehicleId,
                 TripId = tripId,
-                TypeOfTicket = Constant.VE_XE_TIEN_CHUYEN,
+                Note = "Chuyến đi đã được staff phê duyệt ",
+                Description = "Xe sẽ đón bạn lúc: " + checkRequestDetail.StartTime + " tại: " + checkRequestDetail.StartLocation,
+                TypeOfTicket = typeOfTrip,
                 TypeOfPayment = 2,
                 Status = "Thanh toán bằng tiền mặt",
                 CreatedAt = DateTime.Now,
@@ -902,22 +904,7 @@ namespace MyAPI.Repositories.Impls
                 await _promotionUserRepository.DeletePromotionAfterPayment(checkRequest.UserId, promotionUserId);
             }
             await _context.SaveChangesAsync();
-
-            var paymentDTO = new PaymentAddDTO
-            {
-                UserId = addTicket.UserId,
-                Code = addTicket.CodePromotion,
-                Description = "",
-                Price = addTicket.PricePromotion,
-                TicketId = addTicket.Id,
-                TypeOfPayment = 2,
-                Time = DateTime.Now,
-            };
-            var paymentResult = await _paymentRepository.addPayment(paymentDTO);
-            if (paymentResult == null)
-            {
-                throw new Exception("Add Payment Fails!!");
-            }
+          
             return true;
         }
         public async Task<List<RequestDTO>> getListRequestForUser(int userId)

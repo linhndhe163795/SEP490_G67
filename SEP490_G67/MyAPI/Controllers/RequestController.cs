@@ -278,11 +278,11 @@ namespace MyAPI.Controllers
         }
         [Authorize(Roles = "Staff")]
         [HttpPost("ConvenientTripUpdateForStaff")]
-        public async Task<IActionResult> UpdateRequestConvenientTrip(int requestId, bool choose)
+        public async Task<IActionResult> UpdateRequestConvenientTrip(int requestId, bool choose, int? vehicleId)
         {
             try
             {
-                var result = await _requestRepository.UpdateStatusRequestConvenient(requestId, choose);
+                var result = await _requestRepository.UpdateStatusRequestConvenient(requestId, choose, vehicleId);
                 return Ok(new { success = true, message = "Request updated successfully." });
             }
             catch (UnauthorizedAccessException ex)
