@@ -254,6 +254,7 @@ namespace MyAPI.Repositories.Impls
                 await _context.Tickets.AddAsync(ticket);
 
                 request.Status = true;
+                request.Note = "Đã xác nhận";
                 await _context.SaveChangesAsync();
 
                 var user = await _context.Users.FindAsync(request.UserId);

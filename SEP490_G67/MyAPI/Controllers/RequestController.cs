@@ -135,7 +135,7 @@ namespace MyAPI.Controllers
             }
         }
         [Authorize(Roles = "Staff")]
-        [HttpPost("acceptCancleTicket/{id}")]
+        [HttpPost("acceptCancleTicket/id")]
         public async Task<IActionResult> AcceptCancleTicketRequest(int id)
         {
             try

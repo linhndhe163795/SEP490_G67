@@ -474,6 +474,7 @@ namespace MyAPI.Repositories.Impls
                 inforTicketCancle.t.NumberTicket = 0;
                 var UserCancleTicket = new UserCancleTicket
                 {
+
                     PaymentId = inforTicketCancle.p.PaymentId,
                     ReasonCancle = inforTicketCancle.r.Description,
                     UserId = inforTicketCancle.r.UserId,
@@ -805,7 +806,7 @@ namespace MyAPI.Repositories.Impls
                 throw new UnauthorizedAccessException("Invalid user ID from token.");
             }
 
-            if(checkRequest.TypeId != 5)
+            if(checkRequest.TypeId != 5 && checkRequest.TypeId != 6)
             {
                 throw new Exception("Request musst be for rent convenient!!!");
             }
@@ -862,10 +863,10 @@ namespace MyAPI.Repositories.Impls
                 price = price / (1 - (discount / 100m));
             }
 
-            if (checkRequestDetail.VehicleId == 0 || checkRequestDetail.VehicleId == null)
-            {
-                throw new Exception("Vehicle Id null please update VehicleId before accpet!!");
-            }
+            //if (checkRequestDetail.VehicleId == 0 || checkRequestDetail.VehicleId == null)
+            //{
+            //    throw new Exception("Vehicle Id null please update VehicleId before accpet!!");
+            //}
 
             var addTicket = new Ticket
             {
