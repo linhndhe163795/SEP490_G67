@@ -747,7 +747,7 @@ namespace MyAPI.Repositories.Impls
         {
             try
             {
-                var ticketById = await _context.Tickets.FirstOrDefaultAsync(x => x.TypeOfPayment == Constant.TIEN_MAT && x.Id == id && x.TypeOfTicket == Constant.XE_LIEN_TINH);
+                var ticketById = await _context.Tickets.FirstOrDefaultAsync(x => x.TypeOfPayment == Constant.TIEN_MAT && x.Id == id);
                 if (ticketById == null)
                 {
                     throw new Exception("Not found ticket valid");
