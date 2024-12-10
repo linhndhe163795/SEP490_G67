@@ -5,8 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using MyAPI.DTOs.TicketDTOs;
 using MyAPI.Helper;
 using MyAPI.Infrastructure.Interfaces;
-using MyAPI.Models;
-using MyAPI.Repositories.Impls;
+
 
 namespace MyAPI.Controllers
 {

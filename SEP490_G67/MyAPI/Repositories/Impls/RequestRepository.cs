@@ -60,6 +60,8 @@ namespace MyAPI.Repositories.Impls
                     UpdatedAt = rd.UpdateAt,
                     UpdatedBy = rd.UpdateBy,
                     Price = rd.Price,
+                    phoneNumber = rd.PhoneNumber,
+                    promotionCode = rd.PromotionCode
                 })
                 .FirstOrDefaultAsync();
 

@@ -9,6 +9,8 @@
         public string? Note { get; set; }
         public int? typeRequestId { get; set; }
         public string? typeName { get; set; }
+        public string? phoneNumber { get; set; }
+        public string? promotionCode { get; set; }
         public string? StartLocation { get; set; }
         public string? EndLocation { get; set; }
         public DateTime? StartTime { get; set; }
