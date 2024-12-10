@@ -98,7 +98,7 @@ namespace MyAPI.Controllers
             return Ok("Update success!");
         }
 
-        [Authorize(Roles = "Staff")]
+        [Authorize(Roles = "Staff,Driver,VehicleOwner")]
         [HttpGet("/GetRequestDetailById/{id}")]
         public async Task<IActionResult> GetRequestDetail(int id)
         {
@@ -109,7 +109,7 @@ namespace MyAPI.Controllers
             }
             return Ok(requestdetail);
         }
-        [Authorize(Roles = "Staff")]
+        [Authorize(Roles = "Staff,Driver,VehicleOwner")]
         [HttpPost("Delete/{id}")]
         public async Task<IActionResult> DeleteRequest(int id)
         {
