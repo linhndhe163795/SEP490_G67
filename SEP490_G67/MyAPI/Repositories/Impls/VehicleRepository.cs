@@ -206,7 +206,7 @@ namespace MyAPI.Repositories.Impls
                 }
 
                 checkRequestExits.Note = isApprove ? "Đã xác nhận" : "Từ chối xác nhận";
-                checkRequestExits.Status = isApprove;
+                checkRequestExits.Status = true;
                 var updateRequest = await _requestRepository.UpdateRequestVehicleAsync(requestId, checkRequestExits);
 
                 if (!updateRequest)
@@ -247,16 +247,14 @@ namespace MyAPI.Repositories.Impls
                                               .Select(rq => rq.VehicleId)
                                               .FirstOrDefaultAsync();
                 var requestDetails = await _context.RequestDetails.FirstOrDefaultAsync(x => x.RequestId == requestId);
-               
+
 
                 if (vehicleID == 0 || vehicleID == null)
                 {
                     throw new Exception("Vehicle ID not found in request details.");
                 }
 
-                UpdateVehicleByStaff(vehicleID.Value, user.Id, isApprove);
-                _context.RequestDetails.Remove(requestDetails);
-                _context.Requests.Remove(checkRequestExits);
+                await UpdateVehicleByStaff(vehicleID.Value, user.Id, isApprove);
                 await _context.SaveChangesAsync();
                 return isApprove;
             }
@@ -546,7 +544,7 @@ namespace MyAPI.Repositories.Impls
         //    }
         //}
 
-        private async Task<bool> UpdateVehicleByStaff(int? id, int? userIdUpdate, bool updateStatus)
+        private async Task UpdateVehicleByStaff(int? id, int? userIdUpdate, bool updateStatus)
         {
             try
             {
@@ -576,12 +574,7 @@ namespace MyAPI.Repositories.Impls
                 {
                     throw new Exception("Vehicle not found in the system.");
                 }
-                if(updateStatus == false)
-                {
-                    _context.Vehicles.Remove(vehicleUpdate);
-                    await _context.SaveChangesAsync();
-                    return true;
-                }
+
                 vehicleUpdate.Status = updateStatus;
                 vehicleUpdate.UpdateBy = userIdUpdate.Value;
                 vehicleUpdate.UpdateAt = DateTime.Now;
@@ -589,7 +582,7 @@ namespace MyAPI.Repositories.Impls
                 _context.Vehicles.Update(vehicleUpdate);
                 await _context.SaveChangesAsync();
 
-                return true;
+
             }
             catch (Exception ex)
             {
@@ -875,7 +868,7 @@ namespace MyAPI.Repositories.Impls
                     throw new Exception("Not found driver");
                 }
                 var checkLicensePlate = await _context.Vehicles
-                                    .Where(s => s.LicensePlate.Equals(updateDTO.LicensePlate) && s.Id != id) 
+                                    .Where(s => s.LicensePlate.Equals(updateDTO.LicensePlate) && s.Id != id)
                                     .FirstOrDefaultAsync();
                 if (checkLicensePlate != null)
                 {
