@@ -32,6 +32,7 @@ namespace MyAPI.MappingProfile
             CreateMap<Role, UserLoginDTO>().ReverseMap();
             CreateMap<User, ForgotPasswordDTO>().ReverseMap();
             CreateMap<User, UserPostLoginDTO>().ReverseMap();
+            CreateMap<Driver, UserPostLoginDTO>().ReverseMap();
             CreateMap<User, VehicleOwnerDTO>().ReverseMap();
             CreateMap<UserPostLoginDTO, User>().ReverseMap();
             CreateMap<User, AccountListDTO>().ReverseMap();

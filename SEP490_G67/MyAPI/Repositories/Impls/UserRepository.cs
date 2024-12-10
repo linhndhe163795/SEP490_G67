@@ -23,9 +23,11 @@ namespace MyAPI.Repositories.Impls
         private readonly GetInforFromToken _tokenHelper;
         private readonly HashPassword _hassPassword;
         private readonly IPointUserRepository _pointUserRepository;
-        public UserRepository(SEP490_G67Context _context, IPointUserRepository pointUserRepository, SendMail sendMail, IMapper mapper, HashPassword hashPassword, IHttpContextAccessor httpContextAccessor, GetInforFromToken tokenHelper) : base(_context)
+        private readonly GetInforFromToken _getInforFromToken;
+        public UserRepository(GetInforFromToken getInforFromToken, SEP490_G67Context _context, IPointUserRepository pointUserRepository, SendMail sendMail, IMapper mapper, HashPassword hashPassword, IHttpContextAccessor httpContextAccessor, GetInforFromToken tokenHelper) : base(_context)
         {
             _httpContextAccessor = httpContextAccessor;
+            _getInforFromToken = getInforFromToken;
             _tokenHelper = tokenHelper;
             _mapper = mapper;
             _hassPassword = hashPassword;
@@ -425,18 +427,44 @@ namespace MyAPI.Repositories.Impls
 
             try
             {
-                var user = await _context.Users
-                    .Include(u => u.UserRoles)
+                var token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+                var role = _tokenHelper.GetRoleFromToken(token);
+
+                object user;
+
+                if (role == "Driver")
+                {
+                    user = await _context.Drivers.FirstOrDefaultAsync(x => x.Id == id);
+                }
+                else
+                {
+                    user = await _context.Users
+                        .Include(u => u.UserRoles)
                         .ThenInclude(ur => ur.Role)
-                    .FirstOrDefaultAsync(x => x.Id == id);
+                        .FirstOrDefaultAsync(x => x.Id == id);
+                }
 
                 if (user == null)
                 {
                     throw new Exception("User not found.");
                 }
 
-                var userMapper = _mapper.Map<UserPostLoginDTO>(user);
-                userMapper.Role = user.UserRoles.FirstOrDefault()?.Role?.RoleName;
+                UserPostLoginDTO userMapper;
+
+                if (role == "Driver" && user is Driver driver)
+                {
+                    userMapper = _mapper.Map<UserPostLoginDTO>(driver);
+                    userMapper.Role = "Driver";
+                }
+                else if (user is User appUser)
+                {
+                    userMapper = _mapper.Map<UserPostLoginDTO>(appUser);
+                    userMapper.Role = appUser.UserRoles.FirstOrDefault()?.Role?.RoleName;
+                }
+                else
+                {
+                    throw new Exception("Unable to map user data.");
+                }
 
                 return userMapper;
             }
@@ -486,8 +514,8 @@ namespace MyAPI.Repositories.Impls
         {
             try
             {
-                if(string.IsNullOrWhiteSpace(vehicleOwnerRegister.Username))
-            {
+                if (string.IsNullOrWhiteSpace(vehicleOwnerRegister.Username))
+                {
                     throw new Exception("Username cannot be null or empty.");
                 }
 
@@ -554,6 +582,6 @@ namespace MyAPI.Repositories.Impls
             }
         }
 
-       
+
     }
 }

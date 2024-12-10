@@ -8,6 +8,7 @@
         public string Role { get; set; } = null!;
         public string NumberPhone { get; set; } = null!;
         public string Password { get; set; } = null!;
+        public string Liscense { get; set; }
         public string? Avatar { get; set; }
         public string? FullName { get; set; }
         public string? Address { get; set; }
