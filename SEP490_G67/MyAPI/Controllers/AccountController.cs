@@ -67,7 +67,7 @@ namespace MyAPI.Controllers
         }
 
         [Authorize(Roles = "Admin")]
-        [HttpPost("deleteAccount/{id}")]
+        [HttpPost("deleteAccount/id")]
         public async Task<IActionResult> DelteAccountById(int id)
         {
             try
