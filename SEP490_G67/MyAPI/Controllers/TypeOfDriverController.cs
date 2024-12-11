@@ -20,7 +20,7 @@ namespace MyAPI.Controllers
         {
             _typeOfDriverRepository = typeOfDriverRepository;
         }
-        [Authorize(Roles = "Admin")]
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> CreateTypeOfDriver([FromBody] UpdateTypeOfDriverDTO updateTypeOfDriverDto)
         {
@@ -32,7 +32,7 @@ namespace MyAPI.Controllers
             var typeOfDriver = await _typeOfDriverRepository.CreateTypeOfDriverAsync(updateTypeOfDriverDto);
             return CreatedAtAction(nameof(GetTypeOfDriverById), new { id = typeOfDriver.Id }, typeOfDriver);
         }
-        [Authorize(Roles = "Admin")]
+        [Authorize]
         [HttpPost("{id}")]
         public async Task<IActionResult> UpdateTypeOfDriver(int id, [FromBody] UpdateTypeOfDriverDTO updateTypeOfDriverDto)
         {
@@ -64,7 +64,7 @@ namespace MyAPI.Controllers
             await _typeOfDriverRepository.Delete(typeOfDriver);
             return Ok("Deleted successfully");
         }
-        [Authorize(Roles = "Admin")]
+        [Authorize]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetTypeOfDriverById(int id)
         {
@@ -76,7 +76,7 @@ namespace MyAPI.Controllers
 
             return Ok(typeOfDriver);
         }
-        [Authorize(Roles = "Admin")]
+        [Authorize]
         [HttpGet]
         public async Task<IActionResult> GetAllTypeOfDrivers()
         {

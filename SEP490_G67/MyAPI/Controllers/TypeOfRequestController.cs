@@ -20,7 +20,7 @@ namespace MyAPI.Controllers
             _typeOfRequestRepository = typeOfRequestRepository;
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize]
         [HttpGet]
         public async Task<IActionResult> GetAllTypeOfRequests()
         {

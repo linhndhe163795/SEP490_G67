@@ -862,12 +862,6 @@ namespace MyAPI.Repositories.Impls
                 price = price + (price * discount / 100);
              
             }
-
-            //if (checkRequestDetail.VehicleId == 0 || checkRequestDetail.VehicleId == null)
-            //{
-            //    throw new Exception("Vehicle Id null please update VehicleId before accpet!!");
-            //}
-
             var addTicket = new Ticket
             {
                 Price = price,

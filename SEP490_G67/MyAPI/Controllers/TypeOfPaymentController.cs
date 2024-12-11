@@ -20,7 +20,7 @@ namespace MyAPI.Controllers
             _typeOfPaymentRepository = typeOfPaymentRepository;
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize]
         [HttpGet]
         public async Task<IActionResult> GetAllTypeOfPayments()
         {

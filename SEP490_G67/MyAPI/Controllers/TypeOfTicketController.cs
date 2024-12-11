@@ -20,7 +20,7 @@ namespace MyAPI.Controllers
             _typeOfTicketRepository = typeOfTicketRepository;
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize]
         [HttpGet]
         public async Task<IActionResult> GetAllTypeOfTickets()
         {

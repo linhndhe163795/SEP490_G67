@@ -20,7 +20,7 @@ namespace MyAPI.Controllers
             _typeOfTripRepository = typeOfTripRepository;
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize]
         [HttpGet]
         public async Task<IActionResult> GetAllTypeOfTrips()
         {
