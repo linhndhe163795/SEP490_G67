@@ -90,12 +90,12 @@ namespace MyAPI.Controllers
         }
 
         [Authorize(Roles = "Admin")]
-        [HttpPost("updateAccount/{id}/{newIdUpdate}")]
-        public async Task<IActionResult> UpdateAccountById(int id, int newIdUpdate)
+        [HttpPost("updateAccount/userId/newRoleId")]
+        public async Task<IActionResult> UpdateAccountById(int userId, int newRoleId)
         {
             try
             {
-                var accountUpdated = await _accountRepository.UpdateRoleOfAccount(id, newIdUpdate);
+                var accountUpdated = await _accountRepository.UpdateRoleOfAccount(userId, newRoleId);
 
                 return Ok(new { Message = "Account Update successfully." });
 
