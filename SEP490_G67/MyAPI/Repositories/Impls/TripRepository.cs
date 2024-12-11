@@ -735,7 +735,7 @@ namespace MyAPI.Repositories.Impls
             try
             {
                 var listStartPoint = await _context.Trips
-                    .Where(x => !string.IsNullOrEmpty(x.PointStart))
+                    .Where(x => !string.IsNullOrEmpty(x.PointStart) && x.Status == true && x.TypeOfTrip == Constant.CHUYEN_DI_LIEN_TINH)
                     .Select(x => x.PointStart)
                     .Distinct()
                     .ToListAsync();
@@ -758,7 +758,7 @@ namespace MyAPI.Repositories.Impls
             try
             {
                 var listPointEnd = await _context.Trips
-                    .Where(x => !string.IsNullOrEmpty(x.PointEnd))
+                    .Where(x => !string.IsNullOrEmpty(x.PointEnd) && x.Status == true && x.TypeOfTrip == Constant.CHUYEN_DI_LIEN_TINH)
                     .Select(x => x.PointEnd)
                     .Distinct()
                     .ToListAsync();

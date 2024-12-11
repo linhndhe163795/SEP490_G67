@@ -214,12 +214,12 @@ namespace MyAPI.Controllers
             }
         }
         [Authorize]
-        [HttpGet("getEndPointTripFromVehicle/{vehicleId}")]
-        public async Task<IActionResult> getEndPointTripFromVehicle(int vehicleId)
+        [HttpGet("getEndPointTripFromVehicle/startPoint/{vehicleId}")]
+        public async Task<IActionResult> getEndPointTripFromVehicle(int vehicleId,string startPoint)
         {
             try
             {
-                var listEndPoint = await _vehicleRepository.GetListEndPointByVehicleId(vehicleId);
+                var listEndPoint = await _vehicleRepository.GetListEndPointByVehicleId(vehicleId, startPoint);
                 if (listEndPoint == null)
                 {
                     return NotFound();

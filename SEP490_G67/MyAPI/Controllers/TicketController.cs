@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using MyAPI.DTOs.TicketDTOs;
 using MyAPI.Helper;
 using MyAPI.Infrastructure.Interfaces;
+using MyAPI.Models;
 
 
 namespace MyAPI.Controllers
@@ -71,6 +72,25 @@ namespace MyAPI.Controllers
                 var priceTrip = await _ticketRepository.GetPriceFromPoint(ticketFromDriver, vehicleId);
                 await _ticketRepository.CreatTicketFromDriver(priceTrip, vehicleId, ticketFromDriver, driverId, numberTicket);
                 return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [Authorize]
+        [HttpGet("getPriceFromPoint/pointStart/pointEnd/vehicleId")]
+        public async Task<IActionResult> getPriceFromPoint(string pointStart, string pointEnd,int vehicleId)
+        {
+            try
+            {
+                var ticketFromDriver = new TicketFromDriverDTOs
+                {
+                    PointEnd = pointEnd,
+                    PointStart = pointStart
+                };
+                var priceTrip = await _ticketRepository.GetPriceFromPoint(ticketFromDriver, vehicleId);
+                return Ok(priceTrip);
             }
             catch (Exception ex)
             {

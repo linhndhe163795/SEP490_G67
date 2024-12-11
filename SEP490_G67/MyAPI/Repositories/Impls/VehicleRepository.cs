@@ -296,7 +296,7 @@ namespace MyAPI.Repositories.Impls
             }
         }
 
-        public async Task<List<EndPointDTO>> GetListEndPointByVehicleId(int vehicleId)
+        public async Task<List<EndPointDTO>> GetListEndPointByVehicleId(int vehicleId, string startPoint)
         {
             try
             {
@@ -316,7 +316,7 @@ namespace MyAPI.Repositories.Impls
                                             on v.Id equals vt.VehicleId
                                             join t in _context.Trips
                                             on vt.TripId equals t.Id
-                                            where v.Id == vehicleId
+                                            where v.Id == vehicleId && t.PointStart == startPoint
                                             select t.PointEnd).Distinct()
                                          .ToListAsync();
 
