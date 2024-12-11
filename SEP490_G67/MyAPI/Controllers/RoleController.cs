@@ -53,7 +53,7 @@ namespace MyAPI.Controllers
             }
 
         }
-        [HttpPost("updateRole/{id}")]
+        [HttpPost("updateRole/id")]
         public async Task<IActionResult> UpdateRole(int id,RoleAddDTO roleAddDTO)
         {
             try
@@ -67,7 +67,7 @@ namespace MyAPI.Controllers
             }
         }
 
-        [HttpPost("deleteRole/{id}")]
+        [HttpPost("deleteRole/id")]
         public async Task<IActionResult> DeleteRole(int id)
         {
             try
