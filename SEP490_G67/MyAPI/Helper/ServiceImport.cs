@@ -203,7 +203,7 @@ namespace MyAPI.Helper
                             PointStart = row.Cell(5).GetValue<string>(),
                             PointEnd = row.Cell(6).GetValue<string>(),
                             LicensePlate = row.Cell(7).GetValue<string>(),
-                            TypeOfTrip = Constant.CHUYEN_DI_LIEN_TINH,
+                            TypeOfTrip = Constant.XE_TIEN_CHUYEN,
                             Status = true,
                             CreatedAt = DateTime.Now,
                             CreatedBy = staffId,
