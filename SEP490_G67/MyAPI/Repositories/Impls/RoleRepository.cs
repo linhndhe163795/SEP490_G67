@@ -57,7 +57,7 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception("Role has no exits!!!");
             }else
             {
-                role.Status = false;
+                role.Status = !role.Status;
                 await _context.SaveChangesAsync();
                 return true;
             }
