@@ -195,19 +195,36 @@ namespace MyAPI.Helper
                     {
                         rowNumber++;
                         List<string> error = new List<string>();
+                        var typeOfTripCell = row.Cell(4).GetValue<string>();
+                        if (string.IsNullOrWhiteSpace(typeOfTripCell) || (typeOfTripCell != "2" && typeOfTripCell != "3"))
+                        {
+                            error.Add($"Invalid or empty type Of Trip (only 2 or 3 allowed) in row: {rowNumber}");
+                        }
 
+                        var priceCell = row.Cell(5).GetValue<string>();
+                        if (string.IsNullOrWhiteSpace(priceCell) || !int.TryParse(priceCell, out int price))
+                        {
+                            error.Add($"Invalid or empty price in row: {rowNumber}");
+                        }
                         var trip = new TripConvenientDTO
                         {
                             Name = row.Cell(1).GetValue<string>(),
                             Description = row.Cell(3).GetValue<string>(),
-                            PointStart = row.Cell(5).GetValue<string>(),
-                            PointEnd = row.Cell(6).GetValue<string>(),
-                            LicensePlate = row.Cell(7).GetValue<string>(),
-                            TypeOfTrip = Constant.XE_TIEN_CHUYEN,
+                            PointStart = row.Cell(6).GetValue<string>(),
+                            PointEnd = row.Cell(7).GetValue<string>(),
+                            LicensePlate = row.Cell(8).GetValue<string>(),
                             Status = true,
                             CreatedAt = DateTime.Now,
                             CreatedBy = staffId,
                         };
+                        if (string.IsNullOrWhiteSpace(typeOfTripCell) || !int.TryParse(typeOfTripCell, out int typeOfTripEntries) || (typeOfTripEntries != 2 && typeOfTripEntries != 3))
+                        {
+                            error.Add($"Invalid or empty type Of Trip (only 2 or 3 allowed) in row: {rowNumber}");
+                        }
+                        else
+                        {
+                            trip.TypeOfTrip = typeOfTripEntries;
+                        }
                         if (!TimeSpan.TryParse(row.Cell(2).GetString(), out var parsedStartTime))
                         {
                             trip.ErrorMessages.Add("Invalid StartTime format in row : " + rowNumber);
@@ -216,9 +233,9 @@ namespace MyAPI.Helper
                         {
                             trip.StartTime = parsedStartTime;
                         }
-                        if (!int.TryParse(row.Cell(4).GetString(), out var parsedPrice) || parsedPrice <= 0)
+                        if (!int.TryParse(row.Cell(5).GetString(), out var parsedPrice) || parsedPrice <= 0 || parsedPrice.ToString() == "null")
                         {
-                            trip.ErrorMessages.Add("Invalid or negative Price in row: " + rowNumber);
+                            trip.ErrorMessages.Add("Invalid or negative price in row: " + rowNumber);
                         }
                         else
                         {
@@ -248,7 +265,11 @@ namespace MyAPI.Helper
                         {
                             trip.ErrorMessages.Add("Description is empty in row: " + rowNumber);
                         }
-                        if (trip.ErrorMessages.Count == 0)
+                        if (trip.TypeOfTrip.ToString() == "null" || (trip.TypeOfTrip != 2 && trip.TypeOfTrip != 3))
+                        {
+                            trip.ErrorMessages.Add($"Invalid or empty type Of Trip (only 2 or 3 allowed) in row: {rowNumber}");
+                        }
+                        if (trip.ErrorMessages.Count == 0 && error.Count == 0)
                         {
                             validEntries.Add(trip);
                         }

@@ -32,7 +32,7 @@ namespace MyAPI.Repositories.Impls
                 var checkAccount = await _context.Users.SingleOrDefaultAsync(s => s.Id == id);
                 if (checkAccount != null)
                 {
-                    checkAccount.Status = false;
+                    checkAccount.Status = !checkAccount.Status;
                     await base.SaveChange();
                     return true;
                 }else

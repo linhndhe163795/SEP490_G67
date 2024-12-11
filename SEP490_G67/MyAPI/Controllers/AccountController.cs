@@ -75,7 +75,7 @@ namespace MyAPI.Controllers
                 var account = await _accountRepository.DeteleAccount(id);
                 if (account == true)
                 {
-                    return Ok("Delte Success!!");
+                    return Ok("Update status success!!");
                 }
                 else
                 {
