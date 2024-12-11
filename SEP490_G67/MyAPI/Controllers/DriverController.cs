@@ -79,7 +79,7 @@ namespace MyAPI.Controllers
             var UpdateDriverDtos = _mapper.Map<IEnumerable<DriverDTO>>(drivers);
             return Ok(UpdateDriverDtos);
         }
-        [Authorize(Roles = "Staff,Admin")]
+        [Authorize(Roles = "Staff,Admin,Driver")]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetDriverById(int id)
         {
@@ -120,7 +120,6 @@ namespace MyAPI.Controllers
             {
                 return BadRequest("Invalid driver data");
             }
-
             try
             {
                 var existingDriver = await _driverRepository.UpdateDriverAsync(id, updateDriverDto);

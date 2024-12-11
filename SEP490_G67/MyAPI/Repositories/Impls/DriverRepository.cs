@@ -130,7 +130,6 @@ namespace MyAPI.Repositories.Impls
             {
                 throw new ArgumentNullException(nameof(updateDriverDto), "Update data is required.");
             }
-
             var existingDriver = await Get(id);
             if (existingDriver == null)
             {
@@ -162,6 +161,7 @@ namespace MyAPI.Repositories.Impls
             }
             existingDriver.Name = updateDriverDto.Name;
             existingDriver.NumberPhone = updateDriverDto.NumberPhone;
+            existingDriver.Email = updateDriverDto.Email;
             existingDriver.Avatar = updateDriverDto.Avatar;
             existingDriver.Dob = updateDriverDto.Dob;
             existingDriver.License = updateDriverDto.License;
