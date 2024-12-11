@@ -38,7 +38,7 @@ namespace MyAPI.Repositories.Impls
             int requestId = add.requestId;
             bool choose = add.choose;
             int? vehicleId = add.vehicleId;
-            decimal price = add.price;
+            decimal? price = add.price;
 
             var checkRequest = await _context.Requests.FirstOrDefaultAsync(s => s.Id == requestId);
             if (checkRequest == null)
@@ -68,7 +68,7 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception("Invalid vehicle ID.");
             }
 
-            if (add.price <= 0)
+            if (add.price <= 0 && add.price != null)
             {
                 throw new Exception("Price must be greater than 0.");
             }
@@ -96,7 +96,7 @@ namespace MyAPI.Repositories.Impls
                         throw new Exception("Request not found in AccpetOrDeninedRentVehicle");
                     }
                     updateRequest.Note = "Từ chối yêu cầu";
-                    updateRequest.Status = choose;
+                    updateRequest.Status = true;
                     _context.Requests.Update(updateRequest);
                     await _context.SaveChangesAsync();
                     return true;
