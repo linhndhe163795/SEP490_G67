@@ -78,6 +78,7 @@ namespace MyAPI.Repositories.Impls
 
             if(checkRoleExits != null)
             {
+                checkRoleExits.RoleName = roleAddDTO.RoleName;
                 checkRoleExits.Status = roleAddDTO.Status;
                 checkRoleExits.UpdateBy = getUserId();
                 checkRoleExits.UpdateAt = DateTime.Now;
