@@ -53,7 +53,7 @@ namespace MyAPI.Controllers
         }
 
         [Authorize(Roles = "Driver, Staff")]
-        [HttpPost("createTicketFromDriver/{vehicleId}/{numberTicket}")]
+        [HttpPost("createTicketFromDriver/vehicleId/numberTicket")]
         public async Task<IActionResult> creatTicketFromDriver([FromBody] TicketFromDriverDTOs ticketFromDriver, int vehicleId, int numberTicket)
         {
             try
