@@ -65,7 +65,7 @@ namespace MyAPI.Repositories.Impls
 
         public async Task<List<RoleListDTO>> GetListRole()
         {
-            var listRoles = await _context.Roles.ToListAsync();
+            var listRoles = await _context.Roles.Where(x => x.Status == true).ToListAsync();
 
             var roleListDTOs = _mapper.Map<List<RoleListDTO>>(listRoles);
 
