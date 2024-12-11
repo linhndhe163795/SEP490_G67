@@ -186,15 +186,24 @@ namespace MyAPI.Controllers
             }
         }
         [Authorize(Roles = "Staff")]
-        [HttpPost("confirmImportTrip")]
-        public async Task<IActionResult> ConfirmImportTrip([FromBody] List<TripImportDTO> validEntries)
+        [HttpPost("confirmImportTrip/typeOfTrip")]
+        public async Task<IActionResult> ConfirmImportTrip([FromBody] List<TripImportDTO> validEntries, int typeOfTrip)
         {
             if (validEntries == null || !validEntries.Any())
             {
                 return BadRequest("No valid entries to import.");
             }
-            await _tripRepository.confirmAddValidEntryImport(validEntries);
-            return Ok("Successfully imported valid entries.");
+            if(typeOfTrip == Constant.CHUYEN_DI_LIEN_TINH)
+            {
+                await _tripRepository.confirmAddValidEntryImport(validEntries);
+                return Ok("Successfully imported valid entries.");
+            }
+            else
+            {
+                await _tripRepository.confirmAddValidEntriesConvenience(validEntries);
+                return Ok("Successfully imported valid entries.");
+            }
+            
         }
         [Authorize(Roles = "Staff")]
         [HttpPost("updateTrip/{id}")]

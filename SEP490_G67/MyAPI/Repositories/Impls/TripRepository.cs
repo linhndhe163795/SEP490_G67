@@ -698,24 +698,24 @@ namespace MyAPI.Repositories.Impls
             try
             {
                 var trip = await (from t in _context.Trips
-                                      join vh in _context.VehicleTrips
-                                      on t.Id equals vh.TripId
-                                      join v in _context.Vehicles
-                                      on vh.VehicleId equals v.Id
-                                      select new TripDTO
-                                      {
-                                          Id = t.Id,
-                                          Name = t.Name,
-                                          Description = t.Description,
-                                          PointStart = t.PointStart,
-                                          PointEnd = t.PointEnd,
-                                          Price = t.Price,
-                                          Status = t.Status,
-                                          TypeOfTrip = t.TypeOfTrip,
-                                          StartTime = t.StartTime,
-                                          VehicleId = v.Id,
-                                          LicensePlate = v.LicensePlate
-                                      }).FirstOrDefaultAsync(x => x.Id == id);
+                                  join vh in _context.VehicleTrips
+                                  on t.Id equals vh.TripId
+                                  join v in _context.Vehicles
+                                  on vh.VehicleId equals v.Id
+                                  select new TripDTO
+                                  {
+                                      Id = t.Id,
+                                      Name = t.Name,
+                                      Description = t.Description,
+                                      PointStart = t.PointStart,
+                                      PointEnd = t.PointEnd,
+                                      Price = t.Price,
+                                      Status = t.Status,
+                                      TypeOfTrip = t.TypeOfTrip,
+                                      StartTime = t.StartTime,
+                                      VehicleId = v.Id,
+                                      LicensePlate = v.LicensePlate
+                                  }).FirstOrDefaultAsync(x => x.Id == id);
 
                 if (trip == null)
                 {
@@ -802,6 +802,43 @@ namespace MyAPI.Repositories.Impls
                                                         x.TimeEndDetails == dateEndPoint &&
                                                         x.TimeStartDetils == dateStartPoint).Select(x => x.Id).FirstOrDefaultAsync();
                 return tripDetailsID;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task confirmAddValidEntriesConvenience(List<TripImportDTO> validEntries)
+        {
+            try
+            {
+                List<VehicleTrip> vt = new List<VehicleTrip>();
+
+                var tripMapper = _mapper.Map<List<Trip>>(validEntries);
+                _context.Trips.AddRange(tripMapper);
+                await _context.SaveChangesAsync();
+
+                for (int i = 0; i < tripMapper.Count; i++)
+                {
+                    string licensePlate = validEntries[i].LicensePlate;
+                    var vehicle = await _context.Vehicles.FirstOrDefaultAsync(v => v.LicensePlate == licensePlate);
+                    // assgin vehicle
+                    if (vehicle != null)
+                    {
+                        int vehicleId = vehicle.Id;
+                        var vehicleTrip = new VehicleTrip
+                        {
+                            TripId = tripMapper[i].Id,
+                            VehicleId = vehicleId,
+                            CreatedAt = tripMapper[i].CreatedAt,
+                            CreatedBy = tripMapper[i].CreatedBy,
+                        };
+                        vt.Add(vehicleTrip);
+                    }
+                }
+                await _context.VehicleTrips.AddRangeAsync(vt);
+                await _context.SaveChangesAsync();
             }
             catch (Exception ex)
             {
