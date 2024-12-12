@@ -285,7 +285,7 @@ namespace MyAPI.Repositories.Impls
                     throw new Exception("Vehicle not found.");
                 }
 
-                checkVehicle.Status = false;
+                checkVehicle.Status = !checkVehicle.Status;
                 await _context.SaveChangesAsync();
 
                 return true;
