@@ -162,7 +162,7 @@ namespace MyAPI.Repositories.Impls
                 return false;
             }
 
-            vehicleOwner.Status = false;
+            vehicleOwner.Status = !vehicleOwner.Status;
             vehicleOwner.UpdateAt = DateTime.Now;
 
             _context.Users.Update(vehicleOwner);
