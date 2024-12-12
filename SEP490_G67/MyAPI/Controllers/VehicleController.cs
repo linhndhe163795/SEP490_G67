@@ -1,16 +1,13 @@
-﻿using AutoMapper;
-using AutoMapper.Internal;
-using ClosedXML.Excel;
-using DocumentFormat.OpenXml.Spreadsheet;
+﻿
+using DocumentFormat.OpenXml.Vml;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MyAPI.DTOs.VehicleDTOs;
 using MyAPI.Helper;
 using MyAPI.Infrastructure.Interfaces;
-using MyAPI.Models;
-using MyAPI.Repositories.Impls;
-using OfficeOpenXml;
-using System.IO.Packaging;
+
+
+
 
 namespace MyAPI.Controllers
 {
@@ -107,11 +104,25 @@ namespace MyAPI.Controllers
         }
         [Authorize(Roles = "Staff, VehicleOwner")]
         [HttpPost("addVehicle")]
-        public async Task<IActionResult> AddVehicle(VehicleAddDTO vehicleAddDTO)
+        public async Task<IActionResult> AddVehicle([FromForm]VehicleAddDTO vehicleAddDTO, IFormFile imageFile)
         {
             try
             {
+                if (imageFile != null && imageFile.Length > 0)
+                {
+                    var fileName = System.IO.Path.GetFileNameWithoutExtension(imageFile.FileName);
+                    var fileExtension =  System.IO.Path.GetExtension(imageFile.FileName);
+                    var newFileName = $"{fileName}_{DateTime.Now.Ticks}{fileExtension}";
+                    var filePath = System.IO.Path.Combine("wwwroot/uploads", newFileName);
 
+                    Directory.CreateDirectory(System.IO.Path.GetDirectoryName(filePath));
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await imageFile.CopyToAsync(stream);
+                    }
+
+                    vehicleAddDTO.Image = $"/uploads/{newFileName}";
+                }
                 var isAdded = await _vehicleRepository.AddVehicleAsync(vehicleAddDTO);
                 return Ok(new { Message = "Vehicle added successfully.", Vehicle = vehicleAddDTO });
 
@@ -147,15 +158,30 @@ namespace MyAPI.Controllers
 
         [Authorize(Roles = "Staff")]
         [HttpPost("updateVehicleInformation/{id}")]
-        public async Task<IActionResult> UpdateVehicle(int id, [FromBody] VehicleUpdateDTO updateDTO)
+        public async Task<IActionResult> UpdateVehicle(int id, [FromForm] VehicleUpdateDTO updateDTO, IFormFile imageFile)
         {
             try
             {
+
                 if (!ModelState.IsValid)
                 {
                     return BadRequest(ModelState);
                 }
+                if (imageFile != null && imageFile.Length > 0)
+                {
+                    var fileName = System.IO.Path.GetFileNameWithoutExtension(imageFile.FileName);
+                    var fileExtension = System.IO.Path.GetExtension(imageFile.FileName);
+                    var newFileName = $"{fileName}_{DateTime.Now.Ticks}{fileExtension}";
+                    var filePath = System.IO.Path.Combine("wwwroot/uploads", newFileName);
 
+                    Directory.CreateDirectory(System.IO.Path.GetDirectoryName(filePath));
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await imageFile.CopyToAsync(stream);
+                    }
+
+                    updateDTO.Image = $"/uploads/{newFileName}";
+                }
                 var result = await _vehicleRepository.UpdateVehicleAsync(id, updateDTO);
 
                 if (!result)
@@ -259,7 +285,7 @@ namespace MyAPI.Controllers
         {
             try
             {
-                var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "templates", "TemplateVehicle.xlsx");
+                var filePath = System.IO.Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "templates", "TemplateVehicle.xlsx");
                 if
                     (!System.IO.File.Exists(filePath))
                 {

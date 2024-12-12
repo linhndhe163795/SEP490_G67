@@ -137,7 +137,7 @@ namespace MyAPI.Helper
                             if (TimeSpan.TryParse(row.Cell(col + 1).GetString(), out var pointTimeDetails))
                             {
 
-                                if (!string.IsNullOrEmpty(pointDetail) && !string.IsNullOrEmpty(pointEnd))
+                                if (!string.IsNullOrEmpty(pointDetail) && (!string.IsNullOrEmpty(pointEnd1) || !string.IsNullOrEmpty(pointEnd)))
                                 {
                                     trip.PointStartDetail[pointDetail] = pointTimeDetails;
                                 }
