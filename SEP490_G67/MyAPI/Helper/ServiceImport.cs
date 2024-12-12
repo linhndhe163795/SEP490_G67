@@ -132,7 +132,8 @@ namespace MyAPI.Helper
                         for (int col = 8; col <= tripSheets?.LastColumnUsed()?.ColumnNumber(); col += 2)
                         {
                             var pointDetail = row.Cell(col).GetValue<string>();
-                            var pointEnd = row.Cell(col + 3).GetValue<string>();
+                            var pointEnd = row.Cell(col + 4).GetValue<string>();
+                            var pointEnd1 = row.Cell(col + 3).GetValue<string>();
                             if (TimeSpan.TryParse(row.Cell(col + 1).GetString(), out var pointTimeDetails))
                             {
 
@@ -140,7 +141,7 @@ namespace MyAPI.Helper
                                 {
                                     trip.PointStartDetail[pointDetail] = pointTimeDetails;
                                 }
-                                if (string.IsNullOrEmpty(pointEnd))
+                                if (string.IsNullOrEmpty(pointEnd) && string.IsNullOrEmpty(pointEnd1))
                                 {
                                     var pointEndDetail = row.Cell(col).GetValue<string>();
                                     if (!trip.PointEndDetail.Any() && trip.PointStartDetail.Count > 0)
