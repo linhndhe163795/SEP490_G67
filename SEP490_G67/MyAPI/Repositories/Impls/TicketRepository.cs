@@ -9,6 +9,7 @@ using MyAPI.DTOs.VehicleDTOs;
 using MyAPI.Helper;
 using MyAPI.Infrastructure.Interfaces;
 using MyAPI.Models;
+using System.Linq;
 
 namespace MyAPI.Repositories.Impls
 {
@@ -462,10 +463,15 @@ namespace MyAPI.Repositories.Impls
                 }
                 var pointTicket = ticketNotPaid.PricePromotion * 10 / 100;
 
-                var vehicleID = _context.Vehicles.Where(x => x.DriverId == driverId).Select(x => x.Id).FirstOrDefault();
-                if (ticketNotPaid.VehicleId != vehicleID)
+                var vehicleIDs = await _context.Vehicles
+            .Where(x => x.DriverId == driverId)
+            .Select(x => x.Id)
+            .ToListAsync();
+
+                // Kiểm tra nếu VehicleId của vé có giá trị và nằm trong danh sách các xe
+                if (!ticketNotPaid.VehicleId.HasValue || !vehicleIDs.Contains(ticketNotPaid.VehicleId.Value))
                 {
-                    throw new Exception("Driver not valid");
+                    throw new Exception("Driver is not assigned to this vehicle.");
                 }
 
                 var addPointUser = new PointUser
