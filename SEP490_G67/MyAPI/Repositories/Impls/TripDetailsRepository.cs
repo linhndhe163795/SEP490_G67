@@ -207,5 +207,36 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception(ex.Message);
             }
         }
+
+        public async Task<TripDetailsDTO> GetTripDetailById(int tripDetailId)
+        {
+            try
+            {
+                // Kiểm tra nếu tripDetailId không hợp lệ
+                if (tripDetailId <= 0)
+                {
+                    throw new ArgumentException("TripDetail ID must be a valid positive integer.");
+                }
+
+                // Tìm thông tin TripDetail theo ID
+                var tripDetail = await _context.TripDetails
+                    .FirstOrDefaultAsync(x => x.Id == tripDetailId);
+
+                // Kiểm tra nếu không tìm thấy
+                if (tripDetail == null)
+                {
+                    throw new KeyNotFoundException("No trip detail found for the specified TripDetail ID.");
+                }
+
+                // Map dữ liệu sang DTO
+                var tripDetailDTO = _mapper.Map<TripDetailsDTO>(tripDetail);
+                return tripDetailDTO;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"GetTripDetailById: {ex.Message}");
+            }
+        }
+
     }
 }

@@ -100,5 +100,27 @@ namespace MyAPI.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        [HttpGet("GetTripDetailData/{tripDetailId}")]
+        public async Task<IActionResult> GetTripDetailById(int tripDetailId)
+        {
+            try
+            {
+                var tripDetail = await _tripDetailsRepository.GetTripDetailById(tripDetailId);
+                return Ok(tripDetail);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = ex.Message });
+            }
+        }
     }   
 }
