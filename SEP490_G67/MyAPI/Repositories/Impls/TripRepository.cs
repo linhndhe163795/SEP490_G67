@@ -845,5 +845,31 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception(ex.Message);
             }
         }
+
+        public async Task DeleteTripById(int tripId)
+        {
+            try
+            {
+                if (tripId <= 0)
+                {
+                    throw new ArgumentException("Trip ID must be a valid positive integer.");
+                }
+
+                var trip = await _context.Trips.FirstOrDefaultAsync(x => x.Id == tripId);
+
+                if (trip == null)
+                {
+                    throw new KeyNotFoundException("No trip found for the specified Trip ID.");
+                }
+
+                trip.Status = !trip.Status;
+                _context.Trips.Update(trip);
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"DeleteTripById: {ex.Message}");
+            }
+        }
     }
 }

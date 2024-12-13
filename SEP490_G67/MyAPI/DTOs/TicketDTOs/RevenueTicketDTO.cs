@@ -13,9 +13,9 @@
         public decimal? PricePromotion { get; set; }
         public string? VehicleOwner { get; set; }
         public int? VehicleId { get; set; }
-        public string LiscenseVehicle { get; set; }
-        public string TypeOfTicket { get; set; }
-        public string TypeOfPayment { get; set; }
+        public string? LiscenseVehicle { get; set; }
+        public string? TypeOfTicket { get; set; }
+        public string? TypeOfPayment { get; set; }
         public DateTime? CreatedAt { get; set; }
     }
 }

@@ -403,5 +403,28 @@ namespace MyAPI.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        [Authorize(Roles = "Staff")]
+        [HttpPost("deleteTrip/{tripId}")]
+        public async Task<IActionResult> DeleteTripById(int tripId)
+        {
+            try
+            {
+                await _tripRepository.DeleteTripById(tripId);
+                return Ok(new { message = "Trip status updated to deleted." });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = ex.Message });
+            }
+        }
     }
 }
