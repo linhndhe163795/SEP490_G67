@@ -93,7 +93,7 @@ namespace MyAPI.Controllers
             }
 
             await _reviewRepository.Delete(review);
-            return NoContent();
+            return Ok("Delete success!");
         }
     }
 }

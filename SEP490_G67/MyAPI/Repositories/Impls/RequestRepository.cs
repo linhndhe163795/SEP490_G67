@@ -40,30 +40,37 @@ namespace MyAPI.Repositories.Impls
 
         public async Task<RequestDetailDTO> GetRequestDetailByIdAsync(int requestId)
         {
-            var requestDetail = await _context.RequestDetails.Include(x => x.Request).ThenInclude(x => x.Type)
-                .Where(rd => rd.RequestId == requestId)
-                .Select(rd => new RequestDetailDTO
-                {
-                    RequestId = rd.RequestId,
-                    TicketId = rd.TicketId,
-                    VehicleId = rd.VehicleId,
-                    DriverId = rd.DriverId,
-                    typeRequestId = rd.Request.TypeId,
-                    typeName = rd.Request.Type.TypeName,
-                    StartLocation = rd.StartLocation,
-                    EndLocation = rd.EndLocation,
-                    StartTime = rd.StartTime,
-                    EndTime = rd.EndTime,
-                    Seats = rd.Seats,
-                    CreatedAt = rd.CreatedAt,
-                    CreatedBy = rd.CreatedBy,
-                    UpdatedAt = rd.UpdateAt,
-                    UpdatedBy = rd.UpdateBy,
-                    Price = rd.Price,
-                    phoneNumber = rd.PhoneNumber,
-                    promotionCode = rd.PromotionCode
-                })
-                .FirstOrDefaultAsync();
+            var requestDetail = await _context.RequestDetails
+        .Include(x => x.Request).ThenInclude(x => x.Type)
+        .Where(rd => rd.RequestId == requestId)
+        .Select(rd => new RequestDetailDTO
+        {
+            RequestId = rd.RequestId,
+            TicketId = rd.TicketId,
+            VehicleId = rd.VehicleId,
+            DriverId = rd.DriverId,
+            typeRequestId = rd.Request.TypeId,
+            typeName = rd.Request.Type.TypeName,
+            StartLocation = rd.StartLocation,
+            EndLocation = rd.EndLocation,
+            StartTime = rd.StartTime,
+            EndTime = rd.EndTime,
+            Seats = rd.Seats,
+            CreatedAt = rd.CreatedAt,
+            CreatedBy = rd.CreatedBy,
+            UpdatedAt = rd.UpdateAt,
+            UpdatedBy = rd.UpdateBy,
+            Price = rd.Price,
+            phoneNumber = rd.PhoneNumber,
+            promotionCode = rd.PromotionCode,
+            LicensePlate = rd.VehicleId.HasValue
+                ? _context.Vehicles.Where(v => v.Id == rd.VehicleId).Select(v => v.LicensePlate).FirstOrDefault()
+                : null,
+            DriverName = rd.DriverId.HasValue
+                ? _context.Drivers.Where(d => d.Id == rd.DriverId).Select(d => d.Name).FirstOrDefault()
+                : null
+        })
+        .FirstOrDefaultAsync();
 
             if (requestDetail == null)
             {
@@ -841,6 +848,8 @@ namespace MyAPI.Repositories.Impls
             {
                 throw new Exception("Invalid TypeId for determining TypeOfTrip.");
             }
+
+            checkRequestDetail.VehicleId = vehicleId;
 
             int typeOfTrip = checkRequest.TypeId == 5 ? Constant.VE_XE_TIEN_CHUYEN : Constant.VE_BAO_XE;
 

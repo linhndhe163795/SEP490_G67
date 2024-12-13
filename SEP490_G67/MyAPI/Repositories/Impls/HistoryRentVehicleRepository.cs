@@ -114,6 +114,7 @@ namespace MyAPI.Repositories.Impls
                     var updateRequestRentVehicle = await _requestRepository.UpdateRequestVehicleAsync(requestId, updateRequest);
 
                     requestDetail.VehicleId = vehicleId;
+                    requestDetail.Price = price;
                     _context.RequestDetails.Update(requestDetail);
                     await _context.SaveChangesAsync();
 

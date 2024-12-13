@@ -230,6 +230,8 @@ namespace MyAPI.Repositories.Impls
                     throw new Exception("Request for type rent car!!!");
                 }
 
+                requestDetail.VehicleId = addTicketForRentCarDTO.vehicleId;
+                requestDetail.Price = addTicketForRentCarDTO.price;
                 var ticket = new Ticket
                 {
                     VehicleId = addTicketForRentCarDTO.vehicleId,

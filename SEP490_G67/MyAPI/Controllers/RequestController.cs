@@ -25,14 +25,16 @@ namespace MyAPI.Controllers
         private readonly IMapper _mapper;
         private readonly Jwt _Jwt;
         private readonly GetInforFromToken _getInforFromToken;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public RequestController(IRequestRepository requestRepository, GetInforFromToken token, IMapper mapper, Jwt jwt, GetInforFromToken getInforFromToken)
+        public RequestController(IRequestRepository requestRepository, GetInforFromToken token, IMapper mapper, Jwt jwt, GetInforFromToken getInforFromToken, IHttpContextAccessor httpContextAccessor)
         {
             _token = token;
             _requestRepository = requestRepository;
             _mapper = mapper;
             _Jwt = jwt;
             _getInforFromToken = getInforFromToken;
+            _httpContextAccessor = httpContextAccessor;
         }
         [Authorize(Roles = "Staff, VehicleOwner, Driver,Admin")]
         [HttpGet]
@@ -114,20 +116,50 @@ namespace MyAPI.Controllers
         public async Task<IActionResult> DeleteRequest(int id)
         {
             try
+
             {
+
+                string token = Request.Headers["Authorization"];
+                if (token.StartsWith("Bearer"))
+                {
+                    token = token.Substring("Bearer ".Length).Trim();
+                }
+                if (string.IsNullOrEmpty(token))
+                {
+                    return BadRequest("Token is required.");
+                }
+                var userId = _getInforFromToken.GetIdInHeader(token);
+                var role = _getInforFromToken.GetRoleFromToken(token);
+
                 var request = await _requestRepository.GetRequestByIdAsync(id);
                 if (request == null)
                 {
                     return NotFound("Request not found.");
                 }
 
-                if (request.Note != "Đã xác nhận")
+                
+
+                if (role == "Staff")
                 {
-                    return BadRequest("Only requests with 'Đã xác nhận' note can be deleted.");
+                    if (request.Note != "Đã xác nhận")
+                    {
+                        return BadRequest("Only requests with 'Đã xác nhận' note can be deleted by staff.");
+                    }
+                }
+                else if (role == "Driver" || role == "VehicleOwner")
+                {
+                    if (request.Note == "Đã xác nhận")
+                    {
+                        return BadRequest("Drivers and Vehicle Owners can only delete requests that are not confirmed.");
+                    }
+                }
+                else
+                {
+                    return Unauthorized("You do not have the necessary role to delete this request.");
                 }
 
                 await _requestRepository.DeleteRequestWithDetailsAsync(request);
-                return NoContent();
+                return Ok("Delete Success");
             }
             catch (Exception ex)
             {

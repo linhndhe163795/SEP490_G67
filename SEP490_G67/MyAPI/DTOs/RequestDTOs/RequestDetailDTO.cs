@@ -5,7 +5,9 @@
         public int? RequestId { get; set; }
         public int? TicketId { get; set; }
         public int? VehicleId { get; set; }
+        public string? LicensePlate { get; set; }
         public int? DriverId { get; set; }
+        public string? DriverName { get; set; }
         public string? Note { get; set; }
         public int? typeRequestId { get; set; }
         public string? typeName { get; set; }

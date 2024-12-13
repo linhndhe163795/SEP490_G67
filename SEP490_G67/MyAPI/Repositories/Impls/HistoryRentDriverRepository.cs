@@ -127,6 +127,7 @@ namespace MyAPI.Repositories.Impls
                     await _context.SaveChangesAsync();
 
                     requestDetail.DriverId = driverId;
+                    requestDetail.Price = price;
                     requestDetail.UpdateBy = userId;
                     requestDetail.UpdateAt = DateTime.Now;
                     _context.RequestDetails.Update(requestDetail);
