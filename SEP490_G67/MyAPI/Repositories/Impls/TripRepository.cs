@@ -60,7 +60,6 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception("Error while retrieving trip list: " + ex.Message);
             }
         }
-
         public async Task<List<TripVehicleDTO>> SreachTrip(string startPoint, string endPoint, string? time)
         {
             if (string.IsNullOrWhiteSpace(startPoint))
@@ -808,7 +807,6 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception(ex.Message);
             }
         }
-
         public async Task confirmAddValidEntriesConvenience(List<TripImportDTO> validEntries)
         {
             try
@@ -818,34 +816,12 @@ namespace MyAPI.Repositories.Impls
                 var tripMapper = _mapper.Map<List<Trip>>(validEntries);
                 _context.Trips.AddRange(tripMapper);
                 await _context.SaveChangesAsync();
-
-                for (int i = 0; i < tripMapper.Count; i++)
-                {
-                    string licensePlate = validEntries[i].LicensePlate;
-                    var vehicle = await _context.Vehicles.FirstOrDefaultAsync(v => v.LicensePlate == licensePlate);
-                    // assgin vehicle
-                    if (vehicle != null)
-                    {
-                        int vehicleId = vehicle.Id;
-                        var vehicleTrip = new VehicleTrip
-                        {
-                            TripId = tripMapper[i].Id,
-                            VehicleId = vehicleId,
-                            CreatedAt = tripMapper[i].CreatedAt,
-                            CreatedBy = tripMapper[i].CreatedBy,
-                        };
-                        vt.Add(vehicleTrip);
-                    }
-                }
-                await _context.VehicleTrips.AddRangeAsync(vt);
-                await _context.SaveChangesAsync();
             }
             catch (Exception ex)
             {
                 throw new Exception(ex.Message);
             }
         }
-
         public async Task DeleteTripById(int tripId)
         {
             try

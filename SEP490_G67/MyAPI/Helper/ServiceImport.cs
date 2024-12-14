@@ -184,7 +184,7 @@ namespace MyAPI.Helper
             var invalidEntries = new List<TripConvenientDTO>();
             var existingLicensePlates = await _context.Vehicles.Where(x => x.VehicleTypeId == typeOfTrip).Select(v => v.LicensePlate).ToListAsync();
             int rowNumber = 1;
-            var licensePlateSet = new HashSet<string>(existingLicensePlates);
+          
             using (var stream = new MemoryStream())
             {
                 await excelFile.CopyToAsync(stream);
@@ -196,11 +196,6 @@ namespace MyAPI.Helper
                     {
                         rowNumber++;
                         List<string> error = new List<string>();
-                        var typeOfTripCell = row.Cell(4).GetValue<string>();
-                        if (string.IsNullOrWhiteSpace(typeOfTripCell) || (typeOfTripCell != "2" && typeOfTripCell != "3"))
-                        {
-                            error.Add($"Invalid or empty type Of Trip (only 2 or 3 allowed) in row: {rowNumber}");
-                        }
 
                         var priceCell = row.Cell(5).GetValue<string>();
                         if (string.IsNullOrWhiteSpace(priceCell) || !int.TryParse(priceCell, out int price))
@@ -211,21 +206,14 @@ namespace MyAPI.Helper
                         {
                             Name = row.Cell(1).GetValue<string>(),
                             Description = row.Cell(3).GetValue<string>(),
-                            PointStart = row.Cell(6).GetValue<string>(),
-                            PointEnd = row.Cell(7).GetValue<string>(),
-                            LicensePlate = row.Cell(8).GetValue<string>(),
+                            PointStart = row.Cell(5).GetValue<string>(),
+                            PointEnd = row.Cell(6).GetValue<string>(),
                             Status = true,
+                            TypeOfTrip = 3,
                             CreatedAt = DateTime.Now,
                             CreatedBy = staffId,
                         };
-                        if (string.IsNullOrWhiteSpace(typeOfTripCell) || !int.TryParse(typeOfTripCell, out int typeOfTripEntries) || (typeOfTripEntries != 2 && typeOfTripEntries != 3))
-                        {
-                            error.Add($"Invalid or empty type Of Trip (only 2 or 3 allowed) in row: {rowNumber}");
-                        }
-                        else
-                        {
-                            trip.TypeOfTrip = typeOfTripEntries;
-                        }
+                       
                         if (!TimeSpan.TryParse(row.Cell(2).GetString(), out var parsedStartTime))
                         {
                             trip.ErrorMessages.Add("Invalid StartTime format in row : " + rowNumber);
@@ -241,10 +229,6 @@ namespace MyAPI.Helper
                         else
                         {
                             trip.Price = parsedPrice;
-                        }
-                        if (!licensePlateSet.Contains(trip.LicensePlate))
-                        {
-                            trip.ErrorMessages.Add($"License plate '{trip.LicensePlate}' does not exist or vehicle not type convenience in row: " + rowNumber);
                         }
                         if (string.IsNullOrEmpty(trip.Name))
                         {
@@ -379,6 +363,7 @@ namespace MyAPI.Helper
                             VehicleTypeId = row.Cell(2).GetValue<Int32>(),
                             LicensePlate = row.Cell(3).GetValue<string>(),
                             Description = row.Cell(4).GetValue<string>(),
+                            Flag = false,
                             VehicleOwner = vehicleOwnerId,
                             DriverId = driverId,
                             Status = true,

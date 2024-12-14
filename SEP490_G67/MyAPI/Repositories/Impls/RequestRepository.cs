@@ -851,6 +851,10 @@ namespace MyAPI.Repositories.Impls
             }
 
             checkRequestDetail.VehicleId = vehicleId;
+            var vehicle = await _context.Vehicles.FirstOrDefaultAsync(x => x.Id == vehicleId);
+            vehicle.DateStartBusy = checkRequestDetail.StartTime;
+            vehicle.DateEndBusy = checkRequestDetail.EndTime;
+            vehicle.Flag = true;
 
             int typeOfTrip = checkRequest.TypeId == 5 ? Constant.VE_XE_TIEN_CHUYEN : Constant.VE_BAO_XE;
 

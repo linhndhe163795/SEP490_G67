@@ -224,73 +224,42 @@ namespace MyAPI.Repositories.Impls
 
 
         }
-        public async Task<List<HistoryRentVehicleListDTO>> historyRentVehicleListDTOs()
+        public async Task<List<Vehicle>> historyRentVehicleListDTOs(DateTime dateTime)
         {
             try
             {
                 int limit = 5;
 
-                var vehiclesNeverRented = await _context.Vehicles
-                    .Where(v => v.DriverId == null)
-                    .Select(v => new
-                    {
-                        Vehicle = v,
-                        RentCount = _context.HistoryRentVehicles.Count(hrv => hrv.VehicleId == v.Id)
-                    })
-                    .Where(v => v.RentCount == 0)
-                    .Take(limit)
-                    .Select(v => new HistoryRentVehicleListDTO
-                    {
-                        Id = v.Vehicle.Id,
-                        NumberSeat = v.Vehicle.NumberSeat,
-                        VehicleTypeId = v.Vehicle.VehicleTypeId,
-                        Status = v.Vehicle.Status,
-                        Image = v.Vehicle.Image,
-                        DriverId = v.Vehicle.DriverId,
-                        VehicleOwner = v.Vehicle.VehicleOwner,
-                        Description = v.Vehicle.Description,
-                        LicensePlate = v.Vehicle.LicensePlate,
-                    })
+                // Lấy danh sách xe không bận vào ngày datetime
+                var vehicles = await _context.Vehicles
+                    .Where(v => (v.DateStartBusy != dateTime || v.DateEndBusy != dateTime)  && v.VehicleTypeId == 2 && v.Status == true && v.Flag == false ) // Lọc xe không bận
                     .ToListAsync();
 
-                if (vehiclesNeverRented.Count < limit)
-                {
-                    int remainingLimit = limit - vehiclesNeverRented.Count;
+                // Ánh xạ kết quả thành DTO
+                var result = vehicles
+                    .Select(v => new Vehicle
+                    {
+                        Id = v.Id,
+                        NumberSeat = v.NumberSeat,
+                        VehicleTypeId = v.VehicleTypeId,
+                        Status = v.Status,
+                        Image = v.Image,
+                        DriverId = v.DriverId,
+                        VehicleOwner = v.VehicleOwner,
+                        Description = v.Description,
+                        LicensePlate = v.LicensePlate + " - " + v.NumberSeat 
+                    })
+                    .ToList();
 
-                    var additionalVehicles = await _context.Vehicles
-                        .Where(v => v.DriverId == null)
-                        .Select(v => new
-                        {
-                            Vehicle = v,
-                            RentCount = _context.HistoryRentVehicles.Count(hrv => hrv.VehicleId == v.Id)
-                        })
-                        .Where(v => v.RentCount > 0)
-                        .OrderBy(v => v.RentCount)
-                        .Take(remainingLimit)
-                        .Select(v => new HistoryRentVehicleListDTO
-                        {
-                            Id = v.Vehicle.Id,
-                            NumberSeat = v.Vehicle.NumberSeat,
-                            VehicleTypeId = v.Vehicle.VehicleTypeId,
-                            Status = v.Vehicle.Status,
-                            Image = v.Vehicle.Image,
-                            DriverId = v.Vehicle.DriverId,
-                            VehicleOwner = v.Vehicle.VehicleOwner,
-                            Description = v.Vehicle.Description,
-                            LicensePlate = v.Vehicle.LicensePlate,
-                        })
-                        .ToListAsync();
-
-                    vehiclesNeverRented.AddRange(additionalVehicles);
-                }
-
-                return vehiclesNeverRented.Take(limit).ToList();
+                return result;
             }
             catch (Exception ex)
             {
                 throw new Exception($"Error in historyRentVehicleListDTOs: {ex.Message}");
             }
         }
+
+
         public bool IsUserRole(User user, string roleName)
         {
             if (user?.UserRoles == null) return false;
@@ -363,12 +332,12 @@ namespace MyAPI.Repositories.Impls
                 }
                 else if (roleName == "VehicleOwner")
                 {
-                     history =  query.Where(x => x.OwnerId == userId).ToList();
-                       
+                    history = query.Where(x => x.OwnerId == userId).ToList();
+
                 }
                 else if (roleName == "Driver")
                 {
-                     history = query.Where(x => x.DriverId == userId).ToList();
+                    history = query.Where(x => x.DriverId == userId).ToList();
                 }
                 else
                 {

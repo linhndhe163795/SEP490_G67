@@ -29,6 +29,9 @@ namespace MyAPI.Models
         public int? CreatedBy { get; set; }
         public DateTime? UpdateAt { get; set; }
         public int? UpdateBy { get; set; }
+        public bool? Flag { get; set; }
+        public DateTime? DateStartBusy { get; set; }
+        public DateTime? DateEndBusy { get; set; }
 
         public virtual Driver? Driver { get; set; }
         public virtual User? VehicleOwnerNavigation { get; set; }

@@ -8,6 +8,7 @@
         public int? VehicleOwner { get; set; }
         public string? LicensePlate { get; set; }
         public string? Description { get; set; }
+        public bool? Flag { get; set; }
         public bool? Status { get; set; }
         public List<string> Errors { get; set; } = new List<string>();
     }
