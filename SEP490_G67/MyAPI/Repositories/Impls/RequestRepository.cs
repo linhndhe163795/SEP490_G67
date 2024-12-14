@@ -61,6 +61,7 @@ namespace MyAPI.Repositories.Impls
             UpdatedAt = rd.UpdateAt,
             UpdatedBy = rd.UpdateBy,
             Price = rd.Price,
+            Status = rd.Request.Status,
             phoneNumber = rd.PhoneNumber,
             promotionCode = rd.PromotionCode,
             LicensePlate = rd.VehicleId.HasValue

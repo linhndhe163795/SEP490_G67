@@ -5,6 +5,7 @@
         public int? RequestId { get; set; }
         public int? TicketId { get; set; }
         public int? VehicleId { get; set; }
+        public bool? Status { get; set; }
         public string? LicensePlate { get; set; }
         public int? DriverId { get; set; }
         public string? DriverName { get; set; }
