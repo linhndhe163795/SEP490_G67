@@ -266,7 +266,6 @@ namespace MyAPI.Repositories.Impls
         {
             try
             {
-                // Lấy thông tin request để lấy khoảng thời gian và số ghế
                 var request = await _context.RequestDetails
                     .Where(r => r.RequestId == requestId)
                     .Select(r => new
@@ -282,15 +281,12 @@ namespace MyAPI.Repositories.Impls
                     throw new Exception($"Request with ID {requestId} not found.");
                 }
 
-                // Lấy danh sách xe rảnh thỏa mãn điều kiện
                 var availableVehicles = await _context.Vehicles
                     .Where(v =>
-                        !(from hrd in _context.HistoryRentDrivers
-                          where hrd.VehicleId == v.Id &&
-                                ((hrd.TimeStart <= request.EndTime && hrd.TimeStart >= request.StartTime) ||
-                                 (hrd.EndStart >= request.StartTime && hrd.EndStart <= request.EndTime) ||
-                                 (hrd.TimeStart <= request.StartTime && hrd.EndStart >= request.EndTime))
-                          select hrd.VehicleId).Contains(v.Id) && 
+                         (
+                        v.DateStartBusy == null || v.DateEndBusy == null || 
+                        (v.DateEndBusy <= request.StartTime || v.DateStartBusy >= request.EndTime)
+                        ) && 
                         v.NumberSeat >= request.Seats &&          
                         v.Status == true &&                     
                         v.Flag == false &&
@@ -298,7 +294,6 @@ namespace MyAPI.Repositories.Impls
                     )
                     .ToListAsync();
 
-                // Ánh xạ danh sách xe thành DTO
                 var result = availableVehicles.Select(v => new Vehicle
                 {
                     Id = v.Id,
