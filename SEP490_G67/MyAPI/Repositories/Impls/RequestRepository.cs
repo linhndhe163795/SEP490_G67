@@ -636,7 +636,7 @@ namespace MyAPI.Repositories.Impls
                     var addRentDriver = new Request
                     {
                         UserId = vehicleOwnerId,
-                        TypeId = 5,
+                        TypeId = 4,
                         Status = false,
                         Description = "Yêu cầu thuê tài xế",
                         CreatedAt = DateTime.Now,
@@ -1068,18 +1068,22 @@ namespace MyAPI.Repositories.Impls
                                        UpdatedBy = r.UpdateBy
                                    }).ToListAsync();
 
-                
-                if (role == "Staff" || role =="Admin")
+
+                if (role == "Staff" || role == "Admin")
                 {
-                    requests = query;
+                    requests = query.OrderByDescending(x => x.Id).ToList(); 
                 }
                 else if (role == "VehicleOwner")
                 {
-                    requests = query.Where(x => x.UserId == userId).ToList(); 
+                    requests = query.Where(x => x.UserId == userId)
+                                    .OrderByDescending(x => x.Id) 
+                                    .ToList();
                 }
                 else if (role == "Driver")
                 {
-                    requests = query.Where(x => x.DriverId == userId).ToList();
+                    requests = query.Where(x => x.DriverId == userId)
+                                    .OrderByDescending(x => x.Id) 
+                                    .ToList();
                 }
 
                 return requests;

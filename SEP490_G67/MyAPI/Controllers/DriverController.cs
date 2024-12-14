@@ -77,9 +77,12 @@ namespace MyAPI.Controllers
         public async Task<IActionResult> GetAllDrivers()
         {
             var drivers = await _driverRepository.GetAll();
-            var UpdateDriverDtos = _mapper.Map<IEnumerable<DriverDTO>>(drivers);
+            var sortedDrivers = drivers.OrderByDescending(d => d.Id);
+            var UpdateDriverDtos = _mapper.Map<IEnumerable<DriverDTO>>(sortedDrivers);
+
             return Ok(UpdateDriverDtos);
         }
+
         [Authorize(Roles = "Staff,Admin,Driver")]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetDriverById(int id)
