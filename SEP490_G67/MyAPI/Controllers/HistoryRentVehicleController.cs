@@ -90,5 +90,24 @@ namespace MyAPI.Controllers
             }
 
         }
+
+        [HttpGet("GetVehicleForDriverRent/{requestId}")]
+        public async Task<IActionResult> GetAvailableVehicles(int requestId)
+        {
+            try
+            {
+                var vehicles = await _historyRentVehicleRepository.GetAvailableVehicles(requestId);
+                if (vehicles == null || !vehicles.Any())
+                {
+                    return NotFound(new { message = "No available vehicles found for this request." });
+                }
+
+                return Ok(vehicles);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = ex.Message });
+            }
+        }
     }
 }

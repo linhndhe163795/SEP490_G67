@@ -5,6 +5,7 @@ using MyAPI.DTOs;
 using MyAPI.DTOs.HistoryRentVehicleDTOs;
 using MyAPI.DTOs.HistoryRentVehicles;
 using MyAPI.DTOs.RequestDTOs;
+using MyAPI.DTOs.VehicleDTOs;
 using MyAPI.Helper;
 using MyAPI.Infrastructure.Interfaces;
 using MyAPI.Models;
@@ -120,7 +121,6 @@ namespace MyAPI.Repositories.Impls
 
                     var vechileAssgin = await _context.Vehicles.FirstOrDefaultAsync(x => x.Id == vehicleId);
                     vechileAssgin.DriverId = requestDetail.DriverId;
-                    vechileAssgin.Flag = true;
                     vechileAssgin.DateStartBusy = requestDetail.StartTime;
                     vechileAssgin.DateEndBusy = requestDetail.EndTime;
                     _context.Vehicles.Update(vechileAssgin);
@@ -261,6 +261,65 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception($"Error in historyRentVehicleListDTOs: {ex.Message}");
             }
         }
+
+        public async Task<List<Vehicle>> GetAvailableVehicles(int requestId)
+        {
+            try
+            {
+                // Lấy thông tin request để lấy khoảng thời gian và số ghế
+                var request = await _context.RequestDetails
+                    .Where(r => r.RequestId == requestId)
+                    .Select(r => new
+                    {
+                        StartTime = r.StartTime,
+                        EndTime = r.EndTime,
+                        Seats = r.Seats
+                    })
+                    .FirstOrDefaultAsync();
+
+                if (request == null)
+                {
+                    throw new Exception($"Request with ID {requestId} not found.");
+                }
+
+                // Lấy danh sách xe rảnh thỏa mãn điều kiện
+                var availableVehicles = await _context.Vehicles
+                    .Where(v =>
+                        !(from hrd in _context.HistoryRentDrivers
+                          where hrd.VehicleId == v.Id &&
+                                ((hrd.TimeStart <= request.EndTime && hrd.TimeStart >= request.StartTime) ||
+                                 (hrd.EndStart >= request.StartTime && hrd.EndStart <= request.EndTime) ||
+                                 (hrd.TimeStart <= request.StartTime && hrd.EndStart >= request.EndTime))
+                          select hrd.VehicleId).Contains(v.Id) && 
+                        v.NumberSeat >= request.Seats &&          
+                        v.Status == true &&                     
+                        v.Flag == false &&
+                        v.DriverId == null   
+                    )
+                    .ToListAsync();
+
+                // Ánh xạ danh sách xe thành DTO
+                var result = availableVehicles.Select(v => new Vehicle
+                {
+                    Id = v.Id,
+                    NumberSeat = v.NumberSeat,
+                    VehicleTypeId = v.VehicleTypeId,
+                    Status = v.Status,
+                    Image = v.Image,
+                    DriverId = v.DriverId,
+                    VehicleOwner = v.VehicleOwner,
+                    Description = v.Description,
+                    LicensePlate = v.LicensePlate
+                }).ToList();
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error in GetAvailableVehicles: {ex.Message}");
+            }
+        }
+
 
 
         public bool IsUserRole(User user, string roleName)

@@ -1,5 +1,6 @@
 ﻿using MyAPI.DTOs.HistoryRentVehicleDTOs;
 using MyAPI.DTOs.HistoryRentVehicles;
+using MyAPI.DTOs.VehicleDTOs;
 using MyAPI.Models;
 
 namespace MyAPI.Infrastructure.Interfaces
@@ -14,5 +15,6 @@ namespace MyAPI.Infrastructure.Interfaces
 
         Task<bool> AccpetOrDeninedRentVehicle(AddHistoryVehicleUseRent add);
         Task<List<HistoryVehicleRentDTO>> listHistoryRentVehicle(int userId, string roleName);
+        Task<List<Vehicle>> GetAvailableVehicles(int requestId);
     }
 }

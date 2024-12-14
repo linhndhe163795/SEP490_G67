@@ -233,6 +233,16 @@ namespace MyAPI.Repositories.Impls
 
                 requestDetail.VehicleId = addTicketForRentCarDTO.vehicleId;
                 requestDetail.Price = addTicketForRentCarDTO.price;
+
+                var vehicle = await _context.Vehicles.FirstOrDefaultAsync(v => v.Id == addTicketForRentCarDTO.vehicleId);
+                if (vehicle == null)
+                {
+                    throw new Exception("Vehicle not found");
+                }
+
+                vehicle.DateStartBusy = requestDetail.StartTime;
+                vehicle.DateEndBusy = requestDetail.EndTime;
+
                 var ticket = new Ticket
                 {
                     VehicleId = addTicketForRentCarDTO.vehicleId,
