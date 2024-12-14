@@ -19,7 +19,7 @@ namespace MyAPI.Infrastructure.Interfaces
         Task<RevenueTicketDTO> getRevenueTicket(int userId);
         Task<bool> deleteTicketTimeOut(int ticketId);
         Task<bool> UpdateVehicleInRequestAsync(int vehicleId, int requestId);
-        Task<IEnumerable<VehicleBasicDto>> GetVehiclesByRequestIdAsync(int requestId);
+        Task<IEnumerable<VehicleBasicDto>> GetVehiclesByRequestIdAsync(int requestId, DateTime startDate, DateTime endDate);
         Task<List<ListTicketDTOs>> GetTicketByUserId(int userId);
         Task updateTicketByTicketId(int ticketId, int userId, TicketUpdateDTOs ticket);
         Task deleteTicketByTicketId(int id, int userId);
