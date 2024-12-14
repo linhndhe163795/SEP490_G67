@@ -113,13 +113,13 @@ namespace MyAPI.Controllers
             }
         }
 
-        [HttpGet("GetTravelCarByRequest/{requestId}")]
-        public async Task<IActionResult> GetVehiclesByRequestId(int requestId)
+        [HttpGet("GetTravelCarByRequest/{requestId}/startDate/endDate")]
+        public async Task<IActionResult> GetVehiclesByRequestId(int requestId, DateTime startDate, DateTime endDate)
         {
             try
             {
                 // Sử dụng repository để lấy danh sách phương tiện, giới hạn tối đa 5 xe
-                var vehicles = await _ticketRepository.GetVehiclesByRequestIdAsync(requestId);
+                var vehicles = await _ticketRepository.GetVehiclesByRequestIdAsync(requestId, startDate, endDate);
 
                 if (vehicles == null || !vehicles.Any())
                 {

@@ -324,7 +324,7 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception(ex.Message);
             }
         }
-        public async Task<IEnumerable<VehicleBasicDto>> GetVehiclesByRequestIdAsync(int requestId)
+        public async Task<IEnumerable<VehicleBasicDto>> GetVehiclesByRequestIdAsync(int requestId, DateTime startDate, DateTime endDate)
         {
             try
             {
@@ -339,7 +339,7 @@ namespace MyAPI.Repositories.Impls
                 var seatCount = requestDetail.Seats.Value;
 
                 var vehicles = await _context.Vehicles
-                    .Where(v => v.VehicleTypeId == 3 && v.NumberSeat >= seatCount)
+                    .Where(v => v.VehicleTypeId == 3 && v.NumberSeat >= seatCount && (v.DateEndBusy < startDate || v.DateStartBusy > endDate) && v.Status == true)
                     .Take(5)
                     .Select(v => new VehicleBasicDto
                     {

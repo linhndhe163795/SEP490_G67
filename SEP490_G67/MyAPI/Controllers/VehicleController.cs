@@ -104,14 +104,14 @@ namespace MyAPI.Controllers
         }
         [Authorize(Roles = "Staff, VehicleOwner")]
         [HttpPost("addVehicle")]
-        public async Task<IActionResult> AddVehicle([FromForm]VehicleAddDTO vehicleAddDTO, IFormFile imageFile)
+        public async Task<IActionResult> AddVehicle([FromForm] VehicleAddDTO vehicleAddDTO, IFormFile imageFile)
         {
             try
             {
                 if (imageFile != null && imageFile.Length > 0)
                 {
                     var fileName = System.IO.Path.GetFileNameWithoutExtension(imageFile.FileName);
-                    var fileExtension =  System.IO.Path.GetExtension(imageFile.FileName);
+                    var fileExtension = System.IO.Path.GetExtension(imageFile.FileName);
                     var newFileName = $"{fileName}_{DateTime.Now.Ticks}{fileExtension}";
                     var filePath = System.IO.Path.Combine("wwwroot/uploads", newFileName);
 
@@ -196,7 +196,7 @@ namespace MyAPI.Controllers
                 return BadRequest(ex.Message);
             }
 
-           
+
         }
         [Authorize(Roles = "Staff")]
         [HttpPost("deleteVehicleByStatus/{id}")]
@@ -241,7 +241,7 @@ namespace MyAPI.Controllers
         }
         [Authorize]
         [HttpGet("getEndPointTripFromVehicle/startPoint/vehicleId")]
-        public async Task<IActionResult> getEndPointTripFromVehicle(int vehicleId,string startPoint)
+        public async Task<IActionResult> getEndPointTripFromVehicle(int vehicleId, string startPoint)
         {
             try
             {
@@ -469,5 +469,7 @@ namespace MyAPI.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
+
+       
     }
 }
