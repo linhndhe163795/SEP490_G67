@@ -455,5 +455,19 @@ namespace MyAPI.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
+        [Authorize(Roles = "Staff")]
+        [HttpGet("VehicleconvinenceNoTrip")]
+        public async Task<IActionResult> GetAvailableVehiclesConvinence()
+        {
+            try
+            {
+                var vehicles = await _vehicleRepository.GetVehicleTypeConvinience();
+                return Ok(vehicles);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
     }
 }

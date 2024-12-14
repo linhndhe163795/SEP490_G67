@@ -21,12 +21,12 @@ namespace MyAPI.Controllers
             _getInforFromToken = getInforFromToken;
         }
         //thiếu role
-        [HttpGet("listVehicleUseRent")]
-        public async Task<IActionResult> GetVehicleUseRent()
+        [HttpGet("listVehicleUseRent/dateTime")]
+        public async Task<IActionResult> GetVehicleUseRent(DateTime date)
         {
             try
             {
-                var requests = await _historyRentVehicleRepository.historyRentVehicleListDTOs();
+                var requests = await _historyRentVehicleRepository.historyRentVehicleListDTOs(date);
                 if (requests != null)
                 {
                     return Ok(requests);

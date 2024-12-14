@@ -1207,11 +1207,21 @@ namespace MyAPI.Models
 
                 entity.Property(e => e.CreatedBy).HasColumnName("created_by");
 
+                entity.Property(e => e.DateEndBusy)
+                    .HasColumnType("datetime")
+                    .HasColumnName("date_end_busy");
+
+                entity.Property(e => e.DateStartBusy)
+                    .HasColumnType("datetime")
+                    .HasColumnName("date_start_busy");
+
                 entity.Property(e => e.Description)
                     .HasMaxLength(255)
                     .HasColumnName("description");
 
                 entity.Property(e => e.DriverId).HasColumnName("driver_id");
+
+                entity.Property(e => e.Flag).HasColumnName("flag");
 
                 entity.Property(e => e.Image)
                     .HasMaxLength(255)

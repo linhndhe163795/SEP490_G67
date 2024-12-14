@@ -10,7 +10,7 @@ namespace MyAPI.Infrastructure.Interfaces
 
         Task<bool> createVehicleForUser(HistoryVehicleRentDTO historyVehicleDTO);
 
-        Task<List<HistoryRentVehicleListDTO>> historyRentVehicleListDTOs();
+        Task<List<Vehicle>> historyRentVehicleListDTOs(DateTime dateTime);
 
         Task<bool> AccpetOrDeninedRentVehicle(AddHistoryVehicleUseRent add);
         Task<List<HistoryVehicleRentDTO>> listHistoryRentVehicle(int userId, string roleName);

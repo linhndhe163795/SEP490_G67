@@ -109,6 +109,7 @@ namespace MyAPI.Repositories.Impls
                     VehicleOwner = (isRoleStaff == true) ? vehicleAddDTO.VehicleOwner : userId,
                     LicensePlate = vehicleAddDTO.LicensePlate,
                     Description = vehicleAddDTO.Description,
+                    Flag = false,
                     CreatedBy = userId,
                     CreatedAt = DateTime.UtcNow,
                     UpdateAt = null,
@@ -911,6 +912,7 @@ namespace MyAPI.Repositories.Impls
                 if (updateDTO.NumberSeat.HasValue) vehicle.NumberSeat = updateDTO.NumberSeat.Value;
                 if (updateDTO.VehicleTypeId.HasValue) vehicle.VehicleTypeId = updateDTO.VehicleTypeId.Value;
                 if (updateDTO.Status.HasValue) vehicle.Status = updateDTO.Status.Value;
+                if (updateDTO.Flag.HasValue) vehicle.Flag = updateDTO.Status.Value;
                 if (!string.IsNullOrEmpty(updateDTO.Image)) vehicle.Image = updateDTO.Image;
                 vehicle.DriverId = (updateDTO.DriverId != null) ? updateDTO.DriverId.Value : null;
                 if (updateDTO.VehicleOwner.HasValue) vehicle.VehicleOwner = updateDTO.VehicleOwner.Value;
@@ -1115,7 +1117,21 @@ namespace MyAPI.Repositories.Impls
             }
         }
 
+        public async Task<List<VehicleBasicDto>> GetVehicleTypeConvinience()
+        {
+            try
+            {
+                var vehicles = await (from v in _context.Vehicles
+                                      where !_context.VehicleTrips.Any(vt => vt.VehicleId == v.Id) && v.VehicleTypeId == Constant.XE_TIEN_CHUYEN
+                                      select v).ToListAsync();
 
+                return _mapper.Map<List<VehicleBasicDto>>(vehicles);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("GetAvailableVehiclesAsync: " + ex.Message);
+            }
+        }
 
     }
 }
