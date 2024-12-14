@@ -232,7 +232,7 @@ namespace MyAPI.Repositories.Impls
 
                 // Lấy danh sách xe không bận vào ngày datetime
                 var vehicles = await _context.Vehicles
-                    .Where(v => (v.DateStartBusy != dateTime || v.DateEndBusy != dateTime)  && v.VehicleTypeId == 2 && v.Status == true && v.Flag == false ) // Lọc xe không bận
+                    .Where(v => (v.DateStartBusy != dateTime || v.DateEndBusy != dateTime)  && v.VehicleTypeId == 2 && v.Status == true ) // Lọc xe không bận
                     .ToListAsync();
 
                 // Ánh xạ kết quả thành DTO
