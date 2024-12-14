@@ -98,7 +98,7 @@ namespace MyAPI.Repositories.Impls
                     Status = (ticketDTOs.TypeOfPayment == Constant.CHUYEN_KHOAN) ? "Chờ thanh toán" : "Thanh toán bằng tiền mặt",
                     VehicleId = tripDetails.Vehicle.Id,
                     TypeOfTicket = (tripDetails.Vehicle.NumberSeat >= Constant.SO_GHE_XE_TIEN_CHUYEN) ? Constant.VE_XE_LIEN_TINH : Constant.VE_XE_TIEN_CHUYEN,
-                    Note = ticketDTOs.Note + "\n" +
+                    Note = 
                         " Xe sẽ đến điểm " + tripDetails.TripDetails.PointStartDetails +
                         " vào lúc: " + tripDetails.TripDetails.TimeStartDetils,
                     UserId = userId,
