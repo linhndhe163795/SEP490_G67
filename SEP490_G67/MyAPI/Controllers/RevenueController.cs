@@ -50,8 +50,8 @@ namespace MyAPI.Controllers
                     foreach (var ticket in data.revenueTicketDTOs[0].listTicket)
                     {
                         ticketSheet.Cells[row, 1].Value = ticket.LiscenseVehicle;
-                        ticketSheet.Cells[row, 2].Value = ticket.TypeOfTicket;
-                        ticketSheet.Cells[row, 3].Value = ticket.TypeOfPayment;
+                        ticketSheet.Cells[row, 2].Value = ticket.TypeOfTicket ?? "N/A";
+                        ticketSheet.Cells[row, 3].Value = ticket.TypeOfPayment ?? "N/A";
                         ticketSheet.Cells[row, 4].Value = ticket.PricePromotion ?? 0;
                         ticketSheet.Cells[row, 5].Value = ticket.CreatedAt;
                         ticketSheet.Cells[row, 5].Style.Numberformat.Format = "dd/MM/yyyy";
