@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MyAPI.DTOs.AccountDTOs;
 using MyAPI.DTOs.UserDTOs;
 using MyAPI.DTOs.VehicleOwnerDTOs;
 using MyAPI.Helper;
@@ -214,10 +215,24 @@ namespace MyAPI.Controllers
             {
                 var listVehicleOwner = await _accountRepository.listVehicleOnwer();
                 return Ok(listVehicleOwner);
-            }catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }
         }
+        //[Authorize(Roles = "Admin")]
+        //[HttpPost("addAccountFromAdmin")]
+        //public async Task<IActionResult> addAccountFromAdmin(AccountRequestDTO acc)
+        //{
+        //    try
+        //    {
+        //        var 
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return BadRequest(ex.Message);
+        //    }
+        //}
     }
 }

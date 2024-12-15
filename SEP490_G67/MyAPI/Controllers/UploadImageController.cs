@@ -90,7 +90,7 @@ namespace MyAPI.Controllers
 
     public class UploadImageDto
     {
-        public IFormFile ImageFile { get; set; } // Dành cho upload file
-        public string ImageUrl { get; set; } // Dành cho URL ảnh
+        public IFormFile? ImageFile { get; set; } 
+        public string? ImageUrl { get; set; } 
     }
 }
