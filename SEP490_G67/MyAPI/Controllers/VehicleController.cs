@@ -104,25 +104,11 @@ namespace MyAPI.Controllers
         }
         [Authorize(Roles = "Staff, VehicleOwner")]
         [HttpPost("addVehicle")]
-        public async Task<IActionResult> AddVehicle([FromForm] VehicleAddDTO vehicleAddDTO, IFormFile imageFile)
+        public async Task<IActionResult> AddVehicle([FromForm] VehicleAddDTO vehicleAddDTO)
         {
             try
             {
-                if (imageFile != null && imageFile.Length > 0)
-                {
-                    var fileName = System.IO.Path.GetFileNameWithoutExtension(imageFile.FileName);
-                    var fileExtension = System.IO.Path.GetExtension(imageFile.FileName);
-                    var newFileName = $"{fileName}_{DateTime.Now.Ticks}{fileExtension}";
-                    var filePath = System.IO.Path.Combine("wwwroot/uploads", newFileName);
-
-                    Directory.CreateDirectory(System.IO.Path.GetDirectoryName(filePath));
-                    using (var stream = new FileStream(filePath, FileMode.Create))
-                    {
-                        await imageFile.CopyToAsync(stream);
-                    }
-
-                    vehicleAddDTO.Image = $"/uploads/{newFileName}";
-                }
+             
                 var isAdded = await _vehicleRepository.AddVehicleAsync(vehicleAddDTO);
                 return Ok(new { Message = "Vehicle added successfully.", Vehicle = vehicleAddDTO });
 
@@ -158,7 +144,7 @@ namespace MyAPI.Controllers
 
         [Authorize(Roles = "Staff")]
         [HttpPost("updateVehicleInformation/{id}")]
-        public async Task<IActionResult> UpdateVehicle(int id, [FromForm] VehicleUpdateDTO updateDTO, IFormFile imageFile)
+        public async Task<IActionResult> UpdateVehicle(int id, [FromForm] VehicleUpdateDTO updateDTO)
         {
             try
             {
@@ -166,21 +152,6 @@ namespace MyAPI.Controllers
                 if (!ModelState.IsValid)
                 {
                     return BadRequest(ModelState);
-                }
-                if (imageFile != null && imageFile.Length > 0)
-                {
-                    var fileName = System.IO.Path.GetFileNameWithoutExtension(imageFile.FileName);
-                    var fileExtension = System.IO.Path.GetExtension(imageFile.FileName);
-                    var newFileName = $"{fileName}_{DateTime.Now.Ticks}{fileExtension}";
-                    var filePath = System.IO.Path.Combine("wwwroot/uploads", newFileName);
-
-                    Directory.CreateDirectory(System.IO.Path.GetDirectoryName(filePath));
-                    using (var stream = new FileStream(filePath, FileMode.Create))
-                    {
-                        await imageFile.CopyToAsync(stream);
-                    }
-
-                    updateDTO.Image = $"https://boring-wiles.202-92-7-204.plesk.page/uploads/{newFileName}";
                 }
                 var result = await _vehicleRepository.UpdateVehicleAsync(id, updateDTO);
 

@@ -84,29 +84,13 @@ namespace MyAPI.Controllers
         }
         [Authorize(Roles = "Staff")]
         [HttpPost("CreatePromotion")]
-        public async Task<IActionResult> CreatePromotion([FromForm] PromotionPost promotionDTO,IFormFile? imageFile)
+        public async Task<IActionResult> CreatePromotion([FromForm] PromotionPost promotionDTO)
         {
             try
             {
                 if (promotionDTO == null)
                     return BadRequest("Promotion data is required.");
-
               
-                if (imageFile != null && imageFile.Length > 0)
-                {
-                    var fileName = System.IO.Path.GetFileNameWithoutExtension(imageFile.FileName);
-                    var fileExtension = System.IO.Path.GetExtension(imageFile.FileName);
-                    var newFileName = $"{fileName}_{DateTime.Now.Ticks}{fileExtension}";
-                    var filePath = System.IO.Path.Combine("wwwroot/uploads", newFileName);
-
-                    Directory.CreateDirectory(System.IO.Path.GetDirectoryName(filePath));
-                    using (var stream = new FileStream(filePath, FileMode.Create))
-                    {
-                        await imageFile.CopyToAsync(stream);
-                    }
-
-                    promotionDTO.ImagePromotion = $"/uploads/{newFileName}";
-                }
                 var createdPromotion = await _promotionRepository.CreatePromotion(promotionDTO);
                 return CreatedAtAction(nameof(GetPromotionByUser), new { id = createdPromotion.CodePromotion }, createdPromotion);
             }
@@ -118,7 +102,7 @@ namespace MyAPI.Controllers
         [Authorize(Roles = "Staff")]
       
         [HttpPost("updatePromotion/id")]
-        public async Task<IActionResult> UpdatePromotion(int id, [FromForm] PromotionDTO promotionDTO, IFormFile? imageFile)
+        public async Task<IActionResult> UpdatePromotion(int id, [FromForm] PromotionDTO promotionDTO)
         
         {
             try
@@ -134,21 +118,6 @@ namespace MyAPI.Controllers
                 getPromotionById.UpdateBy = 1;
                 getPromotionById.StartDate = promotionDTO.StartDate;
                 getPromotionById.EndDate = promotionDTO.EndDate;
-                if (imageFile != null && imageFile.Length > 0)
-                {
-                    var fileName = System.IO.Path.GetFileNameWithoutExtension(imageFile.FileName);
-                    var fileExtension = System.IO.Path.GetExtension(imageFile.FileName);
-                    var newFileName = $"{fileName}_{DateTime.Now.Ticks}{fileExtension}";
-                    var filePath = System.IO.Path.Combine("wwwroot/uploads", newFileName);
-
-                    Directory.CreateDirectory(System.IO.Path.GetDirectoryName(filePath));
-                    using (var stream = new FileStream(filePath, FileMode.Create))
-                    {
-                        await imageFile.CopyToAsync(stream);
-                    }
-
-                    getPromotionById.ImagePromotion = $"/uploads/{newFileName}";
-                }
                 await _promotionRepository.Update(getPromotionById);
                 return Ok(promotionDTO);
             }
@@ -210,7 +179,7 @@ namespace MyAPI.Controllers
         }
         [Authorize(Roles = "Staff")]
         [HttpPost("givePromotionAllUser")]
-        public async Task<IActionResult> GivePromotionAllUser([FromForm] PromotionPost promotionDTO, IFormFile? imageFile)
+        public async Task<IActionResult> GivePromotionAllUser([FromForm] PromotionPost promotionDTO)
         {
             try
             {

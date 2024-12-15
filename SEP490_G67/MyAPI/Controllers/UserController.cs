@@ -52,25 +52,11 @@ namespace MyAPI.Controllers
 
         [Authorize]
         [HttpPost("EditProfile")]
-        public async Task<IActionResult> EditProfile([FromForm] EditProfileDTO editProfileDTO, IFormFile? imageFile)
+        public async Task<IActionResult> EditProfile([FromForm] EditProfileDTO editProfileDTO)
         {
             try
             {
-                if (imageFile != null && imageFile.Length > 0)
-                {
-                    var fileName = Path.GetFileNameWithoutExtension(imageFile.FileName);
-                    var fileExtension = Path.GetExtension(imageFile.FileName);
-                    var newFileName = $"{fileName}_{DateTime.Now.Ticks}{fileExtension}";
-                    var filePath = Path.Combine("wwwroot/uploads", newFileName);
-
-                    Directory.CreateDirectory(Path.GetDirectoryName(filePath));
-                    using (var stream = new FileStream(filePath, FileMode.Create))
-                    {
-                        await imageFile.CopyToAsync(stream);
-                    }
-
-                    editProfileDTO.Avatar = $"/uploads/{newFileName}";
-                }
+               
                 var updatedUser = await _userRepository.EditProfile(editProfileDTO);
                 return Ok("Update user profile successfull");
             }
