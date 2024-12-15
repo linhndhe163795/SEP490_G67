@@ -115,7 +115,7 @@ namespace MyAPI.Repositories.Impls
 
         public async Task<List<LossCostTypeListDTO>> GetAllList()
         {
-            var listLossCostType = await _context.LossCostTypes.ToListAsync();
+            var listLossCostType = await _context.LossCostTypes.OrderByDescending(x => x.Id).ToListAsync();
 
             var LossCostTypeListDTOs = _mapper.Map<List<LossCostTypeListDTO>>(listLossCostType);
 

@@ -69,7 +69,6 @@ namespace MyAPI.Controllers
         {
             try
             {
-                // Gọi phương thức repository để lấy thông tin chi tiết các lần thuê và tổng chi phí
                 var result = await _historyRentDriverRepository.GetRentDetailsWithTotalForOwner();
 
                 return Ok(result);
@@ -85,7 +84,6 @@ namespace MyAPI.Controllers
         {
             try
             {
-                // Gọi hàm repository để cập nhật driverId cho requestId
                 var result = await _historyRentDriverRepository.UpdateDriverInRequestAsync(driverId, requestId);
 
                 if (result)

@@ -412,20 +412,27 @@ namespace MyAPI.Repositories.Impls
                                        price = p.Price,
                                        TimeStart = htd.TimeStart,
                                        EndStart = htd.EndStart
-                                   }
-                                     ).ToListAsync();
+                                   }).ToListAsync();
+
                 if (role == "Staff")
                 {
-                    history = query;
+                    history = query.OrderByDescending(x => x.HistoryId).ToList();
                 }
-                if (role == "VehicleOwner")
+                else if (role == "VehicleOwner")
                 {
-                    history = query.Where(x => x.vehicleOwnerId == userId).ToList();
+                    history = query
+                        .Where(x => x.vehicleOwnerId == userId)
+                        .OrderByDescending(x => x.HistoryId)
+                        .ToList();
                 }
-                if (role == "Driver")
+                else if (role == "Driver")
                 {
-                    history = query.Where(x => x.DriverId == userId).ToList();
+                    history = query
+                        .Where(x => x.DriverId == userId)
+                        .OrderByDescending(x => x.HistoryId)
+                        .ToList();
                 }
+
                 return history;
             }
             catch (Exception ex)
@@ -433,5 +440,6 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception(ex.Message);
             }
         }
+
     }
 }

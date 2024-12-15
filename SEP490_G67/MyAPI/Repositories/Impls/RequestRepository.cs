@@ -55,6 +55,8 @@ namespace MyAPI.Repositories.Impls
             EndLocation = rd.EndLocation,
             StartTime = rd.StartTime,
             EndTime = rd.EndTime,
+            UserName = rd.UserName,
+            promotionCode = rd.PromotionCode,
             Seats = rd.Seats,
             CreatedAt = rd.CreatedAt,
             CreatedBy = rd.CreatedBy,
@@ -63,7 +65,6 @@ namespace MyAPI.Repositories.Impls
             Price = rd.Price,
             Status = rd.Request.Status,
             phoneNumber = rd.PhoneNumber,
-            promotionCode = rd.PromotionCode,
             LicensePlate = rd.VehicleId.HasValue
                 ? _context.Vehicles.Where(v => v.Id == rd.VehicleId).Select(v => v.LicensePlate).FirstOrDefault()
                 : null,
