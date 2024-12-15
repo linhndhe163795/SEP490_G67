@@ -811,8 +811,6 @@ namespace MyAPI.Repositories.Impls
         {
             try
             {
-                List<VehicleTrip> vt = new List<VehicleTrip>();
-
                 var tripMapper = _mapper.Map<List<Trip>>(validEntries);
                 _context.Trips.AddRange(tripMapper);
                 await _context.SaveChangesAsync();
