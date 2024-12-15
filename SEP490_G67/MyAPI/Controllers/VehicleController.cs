@@ -180,7 +180,7 @@ namespace MyAPI.Controllers
                         await imageFile.CopyToAsync(stream);
                     }
 
-                    updateDTO.Image = $"/uploads/{newFileName}";
+                    updateDTO.Image = $"https://boring-wiles.202-92-7-204.plesk.page/uploads/{newFileName}";
                 }
                 var result = await _vehicleRepository.UpdateVehicleAsync(id, updateDTO);
 
