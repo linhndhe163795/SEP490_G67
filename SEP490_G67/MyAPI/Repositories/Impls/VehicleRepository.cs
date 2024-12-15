@@ -469,15 +469,23 @@ namespace MyAPI.Repositories.Impls
                 List<Vehicle> listVehicle = new List<Vehicle>();
                 if (role == "Staff")
                 {
-                    listVehicle = await _context.Vehicles.ToListAsync();
+                    listVehicle = await _context.Vehicles
+                        .OrderByDescending(x => x.Id)
+                        .ToListAsync();
                 }
-                if (role == "VehicleOwner")
+                else if (role == "VehicleOwner")
                 {
-                    listVehicle = await _context.Vehicles.Where(x => x.VehicleOwner == userId).ToListAsync();
+                    listVehicle = await _context.Vehicles
+                        .Where(x => x.VehicleOwner == userId)
+                        .OrderByDescending(x => x.Id)
+                        .ToListAsync();
                 }
-                if (role == "Driver")
+                else if (role == "Driver")
                 {
-                    listVehicle = await _context.Vehicles.Where(x => x.DriverId == userId).ToListAsync();
+                    listVehicle = await _context.Vehicles
+                        .Where(x => x.DriverId == userId)
+                        .OrderByDescending(x => x.Id)
+                        .ToListAsync();
                 }
 
                 var vehicleListDTOs = _mapper.Map<List<VehicleListDTO>>(listVehicle);

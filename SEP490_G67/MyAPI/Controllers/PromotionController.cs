@@ -32,7 +32,10 @@ namespace MyAPI.Controllers
             try
             {
                 var listPromotion = await _promotionRepository.GetAll();
-                var listPromotionMapper = _mapper.Map<List<PromotionDTO>>(listPromotion);
+
+                var sortedPromotion = listPromotion.OrderByDescending(x => x.Id).ToList();
+
+                var listPromotionMapper = _mapper.Map<List<PromotionDTO>>(sortedPromotion);
                 return Ok(listPromotionMapper);
             }
             catch (Exception ex)

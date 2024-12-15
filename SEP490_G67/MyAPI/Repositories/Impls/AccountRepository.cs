@@ -247,12 +247,13 @@ namespace MyAPI.Repositories.Impls
                                              join ur in _context.UserRoles on u.Id equals ur.UserId
                                              join r in _context.Roles on ur.RoleId equals r.Id
                                              where r.RoleName == "VehicleOwner"
-                                             select new VehicleOwnerDTO
+                                              orderby u.Id descending
+                                              select new VehicleOwnerDTO
                                              {
                                                  Id = u.Id,
                                                  Username = u.Username,
                                                  Email = u.Email
-                                             }).ToListAsync();
+                                             }).ToListAsync();  
                 if(listVehicleOwner == null)
                 {
                     throw new Exception("Not found vehicle owner");

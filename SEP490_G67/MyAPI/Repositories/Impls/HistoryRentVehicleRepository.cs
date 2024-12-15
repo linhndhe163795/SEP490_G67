@@ -359,15 +359,16 @@ namespace MyAPI.Repositories.Impls
             try
             {
                 List<HistoryVehicleRentDTO> history;
+
                 var query = await (from hrv in _context.HistoryRentVehicles
                                    join d in _context.Drivers
-                                   on hrv.DriverId equals d.Id
+                                       on hrv.DriverId equals d.Id
                                    join v in _context.Vehicles
-                                   on hrv.VehicleId equals v.Id
+                                       on hrv.VehicleId equals v.Id
                                    join u in _context.Users
-                                   on v.VehicleOwner equals u.Id
+                                       on v.VehicleOwner equals u.Id
                                    join p in _context.PaymentRentVehicles
-                                   on hrv.HistoryId equals p.HistoryRentVehicleId
+                                       on hrv.HistoryId equals p.HistoryRentVehicleId
                                    select new HistoryVehicleRentDTO
                                    {
                                        Id = hrv.HistoryId,
@@ -383,18 +384,23 @@ namespace MyAPI.Repositories.Impls
 
                 if (roleName == "Staff")
                 {
-                    var listHistory = query;
-
-                    history = _mapper.Map<List<HistoryVehicleRentDTO>>(listHistory);
+                    history = query
+                        .OrderByDescending(x => x.Id) 
+                        .ToList();
                 }
                 else if (roleName == "VehicleOwner")
                 {
-                    history = query.Where(x => x.OwnerId == userId).ToList();
-
+                    history = query
+                        .Where(x => x.OwnerId == userId)
+                        .OrderByDescending(x => x.Id) 
+                        .ToList();
                 }
                 else if (roleName == "Driver")
                 {
-                    history = query.Where(x => x.DriverId == userId).ToList();
+                    history = query
+                        .Where(x => x.DriverId == userId)
+                        .OrderByDescending(x => x.Id) 
+                        .ToList();
                 }
                 else
                 {
@@ -408,6 +414,7 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception($"Error: {ex.Message}");
             }
         }
+
 
     }
 }
