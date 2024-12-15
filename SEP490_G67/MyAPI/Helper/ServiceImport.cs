@@ -182,7 +182,6 @@ namespace MyAPI.Helper
             }
             var validEntries = new List<TripConvenientDTO>();
             var invalidEntries = new List<TripConvenientDTO>();
-            var existingLicensePlates = await _context.Vehicles.Where(x => x.VehicleTypeId == typeOfTrip).Select(v => v.LicensePlate).ToListAsync();
             int rowNumber = 1;
           
             using (var stream = new MemoryStream())
@@ -197,7 +196,7 @@ namespace MyAPI.Helper
                         rowNumber++;
                         List<string> error = new List<string>();
 
-                        var priceCell = row.Cell(5).GetValue<string>();
+                        var priceCell = row.Cell(4).GetValue<string>();
                         if (string.IsNullOrWhiteSpace(priceCell) || !int.TryParse(priceCell, out int price))
                         {
                             error.Add($"Invalid or empty price in row: {rowNumber}");
@@ -222,7 +221,7 @@ namespace MyAPI.Helper
                         {
                             trip.StartTime = parsedStartTime;
                         }
-                        if (!int.TryParse(row.Cell(5).GetString(), out var parsedPrice) || parsedPrice <= 0 || parsedPrice.ToString() == "null")
+                        if (!int.TryParse(row.Cell(4).GetString(), out var parsedPrice) || parsedPrice <= 0 || parsedPrice.ToString() == "null")
                         {
                             trip.ErrorMessages.Add("Invalid or negative price in row: " + rowNumber);
                         }
@@ -242,17 +241,9 @@ namespace MyAPI.Helper
                         {
                             trip.ErrorMessages.Add("Point End is empty in row: " + rowNumber);
                         }
-                        if (string.IsNullOrEmpty(trip.LicensePlate))
-                        {
-                            trip.ErrorMessages.Add("License Plate is empty in row: " + rowNumber);
-                        }
                         if (string.IsNullOrEmpty(trip.Description))
                         {
                             trip.ErrorMessages.Add("Description is empty in row: " + rowNumber);
-                        }
-                        if (trip.TypeOfTrip.ToString() == "null" || (trip.TypeOfTrip != 2 && trip.TypeOfTrip != 3))
-                        {
-                            trip.ErrorMessages.Add($"Invalid or empty type Of Trip (only 2 or 3 allowed) in row: {rowNumber}");
                         }
                         if (trip.ErrorMessages.Count == 0 && error.Count == 0)
                         {
