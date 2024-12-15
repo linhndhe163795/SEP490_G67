@@ -231,14 +231,19 @@ namespace MyAPI.Repositories.Impls
         {
             try
             {
-                int limit = 5;
+                // Extract only the date portion of the input
+                var inputDate = dateTime.Date;
 
-                // Lấy danh sách xe không bận vào ngày datetime
+                // Query to compare only dates (handling nullable DateTime)
                 var vehicles = await _context.Vehicles
-                    .Where(v => (v.DateStartBusy != dateTime || v.DateEndBusy != dateTime)  && v.VehicleTypeId == 2 && v.Status == true ) // Lọc xe không bận
+                    .Where(v =>
+                        (v.DateStartBusy.HasValue && v.DateStartBusy.Value.Date != inputDate ||
+                         v.DateEndBusy.HasValue && v.DateEndBusy.Value.Date != inputDate)  // Compare only dates
+                        && v.VehicleTypeId == 2
+                        && v.Status == true) // Filter available vehicles
                     .ToListAsync();
 
-                // Ánh xạ kết quả thành DTO
+                // Map the results to DTO
                 var result = vehicles
                     .Select(v => new Vehicle
                     {
@@ -250,7 +255,7 @@ namespace MyAPI.Repositories.Impls
                         DriverId = v.DriverId,
                         VehicleOwner = v.VehicleOwner,
                         Description = v.Description,
-                        LicensePlate = v.LicensePlate + " - " + v.NumberSeat 
+                        LicensePlate = $"{v.LicensePlate} - {v.NumberSeat}"
                     })
                     .ToList();
 
@@ -258,9 +263,11 @@ namespace MyAPI.Repositories.Impls
             }
             catch (Exception ex)
             {
-                throw new Exception($"Error in historyRentVehicleListDTOs: {ex.Message}");
+                throw new Exception($"Error in HistoryRentVehicleListDTOs: {ex.Message}");
             }
         }
+
+
 
         public async Task<List<Vehicle>> GetAvailableVehicles(int requestId)
         {
