@@ -87,7 +87,7 @@ namespace MyAPI.Repositories.Impls
         {
             try
             {
-                var lossCostVehicle = await _context.LossCosts.Include(x => x.Vehicle).Include(x => x.LossCostType)
+                var lossCostVehicle = await _context.LossCosts.Include(x => x.Vehicle).Include(x => x.LossCostType).OrderByDescending(ls => ls.Id)
                                             .Select(ls => new AddLostCostVehicleDTOs
                                             {
                                                 Id = ls.Id,

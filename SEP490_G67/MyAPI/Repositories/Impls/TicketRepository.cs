@@ -363,7 +363,7 @@ namespace MyAPI.Repositories.Impls
         {
             try
             {
-                var listTicket = await _context.Tickets.ToListAsync();
+                var listTicket = await _context.Tickets.OrderByDescending(x => x.Id).ToListAsync();
                 var listTicketMapper = _mapper.Map<List<ListTicketDTOs>>(listTicket);
                 return listTicketMapper;
             }
