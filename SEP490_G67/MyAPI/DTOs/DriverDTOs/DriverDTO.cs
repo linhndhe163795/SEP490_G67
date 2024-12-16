@@ -8,6 +8,7 @@
         public string? NumberPhone { get; set; }
         public string? Email { get; set; }
         public string? Avatar { get; set; }
+        public string? License { get; set; }
         public DateTime? Dob { get; set; }
         public string? StatusWork { get; set; }
         public int? TypeOfDriver { get; set; }

@@ -117,7 +117,7 @@ namespace MyAPI.Controllers
         }
         [Authorize(Roles = "Staff")]
         [HttpPost("{id}")]
-        public async Task<IActionResult> UpdateDriver(int id, [FromForm] UpdateDriverDTO updateDriverDto)
+        public async Task<IActionResult> UpdateDriver(int id,  UpdateDriverDTO updateDriverDto)
         {
             
             if (updateDriverDto == null)
