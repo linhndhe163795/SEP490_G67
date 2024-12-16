@@ -339,10 +339,6 @@ namespace MyAPI.Repositories.Impls
             {
                 throw new Exception("NumberPhone cannot be null or empty.");
             }
-            if (string.IsNullOrWhiteSpace(editProfileDTO.Address))
-            {
-                throw new Exception("Address cannot be null or empty.");
-            }
             if (string.IsNullOrWhiteSpace(editProfileDTO.FullName))
             {
                 throw new Exception("FullName cannot be null or empty.");
@@ -355,7 +351,6 @@ namespace MyAPI.Repositories.Impls
             {
                 throw new Exception("Phone is invalid");
             }
-
             var token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
             int userId = _tokenHelper.GetIdInHeader(token);
 
