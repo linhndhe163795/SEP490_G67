@@ -34,7 +34,22 @@ namespace MyAPI.Controllers
                 return BadRequest("getListTripDetailsbyTripId API: " + ex.Message);
             }
         }
-        
+
+        [HttpGet("tripIdStaff/TripId")]
+        public async Task<IActionResult> getListTripDetailsbyTripIdStaff(int TripId)
+        {
+            try
+            {
+                var listTripDetail = await _tripDetailsRepository.TripDetailsByTripIdStaff(TripId);
+                if (listTripDetail == null) return NotFound();
+                return Ok(listTripDetail);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest("getListTripDetailsbyTripId API: " + ex.Message);
+            }
+        }
+
         [HttpGet("startPoint/tripId")]
         public async Task<IActionResult> getListstartPointTripDetailsbyTripId(int TripId)
         {

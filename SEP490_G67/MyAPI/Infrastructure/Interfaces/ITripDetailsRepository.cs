@@ -12,6 +12,6 @@ namespace MyAPI.Infrastructure.Interfaces
         Task UpdateTripDetailsById(int tripId, int tripDetailsId, UpdateTripDetails updateTripDetails);
         Task AddTripDetailsByTripId(int tripId, TripDetailsDTO tripDetails, int userId);
         Task<TripDetailsDTO> GetTripDetailById(int tripDetailId);
-    
-}
+        Task<List<TripDetailsDTO>> TripDetailsByTripIdStaff(int tripId);
+    }
 }

@@ -238,5 +238,32 @@ namespace MyAPI.Repositories.Impls
             }
         }
 
+        public async Task<List<TripDetailsDTO>> TripDetailsByTripIdStaff(int tripId)
+        {
+            if (tripId <= 0)
+            {
+                throw new ArgumentException("Trip ID must be a valid positive integer.");
+            }
+
+            try
+            {
+                var listTripDetails = await _context.TripDetails
+                    .Where(x => x.TripId == tripId)
+                    .ToListAsync();
+
+                if (listTripDetails == null || !listTripDetails.Any())
+                {
+                    throw new KeyNotFoundException("No trip details found for the specified Trip ID.");
+                }
+
+                var listTripDetailsMapper = _mapper.Map<List<TripDetailsDTO>>(listTripDetails);
+                return listTripDetailsMapper;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("TripDetailsByTripId: " + ex.Message);
+            }
+        }
     }
+
 }
