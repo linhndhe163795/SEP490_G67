@@ -104,7 +104,6 @@ namespace MyAPI.Controllers
             {
                 return BadRequest("Invalid driver data");
             }
-
             try
             {
                 var driver = await _driverRepository.CreateDriverAsync(updateDriverDto);
@@ -118,22 +117,9 @@ namespace MyAPI.Controllers
         }
         [Authorize(Roles = "Staff")]
         [HttpPost("{id}")]
-        public async Task<IActionResult> UpdateDriver(int id, [FromForm] UpdateDriverDTO updateDriverDto, IFormFile imageFile)
+        public async Task<IActionResult> UpdateDriver(int id, [FromForm] UpdateDriverDTO updateDriverDto)
         {
-            if (imageFile != null && imageFile.Length > 0)
-            {
-                var fileName = Path.GetFileNameWithoutExtension(imageFile.FileName);
-                var fileExtension = Path.GetExtension(imageFile.FileName);
-                var newFileName = $"{fileName}_{DateTime.Now.Ticks}{fileExtension}";
-                var filePath = Path.Combine("wwwroot/uploads", newFileName);
-
-                Directory.CreateDirectory(Path.GetDirectoryName(filePath));
-                using (var stream = new FileStream(filePath, FileMode.Create))
-                {
-                    await imageFile.CopyToAsync(stream);
-                }
-                updateDriverDto.Avatar = $"/uploads/{newFileName}";
-            }
+            
             if (updateDriverDto == null)
             {
                 return BadRequest("Invalid driver data");
