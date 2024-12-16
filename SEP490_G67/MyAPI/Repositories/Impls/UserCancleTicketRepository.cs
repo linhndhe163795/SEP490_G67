@@ -43,7 +43,7 @@ namespace MyAPI.Repositories.Impls
                 {
                     throw new Exception("Ticket does not belong to the user.");
                 }
-                if (ticket.Status == "Hủy chuyến")
+                if (ticket.Status == "Hủy vé")
                 {
                     throw new Exception("Ticket had cancle!");
                 }
@@ -64,7 +64,7 @@ namespace MyAPI.Repositories.Impls
                 //                               select p).FirstOrDefaultAsync();
                 if (ticket.TypeOfPayment == Constant.TIEN_MAT)
                 {
-                    ticket.Status = "Hủy chuyến";
+                    ticket.Status = "Hủy vé";
                     ticket.NumberTicket = 0;
                     ticket.PricePromotion = 0;
                     ticket.Price = 0;
