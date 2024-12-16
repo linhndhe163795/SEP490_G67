@@ -81,8 +81,17 @@ namespace MyAPI.Repositories.Impls
                 FromEmail = "duclinh5122002@gmail.com",
                 Password = "jetj haze ijdw euci",
                 ToEmail = entity.Email,
-                Subject = "Verify Code",
-                Body = verifyCode,
+                Subject = "Xác thực OTP",
+                Body = $@"
+                Xin chào {entity.Username},
+
+                Để hoàn tất quy trình đăng nhập hoặc đặt vé, vui lòng sử dụng mã OTP sau:
+
+                {verifyCode}
+
+                Nếu bạn không yêu cầu mã OTP, vui lòng bỏ qua email này hoặc liên hệ với chúng tôi để được hỗ trợ.
+
+                Cảm ơn bạn đã sử dụng dịch vụ của chúng tôi!"
             };
 
             if (await _sendMail.SendEmail(sendMailDTO))
@@ -209,8 +218,17 @@ namespace MyAPI.Repositories.Impls
                     FromEmail = "duclinh5122002@gmail.com",
                     Password = "jetj haze ijdw euci",
                     ToEmail = entity.Email,
-                    Subject = "Code Reset Password",
-                    Body = verifyCode,
+                    Subject = "Xác thực OTP",
+                    Body = $@"
+                Xin chào {entity.Email},
+
+                Để hoàn tất quy trình lấy lại mật khẩu, vui lòng sử dụng mã OTP sau:
+
+                {verifyCode}
+
+                Nếu bạn không yêu cầu mã OTP, vui lòng bỏ qua email này hoặc liên hệ với chúng tôi để được hỗ trợ.
+
+                Cảm ơn bạn đã sử dụng dịch vụ của chúng tôi!"
                 };
 
                 if (await _sendMail.SendEmail(sendMailDTO))

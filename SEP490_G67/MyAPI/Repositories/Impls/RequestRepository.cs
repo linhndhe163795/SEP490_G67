@@ -414,13 +414,11 @@ namespace MyAPI.Repositories.Impls
                     throw new NullReferenceException();
                 }
                 var inforTicketCancle = await (from t in _context.Tickets
-                                               join p in _context.Payments
-                                               on t.Id equals p.TicketId
                                                join rd in _context.RequestDetails on t.Id equals rd.TicketId
                                                join r in _context.Requests on rd.RequestId equals r.Id
                                                join u in _context.Users on t.UserId equals u.Id
                                                where r.Id == requestId && t.Id == getTicketCancle.TicketId
-                                               select new { t, p, u, r }
+                                               select new { t, u, r }
                                                ).FirstOrDefaultAsync();
                 if (inforTicketCancle == null)
                 {
@@ -443,7 +441,6 @@ namespace MyAPI.Repositories.Impls
                 {
                     var PointUserMinus = new PointUser
                     {
-                        PaymentId = inforTicketCancle.p.PaymentId,
                         UserId = inforTicketCancle.t.UserId,
                         Points = 0,
                         PointsMinus = (int)pointOfPayment,
@@ -459,7 +456,6 @@ namespace MyAPI.Repositories.Impls
                 {
                     var PointUserMinus = new PointUser
                     {
-                        PaymentId = inforTicketCancle.p.PaymentId,
                         UserId = inforTicketCancle.t.UserId,
                         Points = (int)(updatePointUserCancle.Points - pointOfPayment),
                         PointsMinus = (int)pointOfPayment,
@@ -474,12 +470,10 @@ namespace MyAPI.Repositories.Impls
                 inforTicketCancle.t.Price = 0;
                 inforTicketCancle.t.PricePromotion = 0;
                 inforTicketCancle.t.Status = "Hủy vé";
-                inforTicketCancle.p.Price = 0;
+                inforTicketCancle.t.Price = 0;
                 inforTicketCancle.t.NumberTicket = 0;
                 var UserCancleTicket = new UserCancleTicket
                 {
-
-                    PaymentId = inforTicketCancle.p.PaymentId,
                     ReasonCancle = inforTicketCancle.r.Description,
                     UserId = inforTicketCancle.r.UserId,
                     TicketId = inforTicketCancle.t.Id,
