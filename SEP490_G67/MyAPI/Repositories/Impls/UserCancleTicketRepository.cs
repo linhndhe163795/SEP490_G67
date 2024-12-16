@@ -51,20 +51,23 @@ namespace MyAPI.Repositories.Impls
                 {
                     throw new Exception("You send request to system, please wait staff accept!");
                 }
-                DateTime dateTimeCancle = DateTime.Now.AddHours(-2);
-                var listTicketId = await _context.Tickets.Where(x => x.UserId == userId && x.TimeFrom <= dateTimeCancle).ToListAsync();
-                if (ticket.TimeFrom <= dateTimeCancle)
-                {
-                    throw new InvalidOperationException("The ticket cannot be canceled within 2 hours of departure.");
-                }
-                var inforTicketCancle = await (from t in _context.Tickets
-                                               join p in _context.Payments
-                                                 on t.Id equals p.TicketId
-                                               where t.Id == addUserCancleTicketDTOs.TicketId
-                                               select p).FirstOrDefaultAsync();
+                    DateTime dateTimeCancle = DateTime.Now.AddDays(-1);
+                    var listTicketId = await _context.Tickets.Where(x => x.UserId == userId && x.TimeFrom <= dateTimeCancle).ToListAsync();
+                    if (ticket.TimeFrom <= dateTimeCancle)
+                    {
+                        throw new InvalidOperationException("The ticket cannot be canceled within 1 day of departure.");
+                    }
+                //var inforTicketCancle = await (from t in _context.Tickets
+                //                               join p in _context.Payments
+                //                                 on t.Id equals p.TicketId
+                //                               where t.Id == addUserCancleTicketDTOs.TicketId
+                //                               select p).FirstOrDefaultAsync();
                 if (ticket.TypeOfPayment == Constant.TIEN_MAT)
                 {
                     ticket.Status = "Hủy chuyến";
+                    ticket.NumberTicket = 0;
+                    ticket.PricePromotion = 0;
+                    ticket.Price = 0;
                     var addCancleTicket = new UserCancleTicket
                     {
                         TicketId = addUserCancleTicketDTOs.TicketId,
@@ -110,7 +113,7 @@ namespace MyAPI.Repositories.Impls
                     // request đến staff
                     var RequestCancleTicket = new RequestCancleTicketDTOs
                     {
-                        TicketId = inforTicketCancle.TicketId,
+                        TicketId = ticket.Id,
                         Description = addUserCancleTicketDTOs.ReasonCancle,
                         TypeId = Constant.CHUYEN_KHOAN,
                     };
