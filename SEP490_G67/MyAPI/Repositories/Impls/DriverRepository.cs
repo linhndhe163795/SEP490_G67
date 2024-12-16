@@ -126,10 +126,6 @@ namespace MyAPI.Repositories.Impls
         }
         public async Task<Driver> UpdateDriverAsync(int id, UpdateDriverDTO updateDriverDto)
         {
-            if (updateDriverDto == null)
-            {
-                throw new ArgumentNullException(nameof(updateDriverDto), "Update data is required.");
-            }
             var existingDriver = await Get(id);
             if (existingDriver == null)
             {
@@ -155,10 +151,7 @@ namespace MyAPI.Repositories.Impls
             {
                 throw new Exception("Phone is invalid");
             }
-            if (!IsPasswordValid(updateDriverDto.Password))
-            {
-                throw new Exception("Password is weak, please input password has length more than 6 charater");
-            }
+           
             existingDriver.Name = updateDriverDto.Name;
             existingDriver.NumberPhone = updateDriverDto.NumberPhone;
             existingDriver.Email = updateDriverDto.Email;
