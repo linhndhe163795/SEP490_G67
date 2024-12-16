@@ -260,11 +260,6 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception("Trip name cannot be null or empty.");
             }
 
-            if (string.IsNullOrWhiteSpace(trip.Description))
-            {
-                throw new Exception("Description cannot be null or empty.");
-            }
-
             if (trip.Price == null || trip.Price <= 0)
             {
                 throw new Exception("Price must be greater than 0.");

@@ -39,11 +39,6 @@ namespace MyAPI.Repositories.Impls
                     throw new ArgumentException("Price must be greater than zero.", nameof(lossCostAddDTOs.Price));
                 }
 
-                if (string.IsNullOrWhiteSpace(lossCostAddDTOs.Description))
-                {
-                    throw new ArgumentException("Description cannot be null, empty, or whitespace.", nameof(lossCostAddDTOs.Description));
-                }
-
                 if (lossCostAddDTOs.DateIncurred == default || lossCostAddDTOs.DateIncurred > DateTime.Now)
                 {
                     throw new ArgumentException("DateIncurred must be a valid date and not in the future.", nameof(lossCostAddDTOs.DateIncurred));
@@ -228,11 +223,6 @@ namespace MyAPI.Repositories.Impls
                     throw new ArgumentException("Price must be greater than zero.", nameof(lossCostupdateDTOs.Price));
                 }
 
-                if (string.IsNullOrWhiteSpace(lossCostupdateDTOs.Description))
-                {
-                    throw new ArgumentException("Description cannot be null, empty, or whitespace.", nameof(lossCostupdateDTOs.Description));
-                }
-
                 if (lossCostupdateDTOs.DateIncurred == default || lossCostupdateDTOs.DateIncurred > DateTime.Now)
                 {
                     throw new ArgumentException("DateIncurred must be a valid date and not in the future.", nameof(lossCostupdateDTOs.DateIncurred));
@@ -281,11 +271,6 @@ namespace MyAPI.Repositories.Impls
             if (!dto.Price.HasValue || dto.Price <= 0)
             {
                 throw new Exception("Price is required and must be greater than 0.");
-            }
-
-            if (string.IsNullOrWhiteSpace(dto.Description))
-            {
-                throw new Exception("Description is required and cannot be empty.");
             }
 
             if (!dto.DateIncurred.HasValue)

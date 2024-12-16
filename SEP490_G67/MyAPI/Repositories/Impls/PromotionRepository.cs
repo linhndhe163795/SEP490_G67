@@ -43,11 +43,6 @@ namespace MyAPI.Repositories.Impls
                     throw new ArgumentException("CodePromotion is required and cannot be empty or whitespace.", nameof(promotionDTO.CodePromotion));
                 }
 
-                if (string.IsNullOrWhiteSpace(promotionDTO.Description))
-                {
-                    throw new ArgumentException("Description is required and cannot be empty or whitespace.", nameof(promotionDTO.Description));
-                }
-
                 if (promotionDTO.Discount <= 0)
                 {
                     throw new ArgumentException("Discount must be greater than zero.", nameof(promotionDTO.Discount));
@@ -96,11 +91,6 @@ namespace MyAPI.Repositories.Impls
                 if (string.IsNullOrWhiteSpace(promotionDTO.CodePromotion))
                 {
                     throw new ArgumentException("CodePromotion is required and cannot be empty or whitespace.", nameof(promotionDTO.CodePromotion));
-                }
-
-                if (string.IsNullOrWhiteSpace(promotionDTO.Description))
-                {
-                    throw new ArgumentException("Description is required and cannot be empty or whitespace.", nameof(promotionDTO.Description));
                 }
 
                 if (promotionDTO.Discount <= 0 || promotionDTO.Discount > 100)

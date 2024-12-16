@@ -270,11 +270,6 @@ namespace MyAPI.Repositories.Impls
                 var token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
                 int userId = _tokenHelper.GetIdInHeader(token);
 
-                if (string.IsNullOrWhiteSpace(requestDTO.Description))
-                {
-                    throw new Exception("Description is required.");
-                }
-
                 if (requestDTO.TypeId < 0)
                 {
                     throw new Exception("Invalid Type ID.");

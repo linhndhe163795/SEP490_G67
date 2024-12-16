@@ -22,10 +22,6 @@ namespace MyAPI.Repositories.Impls
 
         public async Task<LossCostType> CreateLossCostType(LossCostTypeAddDTO lossCostTypeAddDTO)
         {
-            if (string.IsNullOrWhiteSpace(lossCostTypeAddDTO.Description))
-            {
-                throw new Exception("Description cannot be null, empty, or whitespace.");
-            }
             var existingLossCostType = await _context.LossCostTypes.FirstOrDefaultAsync(lct => lct.Description == lossCostTypeAddDTO.Description);
 
             if (existingLossCostType != null)
