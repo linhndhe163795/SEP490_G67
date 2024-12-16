@@ -51,11 +51,11 @@ namespace MyAPI.Repositories.Impls
                 {
                     throw new Exception("You send request to system, please wait staff accept!");
                 }
-                DateTime dateTimeCancle = DateTime.Now.AddHours(-2);
+                DateTime dateTimeCancle = DateTime.Now.AddDays(-1);
                 var listTicketId = await _context.Tickets.Where(x => x.UserId == userId && x.TimeFrom <= dateTimeCancle).ToListAsync();
                 if (ticket.TimeFrom <= dateTimeCancle)
                 {
-                    throw new InvalidOperationException("The ticket cannot be canceled within 2 hours of departure.");
+                    throw new InvalidOperationException("The ticket cannot be canceled within 1 day of departure.");
                 }
                 var inforTicketCancle = await (from t in _context.Tickets
                                                join p in _context.Payments
