@@ -123,7 +123,7 @@ namespace MyAPI.Controllers
 
                 if (vehicles == null || !vehicles.Any())
                 {
-                    return NotFound(new { Message = "No vehicles found with the specified criteria." });
+                    return Ok(new List<object>());
                 }
 
                 return Ok(vehicles);
