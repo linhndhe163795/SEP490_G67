@@ -65,6 +65,9 @@ namespace MyAPI.Repositories.Impls
                 if (ticket.TypeOfPayment == Constant.TIEN_MAT)
                 {
                     ticket.Status = "Hủy chuyến";
+                    ticket.NumberTicket = 0;
+                    ticket.PricePromotion = 0;
+                    ticket.Price = 0;
                     var addCancleTicket = new UserCancleTicket
                     {
                         TicketId = addUserCancleTicketDTOs.TicketId,
