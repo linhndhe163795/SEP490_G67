@@ -574,7 +574,7 @@ namespace MyAPI.Repositories.Impls
                     FullName = vehicleOwnerRegister.FullName,
                     NumberPhone = vehicleOwnerRegister.NumberPhone,
                     Password = _hassPassword.HashMD5Password(vehicleOwnerRegister.Password),
-                    Status = true,
+                    Status = vehicleOwnerRegister.Status,
                     Dob = vehicleOwnerRegister.Dob,
                     CreatedAt = DateTime.Now,
                     CreatedBy = staffId
