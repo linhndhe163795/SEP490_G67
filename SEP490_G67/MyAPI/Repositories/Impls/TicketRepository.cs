@@ -339,7 +339,7 @@ namespace MyAPI.Repositories.Impls
                 var seatCount = requestDetail.Seats.Value;
 
                 var vehicles = await _context.Vehicles
-                    .Where(v => v.VehicleTypeId == 3 && v.NumberSeat >= seatCount && (v.DateEndBusy < startDate || v.DateStartBusy > endDate) && v.Status == true)
+                    .Where(v => v.VehicleTypeId == 3 && v.NumberSeat >= seatCount && (v.DateEndBusy < startDate || v.DateStartBusy > endDate || !v.DateStartBusy.HasValue || !v.DateEndBusy.HasValue ) && v.Status == true)
                     .Take(5)
                     .Select(v => new VehicleBasicDto
                     {
