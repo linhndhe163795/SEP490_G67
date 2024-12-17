@@ -102,7 +102,7 @@ namespace MyAPI.Repositories.Impls
                     VehicleTypeId = vehicleAddDTO.VehicleTypeId ?? 1,
                     Image = vehicleAddDTO.Image,
                     Status = isRoleStaff,
-                    DriverId = vehicleAddDTO.driverId,
+                    DriverId = vehicleAddDTO.driverId ?? null,
                     VehicleOwner = (isRoleStaff == true) ? vehicleAddDTO.VehicleOwner : userId,
                     LicensePlate = vehicleAddDTO.LicensePlate,
                     Description = vehicleAddDTO.Description,
