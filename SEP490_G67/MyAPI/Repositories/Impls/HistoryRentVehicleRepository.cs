@@ -238,7 +238,7 @@ namespace MyAPI.Repositories.Impls
                 var vehicles = await _context.Vehicles
                     .Where(v =>
                         (v.DateStartBusy.HasValue && v.DateStartBusy.Value.Date != inputDate ||
-                         v.DateEndBusy.HasValue && v.DateEndBusy.Value.Date != inputDate)  // Compare only dates
+                         v.DateEndBusy.HasValue && v.DateEndBusy.Value.Date != inputDate || !v.DateEndBusy.HasValue || !v.DateStartBusy.HasValue)  // Compare only dates
                         && v.VehicleTypeId == 2
                         && v.Status == true) // Filter available vehicles
                     .ToListAsync();
