@@ -70,10 +70,7 @@ namespace MyAPI.Repositories.Impls
                     throw new Exception("Invalid type of vehicle");
                 }
                 var checkUserNameDrive = await _context.Drivers.SingleOrDefaultAsync(s => s.UserName.Equals(vehicleAddDTO.driverName));
-                if (checkUserNameDrive == null && vehicleAddDTO.driverName != null)
-                {
-                    throw new Exception("Not found driver");
-                }
+
                 var token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
                 int userId = _tokenHelper.GetIdInHeader(token);
 
@@ -872,10 +869,7 @@ namespace MyAPI.Repositories.Impls
                     throw new Exception("Invalid type of vehicle");
                 }
                 var checkUserId = await _context.Drivers.SingleOrDefaultAsync(s => s.Id.Equals(updateDTO.DriverId));
-                if (checkUserId == null && updateDTO.DriverId != null)
-                {
-                    throw new Exception("Not found driver");
-                }
+
                 var checkLicensePlate = await _context.Vehicles
                                     .Where(s => s.LicensePlate.Equals(updateDTO.LicensePlate) && s.Id != id)
                                     .FirstOrDefaultAsync();
