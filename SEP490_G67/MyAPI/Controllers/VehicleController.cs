@@ -32,7 +32,7 @@ namespace MyAPI.Controllers
             _tripRepository = tripRepository;
             _getInforFromToken = getInforFromToken;
         }
-        [Authorize(Roles = "Staff")]
+        [Authorize(Roles = "Staff, VehicleOwner")]
         [HttpGet("listVehicleType")]
         public async Task<IActionResult> GetVehicleType()
         {
