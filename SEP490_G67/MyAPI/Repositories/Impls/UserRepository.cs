@@ -573,11 +573,12 @@ namespace MyAPI.Repositories.Impls
                     Avatar = vehicleOwnerRegister.Avatar,
                     FullName = vehicleOwnerRegister.FullName,
                     NumberPhone = vehicleOwnerRegister.NumberPhone,
-                    Password = vehicleOwnerRegister.Password,
+                    Password = _hassPassword.HashMD5Password(vehicleOwnerRegister.Password),
+                    Status = true,
                     Dob = vehicleOwnerRegister.Dob,
                     CreatedAt = DateTime.Now,
-                    CreatedBy = staffId,
-                };
+                    CreatedBy = staffId
+            };
                 _context.Users.Add(vehicleOwner);
                 await _context.SaveChangesAsync();
                 var userRole = new UserRole
