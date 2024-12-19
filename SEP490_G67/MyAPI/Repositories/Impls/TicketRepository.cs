@@ -53,7 +53,6 @@ namespace MyAPI.Repositories.Impls
 
                 var promotionUserUsed = await _context.PromotionUsers.Include(x => x.Promotion)
                                         .FirstOrDefaultAsync(x => x.Promotion.CodePromotion == promotionCode && x.UserId == userId);
-                //var dateString = _httpContextAccessor?.HttpContext?.Session.GetString("date") ?? DateTime.Now.ToString("MM/dd/yyyy");
                 var dateString = dateTicket.ToString("MM/dd/yyyy");
 
                 var tripDetails = await (from td in _context.TripDetails
@@ -393,11 +392,17 @@ namespace MyAPI.Repositories.Impls
                                         v.Id == vehicleId &&
                                         tk.Status == "Thanh toán bằng tiền mặt" &&
                                         tk.TimeFrom <= DateTime.Now
-                                        select new { tk.UserId, u.FullName, tk.PricePromotion, typeP.TypeOfPayment1, tk.Id }
+                                        select new { tk.UserId, u.FullName, tk.PricePromotion, typeP.TypeOfPayment1, tk.Id, v.LicensePlate }
                                        ).ToListAsync();
                 var totalPricePromotion = listTicket
-                    .GroupBy(t => new { t.UserId, t.Id })
-                    .Select(g => new TicketNotPaid { ticketId = g.Key.Id, userId = g.Key.UserId, FullName = g.FirstOrDefault()?.FullName, Price = g.Sum(x => x.PricePromotion.Value), TypeOfPayment = g.FirstOrDefault()?.TypeOfPayment1 })
+                    .GroupBy(t => new { t.UserId, t.Id, t.LicensePlate })
+                    .Select(g => new TicketNotPaid { 
+                        ticketId = g.Key.Id, 
+                        userId = g.Key.UserId,
+                        LicensePlate = g.Key.LicensePlate,
+                        FullName = g.FirstOrDefault()?.FullName, 
+                        Price = g.Sum(x => x.PricePromotion.Value), 
+                        TypeOfPayment = g.FirstOrDefault()?.TypeOfPayment1 })
                     .ToList();
                 decimal total = totalPricePromotion.Sum(t => t.Price);
                 var result = new TicketNotPaidSummary
@@ -732,7 +737,6 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception(ex.Message);
             }
         }
-
         public async Task updateTicketByTicketId(int ticketId, int userId, TicketUpdateDTOs ticket)
         {
             try
@@ -762,7 +766,6 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception(ex.Message);
             }
         }
-
         public async Task deleteTicketByTicketId(int id, int userId)
         {
             try

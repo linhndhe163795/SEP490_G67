@@ -523,6 +523,58 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception("GetTicketCount: " + ex.Message);
             }
         }
+        public async Task<int> GetTicketByDate(int tripId, DateTime? dateTime)
+        {
+            if (tripId <= 0)
+            {
+                throw new ArgumentException("Trip ID must be greater than 0.");
+            }
+            try
+            {
+                var vehicleTrip = await _context.VehicleTrips.FirstOrDefaultAsync(x => x.TripId == tripId);
+
+                if (vehicleTrip == null)
+                {
+                    throw new KeyNotFoundException("No vehicle trip found for the specified trip ID.");
+                }
+                if (dateTime == null)
+                {
+                    dateTime = DateTime.Now;
+                    
+                    var listTicketByVehicleID = await (from t in _context.Tickets
+                                                       where t.VehicleId == vehicleTrip.VehicleId
+                                                             && EF.Functions.DateDiffDay(t.TimeFrom, dateTime) == 0
+                                                       select t.NumberTicket
+                                 ).ToListAsync();
+                    if (listTicketByVehicleID == null || !listTicketByVehicleID.Any())
+                    {
+                        return 0;
+                    }
+
+                    var sum = listTicketByVehicleID.Sum();
+                    return sum ?? 0;
+                }
+                else
+                {
+                    var listTicketByVehicleID = await (from t in _context.Tickets
+                                                       where t.VehicleId == vehicleTrip.VehicleId
+                                                             && EF.Functions.DateDiffDay(t.TimeFrom, dateTime) == 0
+                                                       select t.NumberTicket
+                                  ).ToListAsync();
+                    if (listTicketByVehicleID == null || !listTicketByVehicleID.Any())
+                    {
+                        return 0;
+                    }
+
+                    var sum = listTicketByVehicleID.Sum();
+                    return sum ?? 0;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("GetTicketCount: " + ex.Message);
+            }
+        }
         public async Task<(List<Trip>, List<string>)> ImportExcel(Stream excelStream)
         {
 

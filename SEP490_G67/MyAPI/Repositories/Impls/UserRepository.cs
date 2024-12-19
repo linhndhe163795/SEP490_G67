@@ -114,7 +114,6 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception("Failed to send verification email.");
             }
         }
-
         public bool IsValidEmail(string email)
         {
             var emailPattern = @"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$";
@@ -129,7 +128,6 @@ namespace MyAPI.Repositories.Impls
         {
             return password.Length >= 6;
         }
-
         public async Task<bool> checkAccountExsit(User user)
         {
             if (user == null)
@@ -140,8 +138,6 @@ namespace MyAPI.Repositories.Impls
             var userExit = await _context.Users.FirstOrDefaultAsync(x => x.Username == user.Username || x.Email == user.Email);
             return userExit != null;
         }
-
-
         public async Task<int> lastIdUser()
         {
             int lastId = await _context.Users.OrderByDescending(x => x.Id).Select(x => x.Id).FirstOrDefaultAsync();
@@ -167,8 +163,6 @@ namespace MyAPI.Repositories.Impls
 
             }
         }
-
-
         public async Task<bool> checkLogin(UserLoginDTO userLoginDTO)
         {
             if (userLoginDTO == null)
@@ -196,7 +190,6 @@ namespace MyAPI.Repositories.Impls
 
             return user != null;
         }
-
         public async Task ForgotPassword(ForgotPasswordDTO entity)
         {
             if (entity == null)
@@ -247,7 +240,6 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception("Account not found with the provided email.");
             }
         }
-
         public async Task ResetPassword(ResetPasswordDTO resetPasswordDTO)
         {
             if (resetPasswordDTO == null)
@@ -288,7 +280,6 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception("Invalid email or reset code.");
             }
         }
-
         public async Task ChangePassword(ChangePasswordDTO changeEmailDTO, int userId)
         {
             try
@@ -377,8 +368,6 @@ namespace MyAPI.Repositories.Impls
             await _context.SaveChangesAsync();
             return user;
         }
-
-
         public async Task<UserLoginDTO> GetUserLogin(UserLoginDTO userLogin)
         {
             if (userLogin == null)
@@ -429,8 +418,6 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception("GetUserLogin: " + ex.Message);
             }
         }
-
-
         public async Task<UserPostLoginDTO> getUserById(int id)
         {
             if (id <= 0)
@@ -486,7 +473,6 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception("getUserById: " + ex.Message);
             }
         }
-
         public async Task<List<UserPostLoginDTO>> getListVehicleOwner()
         {
             try
@@ -522,7 +508,6 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception(ex.Message);
             }
         }
-
         public async Task<User> RegisterVehicleOwner(VehicleOwnerDTO vehicleOwnerRegister, int staffId)
         {
             try
@@ -578,7 +563,7 @@ namespace MyAPI.Repositories.Impls
                     Dob = vehicleOwnerRegister.Dob,
                     CreatedAt = DateTime.Now,
                     CreatedBy = staffId
-            };
+                };
                 _context.Users.Add(vehicleOwner);
                 await _context.SaveChangesAsync();
                 var userRole = new UserRole
@@ -595,7 +580,61 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception(ex.Message);
             }
         }
+        public async Task<User> RegisterAccountFromAdmin(CreateAccountDTO userRegisterDTO)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(userRegisterDTO.Email))
+                {
+                    throw new Exception("Email cannot be null or empty.");
+                }
+                if (string.IsNullOrWhiteSpace(userRegisterDTO.NumberPhone))
+                {
+                    throw new Exception("NumberPhone cannot be null or empty.");
+                }
+                if (string.IsNullOrWhiteSpace(userRegisterDTO.FullName))
+                {
+                    throw new Exception("FullName cannot be null or empty.");
+                }
+                if (!IsValidEmail(userRegisterDTO.Email))
+                {
+                    throw new Exception("Email is invalid.");
+                }
+                if (!IsValidPhone(userRegisterDTO.NumberPhone))
+                {
+                    throw new Exception("Phone is invalid");
+                }
+                var userFromStaff = new User
+                {
+                    Username = userRegisterDTO.Username,
+                    FullName = userRegisterDTO.FullName,
+                    Email = userRegisterDTO.Email,
+                    Password = _hassPassword.HashMD5Password(userRegisterDTO.Password),
+                    NumberPhone = userRegisterDTO.NumberPhone,
+                    Status = true
+                };
+                if (await checkAccountExsit(userFromStaff))
+                {
+                    throw new Exception("Email or User Name exist");
+                }
 
+                    _context.Users.Add(userFromStaff);
+                await _context.SaveChangesAsync();
+                var userRole = new UserRole
+                {
+                    RoleId = userRegisterDTO.RoleId,
+                    UserId = userFromStaff.Id,
+                    Status = true
+                };
+                _context.UserRoles.Add(userRole);
+                await _context.SaveChangesAsync();
+                return userFromStaff;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
 
     }
 }
