@@ -335,11 +335,11 @@ namespace MyAPI.Controllers
                     return BadRequest("Trip StartTime is not available.");
                 }
 
-                // Combine the provided date with the trip start time
+             
                 var tripDateTime = new DateTime(date.Year, date.Month, date.Day).Add(trip.StartTime.Value);
                 Console.WriteLine($"Trip DateTime: {tripDateTime}");
 
-                // Retrieve the number of available seats
+                
                 var availableSeats = await _vehicleRepository.GetNumberSeatAvaiable(tripId, tripDateTime);
                 return Ok(availableSeats);
             }

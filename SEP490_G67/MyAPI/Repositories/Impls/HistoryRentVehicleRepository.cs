@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using DocumentFormat.OpenXml.Spreadsheet;
+using DocumentFormat.OpenXml.Wordprocessing;
 using Microsoft.EntityFrameworkCore;
 using MyAPI.DTOs;
 using MyAPI.DTOs.HistoryRentVehicleDTOs;
@@ -231,19 +232,19 @@ namespace MyAPI.Repositories.Impls
         {
             try
             {
-                // Extract only the date portion of the input
-                var inputDate = dateTime.Date;
+                var ticket = await _context.Tickets.Where(t => t.TimeFrom <= dateTime &&
+                                        t.TimeTo >= dateTime && t.TypeOfTicket == Constant.VE_BAO_XE).ToListAsync();
+                var ticketVehicleIds = ticket
+                                        .Where(t => t.VehicleId.HasValue)
+                                        .Select(t => t.VehicleId.Value)
+                                        .ToHashSet();
 
-                // Query to compare only dates (handling nullable DateTime)
                 var vehicles = await _context.Vehicles
-                    .Where(v =>
-                        (v.DateStartBusy.HasValue && v.DateStartBusy.Value.Date != inputDate ||
-                         v.DateEndBusy.HasValue && v.DateEndBusy.Value.Date != inputDate || !v.DateEndBusy.HasValue || !v.DateStartBusy.HasValue)  // Compare only dates
-                        && v.VehicleTypeId == 2
-                        && v.Status == true) // Filter available vehicles
+                    .Include(x => x.Tickets)
+                    .Where(v => v.VehicleTypeId == Constant.VE_XE_TIEN_CHUYEN
+                           && !ticketVehicleIds.Contains(v.Id)) 
                     .ToListAsync();
 
-                // Map the results to DTO
                 var result = vehicles
                     .Select(v => new Vehicle
                     {
@@ -255,7 +256,7 @@ namespace MyAPI.Repositories.Impls
                         DriverId = v.DriverId,
                         VehicleOwner = v.VehicleOwner,
                         Description = v.Description,
-                        LicensePlate = $"{v.LicensePlate} - {v.NumberSeat}"
+                        LicensePlate = $"{v.LicensePlate} - Số ghế: {v.NumberSeat}"
                     })
                     .ToList();
 
@@ -291,13 +292,13 @@ namespace MyAPI.Repositories.Impls
                 var availableVehicles = await _context.Vehicles
                     .Where(v =>
                          (
-                        v.DateStartBusy == null || v.DateEndBusy == null || 
+                        v.DateStartBusy == null || v.DateEndBusy == null ||
                         (v.DateEndBusy <= request.StartTime || v.DateStartBusy >= request.EndTime)
-                        ) && 
-                        v.NumberSeat >= request.Seats &&          
-                        v.Status == true &&                     
+                        ) &&
+                        v.NumberSeat >= request.Seats &&
+                        v.Status == true &&
                         v.Flag == false &&
-                        v.DriverId == null   
+                        v.DriverId == null
                     )
                     .ToListAsync();
 
@@ -392,21 +393,21 @@ namespace MyAPI.Repositories.Impls
                 if (roleName == "Staff")
                 {
                     history = query
-                        .OrderByDescending(x => x.Id) 
+                        .OrderByDescending(x => x.Id)
                         .ToList();
                 }
                 else if (roleName == "VehicleOwner")
                 {
                     history = query
                         .Where(x => x.OwnerId == userId)
-                        .OrderByDescending(x => x.Id) 
+                        .OrderByDescending(x => x.Id)
                         .ToList();
                 }
                 else if (roleName == "Driver")
                 {
                     history = query
                         .Where(x => x.DriverId == userId)
-                        .OrderByDescending(x => x.Id) 
+                        .OrderByDescending(x => x.Id)
                         .ToList();
                 }
                 else
