@@ -8,9 +8,13 @@ namespace MyAPI.Infrastructure.Interfaces
     public interface ITripRepository : IRepository<Trip>
     {
         Task<List<TripDTO>> GetListTrip();
+        Task<List<TripDTO>> getListTripConvenience();
         Task<List<TripVehicleDTO>> SreachTrip(string startPoint, string endPoint, string time);
-        Task AddTrip(TripDTO trip, int userId);  
+        Task AddTrip(TripDTO trip, int userId);
+        Task AddTripConvenience(TripConvenientDTO trip, int userId);
+        Task updateStatusTripConvenience(int id, int userId);
         Task UpdateTripById(int tripId, UpdateTrip trip, int userId);
+        Task UpdateTripConvenience(int tripId, TripConvenientDTO trip, int userId);
         Task updateStatusTrip(int id, int userId);
         Task confirmAddValidEntryImport(List<TripImportDTO> validEntry);
         Task<List<TripDTO>> getListTripNotVehicle();

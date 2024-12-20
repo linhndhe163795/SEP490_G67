@@ -225,15 +225,13 @@ namespace MyAPI.Repositories.Impls
             {
                 throw new Exception($"Failed to create {ex.Message}");
             }
-
-
         }
         public async Task<List<Vehicle>> historyRentVehicleListDTOs(DateTime dateTime)
         {
             try
             {
-                var ticket = await _context.Tickets.Where(t => t.TimeFrom <= dateTime &&
-                                        t.TimeTo >= dateTime && t.TypeOfTicket == Constant.VE_BAO_XE).ToListAsync();
+                var ticket = await _context.Tickets.Where(t => t.TimeFrom.HasValue && t.TimeFrom.Value.Date <= dateTime.Date &&
+                                        t.TimeFrom.Value.Date >= dateTime && t.TypeOfTicket == Constant.VE_BAO_XE).ToListAsync();
                 var ticketVehicleIds = ticket
                                         .Where(t => t.VehicleId.HasValue)
                                         .Select(t => t.VehicleId.Value)

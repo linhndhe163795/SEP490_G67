@@ -31,6 +31,8 @@
         public const double TICH_DIEM = 0.0001;
 
         public const int CHUYEN_DI_LIEN_TINH = 1;
+        public const int CHUYEN_XE_GHEP = 2;
+        public const int CHUYEN_DI_BAO_XE = 3;
 
        
 

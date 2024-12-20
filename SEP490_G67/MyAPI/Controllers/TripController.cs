@@ -48,6 +48,75 @@ namespace MyAPI.Controllers
                 throw new Exception("GetListTrip: " + ex.Message);
             }
         }
+        [Authorize(Roles = "Staff")]
+        [HttpGet("listTripConvenience")]
+        public async Task<IActionResult> GetListTripConvenience()
+        {
+            try
+            {
+                var listTrip = await _tripRepository.getListTripConvenience();
+                if (listTrip == null)
+                {
+                    return NotFound("Not found any trip");
+                }
+                else
+                {
+                    return Ok(listTrip);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("GetListTrip: " + ex.Message);
+            }
+        }
+        [Authorize(Roles = "Staff")]
+        [HttpPost("updateTripConvenience/id")]
+        public async Task<IActionResult> updateTripConvenienceByTripId(int tripId, TripConvenientDTO tripConvenience)
+        {
+            try
+            {
+                string token = Request.Headers["Authorization"];
+                if (token.StartsWith("Bearer"))
+                {
+                    token = token.Substring("Bearer ".Length).Trim();
+                }
+                if (string.IsNullOrEmpty(token))
+                {
+                    return BadRequest("Token is required.");
+                }
+                var userId = _getInforFromToken.GetIdInHeader(token);
+                await _tripRepository.UpdateTripConvenience(tripId, tripConvenience, userId);
+                return Ok("Update trip successfull");
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("GetListTrip: " + ex.Message);
+            }
+        }
+        [Authorize(Roles = "Staff")]
+        [HttpPost("updateStatusConvenience/id")]
+        public async Task<IActionResult> updateStatusTripConvenience(int tripId)
+        {
+            try
+            {
+                string token = Request.Headers["Authorization"];
+                if (token.StartsWith("Bearer"))
+                {
+                    token = token.Substring("Bearer ".Length).Trim();
+                }
+                if (string.IsNullOrEmpty(token))
+                {
+                    return BadRequest("Token is required.");
+                }
+                var userId = _getInforFromToken.GetIdInHeader(token);
+                await _tripRepository.updateStatusTripConvenience(tripId, userId);
+                return Ok("update status successfull");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
         // xe liên tỉnh
         [HttpGet("searchTrip/startPoint/endPoint/time")]
         public async Task<IActionResult> SearchTrip(string startPoint, string endPoint, DateTime time)
@@ -94,6 +163,33 @@ namespace MyAPI.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        [Authorize(Roles = "Staff")]
+        [HttpPost("addTripConvenience")]
+        public async Task<IActionResult> addTripConvenience(TripConvenientDTO trip)
+        {
+            try
+            {
+                string token = Request.Headers["Authorization"];
+                if (token.StartsWith("Bearer"))
+                {
+                    token = token.Substring("Bearer ".Length).Trim();
+                }
+                if (string.IsNullOrEmpty(token))
+                {
+                    return BadRequest("Token is required.");
+                }
+                var userId = _getInforFromToken.GetIdInHeader(token);
+                await _tripRepository.AddTripConvenience(trip, userId);
+
+                return Ok(trip);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+
         [HttpGet("download_template_trip/typeOfTrip")]
         public IActionResult DownloadTemplateTrip(int typeOfTrip)
         {
@@ -193,7 +289,7 @@ namespace MyAPI.Controllers
             {
                 return BadRequest("No valid entries to import.");
             }
-            if(typeOfTrip == Constant.CHUYEN_DI_LIEN_TINH)
+            if (typeOfTrip == Constant.CHUYEN_DI_LIEN_TINH)
             {
                 await _tripRepository.confirmAddValidEntryImport(validEntries);
                 return Ok("Successfully imported valid entries.");
@@ -203,7 +299,7 @@ namespace MyAPI.Controllers
                 await _tripRepository.confirmAddValidEntriesConvenience(validEntries);
                 return Ok("Successfully imported valid entries.");
             }
-            
+
         }
         [Authorize(Roles = "Staff")]
         [HttpPost("updateTrip/{id}")]
