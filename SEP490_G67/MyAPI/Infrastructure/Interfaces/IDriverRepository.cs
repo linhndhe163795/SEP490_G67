@@ -12,13 +12,10 @@ namespace MyAPI.Infrastructure.Interfaces
         Task<Driver> GetDriverWithVehicle(int id);
         Task<Driver> CreateDriverAsync(UpdateDriverDTO updateDriverDto);
         Task<Driver> UpdateDriverAsync(int id, UpdateDriverDTO updateDriverDto);
-
         Task<IEnumerable<Driver>> GetDriversWithoutVehicleAsync();
-
         Task SendEmailToDriversWithoutVehicle(int price);
         Task<bool> checkLogin(LoginDriverDTO login);
         Task<DriverLoginRespone> getDriverLogin(LoginDriverDTO login);
-
         Task<List<ListDriverDTO>> getListDriverForVehicle();
         Task BanDriver(int id);
     }

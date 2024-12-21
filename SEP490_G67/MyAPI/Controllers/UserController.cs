@@ -14,13 +14,13 @@ namespace MyAPI.Controllers
     {
         private readonly IUserRepository _userRepository;
         private readonly GetInforFromToken _getInforFromToken;
-        
+
 
         public UserController(IUserRepository userRepository, SendMail sendMailHelper, GetInforFromToken getInforFromToken)
         {
             _userRepository = userRepository;
             _getInforFromToken = getInforFromToken;
-            
+
         }
 
         [Authorize]
@@ -41,7 +41,7 @@ namespace MyAPI.Controllers
                 var userId = _getInforFromToken.GetIdInHeader(token);
                 await _userRepository.ChangePassword(changePasswordDTO, userId);
 
-                
+
                 return Ok("Change password successfully");
             }
             catch (Exception ex)
@@ -56,7 +56,7 @@ namespace MyAPI.Controllers
         {
             try
             {
-               
+
                 var updatedUser = await _userRepository.EditProfile(editProfileDTO);
                 return Ok("Update user profile successfull");
             }
@@ -73,6 +73,20 @@ namespace MyAPI.Controllers
             {
                 var listVehicle = await _userRepository.getListVehicleOwner();
                 return Ok(listVehicle);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [Authorize(Roles = "Admin")]
+        [HttpPost("createAccount")]
+        public async Task<IActionResult> createAccountFromAdmin(CreateAccountDTO createAccount)
+        {
+            try
+            {
+                var newAccount = await _userRepository.RegisterAccountFromAdmin(createAccount);
+                return Ok(createAccount);
             }
             catch (Exception ex)
             {

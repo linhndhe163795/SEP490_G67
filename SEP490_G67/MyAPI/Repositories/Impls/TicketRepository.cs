@@ -10,6 +10,7 @@ using MyAPI.Helper;
 using MyAPI.Infrastructure.Interfaces;
 using MyAPI.Models;
 using System.Linq;
+using System.Net.Sockets;
 
 namespace MyAPI.Repositories.Impls
 {
@@ -53,7 +54,6 @@ namespace MyAPI.Repositories.Impls
 
                 var promotionUserUsed = await _context.PromotionUsers.Include(x => x.Promotion)
                                         .FirstOrDefaultAsync(x => x.Promotion.CodePromotion == promotionCode && x.UserId == userId);
-                //var dateString = _httpContextAccessor?.HttpContext?.Session.GetString("date") ?? DateTime.Now.ToString("MM/dd/yyyy");
                 var dateString = dateTicket.ToString("MM/dd/yyyy");
 
                 var tripDetails = await (from td in _context.TripDetails
@@ -98,7 +98,7 @@ namespace MyAPI.Repositories.Impls
                     Status = (ticketDTOs.TypeOfPayment == Constant.CHUYEN_KHOAN) ? "Chờ thanh toán" : "Thanh toán bằng tiền mặt",
                     VehicleId = tripDetails.Vehicle.Id,
                     TypeOfTicket = (tripDetails.Vehicle.NumberSeat >= Constant.SO_GHE_XE_TIEN_CHUYEN) ? Constant.VE_XE_LIEN_TINH : Constant.VE_XE_TIEN_CHUYEN,
-                    Note = 
+                    Note =
                         " Xe sẽ đến điểm " + tripDetails.TripDetails.PointStartDetails +
                         " vào lúc: " + tripDetails.TripDetails.TimeStartDetils,
                     UserId = userId,
@@ -337,20 +337,30 @@ namespace MyAPI.Repositories.Impls
                 }
 
                 var seatCount = requestDetail.Seats.Value;
+                var ticket = await _context.Tickets.Where(t => t.TimeFrom < endDate &&
+                                        t.TimeTo > startDate && t.TypeOfTicket == Constant.VE_XE_DU_LICH).ToListAsync();
+                var ticketVehicleIds = ticket
+                                        .Where(t => t.VehicleId.HasValue)
+                                        .Select(t => t.VehicleId.Value)
+                                        .ToHashSet();
 
                 var vehicles = await _context.Vehicles
-                    .Where(v => v.VehicleTypeId == 3 && v.NumberSeat >= seatCount && (v.DateEndBusy < startDate || v.DateStartBusy > endDate || !v.DateStartBusy.HasValue || !v.DateEndBusy.HasValue ) && v.Status == true)
-                    .Take(5)
-                    .Select(v => new VehicleBasicDto
-                    {
-                        Id = v.Id,
-                        NumberSeat = v.NumberSeat,
-                        VehicleTypeId = v.VehicleTypeId,
-                        Status = v.Status,
-                        LicensePlate = v.LicensePlate,
-                        Description = v.Description
-                    })
-                    .ToListAsync();
+                                .Include(x => x.Tickets)
+                                .Where(v => v.VehicleTypeId == Constant.VE_XE_DU_LICH
+                                    && v.NumberSeat >= seatCount
+                                     && !ticketVehicleIds.Contains(v.Id)
+                                    && v.Status == true)
+                                .Take(5)
+                            .Select(v => new VehicleBasicDto
+                            {
+                                Id = v.Id,
+                                NumberSeat = v.NumberSeat,
+                                VehicleTypeId = v.VehicleTypeId,
+                                Status = v.Status,
+                                LicensePlate = v.LicensePlate,
+                                Description = v.Description
+                            })
+                            .ToListAsync();
 
                 return vehicles;
             }
@@ -393,11 +403,19 @@ namespace MyAPI.Repositories.Impls
                                         v.Id == vehicleId &&
                                         tk.Status == "Thanh toán bằng tiền mặt" &&
                                         tk.TimeFrom <= DateTime.Now
-                                        select new { tk.UserId, u.FullName, tk.PricePromotion, typeP.TypeOfPayment1, tk.Id }
+                                        select new { tk.UserId, u.FullName, tk.PricePromotion, typeP.TypeOfPayment1, tk.Id, v.LicensePlate }
                                        ).ToListAsync();
                 var totalPricePromotion = listTicket
-                    .GroupBy(t => new { t.UserId, t.Id })
-                    .Select(g => new TicketNotPaid { ticketId = g.Key.Id, userId = g.Key.UserId, FullName = g.FirstOrDefault()?.FullName, Price = g.Sum(x => x.PricePromotion.Value), TypeOfPayment = g.FirstOrDefault()?.TypeOfPayment1 })
+                    .GroupBy(t => new { t.UserId, t.Id, t.LicensePlate })
+                    .Select(g => new TicketNotPaid
+                    {
+                        ticketId = g.Key.Id,
+                        userId = g.Key.UserId,
+                        LicensePlate = g.Key.LicensePlate,
+                        FullName = g.FirstOrDefault()?.FullName,
+                        Price = g.Sum(x => x.PricePromotion.Value),
+                        TypeOfPayment = g.FirstOrDefault()?.TypeOfPayment1
+                    })
                     .ToList();
                 decimal total = totalPricePromotion.Sum(t => t.Price);
                 var result = new TicketNotPaidSummary
@@ -649,13 +667,13 @@ namespace MyAPI.Repositories.Impls
         private async Task<RevenueTicketDTO> GetRevenueForVehicleOwner(int userId)
         {
             var query = _context.Tickets.Include(x => x.Vehicle).Where(x => x.Vehicle.VehicleOwner == userId).AsQueryable();
-           
+
             return await GetRevenueTicketDTO(query);
         }
         private async Task<RevenueTicketDTO> GetRevenueForStaff(int userId)
         {
             var query = _context.Tickets.Include(x => x.Vehicle).AsQueryable();
-           
+
             return await GetRevenueTicketDTO(query);
         }
         private async Task<RevenueTicketDTO> GetRevenueTicketDTO(IQueryable<Ticket> query)
@@ -732,7 +750,6 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception(ex.Message);
             }
         }
-
         public async Task updateTicketByTicketId(int ticketId, int userId, TicketUpdateDTOs ticket)
         {
             try
@@ -762,7 +779,6 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception(ex.Message);
             }
         }
-
         public async Task deleteTicketByTicketId(int id, int userId)
         {
             try

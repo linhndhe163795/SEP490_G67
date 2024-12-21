@@ -108,7 +108,7 @@ namespace MyAPI.Controllers
         {
             try
             {
-             
+
                 var isAdded = await _vehicleRepository.AddVehicleAsync(vehicleAddDTO);
                 return Ok(new { Message = "Vehicle added successfully.", Vehicle = vehicleAddDTO });
 
@@ -335,11 +335,11 @@ namespace MyAPI.Controllers
                     return BadRequest("Trip StartTime is not available.");
                 }
 
-                // Combine the provided date with the trip start time
+             
                 var tripDateTime = new DateTime(date.Year, date.Month, date.Day).Add(trip.StartTime.Value);
                 Console.WriteLine($"Trip DateTime: {tripDateTime}");
 
-                // Retrieve the number of available seats
+                
                 var availableSeats = await _vehicleRepository.GetNumberSeatAvaiable(tripId, tripDateTime);
                 return Ok(availableSeats);
             }
@@ -440,7 +440,20 @@ namespace MyAPI.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
+        [HttpGet("listNumberSeatAvaliable/date")]
+        public async Task<IActionResult> listNumberSeatAvaliableOfVehilce(DateTime? date)
+        {
+            try
+            {
+                var list = await _vehicleRepository.listNumberSeatAvaliableOfVehilce(date);
+                return Ok(list);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
 
-       
+
     }
 }

@@ -52,7 +52,7 @@ namespace MyAPI.Repositories.Impls
         {
             try
             {
-                var licensePlatePattern = @"^\d{2}[A-Z]-\d{5}$";
+                var licensePlatePattern = @"^(?!80)\d{2}[A-Z]{1,2}(?:LD)?-\d{3}\.?\d{2}$";
                 if (vehicleAddDTO.NumberSeat == null || vehicleAddDTO.NumberSeat <= 0)
                 {
                     throw new Exception("NumberSeat must be greater than 0.");
@@ -69,6 +69,7 @@ namespace MyAPI.Repositories.Impls
                 {
                     throw new Exception("Invalid type of vehicle");
                 }
+
                 var checkUserNameDrive = await _context.Drivers.SingleOrDefaultAsync(s => s.UserName.Equals(vehicleAddDTO.driverName));
 
                 var token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
@@ -1135,5 +1136,59 @@ namespace MyAPI.Repositories.Impls
             }
         }
 
+        public async Task<List<VehicleSeatAvaliableDTOs>> listNumberSeatAvaliableOfVehilce(DateTime? dateTime)
+        {
+            try
+            {
+                // Lấy danh sách các chuyến xe theo ngày
+                var vehicleTrips = await _context.VehicleTrips
+                                    .Include(x => x.Vehicle)
+                                    .GroupBy(x => x.VehicleId) // Nhóm theo VehicleId
+                                    .Select(g => g.First())    // Lấy bản ghi đầu tiên trong mỗi nhóm
+                                    .ToListAsync();
+
+
+                if (!vehicleTrips.Any())
+                {
+                    throw new Exception("No VehicleTrips found for the given date.");
+                }
+
+               
+                var seatAvailabilityList = new List<VehicleSeatAvaliableDTOs>();
+
+                foreach (var vehicleTrip in vehicleTrips)
+                {
+                    var vehicle = await _context.Vehicles.FirstOrDefaultAsync(x => x.Id == vehicleTrip.VehicleId);
+                    if (vehicle == null || vehicle.NumberSeat == null)
+                    {
+                        throw new Exception($"Vehicle not found or NumberSeat is null for VehicleTripId: {vehicleTrip.Vehicle.Id}");
+                    }
+
+                    var ticketCount = await _tripRepository.GetTicketByDate(vehicleTrip.TripId, dateTime);
+                    var seatAvailable = vehicle.NumberSeat.Value - ticketCount;
+
+                    seatAvailabilityList.Add(new VehicleSeatAvaliableDTOs
+                    {
+                        Id = vehicle.Id,
+                        TripId = vehicleTrip.TripId,
+                        LicensePlate = vehicle.LicensePlate,
+                        NumberAvaliable = seatAvailable,
+                        NumberInvaliable = vehicle.NumberSeat - seatAvailable,
+                        NumberSeat = vehicle.NumberSeat.Value,
+                        DriverId = vehicle.DriverId,
+                        VehicleOwner = vehicle.VehicleOwner
+
+                    });
+                }
+
+                return seatAvailabilityList;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("GetSeatsAvailabilityByDate: " + ex.Message);
+            }
+        }
+
+       
     }
 }

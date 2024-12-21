@@ -33,6 +33,7 @@ namespace MyAPI.Repositories.Impls
                                       on t.Id equals vh.TripId
                                       join v in _context.Vehicles
                                       on vh.VehicleId equals v.Id
+                                      where t.TypeOfTrip == Constant.CHUYEN_DI_LIEN_TINH
                                       select new TripDTO
                                       {
                                           Id = t.Id,
@@ -58,6 +59,116 @@ namespace MyAPI.Repositories.Impls
             catch (Exception ex)
             {
                 throw new Exception("Error while retrieving trip list: " + ex.Message);
+            }
+        }
+        public async Task<List<TripDTO>> getListTripConvenience()
+        {
+            try
+            {
+                var tripList = await (from t in _context.Trips
+                                      where t.TypeOfTrip == Constant.CHUYEN_DI_BAO_XE
+                                      select new TripDTO
+                                      {
+                                          Id = t.Id,
+                                          Name = t.Name,
+                                          Description = t.Description,
+                                          PointStart = t.PointStart,
+                                          PointEnd = t.PointEnd,
+                                          Price = t.Price,
+                                          Status = t.Status,
+                                          TypeOfTrip = t.TypeOfTrip,
+                                          StartTime = t.StartTime,
+                                      }).ToListAsync();
+
+                if (tripList == null || !tripList.Any())
+                {
+                    throw new KeyNotFoundException("No trips found.");
+                }
+
+                return tripList;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+        public async Task UpdateTripConvenience(int tripId, TripConvenientDTO trip, int userId)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(trip.Name))
+                {
+                    throw new Exception("Trip name cannot be null or empty.");
+                }
+
+                if (trip.Price == null || trip.Price <= 0)
+                {
+                    throw new Exception("Price must be greater than 0.");
+                }
+
+                if (string.IsNullOrWhiteSpace(trip.PointStart))
+                {
+                    throw new Exception("Start point cannot be null or empty.");
+                }
+
+                if (string.IsNullOrWhiteSpace(trip.PointEnd))
+                {
+                    throw new Exception("End point cannot be null or empty.");
+                }
+
+                var tripConvenienceById = await _context.Trips.FirstOrDefaultAsync(x => x.Id == tripId && x.TypeOfTrip == Constant.CHUYEN_DI_BAO_XE);
+                if(tripConvenienceById == null)
+                {
+                    throw new Exception("Not found trip");
+                }
+                tripConvenienceById.Description = trip.Description;
+                tripConvenienceById.Price = trip.Price;
+                tripConvenienceById.Name = trip.Name;
+                tripConvenienceById.PointEnd = trip.PointEnd;
+                tripConvenienceById.PointStart = trip.PointStart;
+                tripConvenienceById.Status = trip.Status;
+                tripConvenienceById.StartTime = trip.StartTime;
+                tripConvenienceById.UpdateBy = userId;
+                tripConvenienceById.UpdateAt = DateTime.Now;
+                _context.Trips.Update(tripConvenienceById);
+                await _context.SaveChangesAsync();
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+        public async Task updateStatusTripConvenience(int id, int userId)
+        {
+            if (id == null || id <= 0)
+            {
+                throw new ArgumentException("Trip ID must be a valid positive number.");
+            }
+
+            if (userId == null || userId <= 0)
+            {
+                throw new ArgumentException("User ID must be a valid positive number.");
+            }
+
+            try
+            {
+                var tripById = await _context.Trips.FirstOrDefaultAsync(x => x.Id == id && x.TypeOfTrip == Constant.CHUYEN_DI_BAO_XE);
+                if (tripById != null)
+                {
+                    tripById.Status = !tripById.Status;
+                    tripById.UpdateBy = userId;
+                    tripById.UpdateAt = DateTime.Now;
+                    await _context.SaveChangesAsync();
+                }
+                else
+                {
+                    throw new Exception();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("updateStatusTrip: " + ex.Message);
             }
         }
         public async Task<List<TripVehicleDTO>> SreachTrip(string startPoint, string endPoint, string? time)
@@ -164,7 +275,6 @@ namespace MyAPI.Repositories.Impls
             {
                 throw new ArgumentException("At least 1 Time Start Detail cannot be null.");
             }
-
             if (!trip.Price.HasValue || trip.Price <= 0)
             {
                 throw new ArgumentException("Price must be greater than 0.");
@@ -173,10 +283,6 @@ namespace MyAPI.Repositories.Impls
             if (userId <= 0)
             {
                 throw new ArgumentException("User ID must be greater than 0.");
-            }
-            if (!trip.TypeOfTrip.HasValue || trip.TypeOfTrip <= 0 || (trip.TypeOfTrip != 1 && trip.TypeOfTrip != 2 && trip.TypeOfTrip != 3))
-            {
-                throw new ArgumentException("Type of trip invalid");
             }
             var vechicleById = await _context.Vehicles.Where(x => x.LicensePlate == trip.LicensePlate).Select(v => v.Id).FirstOrDefaultAsync();
             if (vechicleById == 0)
@@ -195,7 +301,7 @@ namespace MyAPI.Repositories.Impls
                     CreatedAt = DateTime.Now,
                     CreatedBy = userId,
                     Price = trip.Price,
-                    TypeOfTrip = trip.TypeOfTrip,
+                    TypeOfTrip = Constant.CHUYEN_DI_LIEN_TINH,
                     UpdateAt = null,
                     UpdateBy = null,
                     Status = trip.Status,
@@ -241,6 +347,63 @@ namespace MyAPI.Repositories.Impls
             catch (Exception ex)
             {
                 throw new Exception("addTrips: " + ex.Message, ex);
+            }
+        }
+        public async Task AddTripConvenience(TripConvenientDTO trip, int userId)
+        {
+            if (string.IsNullOrWhiteSpace(trip.Name))
+            {
+                throw new ArgumentException("Trip name cannot be null or empty.");
+            }
+
+            if (string.IsNullOrWhiteSpace(trip.PointStart))
+            {
+                throw new ArgumentException("Start point cannot be null or empty.");
+            }
+
+            if (string.IsNullOrWhiteSpace(trip.PointEnd))
+            {
+                throw new ArgumentException("End point cannot be null or empty.");
+            }
+
+            if (trip.StartTime == null)
+
+            {
+                throw new ArgumentException("Start time cannot be null.");
+            }
+
+            if (!trip.Price.HasValue || trip.Price <= 0)
+            {
+                throw new ArgumentException("Price must be greater than 0.");
+            }
+
+            if (userId <= 0)
+            {
+                throw new ArgumentException("User ID must be greater than 0.");
+            }
+            try
+            {
+                Trip addTrip = new Trip
+                {
+                    Name = trip.Name,
+                    Description = trip.Description,
+                    PointStart = trip.PointStart,
+                    PointEnd = trip.PointEnd,
+                    StartTime = trip.StartTime,
+                    CreatedAt = DateTime.Now,
+                    CreatedBy = userId,
+                    Price = trip.Price,
+                    TypeOfTrip = Constant.CHUYEN_DI_BAO_XE,
+                    UpdateAt = null,
+                    UpdateBy = null,
+                    Status = trip.Status,
+                };
+                _context.Add(addTrip);
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("addTripConvenience: " + ex.Message, ex);
             }
         }
         public async Task UpdateTripById(int tripId, UpdateTrip trip, int userId)
@@ -523,6 +686,58 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception("GetTicketCount: " + ex.Message);
             }
         }
+        public async Task<int> GetTicketByDate(int tripId, DateTime? dateTime)
+        {
+            if (tripId <= 0)
+            {
+                throw new ArgumentException("Trip ID must be greater than 0.");
+            }
+            try
+            {
+                var vehicleTrip = await _context.VehicleTrips.FirstOrDefaultAsync(x => x.TripId == tripId);
+
+                if (vehicleTrip == null)
+                {
+                    throw new KeyNotFoundException("No vehicle trip found for the specified trip ID.");
+                }
+                if (dateTime == null)
+                {
+                    dateTime = DateTime.Now;
+
+                    var listTicketByVehicleID = await (from t in _context.Tickets
+                                                       where t.VehicleId == vehicleTrip.VehicleId
+                                                             && EF.Functions.DateDiffDay(t.TimeFrom, dateTime) == 0
+                                                       select t.NumberTicket
+                                 ).ToListAsync();
+                    if (listTicketByVehicleID == null || !listTicketByVehicleID.Any())
+                    {
+                        return 0;
+                    }
+
+                    var sum = listTicketByVehicleID.Sum();
+                    return sum ?? 0;
+                }
+                else
+                {
+                    var listTicketByVehicleID = await (from t in _context.Tickets
+                                                       where t.VehicleId == vehicleTrip.VehicleId
+                                                             && EF.Functions.DateDiffDay(t.TimeFrom, dateTime) == 0
+                                                       select t.NumberTicket
+                                  ).ToListAsync();
+                    if (listTicketByVehicleID == null || !listTicketByVehicleID.Any())
+                    {
+                        return 0;
+                    }
+
+                    var sum = listTicketByVehicleID.Sum();
+                    return sum ?? 0;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("GetTicketCount: " + ex.Message);
+            }
+        }
         public async Task<(List<Trip>, List<string>)> ImportExcel(Stream excelStream)
         {
 
@@ -640,7 +855,7 @@ namespace MyAPI.Repositories.Impls
                 throw new ArgumentException("Start point and end point must not be empty.");
 
             var price = await _context.Trips
-                .Where(t => t.PointStart.Contains(startPoint) && t.PointEnd.Contains(endPoint) && t.TypeOfTrip == typeOfTrip)
+                .Where(t => t.PointStart.Contains(startPoint) && t.PointEnd.Contains(endPoint) && t.TypeOfTrip == typeOfTrip && t.Status == true)
                 .Select(s => s.Price)
                 .FirstOrDefaultAsync();
 
@@ -840,5 +1055,7 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception($"DeleteTripById: {ex.Message}");
             }
         }
+
+
     }
 }

@@ -118,7 +118,6 @@ namespace MyAPI.Controllers
         {
             try
             {
-                // Sử dụng repository để lấy danh sách phương tiện, giới hạn tối đa 5 xe
                 var vehicles = await _ticketRepository.GetVehiclesByRequestIdAsync(requestId, startDate, endDate);
 
                 if (vehicles == null || !vehicles.Any())

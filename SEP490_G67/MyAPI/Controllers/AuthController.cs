@@ -46,7 +46,7 @@ namespace MyAPI.Controllers
                     var lastIdUser = _userRepository.lastIdUser();
                     UserRole ur = new UserRole
                     {
-                        RoleId = 4,
+                        RoleId = Constant.USER,
                         Status = true,
                         UserId = lastIdUser.Result
                     };

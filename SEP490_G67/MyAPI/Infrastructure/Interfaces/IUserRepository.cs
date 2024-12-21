@@ -20,6 +20,7 @@ namespace MyAPI.Infrastructure.Interfaces
         Task<UserPostLoginDTO> getUserById(int id);
         Task<List<UserPostLoginDTO>> getListVehicleOwner();
         Task<User> RegisterVehicleOwner(VehicleOwnerDTO userRegisterDTO, int userId);
+        Task<User> RegisterAccountFromAdmin(CreateAccountDTO userRegisterDTO);
 
     }
 }

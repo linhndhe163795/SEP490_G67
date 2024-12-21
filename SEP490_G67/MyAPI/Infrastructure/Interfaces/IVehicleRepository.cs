@@ -27,5 +27,6 @@ namespace MyAPI.Infrastructure.Interfaces
         Task<(bool IsSuccess, List<ValidationErrorDTO> Errors)> ConfirmAddValidEntryImportVehicle(List<VehicleImportDTO> validEntries);
         Task<List<VehicleBasicDto>> GetAvailableVehiclesAsync();
         Task<List<VehicleBasicDto>> GetVehicleTypeConvinience();
+        Task<List<VehicleSeatAvaliableDTOs>> listNumberSeatAvaliableOfVehilce(DateTime? dateTime);
     }
 }
