@@ -23,7 +23,6 @@ namespace MyAPI.Repositories.Impls
             _httpContextAccessor = httpContextAccessor;
             _tokenHelper = tokenHelper;
         }
-
         public async Task<List<TripDTO>> GetListTrip()
         {
             try
@@ -1055,7 +1054,5 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception($"DeleteTripById: {ex.Message}");
             }
         }
-
-
     }
 }

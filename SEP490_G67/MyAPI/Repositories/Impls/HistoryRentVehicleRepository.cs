@@ -226,7 +226,7 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception($"Failed to create {ex.Message}");
             }
         }
-        public async Task<List<Vehicle>> historyRentVehicleListDTOs(DateTime dateTime)
+        public async Task<List<VehicleConvenienceRentResponseDTO>> historyRentVehicleListDTOs(DateTime dateTime)
         {
             try
             {
@@ -240,25 +240,34 @@ namespace MyAPI.Repositories.Impls
                 var vehicles = await _context.Vehicles
                     .Include(x => x.Tickets)
                     .Where(v => v.VehicleTypeId == Constant.VE_XE_TIEN_CHUYEN
-                           && !ticketVehicleIds.Contains(v.Id)) 
+                           && !ticketVehicleIds.Contains(v.Id))
                     .ToListAsync();
+                var vehicle = await (from v in _context.Vehicles
+                                     join d in _context.Drivers
+                                     on v.DriverId equals d.Id into driverGroup
+                                     from d in driverGroup.DefaultIfEmpty()
+                                     join u in _context.Users
+                                     on v.VehicleOwner equals u.Id into userGroup
+                                     from u in userGroup.DefaultIfEmpty()
+                                     join t in _context.Tickets
+                                     on v.Id equals t.VehicleId into ticketGroup
+                                     from t in ticketGroup.DefaultIfEmpty()
+                                     where v.VehicleTypeId == Constant.VE_XE_TIEN_CHUYEN && !ticketVehicleIds.Contains(v.Id)
+                                     select new VehicleConvenienceRentResponseDTO
+                                     {
+                                         Id = v.Id,
+                                         NumberSeat = v.NumberSeat,
+                                         VehicleTypeId = v.VehicleTypeId,
+                                         Status = v.Status,
+                                         DriverId = d.Id != 0 ? d.Id : 0,
+                                         VehicleOwner = u.Id,
+                                         VehicleOwnerName = $"{u.Id} - Tên chủ xe: {u.FullName} - SĐT: {u.NumberPhone}",
+                                         LicensePlate = $"{v.LicensePlate} - Số ghế: {v.NumberSeat}",
+                                         DriverName = $"{(d.Name != null ? d.Name : null)} - SĐT: {d.NumberPhone}",
+                                     }).Distinct().ToListAsync();
+                
 
-                var result = vehicles
-                    .Select(v => new Vehicle
-                    {
-                        Id = v.Id,
-                        NumberSeat = v.NumberSeat,
-                        VehicleTypeId = v.VehicleTypeId,
-                        Status = v.Status,
-                        Image = v.Image,
-                        DriverId = v.DriverId,
-                        VehicleOwner = v.VehicleOwner,
-                        Description = v.Description,
-                        LicensePlate = $"{v.LicensePlate} - Số ghế: {v.NumberSeat}"
-                    })
-                    .ToList();
-
-                return result;
+                return vehicle;
             }
             catch (Exception ex)
             {

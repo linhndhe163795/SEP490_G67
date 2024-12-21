@@ -54,7 +54,7 @@ namespace MyAPI.Repositories.Impls
             }
            
             var listRenvenueTicket = await _ticketRepository.getRevenueTicket(userId);
-            var listRevenueRentVehicle = await _paymentRentVehicleRepository.getPaymentRentVehicleByDate( userId);
+            var listRevenueRentVehicle = await _paymentRentVehicleRepository.getPaymentRentVehicleByDate(userId);
             var listLossCost = await _lossCostVehicleRepository.GetLossCostVehicleByDate(userId);
             var listExpenseRentDriver = await _historyRentDriverRepository.GetRentDetailsWithTotalForOwner();
 
