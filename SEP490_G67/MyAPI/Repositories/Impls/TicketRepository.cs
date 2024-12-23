@@ -328,6 +328,7 @@ namespace MyAPI.Repositories.Impls
         {
             try
             {
+                // xe du lịch đang rảnh
                 var requestDetail = await _context.RequestDetails
                     .FirstOrDefaultAsync(rd => rd.RequestId == requestId);
 
@@ -344,25 +345,31 @@ namespace MyAPI.Repositories.Impls
                                         .Select(t => t.VehicleId.Value)
                                         .ToHashSet();
 
-                var vehicles = await _context.Vehicles
-                                .Include(x => x.Tickets)
-                                .Where(v => v.VehicleTypeId == Constant.VE_XE_DU_LICH
-                                    && v.NumberSeat >= seatCount
-                                     && !ticketVehicleIds.Contains(v.Id)
-                                    && v.Status == true)
-                                .Take(5)
-                            .Select(v => new VehicleBasicDto
-                            {
-                                Id = v.Id,
-                                NumberSeat = v.NumberSeat,
-                                VehicleTypeId = v.VehicleTypeId,
-                                Status = v.Status,
-                                LicensePlate = v.LicensePlate,
-                                Description = v.Description
-                            })
-                            .ToListAsync();
+                var vehicle = await (from v in _context.Vehicles
+                                     join d in _context.Drivers
+                                     on v.DriverId equals d.Id into driverGroup
+                                     from d in driverGroup.DefaultIfEmpty()
+                                     join u in _context.Users
+                                     on v.VehicleOwner equals u.Id into userGroup
+                                     from u in userGroup.DefaultIfEmpty()
+                                     join t in _context.Tickets
+                                     on v.Id equals t.VehicleId into ticketGroup
+                                     from t in ticketGroup.DefaultIfEmpty()
+                                     where v.VehicleTypeId == Constant.VE_XE_DU_LICH && !ticketVehicleIds.Contains(v.Id)
+                                     select new VehicleBasicDto
+                                     {
+                                         Id = v.Id,
+                                         NumberSeat = v.NumberSeat,
+                                         VehicleTypeId = v.VehicleTypeId,
+                                         Status = v.Status,
+                                         DriverId = d.Id != 0 ? d.Id : 0,
+                                         VehicleOwner = u.Id,
+                                         VehicleOwnerName = $"{u.Id} - Tên chủ xe: {u.FullName} - SĐT: {u.NumberPhone}",
+                                         LicensePlate = $"{v.LicensePlate} - Số ghế: {v.NumberSeat}",
+                                         DriverName = $"{(d.Name != null ? d.Name : null)} - SĐT: {d.NumberPhone}",
+                                     }).Distinct().ToListAsync();
 
-                return vehicles;
+                return vehicle;
             }
             catch (Exception)
             {

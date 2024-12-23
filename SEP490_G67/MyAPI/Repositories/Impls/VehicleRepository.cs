@@ -1119,7 +1119,6 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception("GetAvailableVehiclesAsync: " + ex.Message);
             }
         }
-
         public async Task<List<VehicleBasicDto>> GetVehicleTypeConvinience()
         {
             try
@@ -1135,7 +1134,6 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception("GetAvailableVehiclesAsync: " + ex.Message);
             }
         }
-
         public async Task<List<VehicleSeatAvaliableDTOs>> listNumberSeatAvaliableOfVehilce(DateTime? dateTime)
         {
             try

@@ -230,6 +230,7 @@ namespace MyAPI.Repositories.Impls
         {
             try
             {
+                //xe tiện chuyến đang rảnh
                 var ticket = await _context.Tickets.Where(t => t.TimeFrom.HasValue && t.TimeFrom.Value.Date <= dateTime.Date &&
                                         t.TimeFrom.Value.Date >= dateTime && t.TypeOfTicket == Constant.VE_BAO_XE).ToListAsync();
                 var ticketVehicleIds = ticket
@@ -262,11 +263,9 @@ namespace MyAPI.Repositories.Impls
                                          DriverId = d.Id != 0 ? d.Id : 0,
                                          VehicleOwner = u.Id,
                                          VehicleOwnerName = $"{u.Id} - Tên chủ xe: {u.FullName} - SĐT: {u.NumberPhone}",
-                                         LicensePlate = $"{v.LicensePlate} - Số ghế: {v.NumberSeat}",
+                                         LicensePlate = $"{v.LicensePlate} - Số ghế: {v.NumberSeat} - Tên chủ xe: {u.FullName} - SĐT: {u.NumberPhone}",
                                          DriverName = $"{(d.Name != null ? d.Name : null)} - SĐT: {d.NumberPhone}",
                                      }).Distinct().ToListAsync();
-                
-
                 return vehicle;
             }
             catch (Exception ex)
