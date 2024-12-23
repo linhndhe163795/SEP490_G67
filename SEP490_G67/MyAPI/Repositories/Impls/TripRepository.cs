@@ -8,6 +8,7 @@ using MyAPI.Helper;
 using MyAPI.Infrastructure.Interfaces;
 using MyAPI.Models;
 using OfficeOpenXml;
+using System;
 
 namespace MyAPI.Repositories.Impls
 {
@@ -694,10 +695,7 @@ namespace MyAPI.Repositories.Impls
             try
             {
                 var vehicleTrip = await _context.VehicleTrips.Include(x => x.Trip).ThenInclude(x => x.TripDetails).FirstOrDefaultAsync(x => x.TripId == tripId);
-                string date = dateTime.Value.ToString("dd/MM/yyyy");
-                TimeSpan? timeEndDetail = vehicleTrip.Trip.TripDetails.Select(x => x.TimeEndDetails).First();
-
-                var dateTimeCombine = date + timeEndDetail;
+               
                 if (vehicleTrip == null)
                 {
                     throw new KeyNotFoundException("No vehicle trip found for the specified trip ID.");
@@ -705,11 +703,11 @@ namespace MyAPI.Repositories.Impls
                 if (dateTime == null)
                 {
                     dateTime = DateTime.Now;
-
+                    TimeSpan? timeEndDetail = vehicleTrip.Trip.TripDetails.Select(x => x.TimeEndDetails).First();
+                    var dateTimeCombine = new DateTime(dateTime.Value.Year, dateTime.Value.Month, dateTime.Value.Day).Add(timeEndDetail.Value);
                     var listTicketByVehicleID = await (from t in _context.Tickets
                                                        where t.VehicleId == vehicleTrip.VehicleId
-                                                             && EF.Functions.DateDiffDay(t.TimeFrom, dateTime) == 0
-                                                             && t.TimeTo.Value.ToString().Equals(dateTimeCombine)
+                                                             && t.TimeTo == dateTimeCombine
                                                        select t.NumberTicket).ToListAsync();
                     if (listTicketByVehicleID == null || !listTicketByVehicleID.Any())
                     {
@@ -721,13 +719,14 @@ namespace MyAPI.Repositories.Impls
                 }
                 else
                 {
+                    TimeSpan? timeEndDetail = vehicleTrip.Trip.TripDetails.Select(x => x.TimeEndDetails).First();
+                    var dateTimeCombine = new DateTime(dateTime.Value.Year, dateTime.Value.Month, dateTime.Value.Day).Add(timeEndDetail.Value);
+                    Console.WriteLine("dateCombine: " + dateTimeCombine);
                     var listTicketByVehicleID = await (from t in _context.Tickets
                                                        where t.VehicleId == vehicleTrip.VehicleId
-                                                             && EF.Functions.DateDiffDay(t.TimeFrom, dateTime) == 0
-                                                              && t.TimeTo.Value.ToString().Equals(dateTimeCombine)
-                                                             && t.TripId == tripId
-                                                       select t.NumberTicket
-                                  ).ToListAsync();
+                                                              && t.TimeTo == dateTimeCombine
+                                                       select t.NumberTicket).ToListAsync();
+
                     if (listTicketByVehicleID == null || !listTicketByVehicleID.Any())
                     {
                         return 0;

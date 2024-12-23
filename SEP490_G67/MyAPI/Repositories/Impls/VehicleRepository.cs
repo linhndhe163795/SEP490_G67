@@ -1172,6 +1172,7 @@ namespace MyAPI.Repositories.Impls
                         dateTime = vehicleTrip.Trip.StartTime,
                         LicensePlate = vehicle.LicensePlate,
                         NumberAvaliable = seatAvailable,
+                        tripId = vehicleTrip.TripId,
                         NumberInvaliable = vehicle.NumberSeat - seatAvailable,
                         NumberSeat = vehicle.NumberSeat.Value,
                         description = $"{vehicleTrip.Trip.PointStart} - {vehicleTrip.Trip.PointEnd}"
