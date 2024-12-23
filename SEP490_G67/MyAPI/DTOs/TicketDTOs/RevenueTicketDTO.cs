@@ -16,6 +16,7 @@
         public string? LiscenseVehicle { get; set; }
         public string? TypeOfTicket { get; set; }
         public string? TypeOfPayment { get; set; }
+        public DateTime? DateTime{ get; set; }
         public DateTime? CreatedAt { get; set; }
     }
 }

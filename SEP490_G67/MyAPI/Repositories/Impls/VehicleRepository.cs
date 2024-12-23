@@ -1139,10 +1139,11 @@ namespace MyAPI.Repositories.Impls
             try
             {
                 // Lấy danh sách các chuyến xe theo ngày
-                var vehicleTrips = await _context.VehicleTrips
+                var vehicleTrips = await _context.VehicleTrips.Include(x => x.Trip)
                                     .Include(x => x.Vehicle)
-                                    .GroupBy(x => x.VehicleId) // Nhóm theo VehicleId
-                                    .Select(g => g.First())    // Lấy bản ghi đầu tiên trong mỗi nhóm
+                                    .Where(x => x.Trip.Price == 85000)
+                                    .GroupBy(x => new { x.VehicleId, x.TripId, x.Trip.Id})
+                                    .Select(g => g.First())    
                                     .ToListAsync();
 
 
@@ -1168,13 +1169,12 @@ namespace MyAPI.Repositories.Impls
                     seatAvailabilityList.Add(new VehicleSeatAvaliableDTOs
                     {
                         Id = vehicle.Id,
-                        TripId = vehicleTrip.TripId,
+                        dateTime = vehicleTrip.Trip.StartTime,
                         LicensePlate = vehicle.LicensePlate,
                         NumberAvaliable = seatAvailable,
                         NumberInvaliable = vehicle.NumberSeat - seatAvailable,
                         NumberSeat = vehicle.NumberSeat.Value,
-                        DriverId = vehicle.DriverId,
-                        VehicleOwner = vehicle.VehicleOwner
+                        description = $"{vehicleTrip.Trip.PointStart} - {vehicleTrip.Trip.PointEnd}"
 
                     });
                 }

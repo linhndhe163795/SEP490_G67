@@ -365,7 +365,7 @@ namespace MyAPI.Repositories.Impls
                                          DriverId = d.Id != 0 ? d.Id : 0,
                                          VehicleOwner = u.Id,
                                          VehicleOwnerName = $"{u.Id} - Tên chủ xe: {u.FullName} - SĐT: {u.NumberPhone}",
-                                         LicensePlate = $"{v.LicensePlate} - Số ghế: {v.NumberSeat}",
+                                         LicensePlate = $"{v.LicensePlate} - Số ghế: {v.NumberSeat}- Tên chủ xe: {u.FullName} - SĐT: {u.NumberPhone}",
                                          DriverName = $"{(d.Name != null ? d.Name : null)} - SĐT: {d.NumberPhone}",
                                      }).Distinct().ToListAsync();
 
@@ -696,7 +696,8 @@ namespace MyAPI.Repositories.Impls
                     LiscenseVehicle = tv.vehicle.LicensePlate,
                     VehicleOwner = user.FullName, // Lấy tên chủ xe
                     TypeOfTicket = tv.ticket.TypeOfTicketNavigation.Description,
-                    TypeOfPayment = tv.ticket.TypeOfPaymentNavigation.TypeOfPayment1
+                    TypeOfPayment = tv.ticket.TypeOfPaymentNavigation.TypeOfPayment1,
+                    Date = tv.ticket.TimeFrom
                 })
                 .Select(x => new TicketRevenue
                 {
@@ -707,6 +708,7 @@ namespace MyAPI.Repositories.Impls
                     LiscenseVehicle = x.LiscenseVehicle,
                     VehicleOwner = x.VehicleOwner,
                     TypeOfTicket = x.TypeOfTicket,
+                    DateTime = x.Date,
                     TypeOfPayment = x.TypeOfPayment
                 })
                 .ToListAsync();

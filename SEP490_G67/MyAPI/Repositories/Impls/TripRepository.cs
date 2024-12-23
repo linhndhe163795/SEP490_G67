@@ -668,7 +668,7 @@ namespace MyAPI.Repositories.Impls
                 }
 
                 var listTicketByVehicleID = await (from t in _context.Tickets
-                                                   where t.VehicleId == vehicleTrip.VehicleId && t.TimeFrom == dateTime
+                                                   where t.VehicleId == vehicleTrip.VehicleId && t.TimeTo == dateTime
                                                    select t.NumberTicket
                                                   ).ToListAsync();
 
@@ -693,8 +693,11 @@ namespace MyAPI.Repositories.Impls
             }
             try
             {
-                var vehicleTrip = await _context.VehicleTrips.FirstOrDefaultAsync(x => x.TripId == tripId);
+                var vehicleTrip = await _context.VehicleTrips.Include(x => x.Trip).ThenInclude(x => x.TripDetails).FirstOrDefaultAsync(x => x.TripId == tripId);
+                string date = dateTime.Value.ToString("dd/MM/yyyy");
+                TimeSpan? timeEndDetail = vehicleTrip.Trip.TripDetails.Select(x => x.TimeEndDetails).First();
 
+                var dateTimeCombine = date + timeEndDetail;
                 if (vehicleTrip == null)
                 {
                     throw new KeyNotFoundException("No vehicle trip found for the specified trip ID.");
@@ -706,8 +709,8 @@ namespace MyAPI.Repositories.Impls
                     var listTicketByVehicleID = await (from t in _context.Tickets
                                                        where t.VehicleId == vehicleTrip.VehicleId
                                                              && EF.Functions.DateDiffDay(t.TimeFrom, dateTime) == 0
-                                                       select t.NumberTicket
-                                 ).ToListAsync();
+                                                             && t.TimeTo.Value.ToString().Equals(dateTimeCombine)
+                                                       select t.NumberTicket).ToListAsync();
                     if (listTicketByVehicleID == null || !listTicketByVehicleID.Any())
                     {
                         return 0;
@@ -721,6 +724,8 @@ namespace MyAPI.Repositories.Impls
                     var listTicketByVehicleID = await (from t in _context.Tickets
                                                        where t.VehicleId == vehicleTrip.VehicleId
                                                              && EF.Functions.DateDiffDay(t.TimeFrom, dateTime) == 0
+                                                              && t.TimeTo.Value.ToString().Equals(dateTimeCombine)
+                                                             && t.TripId == tripId
                                                        select t.NumberTicket
                                   ).ToListAsync();
                     if (listTicketByVehicleID == null || !listTicketByVehicleID.Any())

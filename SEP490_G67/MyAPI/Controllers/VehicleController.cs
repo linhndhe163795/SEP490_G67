@@ -19,11 +19,12 @@ namespace MyAPI.Controllers
 
         private readonly IVehicleRepository _vehicleRepository;
         private readonly ITripRepository _tripRepository;
+        private readonly ITripDetailsRepository _tripDetailsRepository;
         private readonly GetInforFromToken _inforFromToken;
         private readonly ServiceImport _serviceImport;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly GetInforFromToken _getInforFromToken;
-        public VehicleController(GetInforFromToken getInforFromToken, IVehicleRepository vehicleRepository, GetInforFromToken inforFromToken, ServiceImport serviceImport, IHttpContextAccessor httpContextAccessor, ITripRepository tripRepository)
+        public VehicleController(ITripDetailsRepository tripDetailsRepository,GetInforFromToken getInforFromToken, IVehicleRepository vehicleRepository, GetInforFromToken inforFromToken, ServiceImport serviceImport, IHttpContextAccessor httpContextAccessor, ITripRepository tripRepository)
         {
             _vehicleRepository = vehicleRepository;
             _inforFromToken = inforFromToken;
@@ -31,6 +32,7 @@ namespace MyAPI.Controllers
             _httpContextAccessor = httpContextAccessor;
             _tripRepository = tripRepository;
             _getInforFromToken = getInforFromToken;
+            _tripDetailsRepository = tripDetailsRepository;
         }
         [Authorize(Roles = "Staff, VehicleOwner")]
         [HttpGet("listVehicleType")]
@@ -325,6 +327,8 @@ namespace MyAPI.Controllers
             try
             {
                 var trip = await _tripRepository.GetTripById(tripId);
+                var tripDetails = await _tripDetailsRepository.TripDetailsByTripIdStaff(tripId);
+                var timeSpan = tripDetails.FirstOrDefault().TimeEndDetails;
                 if (trip == null)
                 {
                     return NotFound($"Trip with ID {tripId} was not found.");
@@ -336,8 +340,7 @@ namespace MyAPI.Controllers
                 }
 
              
-                var tripDateTime = new DateTime(date.Year, date.Month, date.Day).Add(trip.StartTime.Value);
-                Console.WriteLine($"Trip DateTime: {tripDateTime}");
+                var tripDateTime = new DateTime(date.Year, date.Month, date.Day).Add(timeSpan.Value);
 
                 
                 var availableSeats = await _vehicleRepository.GetNumberSeatAvaiable(tripId, tripDateTime);
