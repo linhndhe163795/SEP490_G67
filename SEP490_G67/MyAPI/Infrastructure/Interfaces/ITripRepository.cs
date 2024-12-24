@@ -25,7 +25,7 @@ namespace MyAPI.Infrastructure.Interfaces
         Task<List<ListCovenientStartEndDTO>> getListStartAndEndPoint();
         Task<TripDTO> GetTripById(int id);
         Task<List<StartPointDTO>> getListStartPoint();
-        Task<List<EndPointDTO>> getListEndPoint();
+        Task<List<EndPointDTO>> getListEndPoint(string? startPoint);
         //Task<TripByIdDTO> getTripByTripId(int tripId);
         Task<int> getTripDetailsId(string pointStart, string pointEnd, TimeSpan timeStartPoint, TimeSpan timeEndPoint);
         Task confirmAddValidEntriesConvenience(List<TripImportDTO> validEntries);

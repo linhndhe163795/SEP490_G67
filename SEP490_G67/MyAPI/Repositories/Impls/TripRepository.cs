@@ -117,7 +117,7 @@ namespace MyAPI.Repositories.Impls
                 }
 
                 var tripConvenienceById = await _context.Trips.FirstOrDefaultAsync(x => x.Id == tripId && x.TypeOfTrip == Constant.CHUYEN_DI_BAO_XE);
-                if(tripConvenienceById == null)
+                if (tripConvenienceById == null)
                 {
                     throw new Exception("Not found trip");
                 }
@@ -695,7 +695,7 @@ namespace MyAPI.Repositories.Impls
             try
             {
                 var vehicleTrip = await _context.VehicleTrips.Include(x => x.Trip).ThenInclude(x => x.TripDetails).FirstOrDefaultAsync(x => x.TripId == tripId);
-               
+
                 if (vehicleTrip == null)
                 {
                     throw new KeyNotFoundException("No vehicle trip found for the specified trip ID.");
@@ -948,16 +948,22 @@ namespace MyAPI.Repositories.Impls
             {
                 var listStartPoint = await _context.Trips
                     .Where(x => !string.IsNullOrEmpty(x.PointStart) && x.Status == true && x.TypeOfTrip == Constant.CHUYEN_DI_LIEN_TINH)
-                    .Select(x => x.PointStart)
                     .Distinct()
                     .ToListAsync();
+                var listStartPoints = await (from t in _context.Trips
+                                             where t.Status == true && t.TypeOfTrip == Constant.CHUYEN_DI_LIEN_TINH
+                                             select t.PointStart).Distinct().ToListAsync();
 
                 if (listStartPoint == null || !listStartPoint.Any())
                 {
                     throw new KeyNotFoundException("No start points found.");
                 }
 
-                var mapper = _mapper.Map<List<StartPointDTO>>(listStartPoint);
+                var mapper = listStartPoints.Select((x, i) => new StartPointDTO
+                {
+                    id = i + 1,
+                    PointStart = x
+                }).ToList();
                 return mapper;
             }
             catch (Exception ex)
@@ -965,22 +971,24 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception("getListStartPoint: " + ex.Message);
             }
         }
-        public async Task<List<EndPointDTO>> getListEndPoint()
+        public async Task<List<EndPointDTO>> getListEndPoint(string? startPoint)
         {
             try
             {
-                var listPointEnd = await _context.Trips
-                    .Where(x => !string.IsNullOrEmpty(x.PointEnd) && x.Status == true && x.TypeOfTrip == Constant.CHUYEN_DI_LIEN_TINH)
-                    .Select(x => x.PointEnd)
-                    .Distinct()
-                    .ToListAsync();
+                var listEndPoints = await (from t in _context.Trips
+                                           where t.Status == true && t.TypeOfTrip == Constant.CHUYEN_DI_LIEN_TINH && t.PointStart.Contains(startPoint == null ? "" : startPoint )
+                                           select t.PointEnd).Distinct().ToListAsync();
 
-                if (listPointEnd == null || !listPointEnd.Any())
+                if (listEndPoints == null || !listEndPoints.Any())
                 {
-                    throw new KeyNotFoundException("No end points found.");
+                    throw new KeyNotFoundException("No start points found.");
                 }
 
-                var mapper = _mapper.Map<List<EndPointDTO>>(listPointEnd);
+                var mapper = listEndPoints.Select((x, i) => new EndPointDTO
+                {
+                    id = i + 1,
+                    name = x
+                }).ToList();
                 return mapper;
             }
             catch (Exception ex)

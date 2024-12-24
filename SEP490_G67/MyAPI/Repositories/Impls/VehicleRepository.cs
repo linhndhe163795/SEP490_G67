@@ -439,7 +439,7 @@ namespace MyAPI.Repositories.Impls
                 var listStartPointDTOs = listStartPoint.Select((v, i) => new StartPointDTO
                 {
                     id = i + 1,
-                    name = v
+                    PointStart = v
                 }).ToList();
 
                 return listStartPointDTOs;

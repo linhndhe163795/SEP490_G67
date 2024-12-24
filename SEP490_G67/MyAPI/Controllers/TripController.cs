@@ -1,4 +1,5 @@
 ﻿using ClosedXML.Excel;
+using DocumentFormat.OpenXml.Drawing.Wordprocessing;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -446,12 +447,12 @@ namespace MyAPI.Controllers
                 return BadRequest(ex.Message);
             }
         }
-        [HttpGet("getListEndPoint")]
-        public async Task<IActionResult> getListEndPoint()
+        [HttpGet("getListEndPoint/startPoint")]
+        public async Task<IActionResult> getListEndPoint(string? startPoint)
         {
             try
             {
-                var listEnd = await _tripRepository.getListEndPoint();
+                var listEnd = await _tripRepository.getListEndPoint(startPoint);
                 if (listEnd == null)
                 {
                     return NotFound();
@@ -522,5 +523,27 @@ namespace MyAPI.Controllers
                 return StatusCode(500, new { message = ex.Message });
             }
         }
+
+        [HttpGet("listStartPoint")]
+        public async Task<IActionResult> getStartPoint()
+        {
+            try
+            {
+                var listStart = await _tripRepository.getListStartPoint();
+                if (listStart == null)
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    return Ok(listStart);
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
     }
 }
