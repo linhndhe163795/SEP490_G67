@@ -192,6 +192,83 @@ namespace MyAPI.Repositories.Impls
             };
             return combineResult;
         }
+        //update version
+        public async Task<TotalLossCost> GetLossCostVehicleByDateUpdate(DateTime? startDate, DateTime? endDate, int? vehicleId, int userId)
+        {
+            try
+            {
+                var getInforUser = _context.Users.Include(x => x.UserRoles).ThenInclude(x => x.Role).Where(x => x.Id == userId).FirstOrDefault();
+                if (getInforUser == null)
+                {
+                    throw new Exception("User not found.");
+                }
+                
+                if (IsUserRole(getInforUser, "Staff"))
+                {
+                    return await GetLossCosstForStaffUpdate(startDate, endDate, vehicleId, userId);
+                }
+                throw new Exception("User role is not supported.");
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("GetLossCostVehicleByDate: " + ex.Message);
+            }
+        }
+        private async Task<TotalLossCost> GetLossCosstForStaffUpdate(DateTime? startDate, DateTime? endDate, int? vehicleId, int userId)
+        {
+
+            if (startDate > endDate)
+            {
+                throw new Exception("Start date must be earlier than or equal to end date.");
+            }
+
+            if (vehicleId.HasValue && vehicleId <= 0)
+            {
+                throw new Exception("Invalid vehicle ID.");
+            }
+            if (!startDate.HasValue || !endDate.HasValue)
+            {
+                var now = DateTime.Now;
+                startDate ??= new DateTime(now.Year, now.Month, 1); 
+                endDate ??= new DateTime(now.Year, now.Month, DateTime.DaysInMonth(now.Year, now.Month)); 
+            }
+            var query = _context.LossCosts.Include(x => x.Vehicle)
+                                          .ThenInclude(x => x.VehicleOwnerNavigation)
+                                          .Include(x => x.LossCostType)
+                                          .Where(x => x.DateIncurred >= startDate && x.DateIncurred <= endDate);
+            
+            if (vehicleId.HasValue && vehicleId != 0)
+            {
+                query = query.Where(x => x.VehicleId == vehicleId);
+            }
+
+            var totalLossCost = query.Sum(x => x.Price);
+            var lossCostVehicleByDate = await query
+                                            .Select(ls => new AddLostCostVehicleDTOs
+                                            {
+                                                Id = ls.Id,
+                                                VehicleId = ls.VehicleId,
+                                                LicensePlate = ls.Vehicle.LicensePlate,
+                                                DateIncurred = ls.DateIncurred,
+                                                Description = ls.Description,
+                                                Price = ls.Price,
+                                                LossCostType = ls.LossCostType.Description,
+                                                VehicleOwner = _context.Users.Include(uv => uv.Vehicles).Where(u => u.Id == ls.Vehicle.VehicleOwner).Select(u => u.FullName).FirstOrDefault(),
+                                                VehicleOwnerId = ls.Vehicle.VehicleOwner
+                                            }).ToListAsync();
+
+            var combineResult = new TotalLossCost
+            {
+                listLossCostVehicle = lossCostVehicleByDate,
+                TotalCost = totalLossCost
+            };
+            return combineResult;
+        }
+
+
+
+
+
         public async Task UpdateLossCostById(int id, LossCostUpdateDTO lossCostupdateDTOs, int userId)
         {
             try

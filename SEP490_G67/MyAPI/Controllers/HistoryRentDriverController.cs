@@ -78,6 +78,23 @@ namespace MyAPI.Controllers
                 return StatusCode(500, new { message = "Failed to fetch rent details for the owner.", error = ex.Message });
             }
         }
+        [Authorize]
+        [HttpGet("rent-details-with-total-for-owner/startDate/endDate/vehicleId")]
+        public async Task<IActionResult> GetRentDetailsWithTotalForOwner(DateTime? startDate, DateTime? endDate, int? vehicleId)
+        {
+            try
+            {
+                var result = await _historyRentDriverRepository.GetRentDetailsWithTotalForOwnerUpdate(startDate, endDate, vehicleId);
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Failed to fetch rent details for the owner.", error = ex.Message });
+            }
+        }
+
+
 
         [HttpPost("/AssignDriverForRent")]
         public async Task<IActionResult> UpdateDriverInRequest(int driverId, int requestId)
@@ -100,7 +117,7 @@ namespace MyAPI.Controllers
                 return StatusCode(500, new { Message = "Failed to update driver for the request.", Details = ex.Message });
             }
         }
-        
+
         [Authorize(Roles = "Staff, VehicleOwner, Driver")]
         [HttpGet("listHistoryRentDriver")]
         public async Task<IActionResult> getHistoryRentDriver()

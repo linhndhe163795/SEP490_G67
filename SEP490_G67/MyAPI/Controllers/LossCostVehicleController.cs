@@ -122,5 +122,29 @@ namespace MyAPI.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        [Authorize]
+        [HttpGet("totalLossVehicel/startDate/endDate/vehicleId")]
+        public async Task<IActionResult> getTotalLossVehicleUpdate(DateTime? startDate, DateTime? endDate, int? vehicleId)
+        {
+            try
+            {
+                string token = Request.Headers["Authorization"];
+                if (token.StartsWith("Bearer"))
+                {
+                    token = token.Substring("Bearer ".Length).Trim();
+                }
+                if (string.IsNullOrEmpty(token))
+                {
+                    return BadRequest("Token is required.");
+                }
+                var userId = _getInforFromToken.GetIdInHeader(token);
+                var result = await _lossCostVehicleRepository.GetLossCostVehicleByDateUpdate(startDate,endDate,vehicleId,userId);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }

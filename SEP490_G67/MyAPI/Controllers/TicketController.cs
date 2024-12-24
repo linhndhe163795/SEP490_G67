@@ -80,7 +80,7 @@ namespace MyAPI.Controllers
         }
         [Authorize]
         [HttpGet("getPriceFromPoint/pointStart/pointEnd/vehicleId")]
-        public async Task<IActionResult> getPriceFromPoint(string pointStart, string pointEnd,int vehicleId)
+        public async Task<IActionResult> getPriceFromPoint(string pointStart, string pointEnd, int vehicleId)
         {
             try
             {
@@ -320,7 +320,33 @@ namespace MyAPI.Controllers
                 return BadRequest(e.Message);
             }
         }
+        //update version 2
 
+        [HttpGet("RevenueTicket/startDate/endDate/vehicleId")]
+        public async Task<IActionResult> getRevenueTicketV2(DateTime? startDate, DateTime? endDate, int? vehicleId)
+        {
+            try
+            {
+                
+                string token = Request.Headers["Authorization"];
+                if (token.StartsWith("Bearer"))
+                {
+                    token = token.Substring("Bearer ".Length).Trim();
+                }
+                if (string.IsNullOrEmpty(token))
+                {
+                    return BadRequest("Token is required.");
+                }
+                var userId = _getInforFromToken.GetIdInHeader(token);
+                var respone = await _ticketRepository.getRevenueTicketUpdate(startDate, endDate, vehicleId, userId);
+                return Ok(respone);
+
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
         [HttpPost("deleteTicketTimeOut/{ticketId}")]
         public async Task<IActionResult> deleteTicketByTicketId(int ticketId)
         {

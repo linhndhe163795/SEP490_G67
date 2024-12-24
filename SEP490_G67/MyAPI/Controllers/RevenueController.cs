@@ -29,6 +29,19 @@ namespace MyAPI.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        [HttpGet("getRevenue/startDate/endDate/vehicleId")]
+        public async Task<IActionResult> getRevenue(DateTime? startDate, DateTime? endDate, int? vehicleId)
+        {
+            try
+            {
+                var result = await _revenueRepository.RevenueStatisticUpdate(startDate,endDate,vehicleId);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
         [HttpPost("exportRevenue")]
         public async Task<IActionResult> exportRevenue([FromBody] RevenueDTO data)
         {

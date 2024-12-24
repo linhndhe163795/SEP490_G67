@@ -40,7 +40,6 @@ namespace MyAPI.Repositories.Impls
 
 
         }
-        [Authorize(Roles = "Staff, VehicleOwner")]
         public async Task<RevenueDTO> RevenueStatistic()
         {
 
@@ -52,7 +51,7 @@ namespace MyAPI.Repositories.Impls
             {
                 throw new Exception("Invalid user ID from token.");
             }
-           
+
             var listRenvenueTicket = await _ticketRepository.getRevenueTicket(userId);
             var listRevenueRentVehicle = await _paymentRentVehicleRepository.getPaymentRentVehicleByDate(userId);
             var listLossCost = await _lossCostVehicleRepository.GetLossCostVehicleByDate(userId);
@@ -82,6 +81,68 @@ namespace MyAPI.Repositories.Impls
                     new TotalPaymentRentVehicleDTO
                     {
                        PaymentRentVehicelDTOs = listRevenueRentVehicle.PaymentRentVehicelDTOs,
+                    }
+                },
+                totalRevenue = listRenvenueTicket.total + listRevenueRentVehicle.Total - listExpenseRentDriver.Total - listLossCost.TotalCost
+
+            };
+            return revenue;
+        }
+
+
+        // update revenue version 2
+        public async Task<RevenueDTO> RevenueStatisticUpdate(DateTime? startDate, DateTime? endDate, int? vehicleId)
+        {
+
+            if (!startDate.HasValue || !endDate.HasValue)
+            {
+                var now = DateTime.Now;
+                startDate ??= new DateTime(now.Year, now.Month, 1);
+                endDate ??= new DateTime(now.Year, now.Month, DateTime.DaysInMonth(now.Year, now.Month));
+            }
+            var token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+            int userId = _tokenHelper.GetIdInHeader(token);
+
+
+            if (userId <= 0)
+            {
+                throw new Exception("Invalid user ID from token.");
+            }
+
+            var listRenvenueTicket = await _ticketRepository.getRevenueTicketUpdate(startDate, endDate, vehicleId, userId);
+            var listRevenueRentVehicle = await _paymentRentVehicleRepository.getPaymentRentVehicleByDateUpdate(startDate, endDate, vehicleId, userId);
+            var listLossCost = await _lossCostVehicleRepository.GetLossCostVehicleByDateUpdate(startDate, endDate, vehicleId, userId);
+            var listExpenseRentDriver = await _historyRentDriverRepository.GetRentDetailsWithTotalForOwnerUpdate(startDate, endDate, vehicleId);
+
+            var revenue = new RevenueDTO
+            {
+                revenueTicketDTOs = new List<RevenueTicketDTO>{
+                    new RevenueTicketDTO
+                    {
+                        listTicket = listRenvenueTicket.listTicket,
+                        total = listRenvenueTicket.total
+                    }
+                },
+                totalLossCosts = new List<TotalLossCost> {
+                    new TotalLossCost
+                    {
+                        listLossCostVehicle = listLossCost.listLossCostVehicle,
+                        TotalCost = listLossCost.TotalCost
+
+                    }
+                },
+                totalPayementRentDrivers = new List<TotalPayementRentDriver> {
+                    new TotalPayementRentDriver
+                    {
+                        PaymentRentDriverDTOs = listExpenseRentDriver.PaymentRentDriverDTOs,
+                        Total = listExpenseRentDriver.Total
+                    }
+                },
+                totalPaymentRentVehicleDTOs = new List<TotalPaymentRentVehicleDTO> {
+                    new TotalPaymentRentVehicleDTO
+                    {
+                       PaymentRentVehicelDTOs = listRevenueRentVehicle.PaymentRentVehicelDTOs,
+                       Total = listRevenueRentVehicle.Total
                     }
                 },
                 totalRevenue = listRenvenueTicket.total + listRevenueRentVehicle.Total - listExpenseRentDriver.Total - listLossCost.TotalCost

@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using AutoMapper.Configuration.Conventions;
 using DocumentFormat.OpenXml.Office2010.Excel;
+using DocumentFormat.OpenXml.Wordprocessing;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using MyAPI.DTOs;
@@ -817,6 +818,93 @@ namespace MyAPI.Repositories.Impls
             {
                 throw new Exception(ex.Message);
             }
+        }
+        private async Task<RevenueTicketDTO> GetRevenueTicketDTOUpdate(IQueryable<Ticket> query)
+        {
+            var listTicket = await query
+                .Join(_context.Vehicles, ticket => ticket.VehicleId, vehicle => vehicle.Id, (ticket, vehicle) => new { ticket, vehicle })
+                .Join(_context.Users, tv => tv.vehicle.VehicleOwner, user => user.Id, (tv, user) => new
+                {
+                    Id = tv.ticket.Id,
+                    tv.ticket.PricePromotion,
+                    tv.ticket.VehicleId,
+                    tv.ticket.CreatedAt,
+                    LiscenseVehicle = tv.vehicle.LicensePlate,
+                    VehicleOwner = user.FullName, // Lấy tên chủ xe
+                    TypeOfTicket = tv.ticket.TypeOfTicketNavigation.Description,
+                    TypeOfPayment = tv.ticket.TypeOfPaymentNavigation.TypeOfPayment1
+                })
+                .Select(x => new TicketRevenue
+                {
+                    Id = x.Id,
+                    PricePromotion = x.PricePromotion,
+                    VehicleId = x.VehicleId,
+                    CreatedAt = x.CreatedAt,
+                    LiscenseVehicle = x.LiscenseVehicle,
+                    VehicleOwner = x.VehicleOwner,
+                    TypeOfTicket = x.TypeOfTicket,
+                    TypeOfPayment = x.TypeOfPayment
+                })
+                .ToListAsync();
+
+            // Tính tổng giá trị vé
+            var sumPriceTicket = await query.SumAsync(x => x.PricePromotion);
+
+            // Kết hợp dữ liệu
+            var combineResult = new RevenueTicketDTO
+            {
+                total = sumPriceTicket,
+                listTicket = listTicket
+            };
+
+            return combineResult;
+        }
+        public async Task<RevenueTicketDTO> getRevenueTicketUpdate(DateTime? startDate, DateTime? endDate, int? vehicleId, int userId)
+        {
+            try
+            {
+                if (startDate > endDate)
+                {
+                    throw new Exception("Start time must be earlier than or equal to end time.");
+                }
+                if (!startDate.HasValue || !endDate.HasValue)
+                {
+                    var now = DateTime.Now;
+                    startDate ??= new DateTime(now.Year, now.Month, 1);
+                    endDate ??= new DateTime(now.Year, now.Month, DateTime.DaysInMonth(now.Year, now.Month));
+                }
+                if (userId <= 0)
+                {
+                    throw new Exception("Invalid user ID.");
+                }
+                var getInforUser = _context.Users.Include(x => x.UserRoles).ThenInclude(x => x.Role).Where(x => x.Id == userId).FirstOrDefault();
+                if (getInforUser == null)
+                {
+                    throw new Exception("User not found.");
+                }
+                if (IsUserRole(getInforUser, "Staff"))
+                {
+                    return await GetRevenueForStaffUpdate(startDate, endDate, vehicleId);
+                }
+                throw new Exception("User role is not supported.");
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+        private async Task<RevenueTicketDTO> GetRevenueForStaffUpdate(DateTime? startDate, DateTime? endDate, int? vehicleId)
+        {
+            var query = _context.Tickets.Include(x => x.Vehicle).Where(x => x.TimeTo >= startDate && x.TimeTo <= endDate);
+            if (vehicleId.HasValue && vehicleId != 0)
+            {
+                query = query.Where(x => x.VehicleId == vehicleId);
+            }
+            if (vehicleId == null)
+            {
+                query = query;
+            }
+            return await GetRevenueTicketDTOUpdate(query);
         }
     }
 }

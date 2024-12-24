@@ -23,5 +23,6 @@ namespace MyAPI.Infrastructure.Interfaces
         Task<List<ListTicketDTOs>> GetTicketByUserId(int userId);
         Task updateTicketByTicketId(int ticketId, int userId, TicketUpdateDTOs ticket);
         Task deleteTicketByTicketId(int id, int userId);
+        Task<RevenueTicketDTO> getRevenueTicketUpdate(DateTime? startTime, DateTime? endTime, int? vehicleId, int userId);
     }
 }

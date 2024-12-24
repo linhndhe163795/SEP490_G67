@@ -12,5 +12,9 @@ namespace MyAPI.Infrastructure.Interfaces
         Task<TotalPayementRentDriver> GetRentDetailsWithTotalForOwner();
         Task<bool> UpdateDriverInRequestAsync(int driverId, int requestId);
         Task<List<DriverHistoryDTO>> getHistoryRentDriver(int userId, string role);
+        // update version 2
+        Task<TotalPayementRentDriver> GetRentDetailsWithTotalForOwnerUpdate(DateTime? startDate, DateTime? endDate, int? vehicleId);
+
+
     }
 }

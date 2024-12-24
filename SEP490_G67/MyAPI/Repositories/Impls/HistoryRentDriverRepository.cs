@@ -201,7 +201,7 @@ namespace MyAPI.Repositories.Impls
         {
             try
             {
-              
+
                 var token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
                 int userId = _tokenHelper.GetIdInHeader(token);
                 var role = _tokenHelper.GetRoleFromToken(token);
@@ -274,12 +274,12 @@ namespace MyAPI.Repositories.Impls
         }
         private async Task<TotalPayementRentDriver> GetRentDriverTotalForOwner(int? vehicleOwner)
         {
-            
+
 
 
             IQueryable<PaymentRentDriver> query = _context.PaymentRentDrivers.AsQueryable();
             query = query.Include(x => x.HistoryRentDriver).ThenInclude(hrd => hrd.Vehicle).Where(x => x.HistoryRentDriver.Vehicle.VehicleOwner == vehicleOwner);
-          
+
             var result = await GetRentDriver(query);
             if (result == null)
             {
@@ -291,10 +291,10 @@ namespace MyAPI.Repositories.Impls
         }
         private Task<TotalPayementRentDriver> GetRentDriverTotalForStaff()
         {
-           
+
 
             IQueryable<PaymentRentDriver> query = _context.PaymentRentDrivers.AsQueryable();
-           
+
             return GetRentDriver(query);
         }
         private Task<TotalPayementRentDriver> GetRentDriverTotalForDriver(int driverId)
@@ -440,6 +440,159 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception(ex.Message);
             }
         }
+        // update vesion 2 
+        public async Task<TotalPayementRentDriver> GetRentDetailsWithTotalForOwnerUpdate(DateTime? startDate, DateTime? endDate, int? vehicleId)
+        {
+            try
+            {
+                if (startDate > endDate)
+                {
+                    throw new Exception("Start date must be earlier than or equal to end date.");
+                }
+                if (vehicleId.HasValue && vehicleId < 0)
+                {
+                    throw new Exception("Invalid vehicle ID.");
+                }
+                if (!startDate.HasValue || !endDate.HasValue)
+                {
+                    var now = DateTime.Now;
+                    startDate ??= new DateTime(now.Year, now.Month, 1);
+                    endDate ??= new DateTime(now.Year, now.Month, DateTime.DaysInMonth(now.Year, now.Month));
+                }
+                var token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+                int userId = _tokenHelper.GetIdInHeader(token);
+                var role = _tokenHelper.GetRoleFromToken(token);
+
+                if (userId == -1)
+                {
+                    throw new Exception("Invalid user ID from token.");
+                }
+                var getInforUser = _context.Users.Include(x => x.UserRoles).ThenInclude(x => x.Role).Where(x => x.Id == userId).FirstOrDefault();
+
+                if (role == "Staff")
+                {
+                    return await GetRentDriverTotalForStaffUpdate(startDate, endDate, vehicleId);
+                }
+                else if (role == "Driver")
+                {
+                    return await GetRentDriverTotalForDriverUpdate(startDate, endDate, userId);
+                }
+                else
+                {
+                    return null;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error fetching rent details for owner: {ex.Message}");
+                throw;
+            }
+        }
+        public async Task<TotalPayementRentDriver> GetRentDriverUpdate(IQueryable<PaymentRentDriver> query)
+        {
+            var rentDetails = await query
+                .Join(_context.Vehicles, rent => rent.VehicleId, vehicle => vehicle.Id, (rent, vehicle) => new { rent, vehicle })
+                .Join(_context.Users, rv => rv.vehicle.VehicleOwner, user => user.Id, (rv, user) => new { rv.rent, rv.vehicle, VehicleOwnerName = user.FullName })
+                .Join(_context.Drivers, rv => rv.rent.DriverId, driver => driver.Id, (rv, driver) => new
+                {
+                    rv.rent.Id,
+                    rv.rent.Price,
+                    rv.rent.VehicleId,
+                    LicenseVehicle = rv.vehicle.LicensePlate,
+                    rv.rent.DriverId,
+                    DriverName = driver.Name,
+                    rv.rent.CreatedAt,
+                    VehicleOwnerName = rv.VehicleOwnerName
+                })
+                .Select(x => new PaymentRentDriverDTO
+                {
+                    Id = x.Id,
+                    Price = x.Price,
+                    vehicleOwner = x.VehicleOwnerName,
+                    vehicleId = x.VehicleId,
+                    LicenseVehicle = x.LicenseVehicle,
+                    DriverId = x.DriverId,
+                    DriverName = x.DriverName,
+                    CreatedAt = x.CreatedAt,
+                })
+                .ToListAsync();
+            var total = query.Sum(x => x.Price);
+            var combine = new TotalPayementRentDriver
+            {
+                Total = total,
+                PaymentRentDriverDTOs = rentDetails
+            };
+
+            return combine;
+        }
+        private async Task<TotalPayementRentDriver> GetRentDriverTotalForOwnerUpdate(DateTime? startDate, DateTime? endDate, int? vehicleId)
+        {
+            if (startDate > endDate)
+            {
+                throw new Exception("Start date must be earlier than or equal to end date.");
+            }
+
+
+            IQueryable<PaymentRentDriver> query = _context.PaymentRentDrivers.Where(x => x.CreatedAt >= startDate && x.CreatedAt <= endDate);
+            if (vehicleId != 0 && vehicleId.HasValue)
+            {
+                query = query.Include(x => x.HistoryRentDriver).ThenInclude(hrd => hrd.Vehicle).Where(x => x.VehicleId == vehicleId);
+            }
+            else
+            {
+                query = query.Include(x => x.HistoryRentDriver).ThenInclude(hrd => hrd.Vehicle);
+            }
+            var result = await GetRentDriverUpdate(query);
+            if (result == null)
+            {
+                throw new Exception("No rent driver data found for the specified criteria.");
+            }
+
+            return result;
+
+        }
+        private Task<TotalPayementRentDriver> GetRentDriverTotalForStaffUpdate(DateTime? startDate, DateTime? endDate, int? vehicleId)
+        {
+            if (startDate > endDate)
+            {
+                throw new Exception("Start date must be earlier than or equal to end date.");
+            }
+            if (!startDate.HasValue && !endDate.HasValue)
+            {
+                startDate = DateTime.Now;
+                endDate = DateTime.Now;
+            }
+            IQueryable<PaymentRentDriver> query = _context.PaymentRentDrivers.Where(x => x.CreatedAt >= startDate && x.CreatedAt <= endDate);
+            if (vehicleId != 0 && vehicleId.HasValue)
+            {
+                query = query.Where(x => x.VehicleId == vehicleId);
+            }
+            if (vehicleId == null)
+            {
+                query = query.Include(x => x.HistoryRentDriver).ThenInclude(hrd => hrd.Vehicle);
+            }
+            return GetRentDriverUpdate(query);
+        }
+        private Task<TotalPayementRentDriver> GetRentDriverTotalForDriverUpdate(DateTime? startDate, DateTime? endDate, int driverId)
+        {
+            if (startDate > endDate)
+            {
+                throw new Exception("Start date must be earlier than or equal to end date.");
+            }
+
+
+            IQueryable<PaymentRentDriver> query = _context.PaymentRentDrivers.Where(x => x.CreatedAt >= startDate && x.CreatedAt <= endDate);
+            if (driverId != 0)
+            {
+                query = query.Where(x => x.DriverId == driverId);
+            }
+            return GetRentDriverUpdate(query);
+        }
+
+
+
+
 
     }
 }

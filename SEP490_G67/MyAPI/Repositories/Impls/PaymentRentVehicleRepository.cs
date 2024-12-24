@@ -18,7 +18,7 @@ namespace MyAPI.Repositories.Impls
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public async Task<TotalPaymentRentVehicleDTO> getPaymentRentVehicleByDate( int userId)
+        public async Task<TotalPaymentRentVehicleDTO> getPaymentRentVehicleByDate(int userId)
         {
             try
             {
@@ -107,6 +107,89 @@ namespace MyAPI.Repositories.Impls
             var query = _context.PaymentRentVehicles
                            .Where(prv => prv.DriverId == driverId);
             return await GetRevenueRentVehicle(query);
+        }
+
+
+        //update payment rent vehile version 2
+        public async Task<TotalPaymentRentVehicleDTO> getPaymentRentVehicleByDateUpdate(DateTime? startDate, DateTime? endDate, int? vehicleId, int userId)
+        {
+            try
+            {
+                if (startDate > endDate)
+                {
+                    throw new Exception("Start date must be earlier than or equal to end date.");
+                }
+
+                if (vehicleId.HasValue && vehicleId <= 0)
+                {
+                    throw new Exception("Invalid vehicle ID.");
+                }
+
+                var getInforUser = _context.Users.Include(x => x.UserRoles).ThenInclude(x => x.Role).Where(x => x.Id == userId).FirstOrDefault();
+                if (getInforUser == null)
+                {
+                    throw new Exception("User not found.");
+                }
+                if (IsUserRole(getInforUser, "Staff"))
+                {
+                    return await getPaymentRentVehicleByDateForStaffUpdate(startDate, endDate, vehicleId);
+                }
+                throw new Exception("User role is not supported.");
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<TotalPaymentRentVehicleDTO> getPaymentRentVehicleByDateForStaffUpdate(DateTime? startDate, DateTime? endDate, int? vehicleId)
+        {
+            try
+            {
+                if (startDate > endDate)
+                {
+                    throw new Exception("Start date must be earlier than or equal to end date.");
+                }
+
+                if (vehicleId.HasValue && vehicleId <= 0)
+                {
+                    throw new Exception("Invalid vehicle ID.");
+                }
+                var query = _context.PaymentRentVehicles
+                               .Where(prv => prv.CreatedAt >= startDate && prv.CreatedAt <= endDate);
+                if (vehicleId.HasValue && vehicleId != 0)
+                {
+                    query = query.Where(x => x.VehicleId == vehicleId);
+                }
+                return await GetRevenueRentVehicleUpdate(query);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message, ex);
+            }
+
+        }
+        private async Task<TotalPaymentRentVehicleDTO> GetRevenueRentVehicleUpdate(IQueryable<PaymentRentVehicle> query)
+        {
+            var listRentVehicle =
+                 await query.Select(x => new PaymentRentVehicelDTO
+                 {
+                     Id = x.Id,
+                     CreatedAt = x.CreatedAt,
+                     driverId = x.DriverId,
+                     DriverName = _context.Drivers.Where(d => d.Id == x.DriverId).Select(d => d.Name).FirstOrDefault(),
+                     Price = x.Price ?? 0,
+                     vehicelId = x.VehicleId,
+                     LicenseVehicle = _context.Vehicles.Where(v => v.Id == x.DriverId).Select(v => v.LicensePlate).FirstOrDefault(),
+                     CarOwner = _context.Users.Include(uv => uv.Vehicles).Where(u => u.Id == x.CarOwnerId).Select(u => u.FullName).FirstOrDefault()
+                 }).ToListAsync();
+            var sumPrice = query.Sum(x => x.Price);
+            var combineResult = new TotalPaymentRentVehicleDTO
+            {
+                Total = sumPrice,
+                PaymentRentVehicelDTOs = listRentVehicle
+            };
+            return combineResult;
         }
     }
 }
