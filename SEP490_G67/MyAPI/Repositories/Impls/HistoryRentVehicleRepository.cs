@@ -120,12 +120,7 @@ namespace MyAPI.Repositories.Impls
                     _context.RequestDetails.Update(requestDetail);
                     await _context.SaveChangesAsync();
 
-                    var vechileAssgin = await _context.Vehicles.FirstOrDefaultAsync(x => x.Id == vehicleId);
-                    vechileAssgin.DriverId = requestDetail.DriverId;
-                    vechileAssgin.DateStartBusy = requestDetail.StartTime;
-                    vechileAssgin.DateEndBusy = requestDetail.EndTime;
-                    _context.Vehicles.Update(vechileAssgin);
-                    await _context.SaveChangesAsync();
+                   
 
                     var vehicleOwner = await _context.Vehicles
                                                      .Where(s => s.Id == vehicleId)
