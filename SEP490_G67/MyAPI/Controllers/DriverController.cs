@@ -162,27 +162,27 @@ namespace MyAPI.Controllers
             }
         }
         [Authorize(Roles = "Staff")]
-        [HttpGet("driversWithoutVehicle")]
-        public async Task<IActionResult> GetDriversWithoutVehicle()
+        [HttpGet("driversWithoutVehicle/vehicleId")]
+        public async Task<IActionResult> GetDriversWithoutVehicle(int vehicleId)
         {
-            var drivers = await _driverRepository.GetDriversWithoutVehicleAsync();
+            var drivers = await _driverRepository.GetDriversWithoutVehicleAsync(vehicleId);
             return Ok(drivers);
         }
-        [Authorize(Roles = "Staff")]
-        [HttpGet("send-mail-to-drivers-without-vehicle-for-rent")]
-        public async Task<IActionResult> SendMailToDriverWithoutVehicle(int price)
-        {
-            try
-            {
-                await _driverRepository.SendEmailToDriversWithoutVehicle(price);
+        //[Authorize(Roles = "Staff")]
+        //[HttpGet("send-mail-to-drivers-without-vehicle-for-rent")]
+        //public async Task<IActionResult> SendMailToDriverWithoutVehicle(int price)
+        //{
+        //    try
+        //    {
+        //        await _driverRepository.SendEmailToDriversWithoutVehicle(price);
 
-                return Ok("Emails sent successfully to all drivers without vehicles.");
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, "An error occurred while sending emails: " + ex.Message);
-            }
-        }
+        //        return Ok("Emails sent successfully to all drivers without vehicles.");
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return StatusCode(500, "An error occurred while sending emails: " + ex.Message);
+        //    }
+        //}
         [HttpGet("listDriveDTO")]
         public async Task<IActionResult> GetDriveList()
         {

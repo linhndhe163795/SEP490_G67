@@ -51,7 +51,6 @@ namespace MyAPI.Controllers
                 return BadRequest("createTicket: " + ex.Message);
             }
         }
-
         [Authorize(Roles = "Driver, Staff")]
         [HttpPost("createTicketFromDriver/vehicleId/numberTicket")]
         public async Task<IActionResult> creatTicketFromDriver([FromBody] TicketFromDriverDTOs ticketFromDriver, int vehicleId, int numberTicket)
@@ -112,7 +111,6 @@ namespace MyAPI.Controllers
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
-
         [HttpGet("GetTravelCarByRequest/{requestId}/startDate/endDate")]
         public async Task<IActionResult> GetVehiclesByRequestId(int requestId, DateTime startDate, DateTime endDate)
         {
@@ -132,7 +130,6 @@ namespace MyAPI.Controllers
                 return StatusCode(500, new { Message = "Failed to retrieve vehicles.", Details = ex.Message });
             }
         }
-
         [HttpPost("AssignTravelCarForRent")]
         public async Task<IActionResult> UpdateVehicleInRequest(int vehicleId, int requestId)
         {
@@ -321,7 +318,6 @@ namespace MyAPI.Controllers
             }
         }
         //update version 2
-
         [HttpGet("RevenueTicket/startDate/endDate/vehicleId")]
         public async Task<IActionResult> getRevenueTicketV2(DateTime? startDate, DateTime? endDate, int? vehicleId)
         {
@@ -347,6 +343,7 @@ namespace MyAPI.Controllers
                 return BadRequest(e.Message);
             }
         }
+        //end update
         [HttpPost("deleteTicketTimeOut/{ticketId}")]
         public async Task<IActionResult> deleteTicketByTicketId(int ticketId)
         {

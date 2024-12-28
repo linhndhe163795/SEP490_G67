@@ -189,8 +189,6 @@ namespace MyAPI.Controllers
                 return BadRequest(ex.Message);
             }
         }
-
-
         [HttpGet("download_template_trip/typeOfTrip")]
         public IActionResult DownloadTemplateTrip(int typeOfTrip)
         {

@@ -165,55 +165,86 @@ namespace MyAPI.Repositories.Impls
             await Update(existingDriver);
             return existingDriver;
         }
-        public async Task<IEnumerable<Driver>> GetDriversWithoutVehicleAsync()
+        public async Task<IEnumerable<DriverNotVehicleResponse>> GetDriversWithoutVehicleAsync(int vehicleID)
         {
-            return await _context.Drivers
-                .Where(d => !_context.Vehicles.Any(v => v.DriverId == d.Id))
-                .ToListAsync();
+
+            var query1 = from d in _context.Drivers
+                         join v in _context.Vehicles
+                         on d.Id equals v.DriverId into vehicleGroup
+                         from vg in vehicleGroup.DefaultIfEmpty()
+                         where vg == null
+                         select new DriverNotVehicleResponse
+                         {
+                             Id = d.Id,
+                             userName = d.UserName,
+                             vehicleId = (int?)null,
+                             fullName = d.Name,
+                         };
+
+            var query2 = from d in _context.Drivers
+                         join v in _context.Vehicles
+                         on d.Id equals v.DriverId into vehicleGroup
+                         from vg in vehicleGroup.DefaultIfEmpty()
+                         where vg != null && vg.Id == 126
+                         select new DriverNotVehicleResponse // Match the type with `query1`
+                         {
+                             Id = d.Id,
+                             userName = d.UserName,
+                             vehicleId = (int?)vg.Id,
+                             fullName = d.Name,
+                         };
+
+            // Use Union since both queries now return the same type
+            var result = query1.Union(query2).Distinct();
+
+            return result;
+
+
+
         }
-        public async Task SendEmailToDriversWithoutVehicle(int price)
-        {
-            try
-            {
-                var driversWithoutVehicle = await GetDriversWithoutVehicleAsync();
+        //public async Task SendEmailToDriversWithoutVehicle(int price)
+        //{
+        //    try
+        //    {
+        //        var driversWithoutVehicle = await GetDriversWithoutVehicleAsync(vehicleID);
 
-                if (!driversWithoutVehicle.Any())
-                {
-                    Console.WriteLine("No drivers without vehicles found.");
-                    return;
-                }
+        //        if (!driversWithoutVehicle.Any())
+        //        {
+        //            Console.WriteLine("No drivers without vehicles found.");
+        //            return;
+        //        }
 
-                string formattedPrice = string.Format(new CultureInfo("vi-VN"), "{0:N0} VND", price);
+        //        string formattedPrice = string.Format(new CultureInfo("vi-VN"), "{0:N0} VND", price);
 
-                foreach (var driver in driversWithoutVehicle)
-                {
-                    if (string.IsNullOrWhiteSpace(driver.Email))
-                    {
-                        Console.WriteLine($"Driver {driver.Name} does not have an email address. Skipping...");
-                        continue;
-                    }
+        //        foreach (var driver in driversWithoutVehicle)
+        //        {
+        //            if (string.IsNullOrWhiteSpace(driver.Email))
+        //            {
+        //                Console.WriteLine($"Driver {driver.Name} does not have an email address. Skipping...");
+        //                continue;
+        //            }
 
-                    SendMailDTO sendMailDTO = new()
-                    {
-                        FromEmail = "duclinh5122002@gmail.com",
-                        Password = "jetj haze ijdw euci",
-                        ToEmail = driver.Email,
-                        Subject = "Vehicle Rental Opportunity",
-                        Body = $"Hello {driver.Name},\n\nWe currently have vehicles available and would like to hire you at a rate of {formattedPrice}. Please contact us if you are interested in renting a vehicle.\n\nBest regards,\nYour Company Name"
-                    };
+        //            SendMailDTO sendMailDTO = new()
+        //            {
+        //                FromEmail = "duclinh5122002@gmail.com",
+        //                Password = "jetj haze ijdw euci",
+        //                ToEmail = driver.Email,
+        //                Subject = "Vehicle Rental Opportunity",
+        //                Body = $"Hello {driver.Name},\n\nWe currently have vehicles available and would like to hire you at a rate of {formattedPrice}. Please contact us if you are interested in renting a vehicle.\n\nBest regards,\nYour Company Name"
+        //            };
 
-                    if (!await _sendMail.SendEmail(sendMailDTO))
-                    {
-                        Console.WriteLine($"Failed to send email to driver {driver.Email}.");
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("SendEmailToDriversWithoutVehicle error: " + ex.Message);
-                throw new Exception("Failed to send email to drivers without vehicles.", ex);
-            }
-        }
+        //            if (!await _sendMail.SendEmail(sendMailDTO))
+        //            {
+        //                Console.WriteLine($"Failed to send email to driver {driver.Email}.");
+        //            }
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Console.WriteLine("SendEmailToDriversWithoutVehicle error: " + ex.Message);
+        //        throw new Exception("Failed to send email to drivers without vehicles.", ex);
+        //    }
+        //}
         public async Task<bool> checkLogin(LoginDriverDTO login)
         {
             if (login == null)
