@@ -462,7 +462,7 @@ namespace MyAPI.Repositories.Impls
                 {
                     var getInforUser = _context.Users.Include(x => x.UserRoles).ThenInclude(x => x.Role).Where(x => x.Id == userId).FirstOrDefault();
                     if (getInforUser == null)
-                    {
+                    {   
                         throw new Exception("Invalid user");
                     }
                 }

@@ -25,7 +25,7 @@ namespace MyAPI.Repositories.Impls
                 var getInforUser = _context.Users.Include(x => x.UserRoles).ThenInclude(x => x.Role).Where(x => x.Id == userId).FirstOrDefault();
                 var token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
                 var role = _getInforFromToken.GetRoleFromToken(token);
-                if (getInforUser == null)
+                if (getInforUser == null && role != "Driver")
                 {
                     throw new Exception("User not found.");
                 }
@@ -110,6 +110,23 @@ namespace MyAPI.Repositories.Impls
         }
 
 
+        public async Task<TotalPaymentRentVehicleDTO> getPaymentRentVehicleByDriverUpdate( DateTime? startDate, DateTime? endDate, int driverId)
+        {
+            if (driverId <= 0)
+            {
+                throw new Exception("Invalid user ID.");
+            }
+            if(!startDate.HasValue && !endDate.HasValue)
+            {
+                startDate = DateTime.Now;
+                endDate = DateTime.Now;
+            }
+            var query = _context.PaymentRentVehicles
+                           .Where(prv => prv.DriverId == driverId && prv.CreatedAt >= startDate && prv.CreatedAt <= endDate);
+            return await GetRevenueRentVehicle(query);
+        }
+
+
         //update payment rent vehile version 2
         public async Task<TotalPaymentRentVehicleDTO> getPaymentRentVehicleByDateUpdate(DateTime? startDate, DateTime? endDate, int? vehicleId, int userId)
         {
@@ -124,15 +141,23 @@ namespace MyAPI.Repositories.Impls
                 {
                     throw new Exception("Invalid vehicle ID.");
                 }
-
+                
                 var getInforUser = _context.Users.Include(x => x.UserRoles).ThenInclude(x => x.Role).Where(x => x.Id == userId).FirstOrDefault();
-                if (getInforUser == null)
+                var token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+                var driverId = _getInforFromToken.GetIdInHeader(token);
+                var role = _getInforFromToken.GetRoleFromToken(token);
+                if (getInforUser == null && role != "Driver")
                 {
                     throw new Exception("User not found.");
                 }
-                if (IsUserRole(getInforUser, "Staff"))
+                if (role == "Staff")
                 {
                     return await getPaymentRentVehicleByDateForStaffUpdate(startDate, endDate, vehicleId);
+                }
+                if(role == "Driver")
+                {
+                    return await getPaymentRentVehicleByDriverUpdate(startDate, endDate, driverId);
+
                 }
                 throw new Exception("User role is not supported.");
             }
