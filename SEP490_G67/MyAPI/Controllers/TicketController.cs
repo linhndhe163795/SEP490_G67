@@ -52,8 +52,8 @@ namespace MyAPI.Controllers
             }
         }
         [Authorize(Roles = "Driver, Staff")]
-        [HttpPost("createTicketFromDriver/vehicleId/numberTicket")]
-        public async Task<IActionResult> creatTicketFromDriver([FromBody] TicketFromDriverDTOs ticketFromDriver, int vehicleId, int numberTicket)
+        [HttpPost("createTicketFromDriver/numberTicket")]
+        public async Task<IActionResult> creatTicketFromDriver([FromBody] TicketFromDriverDTOs ticketFromDriver, int numberTicket)
         {
             try
             {
@@ -67,7 +67,7 @@ namespace MyAPI.Controllers
                     return BadRequest("Token is required.");
                 }
                 var driverId = _getInforFromToken.GetIdInHeader(token);
-
+                var vehicleId = await _vehicleRepository.getVehicleByDriver(driverId); 
                 var priceTrip = await _ticketRepository.GetPriceFromPoint(ticketFromDriver, vehicleId);
                 await _ticketRepository.CreatTicketFromDriver(priceTrip, vehicleId, ticketFromDriver, driverId, numberTicket);
                 return Ok();
@@ -78,11 +78,22 @@ namespace MyAPI.Controllers
             }
         }
         [Authorize]
-        [HttpGet("getPriceFromPoint/pointStart/pointEnd/vehicleId")]
-        public async Task<IActionResult> getPriceFromPoint(string pointStart, string pointEnd, int vehicleId)
+        [HttpGet("getPriceFromPoint/pointStart/pointEnd")]
+        public async Task<IActionResult> getPriceFromPoint(string pointStart, string pointEnd)
         {
             try
             {
+                string token = Request.Headers["Authorization"];
+                if (token.StartsWith("Bearer"))
+                {
+                    token = token.Substring("Bearer ".Length).Trim();
+                }
+                if (string.IsNullOrEmpty(token))
+                {
+                    return BadRequest("Token is required.");
+                }
+                var driverId = _getInforFromToken.GetIdInHeader(token);
+                var vehicleId = await _vehicleRepository.getVehicleByDriver(driverId);
                 var ticketFromDriver = new TicketFromDriverDTOs
                 {
                     PointEnd = pointEnd,

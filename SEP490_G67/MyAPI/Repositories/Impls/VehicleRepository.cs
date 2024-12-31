@@ -1188,6 +1188,21 @@ namespace MyAPI.Repositories.Impls
             }
         }
 
-       
+        public async Task<int> getVehicleByDriver(int driverId)
+        {
+            try
+            {
+                var vehicleID = await _context.Vehicles.FirstOrDefaultAsync(x => x.DriverId == driverId);
+                if(vehicleID == null)
+                {
+                    throw new Exception("Not found any vehilce");
+                }
+                return vehicleID.Id;
+
+            }catch(Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
     }
 }
