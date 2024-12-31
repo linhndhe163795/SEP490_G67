@@ -479,6 +479,21 @@ namespace MyAPI.Controllers
             }
         }
 
+        [HttpGet("listVehicleConvenience/starDate/endDate")]
+        public async Task<IActionResult> listVehicleConvienceFreeTime(DateTime startDate, DateTime endDate)
+        {
+            try
+            {
+                var list = await _vehicleRepository.getVehilceConvenienceFreeTime(startDate,endDate);
+                return Ok(list);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+
 
     }
 }

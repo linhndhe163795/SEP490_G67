@@ -121,10 +121,10 @@ namespace MyAPI.Repositories.Impls
                     updateRequest.Status = choose;
                     var updateRequestRentDriver = await _requestRepository.UpdateRequestVehicleAsync(requestId, updateRequest);
 
-                    var vechileAssgin = await _context.Vehicles.FirstOrDefaultAsync(x => x.Id == requestDetail.VehicleId);
-                    vechileAssgin.DriverId = driverId;
-                    _context.Vehicles.Update(vechileAssgin);
-                    await _context.SaveChangesAsync();
+                    //var vechileAssgin = await _context.Vehicles.FirstOrDefaultAsync(x => x.Id == requestDetail.VehicleId);
+                    //vechileAssgin.DriverId = driverId;
+                    //_context.Vehicles.Update(vechileAssgin);
+                    //await _context.SaveChangesAsync();
 
                     requestDetail.DriverId = driverId;
                     requestDetail.Price = price;
@@ -353,6 +353,37 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception($"Error in GetListHistoryRentDriver: {ex.Message}");
             }
         }
+
+        public async Task<IEnumerable<HistoryRentDriverListDTOs>> GetListHistoryRentDriverUpdate(int requestDeatailsId)
+        {
+            try
+            {
+                var requestDetails = await _context.RequestDetails.FirstOrDefaultAsync(x => x.RequestId == requestDeatailsId);
+                var listDriverBusyIds = await (from hrd in _context.HistoryRentDrivers
+                                               where hrd.TimeStart < requestDetails.EndTime
+                                                     && hrd.EndStart > requestDetails.StartTime
+                                               select hrd.DriverId).Distinct().ToListAsync();
+
+                var availableDrivers = await _context.Drivers
+                                        .Include(d => d.Vehicles).Where(d => !_context.Vehicles.Any(v => v.DriverId == d.Id) &&
+                                            !listDriverBusyIds.Contains(d.Id))
+                                            .Select(d => new HistoryRentDriverListDTOs
+                                            {
+                                                Id = d.Id,
+                                                UserName = d.UserName,
+                                                Name = d.Name,
+                                                NumberPhone = d.NumberPhone,
+                                            }).ToListAsync();
+
+                return availableDrivers;
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error in GetListHistoryRentDriver: {ex.Message}");
+            }
+        }
+
         public async Task<bool> UpdateDriverInRequestAsync(int driverId, int requestId)
         {
             try
@@ -458,6 +489,8 @@ namespace MyAPI.Repositories.Impls
                     var now = DateTime.Now;
                     startDate = new DateTime(now.Year, now.Month, 1);
                     endDate = new DateTime(now.Year, now.Month, DateTime.DaysInMonth(now.Year, now.Month));
+
+
                 }
                 var token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
                 int userId = _tokenHelper.GetIdInHeader(token);
@@ -558,13 +591,13 @@ namespace MyAPI.Repositories.Impls
             {
                 throw new Exception("Start date must be earlier than or equal to end date.");
             }
-            
+
             IQueryable<PaymentRentDriver> query = _context.PaymentRentDrivers.Where(x => x.CreatedAt >= startDate && x.CreatedAt <= endDate);
             if (vehicleId != 0 && vehicleId.HasValue)
             {
                 query = query.Where(x => x.VehicleId == vehicleId);
             }
-          
+
             return GetRentDriverUpdate(query);
         }
         private Task<TotalPayementRentDriver> GetRentDriverTotalForDriverUpdate(DateTime? startDate, DateTime? endDate, int driverId, int? vehicleId)
@@ -580,13 +613,13 @@ namespace MyAPI.Repositories.Impls
             {
                 query = query.Where(x => x.DriverId == driverId);
             }
-            if(vehicleId != null)
+            if (vehicleId != null)
             {
                 query = query.Where(x => x.VehicleId == vehicleId);
             }
             return GetRentDriverUpdate(query);
         }
-
+        // end update
 
 
 

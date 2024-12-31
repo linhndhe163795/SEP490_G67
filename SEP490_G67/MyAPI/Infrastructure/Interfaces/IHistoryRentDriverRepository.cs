@@ -14,6 +14,7 @@ namespace MyAPI.Infrastructure.Interfaces
         Task<List<DriverHistoryDTO>> getHistoryRentDriver(int userId, string role);
         // update version 2
         Task<TotalPayementRentDriver> GetRentDetailsWithTotalForOwnerUpdate(DateTime? startDate, DateTime? endDate, int? vehicleId);
+        Task<IEnumerable<HistoryRentDriverListDTOs>> GetListHistoryRentDriverUpdate(int requestDeatailsId);
 
 
     }

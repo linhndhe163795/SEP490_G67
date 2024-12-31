@@ -29,5 +29,6 @@ namespace MyAPI.Infrastructure.Interfaces
         Task<List<VehicleBasicDto>> GetAvailableVehiclesAsync();
         Task<List<VehicleBasicDto>> GetVehicleTypeConvinience();
         Task<List<VehicleSeatAvaliableDTOs>> listNumberSeatAvaliableOfVehilce(DateTime? dateTime);
+        Task<List<VehicleListDTO>> getVehilceConvenienceFreeTime(DateTime startDate, DateTime endTime);
     }
 }

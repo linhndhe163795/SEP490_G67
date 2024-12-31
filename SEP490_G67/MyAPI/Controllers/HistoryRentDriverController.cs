@@ -21,12 +21,13 @@ namespace MyAPI.Controllers
             _getInforFromToken = getInforFromToken;
         }
 
-        [HttpGet("ListDriverRent")]
-        public async Task<IActionResult> GetDriverUseRent()
+        [HttpGet("ListDriverRent/requestDetails")]
+        public async Task<IActionResult> GetDriverUseRent(int requestDetails)
         {
             try
             {
-                var requests = await _historyRentDriverRepository.GetListHistoryRentDriver();
+
+                var requests = await _historyRentDriverRepository.GetListHistoryRentDriverUpdate(requestDetails);
                 if (requests != null)
                 {
                     return Ok(requests);

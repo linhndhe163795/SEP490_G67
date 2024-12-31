@@ -458,11 +458,11 @@ namespace MyAPI.Repositories.Impls
         {
             try
             {
-                if(role != "Driver")
+                if (role != "Driver")
                 {
                     var getInforUser = _context.Users.Include(x => x.UserRoles).ThenInclude(x => x.Role).Where(x => x.Id == userId).FirstOrDefault();
                     if (getInforUser == null)
-                    {   
+                    {
                         throw new Exception("Invalid user");
                     }
                 }
@@ -1145,8 +1145,8 @@ namespace MyAPI.Repositories.Impls
                 var vehicleTrips = await _context.VehicleTrips.Include(x => x.Trip)
                                     .Include(x => x.Vehicle)
                                     .Where(x => x.Trip.Price == 85000)
-                                    .GroupBy(x => new { x.VehicleId, x.TripId, x.Trip.Id})
-                                    .Select(g => g.First())    
+                                    .GroupBy(x => new { x.VehicleId, x.TripId, x.Trip.Id })
+                                    .Select(g => g.First())
                                     .ToListAsync();
 
 
@@ -1155,7 +1155,7 @@ namespace MyAPI.Repositories.Impls
                     throw new Exception("No VehicleTrips found for the given date.");
                 }
 
-               
+
                 var seatAvailabilityList = new List<VehicleSeatAvaliableDTOs>();
 
                 foreach (var vehicleTrip in vehicleTrips)
@@ -1196,15 +1196,41 @@ namespace MyAPI.Repositories.Impls
             try
             {
                 var vehicleID = await _context.Vehicles.FirstOrDefaultAsync(x => x.DriverId == driverId);
-                if(vehicleID == null)
+                if (vehicleID == null)
                 {
                     throw new Exception("Not found any vehilce");
                 }
                 return vehicleID.Id;
 
-            }catch(Exception e)
+            }
+            catch (Exception e)
             {
                 throw new Exception(e.Message);
+            }
+        }
+        public async Task<List<VehicleListDTO>> getVehilceConvenienceFreeTime(DateTime startDate, DateTime endTime)
+        {
+            try
+            {
+                var vehicleBusy = await (from v in _context.Vehicles
+                                         join hrd in _context.HistoryRentDrivers
+                                         on v.Id equals hrd.VehicleId
+                                         where hrd.TimeStart >= startDate && hrd.EndStart <= endTime
+                                         select v.Id).ToListAsync();
+                var vehicleConvienceFreeiTime = await _context.Vehicles.
+                    Where(x => !vehicleBusy.Contains(x.Id)).Select(x => new VehicleListDTO
+                    {
+                        Id = x.Id,
+                        LicensePlate = x.LicensePlate,
+                        NumberSeat = x.NumberSeat,
+                        VehicleOwner = x.VehicleOwner,
+                        Description = x.Description
+                    }).ToListAsync();
+                return vehicleConvienceFreeiTime;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
             }
         }
     }
