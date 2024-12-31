@@ -170,7 +170,11 @@ namespace MyAPI.Repositories.Impls
                 {
                     throw new Exception("Invalid type of payment.");
                 }
-                
+                var trip = await _context.Trips.Include(x => x.TripDetails).Where(x => x.PointStart.Equals(ticket.PointStart) && x.PointEnd.Equals(ticket.PointEnd)).FirstOrDefaultAsync();
+                var timeTo = trip.TripDetails.Select(x => x.TimeEndDetails).FirstOrDefault() ?? TimeSpan.MaxValue;
+                var currentDate = DateTime.Today;
+                var dateTimeTo = currentDate.Add(timeTo);
+
                 if (ticket.PointStart != null && ticket.PointEnd != null)
 
                 {
@@ -181,7 +185,7 @@ namespace MyAPI.Repositories.Impls
                         PointStart = ticket.PointStart,
                         PointEnd = ticket.PointEnd,
                         TimeFrom = DateTime.Now,
-                        TimeTo = DateTime.Now.AddMinutes(45),
+                        TimeTo = dateTimeTo,
                         TypeOfTicket = Constant.VE_XE_LIEN_TINH,
                         NumberTicket = numberTicket,
                         Description = "Khách bắt dọc đường di chuyển từ " + ticket.PointStart + " đến " + ticket.PointEnd,
