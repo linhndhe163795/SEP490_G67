@@ -971,6 +971,23 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception("getListStartPoint: " + ex.Message);
             }
         }
+        public async Task<TripDTO> getTripConvenienceDTO(int id)
+        {
+            try
+            {
+                var tripDetails = await _context.Trips.FirstOrDefaultAsync(x => x.Id == id && x.TypeOfTrip == Constant.CHUYEN_DI_BAO_XE);
+                if (tripDetails == null)
+                {
+                    throw new Exception("Not Found Any Trip");
+                }
+                var mapper = _mapper.Map<TripDTO>(tripDetails);
+                return mapper;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
         public async Task<List<EndPointDTO>> getListEndPoint(string? startPoint)
         {
             try

@@ -498,6 +498,19 @@ namespace MyAPI.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        [HttpGet("getTripConvenienceById/id")]
+        public async Task<IActionResult> getTripConvenienceById(int id)
+        {
+            try
+            {
+                var rs = await _tripRepository.getTripConvenienceDTO(id);
+                return Ok(rs);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
 
         [Authorize(Roles = "Staff")]
         [HttpPost("deleteTrip/{tripId}")]

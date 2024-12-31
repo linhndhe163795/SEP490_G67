@@ -30,5 +30,6 @@ namespace MyAPI.Infrastructure.Interfaces
         Task<int> getTripDetailsId(string pointStart, string pointEnd, TimeSpan timeStartPoint, TimeSpan timeEndPoint);
         Task confirmAddValidEntriesConvenience(List<TripImportDTO> validEntries);
         Task DeleteTripById(int tripId);
+        Task<TripDTO> getTripConvenienceDTO(int id);
     }
 }
