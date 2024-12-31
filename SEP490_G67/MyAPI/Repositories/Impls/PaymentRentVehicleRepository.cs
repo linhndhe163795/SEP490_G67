@@ -109,25 +109,23 @@ namespace MyAPI.Repositories.Impls
             return await GetRevenueRentVehicle(query);
         }
 
-
-        public async Task<TotalPaymentRentVehicleDTO> getPaymentRentVehicleByDriverUpdate( DateTime? startDate, DateTime? endDate, int driverId)
+        //update payment rent vehile version 2
+        public async Task<TotalPaymentRentVehicleDTO> getPaymentRentVehicleByDriverUpdate(DateTime? startDate, DateTime? endDate, int driverId, int? vehicleId)
         {
             if (driverId <= 0)
             {
                 throw new Exception("Invalid user ID.");
             }
-            if(!startDate.HasValue && !endDate.HasValue)
-            {
-                startDate = DateTime.Now;
-                endDate = DateTime.Now;
-            }
             var query = _context.PaymentRentVehicles
-                           .Where(prv => prv.DriverId == driverId && prv.CreatedAt >= startDate && prv.CreatedAt <= endDate);
-            return await GetRevenueRentVehicle(query);
+                             .Where(prv => prv.DriverId == driverId && prv.CreatedAt >= startDate && prv.CreatedAt <= endDate);
+            if (vehicleId != null)
+            {
+                query = query.Where(x => x.VehicleId == vehicleId);
+            }
+        
+            return await GetRevenueRentVehicleUpdate(query);
         }
 
-
-        //update payment rent vehile version 2
         public async Task<TotalPaymentRentVehicleDTO> getPaymentRentVehicleByDateUpdate(DateTime? startDate, DateTime? endDate, int? vehicleId, int userId)
         {
             try
@@ -141,7 +139,7 @@ namespace MyAPI.Repositories.Impls
                 {
                     throw new Exception("Invalid vehicle ID.");
                 }
-                
+
                 var getInforUser = _context.Users.Include(x => x.UserRoles).ThenInclude(x => x.Role).Where(x => x.Id == userId).FirstOrDefault();
                 var token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
                 var driverId = _getInforFromToken.GetIdInHeader(token);
@@ -154,9 +152,9 @@ namespace MyAPI.Repositories.Impls
                 {
                     return await getPaymentRentVehicleByDateForStaffUpdate(startDate, endDate, vehicleId);
                 }
-                if(role == "Driver")
+                if (role == "Driver")
                 {
-                    return await getPaymentRentVehicleByDriverUpdate(startDate, endDate, driverId);
+                    return await getPaymentRentVehicleByDriverUpdate(startDate, endDate, driverId, vehicleId);
 
                 }
                 throw new Exception("User role is not supported.");
@@ -205,7 +203,7 @@ namespace MyAPI.Repositories.Impls
                      DriverName = _context.Drivers.Where(d => d.Id == x.DriverId).Select(d => d.Name).FirstOrDefault(),
                      Price = x.Price ?? 0,
                      vehicelId = x.VehicleId,
-                     LicenseVehicle = _context.Vehicles.Where(v => v.Id == x.DriverId).Select(v => v.LicensePlate).FirstOrDefault(),
+                     LicenseVehicle = _context.Vehicles.Where(v => v.DriverId == x.DriverId).Select(v => v.LicensePlate).FirstOrDefault(),
                      CarOwner = _context.Users.Include(uv => uv.Vehicles).Where(u => u.Id == x.CarOwnerId).Select(u => u.FullName).FirstOrDefault()
                  }).ToListAsync();
             var sumPrice = query.Sum(x => x.Price);
