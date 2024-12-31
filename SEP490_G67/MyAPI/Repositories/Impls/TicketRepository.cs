@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using AutoMapper.Configuration.Conventions;
 using DocumentFormat.OpenXml.Office2010.Excel;
+using DocumentFormat.OpenXml.VariantTypes;
 using DocumentFormat.OpenXml.Wordprocessing;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
@@ -170,11 +171,12 @@ namespace MyAPI.Repositories.Impls
                 {
                     throw new Exception("Invalid type of payment.");
                 }
-                var trip = await _context.Trips.Include(x => x.TripDetails).Where(x => x.PointStart.Equals(ticket.PointStart) && x.PointEnd.Equals(ticket.PointEnd)).FirstOrDefaultAsync();
+                var currentTime = DateTime.Now.TimeOfDay;
+            
+                var trip = await _context.Trips.Include(x => x.TripDetails).Where(x => x.PointStart.Equals(ticket.PointStart) && x.PointEnd.Equals(ticket.PointEnd) && x.StartTime >= currentTime).FirstOrDefaultAsync();
                 var timeTo = trip.TripDetails.Select(x => x.TimeEndDetails).FirstOrDefault() ?? TimeSpan.MaxValue;
                 var currentDate = DateTime.Today;
                 var dateTimeTo = currentDate.Add(timeTo);
-
                 if (ticket.PointStart != null && ticket.PointEnd != null)
 
                 {

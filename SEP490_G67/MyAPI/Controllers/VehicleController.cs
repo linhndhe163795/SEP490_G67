@@ -195,11 +195,22 @@ namespace MyAPI.Controllers
             }
         }
         [Authorize(Roles = "Driver,Staff")]
-        [HttpGet("getStartPointTripFromVehicle/vehicleId")]
-        public async Task<IActionResult> getStartPointTripFromVehicle(int vehicleId)
+        [HttpGet("getStartPointTripFromVehicle")]
+        public async Task<IActionResult> getStartPointTripFromVehicle()
         {
             try
             {
+                string token = Request.Headers["Authorization"];
+                if (token.StartsWith("Bearer"))
+                {
+                    token = token.Substring("Bearer ".Length).Trim();
+                }
+                if (string.IsNullOrEmpty(token))
+                {
+                    return BadRequest("Token is required.");
+                }
+                var driverId = _getInforFromToken.GetIdInHeader(token);
+                var vehicleId = await _vehicleRepository.getVehicleByDriver(driverId);
                 var listStartPoint = await _vehicleRepository.GetListStartPointByVehicleId(vehicleId);
                 if (listStartPoint == null)
                 {
@@ -213,11 +224,22 @@ namespace MyAPI.Controllers
             }
         }
         [Authorize]
-        [HttpGet("getEndPointTripFromVehicle/startPoint/vehicleId")]
-        public async Task<IActionResult> getEndPointTripFromVehicle(int vehicleId, string startPoint)
+        [HttpGet("getEndPointTripFromVehicle/startPoint")]
+        public async Task<IActionResult> getEndPointTripFromVehicle(string startPoint)
         {
             try
             {
+                string token = Request.Headers["Authorization"];
+                if (token.StartsWith("Bearer"))
+                {
+                    token = token.Substring("Bearer ".Length).Trim();
+                }
+                if (string.IsNullOrEmpty(token))
+                {
+                    return BadRequest("Token is required.");
+                }
+                var driverId = _getInforFromToken.GetIdInHeader(token);
+                var vehicleId = await _vehicleRepository.getVehicleByDriver(driverId);
                 var listEndPoint = await _vehicleRepository.GetListEndPointByVehicleId(vehicleId, startPoint);
                 if (listEndPoint == null)
                 {
