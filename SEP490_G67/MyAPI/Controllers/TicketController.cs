@@ -52,7 +52,7 @@ namespace MyAPI.Controllers
             }
         }
         [Authorize(Roles = "Driver, Staff")]
-        [HttpPost("createTicketFromDriver/numberTicket")]
+        [HttpPost("createTicketFromDriver/vehicleId/numberTicket")]
         public async Task<IActionResult> creatTicketFromDriver([FromBody] TicketFromDriverDTOs ticketFromDriver, int numberTicket)
         {
             try
@@ -78,12 +78,12 @@ namespace MyAPI.Controllers
             }
         }
         [Authorize]
-        [HttpGet("getPriceFromPoint/pointStart/pointEnd")]
+        [HttpGet("getPriceFromPoint/pointStart/pointEnd/vehicleId")]
         public async Task<IActionResult> getPriceFromPoint(string pointStart, string pointEnd)
         {
             try
             {
-                string token = Request.Headers["Authorization"];
+                  string token = Request.Headers["Authorization"];
                 if (token.StartsWith("Bearer"))
                 {
                     token = token.Substring("Bearer ".Length).Trim();
@@ -93,7 +93,7 @@ namespace MyAPI.Controllers
                     return BadRequest("Token is required.");
                 }
                 var driverId = _getInforFromToken.GetIdInHeader(token);
-                var vehicleId = await _vehicleRepository.getVehicleByDriver(driverId);
+                var vehicleId = await _vehicleRepository.getVehicleByDriver(driverId); 
                 var ticketFromDriver = new TicketFromDriverDTOs
                 {
                     PointEnd = pointEnd,

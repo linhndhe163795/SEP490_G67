@@ -195,7 +195,7 @@ namespace MyAPI.Controllers
             }
         }
         [Authorize(Roles = "Driver,Staff")]
-        [HttpGet("getStartPointTripFromVehicle")]
+        [HttpGet("getStartPointTripFromVehicle/vehicleId")]
         public async Task<IActionResult> getStartPointTripFromVehicle()
         {
             try
@@ -224,7 +224,7 @@ namespace MyAPI.Controllers
             }
         }
         [Authorize]
-        [HttpGet("getEndPointTripFromVehicle/startPoint")]
+        [HttpGet("getEndPointTripFromVehicle/startPoint/vehicleId")]
         public async Task<IActionResult> getEndPointTripFromVehicle(string startPoint)
         {
             try
