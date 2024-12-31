@@ -458,10 +458,13 @@ namespace MyAPI.Repositories.Impls
         {
             try
             {
-                var getInforUser = _context.Users.Include(x => x.UserRoles).ThenInclude(x => x.Role).Where(x => x.Id == userId).FirstOrDefault();
-                if (getInforUser == null)
+                if(role != "Driver")
                 {
-                    throw new Exception("Invalid user");
+                    var getInforUser = _context.Users.Include(x => x.UserRoles).ThenInclude(x => x.Role).Where(x => x.Id == userId).FirstOrDefault();
+                    if (getInforUser == null)
+                    {
+                        throw new Exception("Invalid user");
+                    }
                 }
 
                 List<Vehicle> listVehicle = new List<Vehicle>();
