@@ -64,7 +64,10 @@ namespace MyAPI.Repositories.Impls
 
         public async Task<List<AccountListDTO>> GetListAccount()
         {
+            var token = _contextAccessor?.HttpContext?.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+            var userId = _inforFromToken.GetIdInHeader(token);
             var listAccount = await _context.Users
+                .Where(x => x.Id != userId)
                 .Select(user => new AccountListDTO
                 {
                     Id = user.Id,
