@@ -63,6 +63,10 @@ namespace MyAPI.Repositories.Impls
             {
                 throw new Exception("Email is invalid.");
             }
+            if (string.IsNullOrWhiteSpace(entity.FullName))
+            {
+                throw new Exception("Full Name is invalid.");
+            }
             if (!IsValidPhone(entity.NumberPhone))
             {
                 throw new Exception("Phone is invalid");
