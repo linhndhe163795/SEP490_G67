@@ -502,7 +502,7 @@ namespace MyAPI.Repositories.Impls
                 }
                 var getInforUser = _context.Users.Include(x => x.UserRoles).ThenInclude(x => x.Role).Where(x => x.Id == userId).FirstOrDefault();
 
-                if (role == "Staff")
+                if (role == "Staff" || role == "VehicleOwner")
                 {
                     return await GetRentDriverTotalForStaffUpdate(startDate, endDate, vehicleId);
                 }
@@ -565,25 +565,21 @@ namespace MyAPI.Repositories.Impls
             {
                 throw new Exception("Start date must be earlier than or equal to end date.");
             }
-
-
-            IQueryable<PaymentRentDriver> query = _context.PaymentRentDrivers.Where(x => x.CreatedAt >= startDate && x.CreatedAt <= endDate);
+            IQueryable<PaymentRentDriver> query = _context.PaymentRentDrivers.Include(x => x.HistoryRentDriver).ThenInclude(hrd => hrd.Vehicle);
+            if(startDate.HasValue && endDate.HasValue && vehicleId.HasValue && vehicleId != 0)
+            {
+                query = query.Where(x => x.CreatedAt >= startDate && x.CreatedAt <= endDate && x.VehicleId == vehicleId);
+            }
             if (vehicleId != 0 && vehicleId.HasValue)
             {
-                query = query.Include(x => x.HistoryRentDriver).ThenInclude(hrd => hrd.Vehicle).Where(x => x.VehicleId == vehicleId);
-            }
-            else
-            {
-                query = query.Include(x => x.HistoryRentDriver).ThenInclude(hrd => hrd.Vehicle);
+                query = query.Where(x => x.VehicleId == vehicleId);
             }
             var result = await GetRentDriverUpdate(query);
             if (result == null)
             {
                 throw new Exception("No rent driver data found for the specified criteria.");
             }
-
             return result;
-
         }
         private Task<TotalPayementRentDriver> GetRentDriverTotalForStaffUpdate(DateTime? startDate, DateTime? endDate, int? vehicleId)
         {
@@ -592,7 +588,11 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception("Start date must be earlier than or equal to end date.");
             }
 
-            IQueryable<PaymentRentDriver> query = _context.PaymentRentDrivers.Where(x => x.CreatedAt >= startDate && x.CreatedAt <= endDate);
+            IQueryable<PaymentRentDriver> query = _context.PaymentRentDrivers;
+            if (startDate.HasValue && endDate.HasValue && vehicleId.HasValue && vehicleId != 0)
+            {
+                query = query.Where(x => x.CreatedAt >= startDate && x.CreatedAt <= endDate && x.VehicleId == vehicleId);
+            }
             if (vehicleId != 0 && vehicleId.HasValue)
             {
                 query = query.Where(x => x.VehicleId == vehicleId);

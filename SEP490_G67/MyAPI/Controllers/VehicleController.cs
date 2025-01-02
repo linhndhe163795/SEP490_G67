@@ -479,7 +479,7 @@ namespace MyAPI.Controllers
             }
         }
 
-        [HttpGet("listVehicleConvenience/starDate/endDate")]
+        [HttpGet("listVehicleConvenience/startDate/endDate")]
         public async Task<IActionResult> listVehicleConvienceFreeTime(DateTime startDate, DateTime endDate)
         {
             try

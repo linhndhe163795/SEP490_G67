@@ -876,12 +876,6 @@ namespace MyAPI.Repositories.Impls
                 {
                     throw new Exception("Start time must be earlier than or equal to end time.");
                 }
-                if (!startDate.HasValue || !endDate.HasValue)
-                {
-                    var now = DateTime.Now;
-                    startDate ??= new DateTime(now.Year, now.Month, 1);
-                    endDate ??= new DateTime(now.Year, now.Month, DateTime.DaysInMonth(now.Year, now.Month));
-                }
                 if (userId <= 0)
                 {
                     throw new Exception("Invalid user ID.");
@@ -891,7 +885,7 @@ namespace MyAPI.Repositories.Impls
                 {
                     throw new Exception("User not found.");
                 }
-                if (IsUserRole(getInforUser, "Staff"))
+                if (IsUserRole(getInforUser, "Staff") || IsUserRole(getInforUser, "VehicleOwner"))
                 {
                     return await GetRevenueForStaffUpdate(startDate, endDate, vehicleId);
                 }
@@ -904,14 +898,14 @@ namespace MyAPI.Repositories.Impls
         }
         private async Task<RevenueTicketDTO> GetRevenueForStaffUpdate(DateTime? startDate, DateTime? endDate, int? vehicleId)
         {
-            var query = _context.Tickets.Include(x => x.Vehicle).Where(x => x.TimeTo >= startDate && x.TimeTo <= endDate);
+            var query = _context.Tickets.Include(x => x.Vehicle).AsQueryable();
+            if (startDate.HasValue && endDate.HasValue && vehicleId.HasValue && vehicleId != 0)
+            {
+                query = query.Where(x => x.VehicleId == vehicleId && x.TimeTo >= startDate && x.TimeTo <= endDate);
+            }
             if (vehicleId.HasValue && vehicleId != 0)
             {
                 query = query.Where(x => x.VehicleId == vehicleId);
-            }
-            if (vehicleId == null)
-            {
-                query = query;
             }
             return await GetRevenueTicketDTOUpdate(query);
         }

@@ -203,7 +203,7 @@ namespace MyAPI.Repositories.Impls
                     throw new Exception("User not found.");
                 }
                 
-                if (IsUserRole(getInforUser, "Staff"))
+                if (IsUserRole(getInforUser, "Staff") || IsUserRole(getInforUser, "VehicleOwner"))
                 {
                     return await GetLossCosstForStaffUpdate(startDate, endDate, vehicleId, userId);
                 }
@@ -226,17 +226,15 @@ namespace MyAPI.Repositories.Impls
             {
                 throw new Exception("Invalid vehicle ID.");
             }
-            if (!startDate.HasValue || !endDate.HasValue)
-            {
-                var now = DateTime.Now;
-                startDate ??= new DateTime(now.Year, now.Month, 1); 
-                endDate ??= new DateTime(now.Year, now.Month, DateTime.DaysInMonth(now.Year, now.Month)); 
-            }
+           
             var query = _context.LossCosts.Include(x => x.Vehicle)
                                           .ThenInclude(x => x.VehicleOwnerNavigation)
                                           .Include(x => x.LossCostType)
-                                          .Where(x => x.DateIncurred >= startDate && x.DateIncurred <= endDate);
-            
+                                          .AsQueryable();
+            if(startDate.HasValue && endDate.HasValue && vehicleId.HasValue)
+            {
+                query =query.Where(x => x.DateIncurred >= startDate && x.DateIncurred <= endDate && x.VehicleId == vehicleId);
+            }
             if (vehicleId.HasValue && vehicleId != 0)
             {
                 query = query.Where(x => x.VehicleId == vehicleId);

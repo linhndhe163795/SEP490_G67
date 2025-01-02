@@ -118,6 +118,10 @@ namespace MyAPI.Repositories.Impls
             }
             var query = _context.PaymentRentVehicles
                              .Where(prv => prv.DriverId == driverId && prv.CreatedAt >= startDate && prv.CreatedAt <= endDate);
+            if (startDate.HasValue && endDate.HasValue && vehicleId.HasValue)
+            {
+                query = query.Where(x => x.CreatedAt >= startDate && x.CreatedAt <= endDate && x.VehicleId == vehicleId);
+            }
             if (vehicleId != null)
             {
                 query = query.Where(x => x.VehicleId == vehicleId);
@@ -148,7 +152,7 @@ namespace MyAPI.Repositories.Impls
                 {
                     throw new Exception("User not found.");
                 }
-                if (role == "Staff")
+                if (role == "Staff" || role == "VehicleOwner")
                 {
                     return await getPaymentRentVehicleByDateForStaffUpdate(startDate, endDate, vehicleId);
                 }
@@ -178,9 +182,13 @@ namespace MyAPI.Repositories.Impls
                 {
                     throw new Exception("Invalid vehicle ID.");
                 }
-                var query = _context.PaymentRentVehicles
-                               .Where(prv => prv.CreatedAt >= startDate && prv.CreatedAt <= endDate);
-                if (vehicleId.HasValue && vehicleId != 0)
+                var query = _context.PaymentRentVehicles.AsQueryable();
+                              
+                if(startDate.HasValue && endDate.HasValue && vehicleId.HasValue)
+                {
+                    query = query.Where(x => x.CreatedAt >= startDate && x.CreatedAt <= endDate && x.VehicleId == vehicleId);
+                }
+                if (vehicleId.HasValue && vehicleId != 0 && !startDate.HasValue && !endDate.HasValue)
                 {
                     query = query.Where(x => x.VehicleId == vehicleId);
                 }
