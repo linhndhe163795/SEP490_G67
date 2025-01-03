@@ -55,6 +55,7 @@ builder.Services.AddScoped<IPaymentRentVehicleRepository, PaymentRentVehicleRepo
 builder.Services.AddScoped<ITripDetailsRepository, TripDetailsRepository>();
 builder.Services.AddScoped<ITicketRepository, TicketRepository>();
 builder.Services.AddScoped<ILossCostVehicleRepository, LossCostVehicleRepository>();
+builder.Services.AddHostedService<SheducleService>();
 
 builder.Services.AddAutoMapper(typeof(AutoMappings));
 

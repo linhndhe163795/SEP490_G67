@@ -109,7 +109,7 @@ namespace MyAPI.Repositories.Impls
                 var userMapper = _mapper.Map<User>(entity);
                 await _context.AddAsync(userMapper);
                 await base.SaveChange();
-                await _pointUserRepository.addNewPointUser(userMapper.Id);
+               
 
                 return userMapper;
             }
