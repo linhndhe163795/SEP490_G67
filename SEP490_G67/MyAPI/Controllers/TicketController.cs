@@ -79,7 +79,7 @@ namespace MyAPI.Controllers
         }
         [Authorize]
         [HttpGet("getPriceFromPoint/pointStart/pointEnd/vehicleId")]
-        public async Task<IActionResult> getPriceFromPoint(string pointStart, string pointEnd)
+        public async Task<IActionResult> getPriceFromPoint(int pointStart, int pointEnd)
         {
             try
             {
@@ -93,11 +93,14 @@ namespace MyAPI.Controllers
                     return BadRequest("Token is required.");
                 }
                 var driverId = _getInforFromToken.GetIdInHeader(token);
-                var vehicleId = await _vehicleRepository.getVehicleByDriver(driverId); 
+                var vehicleId = await _vehicleRepository.getVehicleByDriver(driverId);
+                var pointStartString = await _vehicleRepository.getPointStart(pointStart);
+                var pointEndString = await _vehicleRepository.getPointEnd(pointEnd);
+
                 var ticketFromDriver = new TicketFromDriverDTOs
                 {
-                    PointEnd = pointEnd,
-                    PointStart = pointStart
+                    PointEnd = pointEndString,
+                    PointStart = pointStartString
                 };
                 var priceTrip = await _ticketRepository.GetPriceFromPoint(ticketFromDriver, vehicleId);
                 return Ok(priceTrip);

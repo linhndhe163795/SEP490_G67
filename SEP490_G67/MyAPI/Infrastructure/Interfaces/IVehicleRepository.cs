@@ -14,7 +14,7 @@ namespace MyAPI.Infrastructure.Interfaces
         Task<bool> DeleteVehicleAsync(int id);
         Task<List<VehicleListDTO>> GetVehicleDTOsAsync(int userId, string role);
         Task<bool> AddVehicleByStaffcheckAsync(int requestId, bool isApprove);
-        Task<List<EndPointDTO>> GetListEndPointByVehicleId(int vehicleId, string startPoint);
+        Task<List<EndPointDTO>> GetListEndPointByVehicleId(int vehicleId, int startPoint);
         Task<List<StartPointDTO>> GetListStartPointByVehicleId(int vehicleId);
         Task<bool> AssignDriverToVehicleAsync(int vehicleId, int driverId);
         Task<int> GetNumberSeatAvaiable(int tripId, DateTime dateTime);
@@ -30,5 +30,7 @@ namespace MyAPI.Infrastructure.Interfaces
         Task<List<VehicleBasicDto>> GetVehicleTypeConvinience();
         Task<List<VehicleSeatAvaliableDTOs>> listNumberSeatAvaliableOfVehilce(DateTime? dateTime);
         Task<List<VehicleListDTO>> getVehilceConvenienceFreeTime(DateTime startDate, DateTime endTime);
+        Task<string> getPointStart(int pointStart);
+        Task<string> getPointEnd(int pointEnd);
     }
 }

@@ -225,7 +225,7 @@ namespace MyAPI.Controllers
         }
         [Authorize]
         [HttpGet("getEndPointTripFromVehicle/startPoint/vehicleId")]
-        public async Task<IActionResult> getEndPointTripFromVehicle(string startPoint)
+        public async Task<IActionResult> getEndPointTripFromVehicle(int startPoint)
         {
             try
             {

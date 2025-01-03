@@ -295,7 +295,7 @@ namespace MyAPI.Repositories.Impls
             }
         }
 
-        public async Task<List<EndPointDTO>> GetListEndPointByVehicleId(int vehicleId, string startPoint)
+        public async Task<List<EndPointDTO>> GetListEndPointByVehicleId(int vehicleId, int startPointId)
         {
             try
             {
@@ -310,24 +310,29 @@ namespace MyAPI.Repositories.Impls
                 }
 
                 var i = 1;
-                var listStartPoint = await (from v in _context.Vehicles
+                var pointStart = await _context.Trips.Where(x => x.Id == startPointId).Select(x => x.PointStart).FirstOrDefaultAsync();
+                var listEndPoint = await (from v in _context.Vehicles
                                             join vt in _context.VehicleTrips
                                             on v.Id equals vt.VehicleId
                                             join t in _context.Trips
                                             on vt.TripId equals t.Id
-                                            where v.Id == vehicleId && t.PointStart == startPoint
+                                            where t.PointStart.Equals(pointStart)
                                             select t.PointEnd).Distinct()
                                          .ToListAsync();
 
-                if (listStartPoint == null || !listStartPoint.Any())
+                if (listEndPoint == null || !listEndPoint.Any())
                 {
                     throw new Exception("No endpoints found for the given Vehicle ID.");
                 }
 
                 List<EndPointDTO> listEndPointDTOs = new List<EndPointDTO>();
-                foreach (var v in listStartPoint)
+                foreach (var v in listEndPoint)
                 {
-                    listEndPointDTOs.Add(new EndPointDTO { id = i++, name = v });
+                    var trip = await _context.Trips.FirstOrDefaultAsync(x => x.PointEnd.Equals(v));
+                    if (trip != null)
+                    {
+                        listEndPointDTOs.Add(new EndPointDTO { id = trip.Id, name = v });
+                    } 
                 }
 
                 return listEndPointDTOs;
@@ -436,11 +441,19 @@ namespace MyAPI.Repositories.Impls
                     throw new Exception("No start points found for the given Vehicle ID.");
                 }
 
-                var listStartPointDTOs = listStartPoint.Select((v, i) => new StartPointDTO
+                var listStartPointDTOs = new List<StartPointDTO>();
+                foreach (var pointStart in listStartPoint)
                 {
-                    id = i + 1,
-                    PointStart = v
-                }).ToList();
+                    var trip = await _context.Trips.FirstOrDefaultAsync(x => x.PointStart == pointStart);
+                    if (trip != null)
+                    {
+                        listStartPointDTOs.Add(new StartPointDTO
+                        {
+                            id = trip.Id,
+                            PointStart = pointStart
+                        });
+                    }
+                }
 
                 return listStartPointDTOs;
             }
@@ -498,62 +511,6 @@ namespace MyAPI.Repositories.Impls
                 throw new Exception("GetVehicleDTOsAsync: " + ex.Message);
             }
         }
-
-        //public async Task<bool> UpdateVehicleAsync(int id, string driverName, int userIdUpdate)
-        //{
-        //    try
-        //    {
-        //        if (id == null)
-        //        {
-        //            throw new ArgumentNullException(nameof(id), "Vehicle ID cannot be null.");
-        //        }
-
-        //        if (id <= 0)
-        //        {
-        //            throw new Exception("Vehicle ID must be greater than 0.");
-        //        }
-
-        //        if (string.IsNullOrWhiteSpace(driverName))
-        //        {
-        //            throw new Exception("Driver name cannot be null or whitespace.");
-        //        }
-
-        //        if (userIdUpdate == null)
-        //        {
-        //            throw new ArgumentNullException(nameof(userIdUpdate), "User ID for update cannot be null.");
-        //        }
-
-        //        if (userIdUpdate <= 0)
-        //        {
-        //            throw new Exception("User ID for update must be greater than 0.");
-        //        }
-
-        //        var vehicleUpdate = await _context.Vehicles.SingleOrDefaultAsync(vehicle => vehicle.Id == id);
-        //        if (vehicleUpdate == null)
-        //        {
-        //            throw new Exception("Vehicle not found.");
-        //        }
-
-        //        var checkUserNameDrive = await _context.Drivers.SingleOrDefaultAsync(s => s.Name.Equals(driverName));
-        //        if (checkUserNameDrive == null)
-        //        {
-        //            throw new Exception("Driver name not found in the system.");
-        //        }
-
-        //        vehicleUpdate.DriverId = userIdUpdate;
-        //        vehicleUpdate.UpdateBy = checkUserNameDrive.Id;
-        //        vehicleUpdate.UpdateAt = DateTime.Now;
-
-        //        await _context.SaveChangesAsync();
-
-        //        return true;
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        throw new Exception("UpdateVehicleAsync: " + ex.Message);
-        //    }
-        //}
-
         private async Task UpdateVehicleByStaff(int? id, int? userIdUpdate, bool updateStatus)
         {
             try
@@ -1054,7 +1011,6 @@ namespace MyAPI.Repositories.Impls
                                 ErrorMessage = "Invalid license plate format. Expected format: 99A-99999."
                             });
                         }
-                        // Kiểm tra trùng lặp với cơ sở dữ liệu
                         if (licensePlateSet.Contains(entry.LicensePlate))
                         {
                             errors.Add(new ValidationErrorDTO
@@ -1227,6 +1183,32 @@ namespace MyAPI.Repositories.Impls
                         Description = x.Description
                     }).ToListAsync();
                 return vehicleConvienceFreeiTime;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<string> getPointStart(int pointStart)
+        {
+            try
+            {
+                var startPoint = await _context.Trips.FirstOrDefaultAsync(x => x.Id == pointStart);
+                return startPoint.PointStart;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<string> getPointEnd(int pointEnd)
+        {
+            try
+            {
+                var endPoint = await _context.Trips.FirstOrDefaultAsync(x => x.Id == pointEnd);
+                return endPoint.PointEnd;
             }
             catch (Exception ex)
             {
