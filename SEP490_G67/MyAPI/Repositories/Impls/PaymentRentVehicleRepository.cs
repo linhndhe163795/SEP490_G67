@@ -118,6 +118,18 @@ namespace MyAPI.Repositories.Impls
             }
             var query = _context.PaymentRentVehicles
                              .Where(prv => prv.DriverId == driverId && prv.CreatedAt >= startDate && prv.CreatedAt <= endDate);
+            if (startDate.HasValue && endDate.HasValue && !vehicleId.HasValue)
+            {
+                query = query.Where(x => x.CreatedAt >= startDate && x.CreatedAt <= endDate);
+            }
+            if (!startDate.HasValue && endDate.HasValue && !vehicleId.HasValue)
+            {
+                query = query.Where(x => x.CreatedAt <= endDate);
+            }
+            if (startDate.HasValue && !endDate.HasValue && !vehicleId.HasValue)
+            {
+                query = query.Where(x => x.CreatedAt >= startDate);
+            }
             if (startDate.HasValue && endDate.HasValue && vehicleId.HasValue)
             {
                 query = query.Where(x => x.CreatedAt >= startDate && x.CreatedAt <= endDate && x.VehicleId == vehicleId);

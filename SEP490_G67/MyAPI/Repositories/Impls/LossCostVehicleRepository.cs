@@ -231,7 +231,19 @@ namespace MyAPI.Repositories.Impls
                                           .ThenInclude(x => x.VehicleOwnerNavigation)
                                           .Include(x => x.LossCostType)
                                           .AsQueryable();
-            if(startDate.HasValue && endDate.HasValue && vehicleId.HasValue)
+            if (startDate.HasValue && endDate.HasValue && !vehicleId.HasValue)
+            {
+                query = query.Where(x => x.DateIncurred >= startDate && x.DateIncurred <= endDate);
+            }
+            if (!startDate.HasValue && endDate.HasValue && !vehicleId.HasValue)
+            {
+                query = query.Where(x => x.DateIncurred <= endDate);
+            }
+            if (startDate.HasValue && !endDate.HasValue && !vehicleId.HasValue)
+            {
+                query = query.Where(x => x.DateIncurred >= startDate);
+            }
+            if (startDate.HasValue && endDate.HasValue && vehicleId.HasValue)
             {
                 query =query.Where(x => x.DateIncurred >= startDate && x.DateIncurred <= endDate && x.VehicleId == vehicleId);
             }
@@ -264,7 +276,7 @@ namespace MyAPI.Repositories.Impls
         }
 
 
-
+        // end update
 
 
         public async Task UpdateLossCostById(int id, LossCostUpdateDTO lossCostupdateDTOs, int userId)

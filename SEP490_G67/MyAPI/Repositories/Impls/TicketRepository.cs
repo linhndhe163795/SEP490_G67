@@ -845,14 +845,15 @@ namespace MyAPI.Repositories.Impls
                     LiscenseVehicle = tv.vehicle.LicensePlate,
                     VehicleOwner = user.FullName, // Lấy tên chủ xe
                     TypeOfTicket = tv.ticket.TypeOfTicketNavigation.Description,
-                    TypeOfPayment = tv.ticket.TypeOfPaymentNavigation.TypeOfPayment1
+                    TypeOfPayment = tv.ticket.TypeOfPaymentNavigation.TypeOfPayment1,
+                    TimeTo = tv.ticket.TimeTo
                 })
                 .Select(x => new TicketRevenue
                 {
                     Id = x.Id,
                     PricePromotion = x.PricePromotion,
                     VehicleId = x.VehicleId,
-                    CreatedAt = x.CreatedAt,
+                    CreatedAt = x.TimeTo,
                     LiscenseVehicle = x.LiscenseVehicle,
                     VehicleOwner = x.VehicleOwner,
                     TypeOfTicket = x.TypeOfTicket,
@@ -903,6 +904,18 @@ namespace MyAPI.Repositories.Impls
         private async Task<RevenueTicketDTO> GetRevenueForStaffUpdate(DateTime? startDate, DateTime? endDate, int? vehicleId)
         {
             var query = _context.Tickets.Include(x => x.Vehicle).AsQueryable();
+            if(startDate.HasValue && !endDate.HasValue && !vehicleId.HasValue)
+            {
+                query = query.Where(x => x.TimeTo >= startDate);
+            }
+            if (!startDate.HasValue && endDate.HasValue && !vehicleId.HasValue)
+            {
+                query = query.Where(x => x.TimeTo <= endDate);
+            }
+            if (startDate.HasValue && endDate.HasValue && !vehicleId.HasValue)
+            {
+                query = query.Where(x => x.TimeTo >= startDate && x.TimeTo <= endDate);
+            }
             if (startDate.HasValue && endDate.HasValue && vehicleId.HasValue && vehicleId != 0)
             {
                 query = query.Where(x => x.VehicleId == vehicleId && x.TimeTo >= startDate && x.TimeTo <= endDate);
