@@ -193,6 +193,7 @@ namespace MyAPI.Repositories.Impls
                         TimeTo = dateTimeTo,
                         TypeOfTicket = Constant.VE_XE_LIEN_TINH,
                         NumberTicket = numberTicket,
+                        TripId = trip.Id,
                         Description = "Khách bắt dọc đường di chuyển từ " + pointStartString + " đến " + pointEndString,
                         VehicleId = vehicleId,
                         TypeOfPayment = ticket.TypeOfPayment,

@@ -70,7 +70,7 @@ namespace MyAPI.Controllers
                 var driverId = _getInforFromToken.GetIdInHeader(token);
                 var vehicleId = await _vehicleRepository.getVehicleByDriver(driverId);
                 int pointStartId = Int32.Parse(ticketFromDriver.PointStart);
-                int pointEndId = Int32.Parse(ticketFromDriver.PointStart);
+                int pointEndId = Int32.Parse(ticketFromDriver.PointEnd);
                 var pointStartString = await _vehicleRepository.getPointStart(pointStartId);
                 var pointEndString = await _vehicleRepository.getPointEnd(pointEndId);
                 var ticketFromDrivers = new TicketFromDriverDTOs
