@@ -18,11 +18,11 @@ namespace MyAPI.Helper
             {
                 try
                 {
-                    //var now = DateTime.Now;
-                    //var nextRun = now.Date.AddDays(1); // 00:00:00 ngày kế tiếp
-                    //var delay = nextRun - now;
-                  
-                    await Task.Delay(TimeSpan.FromSeconds(20), stoppingToken);
+                    var now = DateTime.Now;
+                    var nextRun = now.Date.AddDays(1); // 00:00:00 ngày kế tiếp
+                    var delay = nextRun - now;
+
+                    await Task.Delay(delay, stoppingToken);
 
                     using (var scope = _serviceProvider.CreateScope())
                     {

@@ -51,7 +51,7 @@ namespace MyAPI.Controllers
                         UserId = lastIdUser.Result
                     };
                     await _userRoleRepository.Add(ur);
-                    await _pointUserRepository.addNewPointUser(lastIdUser.Result);
+                    
                     return Ok(user);
                 }
                 return BadRequest("ton tai account");
@@ -68,6 +68,8 @@ namespace MyAPI.Controllers
             try
             {
                 var user = await _userRepository.confirmCode(code);
+                var lastIdUser = _userRepository.lastIdUser();
+                await _pointUserRepository.addNewPointUser(lastIdUser.Result);
                 if (user)
                 {
                     return Ok();
