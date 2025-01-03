@@ -172,8 +172,11 @@ namespace MyAPI.Repositories.Impls
                     throw new Exception("Invalid type of payment.");
                 }
                 var currentTime = DateTime.Now.TimeOfDay;
-            
-                var trip = await _context.Trips.Include(x => x.TripDetails).Where(x => x.PointStart.Equals(ticket.PointStart) && x.PointEnd.Equals(ticket.PointEnd) && x.StartTime >= currentTime).FirstOrDefaultAsync();
+                var pointStartString = await _context.Trips.Where(x => x.Id == Int32.Parse(ticket.PointStart)).Select(x => x.PointStart).FirstOrDefaultAsync();
+                var pointEndString = await _context.Trips.Where(x => x.Id == Int32.Parse(ticket.PointEnd)).Select(x => x.PointEnd).FirstOrDefaultAsync();
+
+                var trip = await _context.Trips.Include(x => x.TripDetails).Where(x => x.PointStart.Equals(pointStartString) && x.PointEnd.Equals(pointEndString) && x.StartTime >= currentTime).FirstOrDefaultAsync();
+
                 var timeTo = trip.TripDetails.Select(x => x.TimeEndDetails).FirstOrDefault() ?? TimeSpan.MaxValue;
                 var currentDate = DateTime.Today;
                 var dateTimeTo = currentDate.Add(timeTo);
@@ -184,13 +187,13 @@ namespace MyAPI.Repositories.Impls
                     {
                         Price = priceTrip * numberTicket,
                         PricePromotion = priceTrip * numberTicket,
-                        PointStart = ticket.PointStart,
-                        PointEnd = ticket.PointEnd,
+                        PointStart = pointStartString,
+                        PointEnd = pointEndString,
                         TimeFrom = DateTime.Now,
                         TimeTo = dateTimeTo,
                         TypeOfTicket = Constant.VE_XE_LIEN_TINH,
                         NumberTicket = numberTicket,
-                        Description = "Khách bắt dọc đường di chuyển từ " + ticket.PointStart + " đến " + ticket.PointEnd,
+                        Description = "Khách bắt dọc đường di chuyển từ " + pointStartString + " đến " + pointEndString,
                         VehicleId = vehicleId,
                         TypeOfPayment = ticket.TypeOfPayment,
                         Status = "Đã thanh toán",

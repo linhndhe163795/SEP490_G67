@@ -6,6 +6,7 @@ using MyAPI.DTOs.TicketDTOs;
 using MyAPI.Helper;
 using MyAPI.Infrastructure.Interfaces;
 using MyAPI.Models;
+using System.Reflection;
 
 
 namespace MyAPI.Controllers
@@ -67,8 +68,17 @@ namespace MyAPI.Controllers
                     return BadRequest("Token is required.");
                 }
                 var driverId = _getInforFromToken.GetIdInHeader(token);
-                var vehicleId = await _vehicleRepository.getVehicleByDriver(driverId); 
-                var priceTrip = await _ticketRepository.GetPriceFromPoint(ticketFromDriver, vehicleId);
+                var vehicleId = await _vehicleRepository.getVehicleByDriver(driverId);
+                int pointStartId = Int32.Parse(ticketFromDriver.PointStart);
+                int pointEndId = Int32.Parse(ticketFromDriver.PointStart);
+                var pointStartString = await _vehicleRepository.getPointStart(pointStartId);
+                var pointEndString = await _vehicleRepository.getPointEnd(pointEndId);
+                var ticketFromDrivers = new TicketFromDriverDTOs
+                {
+                    PointEnd = pointEndString,
+                    PointStart = pointStartString
+                };
+                var priceTrip = await _ticketRepository.GetPriceFromPoint(ticketFromDrivers, vehicleId);
                 await _ticketRepository.CreatTicketFromDriver(priceTrip, vehicleId, ticketFromDriver, driverId, numberTicket);
                 return Ok();
             }
