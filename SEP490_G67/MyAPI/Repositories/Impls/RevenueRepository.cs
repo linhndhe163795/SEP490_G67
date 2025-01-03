@@ -94,12 +94,6 @@ namespace MyAPI.Repositories.Impls
         public async Task<RevenueDTO> RevenueStatisticUpdate(DateTime? startDate, DateTime? endDate, int? vehicleId)
         {
 
-            //if (!startDate.HasValue || !endDate.HasValue)
-            //{
-            //    var now = DateTime.Now;
-            //    startDate ??= new DateTime(now.Year, now.Month, 1);
-            //    endDate ??= new DateTime(now.Year, now.Month, DateTime.DaysInMonth(now.Year, now.Month));
-            //}
             var token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
             int userId = _tokenHelper.GetIdInHeader(token);
 

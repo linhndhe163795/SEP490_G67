@@ -903,7 +903,7 @@ namespace MyAPI.Repositories.Impls
         }
         private async Task<RevenueTicketDTO> GetRevenueForStaffUpdate(DateTime? startDate, DateTime? endDate, int? vehicleId)
         {
-            var query = _context.Tickets.Include(x => x.Vehicle).AsQueryable();
+            var query = _context.Tickets.Include(x => x.Vehicle).Where(x => x.Price != 0 && x.PricePromotion != 0 && x.NumberTicket !=0).AsQueryable();
             if(startDate.HasValue && !endDate.HasValue && !vehicleId.HasValue)
             {
                 query = query.Where(x => x.TimeTo >= startDate);
